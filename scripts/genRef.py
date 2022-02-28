@@ -978,9 +978,8 @@ if __name__ == '__main__':
         if conventions.write_refpage_include:
             # Only extensions with a supported="..." attribute in this set
             # will be considered for extraction/generation.
-            supported_strings = set((conventions.xml_api_name,))
             ext_names = set(k for k, v in registry.extdict.items()
-                            if v.supported in supported_strings)
+                            if conventions.xml_api_name in v.supported.split(','))
 
             desired_extensions = ext_names.intersection(set(results.extension))
             for prefix in conventions.extension_index_prefixes:

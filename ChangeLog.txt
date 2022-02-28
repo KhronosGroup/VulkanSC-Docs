@@ -3945,14 +3945,6 @@ Internal Issues:
 
 -----------------------------------------------------
 
-ifdef::VKSC_VERSION_1_0[]
-
-TBD - Vulkan SC 1.0 initial public release
-
-endif::VKSC_VERSION_1_0[]
-
-ifndef::VKSC_VERSION_1_0[]
-
 Change log for October 13, 2019 Vulkan 1.1.125 spec update:
 
   * Update release number to 125.
@@ -9894,4 +9886,3 @@ Change log for February 25, 2015 Vulkan 1.0.4 spec update:
 
 February 16, 2016 - Vulkan 1.0 initial public release
 
-endif::VKSC_VERSION_1_0[]
