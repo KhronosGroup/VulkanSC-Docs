@@ -44,11 +44,15 @@ jobs:
           make allchecks
 
       # Build spec targets
+      # Remove 'chunked' target for Vulkan SC, for now - not published
+      # Remove 'manhtmlpages' target from first makeSpec for Vulkan SC, for
+      # now - speed up testing only
       - name: spec-generate
         run: |
-          ./makeSpec -clean -spec all QUIET= -j${nproc} -Otarget manhtmlpages validusage styleguide registry chunked html
-          ./makeSpec -clean -spec core -genpath gencore QUIET= -j${nproc} -Otarget chunked html
+          ./makeSpec -clean -spec all QUIET= -j${nproc} -Otarget validusage styleguide registry html
+          ./makeSpec -clean -spec core -genpath gencore QUIET= -j${nproc} -Otarget html
           ( cd xml && make validate test install )
+          find gen -name '*.h'
 
 # Commented out for Vulkan SC, for now
 #      # Generate the vulkan C++ header (vulkan.hpp)
@@ -82,9 +86,9 @@ jobs:
       # Depends on spec-generate
       - name: h-compile
         run: |
+          find gen -name '*.h'
           gcc -c -std=c11 -Igen/include -Itests -Wall -Wextra -Werror tests/htest.c || true
           clang -c -std=c11 -Igen/include -Itests -Wall -Wextra -Werror tests/htest.c || true
-          ls -R gen
 
 # Commented out for Vulkan SC, for now
 #      # Compile a simple test program that uses vulkan.hpp
