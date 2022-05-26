@@ -4484,7 +4484,7 @@ ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
     attachment in pname:renderPass must: be greater than or equal to
     pname:layers
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
-ifndef::VK_VERSION_1_1+VK_KHR_multiview[]
+ifndef::VK_VERSION_1_1,VK_KHR_multiview[]
   * [[VUID-VkFramebufferCreateInfo-flags-04547]]
     If pname:renderpass is not dlink:VK_NULL_HANDLE and pname:flags includes
     ename:VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT, the pname:layerCount member
@@ -4493,7 +4493,7 @@ ifndef::VK_VERSION_1_1+VK_KHR_multiview[]
     pname:pNext chain used as an input, color, resolve, or depth/stencil
     attachment in pname:pRenderPass must: be greater than or equal to
     pname:layers
-endif::VK_VERSION_1_1+VK_KHR_multiview[]
+endif::VK_VERSION_1_1,VK_KHR_multiview[]
   * [[VUID-VkFramebufferCreateInfo-flags-03201]]
     If pname:renderpass is not dlink:VK_NULL_HANDLE and pname:flags includes
     ename:VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT, the pname:usage member of any

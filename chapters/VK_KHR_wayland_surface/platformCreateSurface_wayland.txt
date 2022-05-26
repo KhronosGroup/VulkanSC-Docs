@@ -8,9 +8,6 @@
 [open,refpage='vkCreateWaylandSurfaceKHR',desc='Create a slink:VkSurfaceKHR object for a Wayland window',type='protos']
 --
 :refpage: vkCreateWaylandSurfaceKHR
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for a Wayland surface, call:
 
@@ -25,11 +22,6 @@ include::{generated}/api/protos/vkCreateWaylandSurfaceKHR.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a slink:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateWaylandSurfaceKHR.txt[]
 --

@@ -3019,6 +3019,125 @@ include::{generated}/validity/structs/VkPhysicalDeviceTimelineSemaphoreFeatures.
 --
 endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
 
+ifdef::VK_NV_external_sci_sync[]
+[open,refpage='VkPhysicalDeviceExternalSciSyncFeaturesNV',desc='Structure describing SciSync features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceExternalSciSyncFeaturesNV structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceExternalSciSyncFeaturesNV.txt[]
+
+The members of the sname:VkPhysicalDeviceExternalSciSyncFeaturesNV structure
+describe the following features:
+
+  * [[features-sciSyncFence]] pname:sciSyncFence indicates whether external
+    fences created with a handle type of
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV and
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV are supported
+    for import and/or export.
+  * [[features-sciSyncSemaphore]] pname:sciSyncSemaphore indicates whether
+    external semaphores created with a handle type of
+    ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV are
+    supported for import and/or export.
+  * [[features-sciSyncImport]] pname:sciSyncImport indicates whether
+    stext:NvSciSyncObj import functionality is supported.
+    If pname:sciSyncImport is set to ename:VK_TRUE, slink:VkFence and/or
+    slink:VkSemaphore support importing stext:NvSciSyncObj from
+    applications.
+    In this case, the application is responsible for the resource management
+    of the stext:NvSciSyncObj.
+  * [[features-sciSyncExport]] pname:sciSyncExport indicates whether
+    stext:NvSciSyncObj export functionality is supported.
+    If pname:sciSyncExport is set to ename:VK_TRUE, slink:VkFence and/or
+    slink:VkSemaphore support exporting stext:NvSciSyncObj created by the
+    driver to applications.
+    In this case, the driver is responsible for the resource management of
+    the stext:NvSciSyncObj.
+
+[[features-externalscisync-table]]
+.Functionality supported for NvSciSync features
+|=====
+| Features           | pname:sciSyncImport | pname:sciSyncExport | Always supported^1^
+| pname:sciSyncFence
+  | flink:vkImportFenceSciSyncFenceNV, flink:vkImportFenceSciSyncObjNV
+  | slink:VkExportFenceSciSyncInfoNV
+  | flink:vkGetFenceSciSyncFenceNV, flink:vkGetFenceSciSyncObjNV, flink:vkGetPhysicalDeviceSciSyncAttributesNV (with ename:VK_SCI_SYNC_PRIMITIVE_TYPE_FENCE_NV)
+| pname:sciSyncSemaphore
+  | flink:vkImportSemaphoreSciSyncObjNV
+  | slink:VkExportSemaphoreSciSyncInfoNV
+  | flink:vkGetSemaphoreSciSyncObjNV, flink:vkGetPhysicalDeviceSciSyncAttributesNV (with ename:VK_SCI_SYNC_PRIMITIVE_TYPE_SEMAPHORE_NV)
+|=====
+
+1::
+    Functionality in this column is always available.
+
+The <<features-externalscisync-table, Functionality supported for NvSciSync
+features>> table summarizes the functionality enabled by the
+sname:VkPhysicalDeviceExternalSciSyncFeaturesNV structure.
+There are two orthogonal pieces of functionality: fence and semaphore
+support; import and export support.
+Each entry in the body of the table summarizes the functionality that can:
+be used when the given features are supported and enabled.
+This summarizes Valid Usage statements that are added elsewhere in this
+specification.
+
+:refpage: VkPhysicalDeviceExternalSciSyncFeaturesNV
+include::{chapters}/features.txt[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceExternalSciSyncFeaturesNV.txt[]
+--
+endif::VK_NV_external_sci_sync[]
+
+ifdef::VK_NV_external_memory_sci_buf[]
+[open,refpage='VkPhysicalDeviceExternalSciBufFeaturesNV',desc='Structure describing NvSciBuf features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceExternalSciBufFeaturesNV.txt[]
+
+The members of the sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure
+describe the following features:
+
+  * [[features-sciBufImport]] pname:sciBufImport indicates whether
+    stext:NvSciBufObj import functionality is supported.
+    If pname:sciBufImport is set to ename:VK_TRUE, slink:VkDeviceMemory
+    supports importing stext:NvSciBufObj from applications.
+    In this case, the application is responsible for the resource management
+    of the stext:NvSciBufObj.
+  * [[features-sciBufExport]] pname:sciBufExport indicates whether
+    stext:NvSciBufObj export functionality is supported.
+    If pname:sciBufExport is set to ename:VK_TRUE, slink:VkDeviceMemory
+    supports exporting stext:NvSciBufObj created by the driver to
+    applications.
+    In this case, the driver is responsible for the resource management of
+    the stext:NvSciBufObj.
+
+[[features-externalscibuf-table]]
+.Functionality supported for NvSciBuf features
+|=====
+| Features            | Functionality
+| pname:sciBufImport  | slink:VkImportMemorySciBufInfoNV, flink:vkGetPhysicalDeviceExternalMemorySciBufPropertiesNV
+| pname:sciBufExport  | slink:VkExportMemorySciBufInfoNV
+| Always supported^1^ | flink:vkGetPhysicalDeviceSciBufAttributesNV, flink:vkGetMemorySciBufNV,
+|=====
+
+1::
+    Functionality in this row is always available.
+
+The <<features-externalscibuf-table, Functionality supported for NvSciBuf
+features>> table summarizes the functionality enabled by the
+sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure.
+Each entry in the body of the table summarizes the functionality that can:
+be used when the given features are supported and enabled.
+This summarizes Valid Usage statements that are added elsewhere in this
+specification.
+
+:refpage: VkPhysicalDeviceExternalSciBufFeaturesNV
+include::{chapters}/features.txt[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceExternalSciBufFeaturesNV.txt[]
+--
+endif::VK_NV_external_memory_sci_buf[]
+
 ifdef::VK_EXT_index_type_uint8[]
 [open,refpage='VkPhysicalDeviceIndexTypeUint8FeaturesEXT',desc='Structure describing whether uint8 index type can be used',type='structs']
 --
@@ -5258,5 +5377,17 @@ ifdef::VK_EXT_image_view_min_lod[]
   * <<features-minLod, pname:minLod>>, if the
     `apiext:VK_EXT_image_view_min_lod` extension is supported.
 endif::VK_EXT_image_view_min_lod[]
+ifdef::VK_NV_external_sci_sync[]
+  * At least one of <<features-sciSyncFence, pname:sciSyncFence>> and
+    <<features-sciSyncSemaphore, pname:sciSyncSemaphore>>, and at least one
+    of <<features-sciSyncImport, pname:sciSyncImport>> and
+    <<features-sciSyncExport, pname:sciSyncExport>>, if the
+    `apiext:VK_NV_external_sci_sync` extension is supported.
+endif::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_memory_sci_buf[]
+  * At least one of <<features-sciBufImport, pname:sciBufImport>> and
+    <<features-sciBufExport, pname:sciBufExport>>, if the
+    `apiext:VK_NV_external_memory_sci_buf` extension is supported.
+endif::VK_NV_external_memory_sci_buf[]
 
 All other features defined in the Specification are optional:.

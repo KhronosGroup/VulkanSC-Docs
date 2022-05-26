@@ -2040,6 +2040,13 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-vkCreateFence-pNext-05106]]
+    If the pname:pNext chain of slink:VkFenceCreateInfo includes
+    slink:VkExportFenceSciSyncInfoNV, then
+    slink:VkFenceCreateInfo::pname:flags must: not include
+    ename:VK_FENCE_CREATE_SIGNALED_BIT
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/protos/vkCreateFence.txt[]
@@ -2106,6 +2113,14 @@ endif::VK_KHR_external_fence[]
   * [[VUID-VkExportFenceCreateInfo-handleTypes-01446]]
     The bits in pname:handleTypes must: be supported and compatible, as
     reported by slink:VkExternalFenceProperties
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkExportFenceCreateInfo-pNext-05107]]
+    If the pname:pNext chain includes a slink:VkExportFenceSciSyncInfoNV
+    structure,
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence and
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncExport
+    must: be enabled
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/structs/VkExportFenceCreateInfo.txt[]
@@ -2331,6 +2346,244 @@ properties of the defined external fence handle types.
 include::{generated}/validity/structs/VkFenceGetFdInfoKHR.txt[]
 --
 endif::VK_KHR_external_fence_fd[]
+
+ifdef::VK_NV_external_sci_sync[]
+[open,refpage='VkExportFenceSciSyncInfoNV',desc='Structure specifying additional attributes SciSync handles exported from a fence',type='structs']
+--
+To specify additional attributes of NvSciSync handles exported from a fence,
+add a slink:VkExportFenceSciSyncInfoNV structure to the pname:pNext chain of
+the slink:VkFenceCreateInfo structure.
+The sname:VkExportFenceSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkExportFenceSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pAttributes is an opaque sname:NvSciSyncAttrList describing the
+    attributes of the NvSciSync object that will be exported.
+
+If slink:VkExportFenceCreateInfo is not present in the same pname:pNext
+chain, this structure is ignored.
+If slink:VkExportFenceCreateInfo is present in the pname:pNext chain of
+slink:VkFenceCreateInfo with a NvSciSync pname:handleType, but either
+slink:VkExportFenceSciSyncInfoNV is not present in the pname:pNext chain, or
+if it is present but pname:pAttributes is set to `NULL`, flink:vkCreateFence
+will return ename:VK_ERROR_INITIALIZATION_FAILED.
+
+The pname:pAttributes must: be a reconciled sname:NvSciSyncAttrList.
+Before exporting the NvSciSync handles, applications must: use the
+flink:vkGetPhysicalDeviceSciSyncAttributesNV command to get the unreconciled
+sname:NvSciSyncAttrList and then use the NvSciSync API to reconcile it.
+
+.Valid Usage
+****
+  * [[VUID-VkExportFenceSciSyncInfoNV-pAttributes-05108]]
+    pname:pAttributes must: be a reconciled stext:NvSciSyncAttrList
+****
+
+include::{generated}/validity/structs/VkExportFenceSciSyncInfoNV.txt[]
+--
+
+[open,refpage='vkGetPhysicalDeviceSciSyncAttributesNV',desc='Get the implementation-specific NvSciSync attributes',type='protos']
+--
+
+To obtain the implementation-specific NvSciSync attributes in an
+unreconciled sname:NvSciSyncAttrList, call:
+
+include::{generated}/api/protos/vkGetPhysicalDeviceSciSyncAttributesNV.txt[]
+
+  * pname:physicalDevice is the handle to the physical device that will be
+    used to determine the attributes.
+  * pname:pSciSyncAttributesInfo is a pointer to a
+    slink:VkSciSyncAttributesInfoNV structure containing information about
+    how the attributes are to be filled.
+  * pname:pAttributes is an opaque stext:NvSciSyncAttrList in which the
+    implementation will set the requested attributes.
+
+On success, pname:pAttributes will contain an unreconciled
+stext:NvSciSyncAttrList whose private attributes and some public attributes
+are filled in by the implementation.
+If the attributes of pname:physicalDevice could not be obtained,
+ename:VK_ERROR_INITIALIZATION_FAILED is returned.
+
+.Valid Usage
+****
+  * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pSciSyncAttributesInfo-05109]]
+    If pname:pSciSyncAttributesInfo->primitiveType is
+    ename:VK_SCI_SYNC_PRIMITIVE_TYPE_FENCE_NV then
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    must: be enabled
+  * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pSciSyncAttributesInfo-05110]]
+    If pname:pSciSyncAttributesInfo->primitiveType is
+    ename:VK_SCI_SYNC_PRIMITIVE_TYPE_SEMAPHORE_NV then
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+    must: be enabled
+  * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pAttributes-05111]]
+    pname:pAttributes must: be a valid stext:NvSciSyncAttrList and must: not
+    be `NULL`
+****
+
+include::{generated}/validity/protos/vkGetPhysicalDeviceSciSyncAttributesNV.txt[]
+--
+
+[open,refpage='VkSciSyncAttributesInfoNV',desc='Structure describing SciSync attribute information',type='structs']
+--
+The sname:VkSciSyncAttributesInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkSciSyncAttributesInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:clientType is the permission type of client.
+  * pname:primitiveType is the synchronization primitive type.
+
+NvSciSync disallows multi-signalers, therefore clients must: specify their
+permission types as one of signaler, waiter or signaler_waiter.
+In addition, NvSciSync requires clients to specify which primitive type is
+to be used in synchronization, hence clients also need to provide the
+primitive type (slink:VkFence or slink:VkSemaphore) that will be used.
+
+include::{generated}/validity/structs/VkSciSyncAttributesInfoNV.txt[]
+--
+
+[open,refpage='VkSciSyncClientTypeNV',desc='Enums specifying client permission types',type='enums']
+--
+The ename:VkSciSyncClientTypeNV enum is defined as:
+
+include::{generated}/api/enums/VkSciSyncClientTypeNV.txt[]
+
+  * ename:VK_SCI_SYNC_CLIENT_TYPE_SIGNALER_NV specifies the permission of
+    the client as signaler.
+    It indicates that the client can only signal the created fence or
+    semaphore and disallows waiting on it.
+  * ename:VK_SCI_SYNC_CLIENT_TYPE_WAITER_NV specifies the permission of the
+    client as waiter.
+    It indicates that the client can only wait on the imported fence or
+    semaphore and disallows signalling it.
+    This type of permission is only used when the client imports NvSciSync
+    handles, and export is not allowed.
+  * ename:VK_SCI_SYNC_CLIENT_TYPE_SIGNALER_WAITER_NV specifies the
+    permission of client as both signaler and waiter.
+    It indicates that the client can: signal and wait on the created fence
+    or semaphore.
+--
+
+[open,refpage='VkSciSyncPrimitiveTypeNV',desc='Enums specifying the primitive types',type='enums']
+--
+The ename:VkSciSyncPrimitiveTypeNV enum is defined as:
+
+include::{generated}/api/enums/VkSciSyncPrimitiveTypeNV.txt[]
+
+  * ename:VK_SCI_SYNC_PRIMITIVE_TYPE_FENCE_NV specifies that the
+    synchronization primitive type the client will create is a
+    slink:VkFence.
+  * ename:VK_SCI_SYNC_PRIMITIVE_TYPE_SEMAPHORE_NV specifies that the
+    synchronization primitive type the client will create is a
+    slink:VkSemaphore.
+--
+
+[open,refpage='vkGetFenceSciSyncFenceNV',desc='Get a stext:NvSciSyncFence handle for a fence',type='protos']
+--
+To export a stext:NvSciSyncFence handle representing the payload of a fence,
+call:
+
+include::{generated}/api/protos/vkGetFenceSciSyncFenceNV.txt[]
+
+  * pname:device is the logical device that created the fence being
+    exported.
+  * pname:pGetSciSyncHandleInfo is a pointer to a
+    slink:VkFenceGetSciSyncInfoNV structure containing parameters of the
+    export operation.
+  * pname:pHandle is a pointer to a stext:NvSciSyncFence which will contain
+    the fence payload on return.
+
+Each call to fname:vkGetFenceSciSyncFenceNV will duplicate the underlying
+stext:NvSciSyncFence handle and transfer the ownership of the
+stext:NvSciSyncFence handle to the application.
+To avoid leaking resources, the application must: release of the ownership
+of the stext:NvSciSyncFence handle when it is no longer needed.
+
+.Valid Usage
+****
+  * [[VUID-vkGetFenceSciSyncFenceNV-pGetSciSyncHandleInfo-05112]]
+    pname:pGetSciSyncHandleInfo->handleType must: be
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
+  * [[VUID-vkGetFenceSciSyncFenceNV-sciSyncFence-05113]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    must: be enabled
+****
+
+include::{generated}/validity/protos/vkGetFenceSciSyncFenceNV.txt[]
+--
+
+[open,refpage='vkGetFenceSciSyncObjNV',desc='Get a stext:NvSciSyncObj handle for a fence',type='protos']
+--
+To export a stext:NvSciSyncObj handle representing the payload of a fence,
+call:
+
+include::{generated}/api/protos/vkGetFenceSciSyncObjNV.txt[]
+
+  * pname:device is the logical device that created the fence being
+    exported.
+  * pname:pGetSciSyncHandleInfo is a pointer to a
+    slink:VkFenceGetSciSyncInfoNV structure containing parameters of the
+    export operation.
+  * pname:pHandle will return the stext:NvSciSyncObj handle representing the
+    fence payload.
+
+Each call to fname:vkGetFenceSciSyncObjNV will duplicate the underlying
+stext:NvSciSyncObj handle and transfer the ownership of the
+stext:NvSciSyncObj handle to the application.
+To avoid leaking resources, the application must: release of the ownership
+of the stext:NvSciSyncObj handle when it is no longer needed.
+
+.Valid Usage
+****
+  * [[VUID-vkGetFenceSciSyncObjNV-pGetSciSyncHandleInfo-05114]]
+    pname:pGetSciSyncHandleInfo->handleType must: be
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
+  * [[VUID-vkGetFenceSciSyncObjNV-sciSyncFence-05115]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    must: be enabled
+****
+
+include::{generated}/validity/protos/vkGetFenceSciSyncObjNV.txt[]
+--
+
+[open,refpage='VkFenceGetSciSyncInfoNV',desc='Structure describing a slink:VkFence export operation to NvSciSync',type='structs']
+--
+The sname:VkFenceGetSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkFenceGetSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:fence is the fence from which state will be exported.
+  * pname:handleType is the type of NvSciSync handle (stext:NvSciSyncObj or
+    stext:NvSciSyncFence) representing the fence payload that will be
+    exported.
+
+If pname:handleType is
+ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV, a
+stext:NvSciSyncObj will be exported.
+If pname:handleType is
+ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV, a
+stext:NvSciSyncFence will be exported.
+
+.Valid Usage
+****
+  * [[VUID-VkFenceGetSciSyncInfoNV-handleType-05116]]
+    pname:handleType must: be
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV or
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
+****
+
+include::{generated}/validity/structs/VkFenceGetSciSyncInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync[]
 
 [open,refpage='vkDestroyFence',desc='Destroy a fence object',type='protos']
 --
@@ -2907,6 +3160,111 @@ include::{generated}/validity/structs/VkImportFenceFdInfoKHR.txt[]
 --
 endif::VK_KHR_external_fence_fd[]
 
+ifdef::VK_NV_external_sci_sync[]
+[open,refpage='vkImportFenceSciSyncFenceNV',desc='Import a fence from a stext:NvSciSyncFence handle',type='protos']
+--
+To import a fence payload from a stext:NvSciSyncFence handle, call:
+
+include::{generated}/api/protos/vkImportFenceSciSyncFenceNV.txt[]
+
+  * pname:device is the logical device that created the fence.
+  * pname:pImportFenceSciSyncInfo is a pointer to a
+    slink:VkImportFenceSciSyncInfoNV structure containing parameters of the
+    import operation
+
+Importing a fence payload from stext:NvSciSyncFence does not transfer
+ownership of the handle to the Vulkan implementation.
+Vulkan will make a copy of stext:NvSciSyncFence when importing it.
+The application must: release ownership using the NvSciSync API when the
+handle is no longer needed.
+
+.Valid Usage
+****
+ * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence must:
+   be enabled
+ * pname:fence must: not be associated with any queue command that has not
+   yet completed execution on that queue
+ * pname:pImportFenceSciSyncInfo->handleType must: be
+   ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
+****
+
+include::{generated}/validity/protos/vkImportFenceSciSyncFenceNV.txt[]
+--
+
+[open,refpage='vkImportFenceSciSyncObjNV',desc='Import a fence from a stext:NvSciSyncObj handle',type='protos']
+--
+To import a fence payload from a stext:NvSciSyncObj handle, call:
+
+include::{generated}/api/protos/vkImportFenceSciSyncObjNV.txt[]
+
+  * pname:device is the logical device that created the fence.
+  * pname:pImportFenceSciSyncInfo is a pointer to a
+    slink:VkImportFenceSciSyncInfoNV structure containing parameters of the
+    import operation
+
+Importing a fence payload from a stext:NvSciSyncObj does not transfer
+ownership of the handle to the Vulkan implementation.
+Vulkan will make a new reference to the stext:NvSciSyncObj object when
+importing it.
+The application must: release ownership using the NvSciSync API when the
+handle is no longer needed.
+
+The application must: not import the same stext:NvSciSyncObj with signaler
+access permissions into multiple instances of slink:VkFence, and must: not
+import into the same instance from which it was exported.
+
+.Valid Usage
+****
+ * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence must:
+   be enabled
+ * pname:fence must: not be associated with any queue command that has not
+   yet completed execution on that queue
+ * pname:pImportFenceSciSyncInfo->handleType must: be
+   ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
+****
+
+include::{generated}/validity/protos/vkImportFenceSciSyncObjNV.txt[]
+--
+
+
+[open,refpage='VkImportFenceSciSyncInfoNV',desc='Structure specifying attributes for importing a SciSync handle as a fence',type='structs']
+--
+The sname:VkImportFenceSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkImportFenceSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:fence is the fence into which the state will be imported.
+  * pname:handleType specifies the type of stext:handle.
+  * pname:handle is the external handle to import.
+
+The handle types supported by pname:handleType are:
+
+[[synchronization-fence-handletypes-sci-sync]]
+.Handle Types Supported by sname:VkImportFenceSciSyncInfoNV
+[width="80%",options="header"]
+|====
+| Handle Type                                           | Transference | Permanence Supported
+| ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV   | Reference | Permanent
+| ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV | Copy      | Temporary
+|====
+
+.Valid Usage
+****
+  * [[VUID-VkImportFenceSciSyncInfoNV-handleType-05117]]
+    pname:handleType must: be a value included in the
+    <<synchronization-fence-handletypes-sci-sync, Handle Types Supported by
+    sname:VkImportFenceSciSyncInfoNV>> table
+****
+
+include::{generated}/validity/structs/VkImportFenceSciSyncInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync[]
+
 ifdef::VK_VERSION_1_1,VK_KHR_external_fence[]
 ifdef::VK_KHR_external_fence_win32,VK_KHR_external_fence_fd[]
 [open,refpage='VkFenceImportFlagBits',desc='Bitmask specifying additional parameters of fence payload import',type='enums']
@@ -3046,6 +3404,17 @@ include::{generated}/api/structs/VkSemaphoreCreateInfo.txt[]
     structure.
   * pname:flags is reserved for future use.
 
+ifdef::VK_NV_external_sci_sync[]
+.Valid Usage
+****
+  * [[VUID-VkSemaphoreCreateInfo-pNext-05118]]
+    If the pname:pNext chain includes slink:VkExportSemaphoreSciSyncInfoNV,
+    it must: also include slink:VkSemaphoreTypeCreateInfo with a
+    slink:VkSemaphoreTypeCreateInfo->pname:semaphoreType of
+    ename:VK_SEMAPHORE_TYPE_TIMELINE
+****
+endif::VK_NV_external_sci_sync[]
+
 include::{generated}/validity/structs/VkSemaphoreCreateInfo.txt[]
 --
 
@@ -3095,6 +3464,11 @@ will have a default elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_BINARY.
   * [[VUID-VkSemaphoreTypeCreateInfo-semaphoreType-03279]]
     If pname:semaphoreType is ename:VK_SEMAPHORE_TYPE_BINARY,
     pname:initialValue must: be zero
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkSemaphoreTypeCreateInfo-pNext-05119]]
+    If the pname:pNext chain includes slink:VkExportSemaphoreSciSyncInfoNV,
+    pname:initialValue must: be zero.
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/structs/VkSemaphoreTypeCreateInfo.txt[]
@@ -3157,6 +3531,14 @@ endif::VK_KHR_external_semaphore[]
   * [[VUID-VkExportSemaphoreCreateInfo-handleTypes-01124]]
     The bits in pname:handleTypes must: be supported and compatible, as
     reported by slink:VkExternalSemaphoreProperties
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkExportSemaphoreCreateInfo-pNext-05120]]
+    If the pname:pNext chain includes a sname:VkExportSemaphoreSciSyncInfoNV
+    structure,
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemapore
+    and slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncExport
+    must: be enabled
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/structs/VkExportSemaphoreCreateInfo.txt[]
@@ -3499,6 +3881,109 @@ properties of the defined external semaphore handle types.
 include::{generated}/validity/structs/VkSemaphoreGetZirconHandleInfoFUCHSIA.txt[]
 --
 endif::VK_FUCHSIA_external_semaphore[]
+
+ifdef::VK_NV_external_sci_sync[]
+[open,refpage='VkExportSemaphoreSciSyncInfoNV',desc='Structure specifying additional attributes of NvSciSync handles exported from a semaphore',type='structs']
+--
+To specify additional attributes of NvSciSync handles exported from a
+semaphore, add a sname:VkExportSemaphoreSciSyncInfoNV structure to the
+pname:pNext chain of the slink:VkSemaphoreCreateInfo structure.
+The sname:VkExportSemaphoreSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkExportSemaphoreSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pAttributes is an opaque sname:NvSciSyncAttrList describing the
+    attributes of the NvSciSync object that will be exported.
+
+If slink:VkExportSemaphoreCreateInfo is not present in the same pname:pNext
+chain, this structure is ignored.
+If slink:VkExportSemaphoreCreateInfo is present in the pname:pNext chain of
+slink:VkSemaphoreCreateInfo with a NvSciSync pname:handleType, but either
+slink:VkExportSemaphoreSciSyncInfoNV is not present in the pname:pNext
+chain, or if it is but pname:pAttributes is set to `NULL`,
+flink:vkCreateSemaphore will return ename:VK_ERROR_INITIALIZATION_FAILED.
+
+The pname:pAttributes must: be a reconciled sname:NvSciSyncAttrList.
+Before exporting a NvSciSync handle, the application must: use the
+flink:vkGetPhysicalDeviceSciSyncAttributesNV command to obtain the
+unreconciled sname:NvSciSyncAttrList and then use the NvSciSync API to
+reconcile it.
+
+.Valid Usage
+****
+  * [[VUID-VkExportSemaphoreSciSyncInfoNV-pAttributes-05121]]
+    pname:pAttributes must: be a reconciled stext:NvSciSyncAttrList
+****
+
+include::{generated}/validity/structs/VkExportSemaphoreSciSyncInfoNV.txt[]
+--
+
+[open,refpage='vkGetSemaphoreSciSyncObjNV',desc='Get a stext:NvSciSyncObj handle for a semaphore',type='protos']
+--
+
+To export a stext:NvSciSyncObj handle representing the payload of a
+semaphore, call:
+
+include::{generated}/api/protos/vkGetSemaphoreSciSyncObjNV.txt[]
+
+  * pname:device is the logical device that created the semaphore being
+    exported.
+  * pname:pGetSciSyncInfo is a pointer to a
+    slink:VkSemaphoreGetSciSyncInfoNV structure containing parameters of the
+    export operation.
+  * pname:pHandle will return the stext:NvSciSyncObj representing the
+    semaphore payload.
+
+Each call to fname:vkGetSemaphoreSciSyncObjNV will duplicate the underlying
+stext:NvSciSyncObj and transfer the ownership of the stext:NvSciSyncObj
+handle to the application.
+To avoid leaking resources, the application must: release ownership of the
+stext:NvSciSyncObj when it is no longer needed.
+
+.Valid Usage
+****
+ * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+   must: be enabled
+****
+
+include::{generated}/validity/protos/vkGetSemaphoreSciSyncObjNV.txt[]
+--
+
+[open,refpage='VkSemaphoreGetSciSyncInfoNV',desc='Structure describing a slink:VkSemaphore export operation to NvSciSync',type='structs']
+--
+
+The sname:VkSemaphoreGetSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkSemaphoreGetSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:semaphore is the semaphore from which state will be exported.
+  * pname:handleType is the type of NvSciSync handle (stext:NvSciSyncObj)
+    representing the semaphore that will be exported.
+
+.Valid Usage
+****
+  * [[VUID-VkSemaphoreGetSciSyncInfoNV-handleType-05122]]
+    pname:handleType must: be
+    ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
+  * [[VUID-VkSemaphoreGetSciSyncInfoNV-semaphore-05123]]
+    pname:semaphore must: have been created with a elink:VkSemaphoreType of
+    ename:VK_SEMAPHORE_TYPE_TIMELINE
+  * [[VUID-VkSemaphoreGetSciSyncInfoNV-semaphore-05129]]
+    pname:semaphore must: have been created with
+    slink:VkExportSemaphoreSciSyncInfoNV included pname:pNext chain of
+    slink:VkSemaphoreCreateInfo, or previously imported by
+    flink:vkImportSemaphoreSciSyncObjNV
+****
+
+include::{generated}/validity/structs/VkSemaphoreGetSciSyncInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync[]
 
 [open,refpage='vkDestroySemaphore',desc='Destroy a semaphore object',type='protos']
 --
@@ -3852,6 +4337,13 @@ endif::VK_KHR_timeline_semaphore[]
     All of the elements of pname:pSemaphores must: reference a semaphore
     that was created with a elink:VkSemaphoreType of
     ename:VK_SEMAPHORE_TYPE_TIMELINE
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkSemaphoreWaitInfo-pSemaphores-05124]]
+    If any of the semaphores in pname:pSemaphores have stext:NvSciSyncObj as
+    payload, application must: calculate the corresponding timeline
+    semaphore values in pname:pValues by calling <<NvSciSync-extension-page,
+    NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/structs/VkSemaphoreWaitInfo.txt[]
@@ -3968,6 +4460,12 @@ endif::VK_KHR_timeline_semaphore[]
     signal operation on pname:semaphore by more than
     <<limits-maxTimelineSemaphoreValueDifference,
     pname:maxTimelineSemaphoreValueDifference>>
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkSemaphoreSignalInfo-semaphores-05125]]
+    If pname:semaphores has stext:NvSciSyncObj as payload, application must:
+    calculate the corresponding timeline semaphore value in pname:value by
+    calling <<NvSciSync-extension-page, NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync[]
 ****
 
 include::{generated}/validity/structs/VkSemaphoreSignalInfo.txt[]
@@ -4462,6 +4960,80 @@ endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
 include::{generated}/validity/structs/VkImportSemaphoreZirconHandleInfoFUCHSIA.txt[]
 --
 endif::VK_FUCHSIA_external_semaphore[]
+
+ifdef::VK_NV_external_sci_sync[]
+[open,refpage='vkImportSemaphoreSciSyncObjNV',desc='Import a semaphore from a SciSync handle',type='protos']
+--
+To import a semaphore payload from a stext:NvSciSyncObj, call:
+
+include::{generated}/api/protos/vkImportSemaphoreSciSyncObjNV.txt[]
+
+  * pname:device is the logical device that created the semaphore.
+  * pname:pImportSemaphoreSciSyncInfo is a pointer to a
+    slink:VkImportSemaphoreSciSyncInfoNV structure containing parameters of
+    the import operation
+
+Importing a semaphore payload from stext:NvSciSyncObj does not transfer
+ownership of the handle to the Vulkan implementation.
+When importing stext:NvSciSyncObj, Vulkan will make a new reference to that
+object, the application must release its ownership using NvSciSync APIs when
+that ownership is no longer needed.
+
+Application must: not import the same stext:NvSciSyncObj with signaler
+access permissions into multiple instances of VkSemaphore, and must: not
+import into the same instance from which it was exported.
+
+.Valid Usage
+****
+ * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+   must: be enabled
+****
+
+include::{generated}/validity/protos/vkImportSemaphoreSciSyncObjNV.txt[]
+--
+
+[open,refpage='VkImportSemaphoreSciSyncInfoNV',desc='Structure specifying SciSync handle to import to a semaphore',type='structs']
+--
+The sname:VkImportSemaphoreSciSyncInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkImportSemaphoreSciSyncInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:semaphore is the semaphore into which the payload will be
+    imported.
+  * pname:handleType specifies the type of stext:handle.
+  * pname:handle is the external handle to import.
+
+The handle types supported by pname:handleType are:
+
+[[synchronization-semaphore-handletypes-sci-sync]]
+.Handle Types Supported by sname:VkImportSemaphoreSciSyncInfoNV
+[width="80%",options="header"]
+|====
+| Handle Type                                           | Transference | Permanence Supported
+| ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV   | Reference | Permanent
+|====
+
+.Valid Usage
+****
+  * [[VUID-VkImportSemaphoreSciSyncInfoNV-handleType-05126]]
+    pname:handleType must: be a value included in the
+    <<synchronization-semaphore-handletypes-sci-sync, Handle Types Supported
+    by sname:VkImportSemaphoreSciSyncInfoNV>> table
+  * [[VUID-VkImportSemaphoreSciSyncInfoNV-semaphore-05127]]
+    pname:semaphore must: have been created with a elink:VkSemaphoreType of
+    ename:VK_SEMAPHORE_TYPE_TIMELINE
+  * [[VUID-VkImportSemaphoreSciSyncInfoNV-semaphore-05128]]
+    pname:semaphore must: not be associated with any queue command that has
+    not yet completed execution on that queue
+****
+
+include::{generated}/validity/structs/VkImportSemaphoreSciSyncInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_semaphore[]
 ifdef::VK_KHR_external_semaphore_win32,VK_KHR_external_semaphore_fd,VK_FUCHSIA_external_semaphore[]

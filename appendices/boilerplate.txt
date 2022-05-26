@@ -350,6 +350,15 @@ endif::VK_EXT_metal_surface[]
 ifdef::VK_QNX_screen_surface[]
 | `apiext:VK_QNX_screen_surface`        | QNX Screen             | `vulkan_screen.h`        | `<screen/screen.h>`            | dname:VK_USE_PLATFORM_SCREEN_QNX
 endif::VK_QNX_screen_surface[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_memory_sci_buf[]
+|
+ifdef::VK_NV_external_sci_sync[`apiext:VK_NV_external_sci_sync`]
+ifdef::VK_NV_external_memory_sci_buf[`apiext:VK_NV_external_memory_sci_buf`]
+| NVIDIA Sci             | `vulkan_sci.h`           |
+ifdef::VK_NV_external_sci_sync[`<nvscisync.h>`]
+ifdef::VK_NV_external_memory_sci_buf[`<nvscibuf.h>`]
+| dname:VK_USE_PLATFORM_SCI
+endif::VK_NV_external_sci_sync,VK_NV_external_memory_sci_buf[]
 |====
 
 [NOTE]

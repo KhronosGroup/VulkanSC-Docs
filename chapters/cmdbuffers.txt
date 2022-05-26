@@ -1945,6 +1945,13 @@ ifdef::VK_KHR_device_group_creation,VK_VERSION_1_1[]
     If the pname:device that pname:semaphore was created on is a device
     group, pname:deviceIndex must: be a valid device index
 endif::VK_KHR_device_group_creation,VK_VERSION_1_1[]
+ifdef::VK_NV_external_sci_sync[]
+  * [[VUID-VkSemaphoreSubmitInfoKHR-semaphore-05094]]
+    If pname:semaphore has a payload of stext:NvSciSyncObj, pname:value
+    must: be calculated by application via <<NvSciSync-extension-page,
+    NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync[]
+
 ****
 
 include::{generated}/validity/structs/VkSemaphoreSubmitInfoKHR.txt[]
@@ -2340,6 +2347,16 @@ pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues respectively was
 not created with a elink:VkSemaphoreType of
 ename:VK_SEMAPHORE_TYPE_TIMELINE, the implementation must: ignore the value
 in the pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues entry.
+
+ifdef::VK_NV_external_sci_sync[]
+If the semaphore in slink:VkSubmitInfo::pname:pWaitSemaphores or
+slink:VkSubmitInfo::pname:pSignalSemaphores corresponding to an entry in
+pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues respectively was
+created with a elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_TIMELINE,
+and has stext:NvSciSyncObj as the payload, the value in the
+pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues entry must: be
+calculated by application via <<NvSciSync-extension-page, NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync[]
 
 include::{generated}/validity/structs/VkTimelineSemaphoreSubmitInfo.txt[]
 --

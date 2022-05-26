@@ -9,9 +9,6 @@
 [open,refpage='vkCreateMetalSurfaceEXT',desc='Create a VkSurfaceKHR object for CAMetalLayer',type='protos']
 --
 :refpage: vkCreateMetalSurfaceEXT
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for a basetype:CAMetalLayer, call:
 
@@ -26,11 +23,6 @@ include::{generated}/api/protos/vkCreateMetalSurfaceEXT.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a sname:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateMetalSurfaceEXT.txt[]
 --

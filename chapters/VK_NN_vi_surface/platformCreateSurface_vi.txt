@@ -8,9 +8,6 @@
 [open,refpage='vkCreateViSurfaceNN',desc='Create a slink:VkSurfaceKHR object for a VI layer',type='protos']
 --
 :refpage: vkCreateViSurfaceNN
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for an code:nn::code:vi::code:Layer,
 query the layer's native handle using
@@ -43,11 +40,6 @@ Otherwise, the pname:currentExtent will have the special value
 choose an appropriate size for the swapchain's pname:imageExtent (e.g., by
 matching the result of a call to
 code:nn::code:vi::code:GetDisplayResolution).
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateViSurfaceNN.txt[]
 --

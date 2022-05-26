@@ -2502,7 +2502,7 @@ include::{generated}/api/protos/vkGetImageSubresourceLayout.txt[]
   * pname:device is the logical device that owns the image.
   * pname:image is the image whose layout is being queried.
   * pname:pSubresource is a pointer to a slink:VkImageSubresource structure
-    selecting a specific image for the image subresource.
+    selecting a specific image subresource from the image.
   * pname:pLayout is a pointer to a slink:VkSubresourceLayout structure in
     which the layout is returned.
 
@@ -3975,13 +3975,13 @@ endif::VK_HUAWEI_invocation_mask[]
     ename:VK_IMAGE_CREATE_SPARSE_ALIASED_BIT
 endif::VK_EXT_fragment_density_map[]
 ifdef::VK_VERSION_1_1,VK_KHR_maintenance2[]
-ifndef::VK_VERSION_1_2+VK_EXT_separate_stencil_usage[]
+ifndef::VK_VERSION_1_2,VK_EXT_separate_stencil_usage[]
   * [[VUID-VkImageViewCreateInfo-pNext-02661]]
     If the pname:pNext chain includes a slink:VkImageViewUsageCreateInfo
     structure, its pname:usage member must: not include any bits that were
     not set in the pname:usage member of the slink:VkImageCreateInfo
     structure used to create pname:image
-endif::VK_VERSION_1_2+VK_EXT_separate_stencil_usage[]
+endif::VK_VERSION_1_2,VK_EXT_separate_stencil_usage[]
 ifdef::VK_VERSION_1_2,VK_EXT_separate_stencil_usage[]
   * [[VUID-VkImageViewCreateInfo-pNext-02662]]
     If the pname:pNext chain includes a slink:VkImageViewUsageCreateInfo
@@ -6665,6 +6665,15 @@ fname:vkBindBufferMemory is equivalent to passing the same parameters
 through slink:VkBindBufferMemoryInfo to flink:vkBindBufferMemory2.
 endif::VK_VERSION_1_1,VK_KHR_bind_memory2[]
 
+ifdef::VK_NV_external_memory_sci_buf[]
+If the pname:memory was obtained by a memory import operation with
+slink:VkExternalMemoryBufferCreateInfo::pname:handleTypes assigned to
+ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_SCI_BUF_BIT_NV, the properties of
+pname:buffer and the pname:memoryoffset must: be compatible with the
+attributes used to create stext:NvSciBufObj, otherwise the implemention will
+return ename:VK_ERROR_VALIDATION_FAILED.
+endif::VK_NV_external_memory_sci_buf[]
+
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 
 .Valid Usage
@@ -6835,6 +6844,15 @@ ifdef::VK_VERSION_1_1,VK_KHR_bind_memory2[]
 fname:vkBindImageMemory is equivalent to passing the same parameters through
 slink:VkBindImageMemoryInfo to flink:vkBindImageMemory2.
 endif::VK_VERSION_1_1,VK_KHR_bind_memory2[]
+
+ifdef::VK_NV_external_memory_sci_buf[]
+If the pname:memory is allocated by a memory import operation with
+slink:VkExternalMemoryBufferCreateInfo::pname:handleTypes assigned to
+ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_SCI_BUF_BIT_NV, the properties of
+pname:image and the pname:memoryoffset must: be compatible with the
+attributes used to create stext:NvSciBufObj, otherwise the implementation
+will return ename:VK_ERROR_VALIDATION_FAILED.
+endif::VK_NV_external_memory_sci_buf[]
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 

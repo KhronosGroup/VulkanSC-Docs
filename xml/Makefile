@@ -87,6 +87,7 @@ PLATFORM_HEADERS = \
     $(VULKAN)/vulkan_xlib_xrandr.h \
     $(VULKAN)/vulkan_metal.h \
     $(VULKAN)/vulkan_screen.h \
+    $(VULKAN)/vulkan_sci.h \
     $(VULKAN)/vulkan_beta.h
 
 HEADERS_H = $(VULKAN)/vulkan$(API_SUFFIX)_core.h $(PLATFORM_HEADERS)

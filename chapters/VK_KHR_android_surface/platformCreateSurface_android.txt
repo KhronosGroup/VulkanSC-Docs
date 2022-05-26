@@ -8,9 +8,6 @@
 [open,refpage='vkCreateAndroidSurfaceKHR',desc='Create a slink:VkSurfaceKHR object for an Android native window',type='protos']
 --
 :refpage: vkCreateAndroidSurfaceKHR
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for an Android native window, call:
 
@@ -51,11 +48,6 @@ pname:minImageExtent is [eq]#(1,1)#, and pname:maxImageExtent is the maximum
 image size supported by the consumer.
 For the system compositor, pname:currentExtent is the window size (i.e. the
 consumer's preferred size).
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateAndroidSurfaceKHR.txt[]
 --

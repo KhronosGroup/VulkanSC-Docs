@@ -433,9 +433,6 @@ include::{generated}/validity/structs/VkDisplayModeParametersKHR.txt[]
 [open,refpage='vkCreateDisplayModeKHR',desc='Create a display mode',type='protos']
 --
 :refpage: vkCreateDisplayModeKHR
-:objectnameplural: display modes
-:objectnamecamelcase: displayMode
-:objectcount: 1
 
 Additional modes may: also be created by calling:
 
@@ -453,11 +450,6 @@ include::{generated}/api/protos/vkCreateDisplayModeKHR.txt[]
     mode created is returned.
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateDisplayModeKHR.txt[]
 --
@@ -654,9 +646,6 @@ endif::VK_EXT_display_control[]
 [open,refpage='vkCreateDisplayPlaneSurfaceKHR',desc='Create a slink:VkSurfaceKHR structure representing a display plane and mode',type='protos']
 --
 :refpage: vkCreateDisplayPlaneSurfaceKHR
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 A complete display configuration includes a mode, one or more display planes
 and any parameters describing their behavior, and parameters describing some
@@ -677,13 +666,6 @@ include::{generated}/api/protos/vkCreateDisplayPlaneSurfaceKHR.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a slink:VkSurfaceKHR handle in which the
     created surface is returned.
-
-include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateDisplayPlaneSurfaceKHR.txt[]
 --
@@ -749,6 +731,10 @@ to a display surface.
     pname:alphaMode must: be one of the bits present in the
     pname:supportedAlpha member of sname:VkDisplayPlaneCapabilitiesKHR for
     the display plane corresponding to pname:displayMode
+  * [[VUID-VkDisplaySurfaceCreateInfoKHR-transform-06740]]
+    pname:transform must: be one of the bits present in the
+    pname:supportedTransforms member of sname:VkDisplayPropertiesKHR for the
+    display corresponding to pname:displayMode
   * [[VUID-VkDisplaySurfaceCreateInfoKHR-width-01256]]
     The pname:width and pname:height members of pname:imageExtent must: be
     less than or equal to

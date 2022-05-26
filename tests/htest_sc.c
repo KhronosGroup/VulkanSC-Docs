@@ -29,10 +29,15 @@
 #define VK_USE_PLATFORM_XLIB_KHR            // <X11/Xlib.h>
 #define VK_USE_PLATFORM_XLIB_XRANDR_EXT     // <X11/extensions/Xrandr.h>
 #define VK_USE_PLATFORM_SCREEN_QNX          // <screen/screen.h>
+#define VK_USE_PLATFORM_SCI                 // nvscisync.h
 #define VK_ENABLE_BETA_EXTENSIONS           // No headers needed
 
 #ifdef USE_HPP
 #include <vulkan/vulkan_sc_core.hpp>
+
+#include <nvscisync.h>
+#include <nvscibuf.h>
+#include "vulkan/vulkan_sci.h"
 #else
 #include <vulkan/vulkan_sc.h>
 #endif
@@ -52,6 +57,7 @@
 //VkXcbSurfaceCreateFlagsKHR              xcb_flags;
 //VkXlibSurfaceCreateFlagsKHR             xlib_flags;
 //VkScreenSurfaceCreateFlagsQNX           screen_flags;
+NvSciSyncAttrList                         scisync_attr_list;
 
 int main(void) {
     const VkInstanceCreateInfo instance_info = {

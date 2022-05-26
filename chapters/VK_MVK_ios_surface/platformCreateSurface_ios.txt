@@ -8,9 +8,6 @@
 [open,refpage='vkCreateIOSSurfaceMVK',desc='Create a VkSurfaceKHR object for an iOS UIView',type='protos']
 --
 :refpage: vkCreateIOSSurfaceMVK
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for an iOS code:UIView or
 basetype:CAMetalLayer, call:
@@ -36,11 +33,6 @@ endif::VK_EXT_metal_surface[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a slink:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateIOSSurfaceMVK.txt[]
 --

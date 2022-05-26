@@ -9,9 +9,6 @@
 [open,refpage='vkCreateImagePipeSurfaceFUCHSIA',desc='Create a slink:VkSurfaceKHR object for a Fuchsia ImagePipe',type='protos']
 --
 :refpage: vkCreateImagePipeSurfaceFUCHSIA
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for a Fuchsia ImagePipe, call:
 
@@ -26,11 +23,6 @@ include::{generated}/api/protos/vkCreateImagePipeSurfaceFUCHSIA.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a slink:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateImagePipeSurfaceFUCHSIA.txt[]
 --

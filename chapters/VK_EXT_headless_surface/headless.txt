@@ -27,9 +27,6 @@ restrictions and features of the implementation.
 [open,refpage='vkCreateHeadlessSurfaceEXT',desc='Create a headless slink:VkSurfaceKHR object',type='protos']
 --
 :refpage: vkCreateHeadlessSurfaceEXT
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a headless sname:VkSurfaceKHR object, call:
 
@@ -44,13 +41,6 @@ include::{generated}/api/protos/vkCreateHeadlessSurfaceEXT.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a sname:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateHeadlessSurfaceEXT.txt[]
 --

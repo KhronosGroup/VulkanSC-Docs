@@ -11,5 +11,31 @@ public pull requests that have been accepted.
 
 -----------------------------------------------------
 
-March 1, 2022 - Vulkan SC 1.0.9 initial public release
+Change log for May 20, 2022 Vulkan SC 1.0.10 spec update:
 
+  * update release number to 10 for this update
+  * Reflow / Assign VUIDs using:
+    python3 scripts/reflow.py -overwrite -tagvu chapters/*txt chapters/*/*txt appendices/*txt
+
+Internal issues:
+
+  * Added changelog for VulkanSC (#144, !281))
+  * Fixes for extension index in the registry and extension refpages (!282)
+  * Updated README.adoc for Vulkan SC (!280)
+  * Added VUs requiring requested object counts not exceed physical device
+    limits (#142,!283)
+  * Fix conditional logic for inverted conditionals (vulkan#3039,!284)
+  * Deprecate surfaceRequestCount and displayModeRequestCount (#146,!285)
+  * Fix description of the pSubResource parameter of
+    vkGetImageSubresourceLayout (!286)
+  * Add VU limiting VkDisplaySurfaceCreateInfoKHR::transform to a single,
+    supported, transformation (!287)
+
+New Extensions:
+
+  * apiext:VK_NV_external_sci_sync and apiext:VK_NV_external_memory_sci_buf
+    (!288,!289,!290)
+
+-----------------------------------------------------
+
+March 1, 2022 - Vulkan SC 1.0.9 initial public release

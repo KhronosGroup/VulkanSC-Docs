@@ -9,9 +9,6 @@
 [open,refpage='vkCreateDirectFBSurfaceEXT',desc='Create a slink:VkSurfaceKHR object for a DirectFB surface',type='protos']
 --
 :refpage: vkCreateDirectFBSurfaceEXT
-:objectnameplural: surfaces
-:objectnamecamelcase: surface
-:objectcount: 1
 
 To create a sname:VkSurfaceKHR object for a DirectFB surface, call:
 
@@ -26,11 +23,6 @@ include::{generated}/api/protos/vkCreateDirectFBSurfaceEXT.txt[]
     <<memory-allocation,Memory Allocation>>).
   * pname:pSurface is a pointer to a slink:VkSurfaceKHR handle in which the
     created surface object is returned.
-
-.Valid Usage
-****
-include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-****
 
 include::{generated}/validity/protos/vkCreateDirectFBSurfaceEXT.txt[]
 --
