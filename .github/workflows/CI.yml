@@ -50,30 +50,31 @@ jobs:
           ./makeSpec -clean -spec core -genpath gencore QUIET= -j${nproc} -Otarget chunked html
           ( cd xml && make validate test install )
 
-      # Generate the vulkan C++ header (vulkan.hpp)
-      # Depends on spec-generate
-      # Failure (should be) allowed, for now
-      - name: hpp-generate
-        run: |
-          SPEC_DIR="${PWD}"
-          cd /tmp
-          rm -rf Vulkan-Hpp
-          git clone https://github.com/KhronosGroup/Vulkan-Hpp.git
-          cd Vulkan-Hpp
-          git submodule update --init --recursive -- tinyxml2
-          rm -rf Vulkan-Docs
-          ln -s "${SPEC_DIR}" Vulkan-Docs
-          ##cp -r "${SPEC_DIR}" Vulkan-Docs
-          # Copy Vulkan C headers into subdir copy used by Vulkan-Hpp
-          ##cp -p ${SPEC_DIR}/include/vulkan/*.h Vulkan-Docs/include/vulkan/
-          echo "Files in Vulkan-Docs:"
-          find Vulkan-Docs -type f
-          # cd /tmp/Vulkan-Hpp
-          cmake -H. -Bbuild
-          make -C build
-          cd build
-          ./VulkanHppGenerator "${SPEC_DIR}"/xml/vk.xml
-          cp /tmp/Vulkan-Hpp/vulkan/*.hpp ${SPEC_DIR}/gen/include/vulkan/
+# Commented out for Vulkan SC, for now
+#      # Generate the vulkan C++ header (vulkan.hpp)
+#      # Depends on spec-generate
+#      # Failure (should be) allowed, for now
+#      - name: hpp-generate
+#        run: |
+#          SPEC_DIR="${PWD}"
+#          cd /tmp
+#          rm -rf Vulkan-Hpp
+#          git clone https://github.com/KhronosGroup/Vulkan-Hpp.git
+#          cd Vulkan-Hpp
+#          git submodule update --init --recursive -- tinyxml2
+#          rm -rf Vulkan-Docs
+#          ln -s "${SPEC_DIR}" Vulkan-Docs
+#          ##cp -r "${SPEC_DIR}" Vulkan-Docs
+#          # Copy Vulkan C headers into subdir copy used by Vulkan-Hpp
+#          ##cp -p ${SPEC_DIR}/include/vulkan/*.h Vulkan-Docs/include/vulkan/
+#          echo "Files in Vulkan-Docs:"
+#          find Vulkan-Docs -type f
+#          # cd /tmp/Vulkan-Hpp
+#          cmake -H. -Bbuild
+#          make -C build
+#          cd build
+#          ./VulkanHppGenerator "${SPEC_DIR}"/xml/vk.xml
+#          cp /tmp/Vulkan-Hpp/vulkan/*.hpp ${SPEC_DIR}/gen/include/vulkan/
 
       # Compile a simple test program that uses vulkan.h
       # The fake platform headers in tests/ allow compiling with all Vulkan
@@ -84,13 +85,14 @@ jobs:
           gcc -c -std=c11 -Igen/include -Itests -Wall -Wextra -Werror tests/htest.c
           clang -c -std=c11 -Igen/include -Itests -Wall -Wextra -Werror tests/htest.c
 
-      # Compile a simple test program that uses vulkan.hpp
-      # Depends on spec-generate and hpp-generate
-      # Failure (should be) allowed, for now
-      - name: hpp-compile
-        run: |
-          g++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
-          clang++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
+# Commented out for Vulkan SC, for now
+#      # Compile a simple test program that uses vulkan.hpp
+#      # Depends on spec-generate and hpp-generate
+#      # Failure (should be) allowed, for now
+#      - name: hpp-compile
+#        run: |
+#          g++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
+#          clang++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
 
       - name: Archive generated files
         uses: actions/upload-artifact@v2
