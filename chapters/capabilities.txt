@@ -1502,7 +1502,7 @@ endif::VK_KHR_external_fence_capabilities[]
     Implementations which support importing this handle type must: accept
     any type of sync or fence FD supported by the native system they are
     running on.
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV specifies a
     synchronization object (code:NvSciSyncObj) shareable across various
     hardware engines including the CPU and software (intra-process and
@@ -1510,7 +1510,7 @@ ifdef::VK_NV_external_sci_sync[]
   * ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV specifies a
     struct of code:NvSciSyncFence that is a snapshot of a synchronization
     object’s underlying primitive and represents its possible state.
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 
 <<<
 
@@ -1526,10 +1526,10 @@ following table:
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_BIT | Must match | Must match
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT | Must match | Must match
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT | No restriction | No restriction
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV | Must match | Must match
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV | Must match | Must match
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 |====
 --
 

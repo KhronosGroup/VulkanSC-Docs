@@ -38,8 +38,8 @@ applications need to:
     flink:vkImportFenceSciSyncObjNV command.
 
 To import/export a stext:NvSciSyncFence to a slink:VkFence object, that
-slink:VkFence object must: already have a stext:NvSciSyncObj imported in
-advance.
+slink:VkFence object must: already have a stext:NvSciSyncObj previously
+imported.
 
 For details of the stext:NvSciSync APIs and data structures, see the
 https://developer.nvidia.com/docs/drive/drive-os/latest/linux/sdk/api%5Freference/group%5F%5Fnvsci%5F%5Ftop.html[`NvStreams

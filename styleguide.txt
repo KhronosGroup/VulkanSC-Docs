@@ -176,7 +176,8 @@ include::style/scid.txt[]
 
 = Vulkan SC Revision History
 
-* 2019-06-25 - Added Safety Critical ID Tags (SCID) appendix <<appendix-scid>>
+* 2019-06-25 - Added Safety Critical ID Tags (SCID) appendix
+  <<appendix-scid>>
 
 endif::VKSC_VERSION_1_0[]
 

@@ -485,8 +485,7 @@ endif::VK_KHR_acceleration_structure[]
 --
 ifdef::VKSC_VERSION_1_0[]
   ** This does not include objects that do not have corresponding free or
-     destroy commands, or any storage reserved by the implementation in
-     response to slink:VkDeviceObjectReservationCreateInfo structures.
+     destroy commands.
      If
      slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,
      pname:deviceDestroyFreesMemory>> is ename:VK_TRUE, the memory from

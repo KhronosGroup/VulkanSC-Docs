@@ -2040,13 +2040,13 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * [[VUID-vkCreateFence-pNext-05106]]
     If the pname:pNext chain of slink:VkFenceCreateInfo includes
     slink:VkExportFenceSciSyncInfoNV, then
     slink:VkFenceCreateInfo::pname:flags must: not include
     ename:VK_FENCE_CREATE_SIGNALED_BIT
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 ****
 
 include::{generated}/validity/protos/vkCreateFence.txt[]
@@ -2113,14 +2113,16 @@ endif::VK_KHR_external_fence[]
   * [[VUID-VkExportFenceCreateInfo-handleTypes-01446]]
     The bits in pname:handleTypes must: be supported and compatible, as
     reported by slink:VkExternalFenceProperties
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * [[VUID-VkExportFenceCreateInfo-pNext-05107]]
     If the pname:pNext chain includes a slink:VkExportFenceSciSyncInfoNV
     structure,
     slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence and
-    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncExport
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncExport, or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence and
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncExport
     must: be enabled
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 ****
 
 include::{generated}/validity/structs/VkExportFenceCreateInfo.txt[]
@@ -2347,12 +2349,12 @@ include::{generated}/validity/structs/VkFenceGetFdInfoKHR.txt[]
 --
 endif::VK_KHR_external_fence_fd[]
 
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 [open,refpage='VkExportFenceSciSyncInfoNV',desc='Structure specifying additional attributes SciSync handles exported from a fence',type='structs']
 --
-To specify additional attributes of NvSciSync handles exported from a fence,
-add a slink:VkExportFenceSciSyncInfoNV structure to the pname:pNext chain of
-the slink:VkFenceCreateInfo structure.
+To specify additional attributes of stext:NvSciSync handles exported from a
+fence, add a slink:VkExportFenceSciSyncInfoNV structure to the pname:pNext
+chain of the slink:VkFenceCreateInfo structure.
 The sname:VkExportFenceSciSyncInfoNV structure is defined as:
 
 include::{generated}/api/structs/VkExportFenceSciSyncInfoNV.txt[]
@@ -2412,12 +2414,15 @@ ename:VK_ERROR_INITIALIZATION_FAILED is returned.
   * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pSciSyncAttributesInfo-05109]]
     If pname:pSciSyncAttributesInfo->primitiveType is
     ename:VK_SCI_SYNC_PRIMITIVE_TYPE_FENCE_NV then
-    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence
     must: be enabled
   * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pSciSyncAttributesInfo-05110]]
     If pname:pSciSyncAttributesInfo->primitiveType is
     ename:VK_SCI_SYNC_PRIMITIVE_TYPE_SEMAPHORE_NV then
     slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+    or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncSemaphore2
     must: be enabled
   * [[VUID-vkGetPhysicalDeviceSciSyncAttributesNV-pAttributes-05111]]
     pname:pAttributes must: be a valid stext:NvSciSyncAttrList and must: not
@@ -2511,7 +2516,8 @@ of the stext:NvSciSyncFence handle when it is no longer needed.
     pname:pGetSciSyncHandleInfo->handleType must: be
     ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
   * [[VUID-vkGetFenceSciSyncFenceNV-sciSyncFence-05113]]
-    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence
     must: be enabled
 ****
 
@@ -2545,7 +2551,8 @@ of the stext:NvSciSyncObj handle when it is no longer needed.
     pname:pGetSciSyncHandleInfo->handleType must: be
     ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
   * [[VUID-vkGetFenceSciSyncObjNV-sciSyncFence-05115]]
-    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence
     must: be enabled
 ****
 
@@ -2573,17 +2580,9 @@ If pname:handleType is
 ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV, a
 stext:NvSciSyncFence will be exported.
 
-.Valid Usage
-****
-  * [[VUID-VkFenceGetSciSyncInfoNV-handleType-05116]]
-    pname:handleType must: be
-    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV or
-    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
-****
-
 include::{generated}/validity/structs/VkFenceGetSciSyncInfoNV.txt[]
 --
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 
 [open,refpage='vkDestroyFence',desc='Destroy a fence object',type='protos']
 --
@@ -3160,7 +3159,7 @@ include::{generated}/validity/structs/VkImportFenceFdInfoKHR.txt[]
 --
 endif::VK_KHR_external_fence_fd[]
 
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 [open,refpage='vkImportFenceSciSyncFenceNV',desc='Import a fence from a stext:NvSciSyncFence handle',type='protos']
 --
 To import a fence payload from a stext:NvSciSyncFence handle, call:
@@ -3180,13 +3179,18 @@ handle is no longer needed.
 
 .Valid Usage
 ****
- * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
-   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence must:
-   be enabled
- * pname:fence must: not be associated with any queue command that has not
-   yet completed execution on that queue
- * pname:pImportFenceSciSyncInfo->handleType must: be
-   ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
+  * [[VUID-vkImportFenceSciSyncFenceNV-sciSyncImport-05140]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence, or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncImport
+    and slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence
+    must: be enabled
+  * [[VUID-vkImportFenceSciSyncFenceNV-fence-05141]]
+    pname:fence must: not be associated with any queue command that has not
+    yet completed execution on that queue
+  * [[VUID-vkImportFenceSciSyncFenceNV-pImportFenceSciSyncInfo-05142]]
+    pname:pImportFenceSciSyncInfo->handleType must: be
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV
 ****
 
 include::{generated}/validity/protos/vkImportFenceSciSyncFenceNV.txt[]
@@ -3216,13 +3220,18 @@ import into the same instance from which it was exported.
 
 .Valid Usage
 ****
- * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
-   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence must:
-   be enabled
- * pname:fence must: not be associated with any queue command that has not
-   yet completed execution on that queue
- * pname:pImportFenceSciSyncInfo->handleType must: be
-   ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
+  * [[VUID-vkImportFenceSciSyncObjNV-sciSyncImport-05143]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncFence, or
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncImport
+    and slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncFence
+    must: be enabled
+  * [[VUID-vkImportFenceSciSyncObjNV-fence-05144]]
+    pname:fence must: not be associated with any queue command that has not
+    yet completed execution on that queue
+  * [[VUID-vkImportFenceSciSyncObjNV-pImportFenceSciSyncInfo-05145]]
+    pname:pImportFenceSciSyncInfo->handleType must: be
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV
 ****
 
 include::{generated}/validity/protos/vkImportFenceSciSyncObjNV.txt[]
@@ -3253,17 +3262,9 @@ The handle types supported by pname:handleType are:
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV | Copy      | Temporary
 |====
 
-.Valid Usage
-****
-  * [[VUID-VkImportFenceSciSyncInfoNV-handleType-05117]]
-    pname:handleType must: be a value included in the
-    <<synchronization-fence-handletypes-sci-sync, Handle Types Supported by
-    sname:VkImportFenceSciSyncInfoNV>> table
-****
-
 include::{generated}/validity/structs/VkImportFenceSciSyncInfoNV.txt[]
 --
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_fence[]
 ifdef::VK_KHR_external_fence_win32,VK_KHR_external_fence_fd[]
@@ -3404,16 +3405,23 @@ include::{generated}/api/structs/VkSemaphoreCreateInfo.txt[]
     structure.
   * pname:flags is reserved for future use.
 
-ifdef::VK_NV_external_sci_sync[]
 .Valid Usage
 ****
+ifdef::VK_NV_external_sci_sync[]
   * [[VUID-VkSemaphoreCreateInfo-pNext-05118]]
     If the pname:pNext chain includes slink:VkExportSemaphoreSciSyncInfoNV,
     it must: also include slink:VkSemaphoreTypeCreateInfo with a
-    slink:VkSemaphoreTypeCreateInfo->pname:semaphoreType of
+    slink:VkSemaphoreTypeCreateInfo::pname:semaphoreType of
     ename:VK_SEMAPHORE_TYPE_TIMELINE
-****
 endif::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync2[]
+  * [[VUID-VkSemaphoreCreateInfo-pNext-05146]]
+    If the pname:pNext chain includes slink:VkSemaphoreSciSyncCreateInfoNV,
+    it must: also include slink:VkSemaphoreTypeCreateInfo with a
+    slink:VkSemaphoreTypeCreateInfo::pname:semaphoreType of
+    ename:VK_SEMAPHORE_TYPE_TIMELINE
+endif::VK_NV_external_sci_sync2[]
+****
 
 include::{generated}/validity/structs/VkSemaphoreCreateInfo.txt[]
 --
@@ -3454,6 +3462,12 @@ slink:VkSemaphoreCreateInfo::pname:pNext chain.
 If no sname:VkSemaphoreTypeCreateInfo structure is included in the
 pname:pNext chain of slink:VkSemaphoreCreateInfo, then the created semaphore
 will have a default elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_BINARY.
+
+ifdef::VK_NV_external_sci_sync2[]
+If slink:VkSemaphoreSciSyncCreateInfoNV structure is included in the
+pname:pNext chain of sname:VkSemaphoreTypeCreateInfo, pname:initialValue is
+ignored.
+endif::VK_NV_external_sci_sync2[]
 
 .Valid Usage
 ****
@@ -3945,8 +3959,9 @@ stext:NvSciSyncObj when it is no longer needed.
 
 .Valid Usage
 ****
- * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
-   must: be enabled
+  * [[VUID-vkGetSemaphoreSciSyncObjNV-sciSyncSemaphore-05147]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+    must: be enabled
 ****
 
 include::{generated}/validity/protos/vkGetSemaphoreSciSyncObjNV.txt[]
@@ -3985,6 +4000,44 @@ include::{generated}/validity/structs/VkSemaphoreGetSciSyncInfoNV.txt[]
 --
 endif::VK_NV_external_sci_sync[]
 
+ifdef::VK_NV_external_sci_sync2[]
+[open,refpage='VkSemaphoreSciSyncCreateInfoNV',desc='Structure to create a semaphore from a semaphore SciSync pool',type='structs']
+--
+The sname:VkSemaphoreSciSyncCreateInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkSemaphoreSciSyncCreateInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:semaphorePool is a slink:VkSemaphoreSciSyncPoolNV handle.
+  * pname:pFence is a pointer to a stext:NvSciSyncFence.
+
+When slink:VkSemaphoreSciSyncCreateInfoNV is included in
+slink:VkSemaphoreCreateInfo::pname:pNext chain, the semaphore is created
+from the slink:VkSemaphoreSciSyncPoolNV handle that represents a
+stext:NvSciSyncObj with one or more primitives.
+The slink:VkSemaphoreSciSyncCreateInfoNV::pname:pFence parameter provides
+the information to select the corresponding primitive represented by this
+semaphore.
+When a stext:NvSciSyncObj with signaler permissions is imported to
+slink:VkSemaphoreSciSyncPoolNV, it only supports one primitive and
+slink:VkSemaphoreSciSyncCreateInfoNV::pname:pFence must: be in the cleared
+state.
+
+.Valid Usage
+****
+  * [[VUID-VkSemaphoreSciSyncCreateInfoNV-sciSyncSemaphore2-05148]]
+    The <<features-sciSyncSemaphore2,
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncSemaphore2>>
+    feature must: be enabled
+****
+
+include::{generated}/validity/structs/VkSemaphoreSciSyncCreateInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync2[]
+
+
 [open,refpage='vkDestroySemaphore',desc='Destroy a semaphore object',type='protos']
 --
 To destroy a semaphore, call:
@@ -3996,11 +4049,30 @@ include::{generated}/api/protos/vkDestroySemaphore.txt[]
   * pname:pAllocator controls host memory allocation as described in the
     <<memory-allocation, Memory Allocation>> chapter.
 
+ifdef::VK_NV_external_sci_sync2[]
+If pname:semaphore was created with slink:VkSemaphoreSciSyncCreateInfoNV
+present in the slink:VkSemaphoreCreateInfo::pname:pNext chain,
+pname:semaphore can: be destroyed immediately after all batches that refer
+to it are submitted.
+Otherwise, all submitted batches that refer to pname:semaphore must: have
+completed execution before it can be destroyed.
+endif::VK_NV_external_sci_sync2[]
+
 .Valid Usage
 ****
+ifndef::VK_NV_external_sci_sync2[]
   * [[VUID-vkDestroySemaphore-semaphore-01137]]
     All submitted batches that refer to pname:semaphore must: have completed
     execution
+endif::VK_NV_external_sci_sync2[]
+ifdef::VK_NV_external_sci_sync2[]
+  * [[VUID-vkDestroySemaphore-semaphore-05149]]
+    If pname:semaphore was not created with
+    slink:VkSemaphoreSciSyncCreateInfoNV present in the
+    slink:VkSemaphoreCreateInfo::pname:pNext chain when it was created, all
+    submitted batches that refer to pname:semaphore must: have completed
+    execution
+endif::VK_NV_external_sci_sync2[]
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroySemaphore-semaphore-01138]]
     If sname:VkAllocationCallbacks were provided when pname:semaphore was
@@ -4013,6 +4085,127 @@ endif::VKSC_VERSION_1_0[]
 
 include::{generated}/validity/protos/vkDestroySemaphore.txt[]
 --
+
+ifdef::VK_NV_external_sci_sync2[]
+=== Semaphore SciSync Pools
+
+A semaphore SciSync pool is used to represent a stext:NvSciSyncObj with one
+or more primitives.
+
+[open,refpage='VkSemaphoreSciSyncPoolNV',desc='Opaque handle to a semaphore SciSync pool',type='handles']
+--
+Semaphore SciSync pools are represented by sname:VkSemaphoreSciSyncPoolNV
+handles:
+
+include::{generated}/api/handles/VkSemaphoreSciSyncPoolNV.txt[]
+--
+
+To import a stext:NvSciSyncObj with multiple primitives, use
+flink:vkCreateSemaphoreSciSyncPoolNV to reserve a semaphore pool to map the
+multiple semaphores allocated by stext:NvSciSyncObj.
+Then create a slink:VkSemaphore from the semaphore pool using the index
+provided by the stext:NvSciSyncFence when chaining the
+slink:VkSemaphoreSciSyncCreateInfoNV structure to
+slink:VkSemaphoreCreateInfo.
+
+[open,refpage='vkCreateSemaphoreSciSyncPoolNV',desc='Create a slink:VkSemaphoreSciSyncPoolNV object',type='protos']
+--
+:refpage: vkCreateSemaphoreSciSyncPoolNV
+
+To create a sname:VkSemaphoreSciSyncPoolNV, call:
+
+include::{generated}/api/protos/vkCreateSemaphoreSciSyncPoolNV.txt[]
+
+  * pname:device is the logical device that creates the semaphore pool.
+  * pname:pCreateInfo is a pointer to a
+    slink:VkSemaphoreSciSyncPoolCreateInfoNV structure containing
+    information about the semaphore SciSync pool being created.
+  * pname:pAllocator controls host memory allocation as described in the
+    <<memory-allocation, Memory Allocation>> chapter.
+  * pname:pSemaphorePool is a pointer to a handle in which the resulting
+    semaphore pool object is returned.
+
+include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
+
+.Valid Usage
+****
+ifdef::VKSC_VERSION_1_0[]
+  * [[VUID-vkCreateSemaphoreSciSyncPoolNV-device-05150]]
+    The number of semaphore pools currently allocated from pname:device plus
+    1 must: be less than or equal to the total number of semaphore pools
+    requested via
+    slink:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV::pname:semaphoreSciSyncPoolRequestCount
+    specified when pname:device was created
+endif::VKSC_VERSION_1_0[]
+  * [[VUID-vkCreateSemaphoreSciSyncPoolNV-sciSyncSemaphore2-05151]]
+    The <<features-sciSyncSemaphore2,
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncSemaphore2>>
+    feature must: be enabled
+****
+
+include::{generated}/validity/protos/vkCreateSemaphoreSciSyncPoolNV.txt[]
+--
+
+[open,refpage='VkSemaphoreSciSyncPoolCreateInfoNV',desc='Structure describing the creation parameters for a SciSync pool',type='structs']
+--
+The sname:VkSemaphoreSciSyncPoolCreateInfoNV structure is defined as:
+
+include::{generated}/api/structs/VkSemaphoreSciSyncPoolCreateInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:handle is an external stext:NvSciSyncObj to import.
+
+During flink:vkCreateSemaphoreSciSyncPoolNV, the external stext:NvSciSyncObj
+is imported to sname:VkSemaphoreSciSyncPoolNV.
+The import does not transfer the ownership of the stext:NvSciSyncObj to the
+implementation, but will increment the reference count of that object and
+flink:vkDestroySemaphoreSciSyncPoolNV will decrement the reference count of
+that object.
+The application must: delete other references of the original
+stext:NvSciSyncObj using <<NvSciSync2-extension-page, NvSciSync APIs>> when
+it is no longer needed.
+
+Applications must: not import the same stext:NvSciSyncObj with signaler
+access permissions to multiple instances of sname:VkSemaphoreSciSyncPoolNV.
+
+.Valid Usage
+****
+  * [[VUID-VkSemaphoreSciSyncPoolCreateInfoNV-handle-05152]]
+    pname:handle must: a valid stext:NvSciSyncObj
+****
+
+include::{generated}/validity/structs/VkSemaphoreSciSyncPoolCreateInfoNV.txt[]
+--
+
+[open,refpage='vkDestroySemaphoreSciSyncPoolNV',desc='Destroy a slink:VkSemaphoreSciSyncPoolNV object',type='protos']
+--
+To destroy a slink:VkSemaphoreSciSyncPoolNV, call:
+
+include::{generated}/api/protos/vkDestroySemaphoreSciSyncPoolNV.txt[]
+
+  * pname:device is the logical device that destroys the semaphore SciSync
+    pool.
+  * pname:semaphorePool is the handle of the semaphore SciSync pool to
+    destroy.
+  * pname:pAllocator controls host memory allocation as described in the
+    <<memory-allocation, Memory Allocation>> chapter.
+
+.Valid Usage
+****
+  * [[VUID-vkDestroySemaphoreSciSyncPoolNV-semaphorePool-05153]]
+    All submitted batches that refer to a semaphore created from
+    pname:semaphorePool must: have completed execution
+  * [[VUID-vkDestroySemaphoreSciSyncPoolNV-sciSyncSemaphore2-05154]]
+    The <<features-sciSyncSemaphore2,
+    slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncSemaphore2>>
+    feature must: be enabled
+****
+
+include::{generated}/validity/protos/vkDestroySemaphoreSciSyncPoolNV.txt[]
+--
+endif::VK_NV_external_sci_sync2[]
 
 
 [[synchronization-semaphores-signaling]]
@@ -4337,13 +4530,13 @@ endif::VK_KHR_timeline_semaphore[]
     All of the elements of pname:pSemaphores must: reference a semaphore
     that was created with a elink:VkSemaphoreType of
     ename:VK_SEMAPHORE_TYPE_TIMELINE
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * [[VUID-VkSemaphoreWaitInfo-pSemaphores-05124]]
     If any of the semaphores in pname:pSemaphores have stext:NvSciSyncObj as
     payload, application must: calculate the corresponding timeline
-    semaphore values in pname:pValues by calling <<NvSciSync-extension-page,
-    NvSciSync APIs>>.
-endif::VK_NV_external_sci_sync[]
+    semaphore values in pname:pValues by calling
+    <<NvSciSync2-extension-page, NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 ****
 
 include::{generated}/validity/structs/VkSemaphoreWaitInfo.txt[]
@@ -4460,12 +4653,12 @@ endif::VK_KHR_timeline_semaphore[]
     signal operation on pname:semaphore by more than
     <<limits-maxTimelineSemaphoreValueDifference,
     pname:maxTimelineSemaphoreValueDifference>>
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * [[VUID-VkSemaphoreSignalInfo-semaphores-05125]]
     If pname:semaphores has stext:NvSciSyncObj as payload, application must:
     calculate the corresponding timeline semaphore value in pname:value by
-    calling <<NvSciSync-extension-page, NvSciSync APIs>>.
-endif::VK_NV_external_sci_sync[]
+    calling <<NvSciSync2-extension-page, NvSciSync APIs>>.
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 ****
 
 include::{generated}/validity/structs/VkSemaphoreSignalInfo.txt[]
@@ -4976,8 +5169,9 @@ include::{generated}/api/protos/vkImportSemaphoreSciSyncObjNV.txt[]
 Importing a semaphore payload from stext:NvSciSyncObj does not transfer
 ownership of the handle to the Vulkan implementation.
 When importing stext:NvSciSyncObj, Vulkan will make a new reference to that
-object, the application must release its ownership using NvSciSync APIs when
-that ownership is no longer needed.
+object, the application must: release its ownership using
+<<NvSciSync-extension-page, NvSciSync APIs>> when that ownership is no
+longer needed.
 
 Application must: not import the same stext:NvSciSyncObj with signaler
 access permissions into multiple instances of VkSemaphore, and must: not
@@ -4985,9 +5179,10 @@ import into the same instance from which it was exported.
 
 .Valid Usage
 ****
- * slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
-   slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
-   must: be enabled
+  * [[VUID-vkImportSemaphoreSciSyncObjNV-sciSyncImport-05155]]
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncImport and
+    slink:VkPhysicalDeviceExternalSciSyncFeaturesNV::pname:sciSyncSemaphore
+    must: be enabled
 ****
 
 include::{generated}/validity/protos/vkImportSemaphoreSciSyncObjNV.txt[]

@@ -60,11 +60,15 @@ include::{generated}/api/structs/VkFaultData.txt[]
   * pname:faultType is a elink:VkFaultType that provides the type of the
     fault.
 
+To retrieve implementation-specific fault data, pname:pNext can: point to
+one or more implementation-defined fault structures or `NULL` to not
+retrieve implementation-specific data.
+
 .Valid Usage
 ****
   * [[VUID-VkFaultData-pNext-05019]]
-    pname:pNext must: be `NULL` or a valid host pointer to an
-    implementation-specific amount of writeable memory.
+    pname:pNext must: be `NULL` or a valid pointer to an
+    implementation-specific structure
 ****
 
 include::{generated}/validity/structs/VkFaultData.txt[]
@@ -73,7 +77,7 @@ include::{generated}/validity/structs/VkFaultData.txt[]
 
 [open,refpage='VkFaultLevel',desc='The different fault severity levels that can be returned',type='enums']
 --
-Possible values of slink:VkFaultData.pname:faultLevel, specifying the fault
+Possible values of slink:VkFaultData::pname:faultLevel, specifying the fault
 severity, are:
 
 include::{generated}/api/enums/VkFaultLevel.txt[]
@@ -91,7 +95,7 @@ include::{generated}/api/enums/VkFaultLevel.txt[]
 [open,refpage='VkFaultType',desc='The different fault types that can be returned',type='enums']
 --
 
-Possible values of slink:VkFaultData.pname:faultType, specifying the fault
+Possible values of slink:VkFaultData::pname:faultType, specifying the fault
 type, are:
 
 include::{generated}/api/enums/VkFaultType.txt[]
@@ -137,7 +141,7 @@ include::{generated}/api/protos/vkGetFaultData.txt[]
     recorded fault data.
 
 Access to fault data is internally synchronized, meaning
-flink:vkGetFaultData can be called from multiple threads simultaneously.
+flink:vkGetFaultData can: be called from multiple threads simultaneously.
 
 The implementation must: not record more than <<limits-maxQueryFaultCount,
 pname:maxQueryFaultCount>> faults to be reported by flink:vkGetFaultData.
@@ -166,9 +170,9 @@ On success, the fault information stored by the implementation for the
 faults that were returned will be handled as specified by
 pname:faultQueryBehavior.
 
-For each filled pname:pFaults entry, if pname:pNext is not `NULL`, then the
-implementation will write the implementation-specific data for that fault to
-the memory at the address pointed to by pname:pNext.
+For each filled pname:pFaults entry, if pname:pNext is not `NULL`, the
+implementation will fill in any implementation-specific structures
+applicable to that fault that are included in the pname:pNext chain.
 
 [NOTE]
 .Note
@@ -220,9 +224,9 @@ sname:VkFaultCallbackInfo structure to the pname:pNext chain of the
 slink:VkDeviceCreateInfo structure.
 The callback function is only called by the implementation during a call to
 the API, using the same thread that is making the API call.
-The sname:VkFaultCallbackInfo structure describes the memory provided by the
-application to store the fault data and the function pointer to be called by
-the implementation.
+The sname:VkFaultCallbackInfo structure provides the function pointer to be
+called by the implementation, and optionally, application memory to store
+fault data.
 
 [open,refpage='VkFaultCallbackInfo',desc='Fault call back information',type='structs']
 --
@@ -236,16 +240,27 @@ include::{generated}/api/structs/VkFaultCallbackInfo.txt[]
     structure.
   * pname:faultCount is the number of reported faults in the array pointed
     to by pname:pFaults.
-  * pname:pFaults is a pointer to an array of pname:faultCount
-    slink:VkFaultData structures.
+  * pname:pFaults is either `NULL` or a pointer to an array of
+    pname:faultCount slink:VkFaultData structures.
   * pname:pfnFaultCallback is a function pointer to the fault handler
     function that will be called by the implementation when a fault occurs.
 
-To retrieve implementation-specific fault data, the pname:pNext of each
-slink:VkFaultData structure must: point to an implementation-defined fault
-structure or `NULL` to not retrieve implementation-specific data.
-The application memory referenced by these structures must: remain
-accessible throughout the lifetime of the logical device that was by created
+If provided, the implementation may: make use of the pname:pFaults array to
+return fault data to the application when using the fault callback.
+
+[NOTE]
+.Note
+====
+Prior to Vulkan SC 1.0.11, the application was required to provide the
+pname:pFaults array for fault callback data.
+This proved to be unwieldly for both applications and implementations and it
+was made optional as of version 1.0.11.
+It is expected that most implementations will ignore this and use stack or
+other preallocated memory for fault callback parameters.
+====
+
+If provided, the application memory referenced by pname:pFaults must: remain
+accessible throughout the lifetime of the logical device that was created
 with this structure.
 
 [NOTE]
@@ -264,8 +279,9 @@ calling the fault callback function.
 
 .Valid Usage
 ****
-  * [[VUID-VkFaultCallbackInfo-faultCount-05088]]
-    pname:faultCount must: be equal to <<limits-maxCallbackFaultCount,
+  * [[VUID-VkFaultCallbackInfo-faultCount-05138]]
+    pname:faultCount must: either be 0, or equal to
+    <<limits-maxCallbackFaultCount,
     sname:VkPhysicalDeviceVulkanSC10Properties::pname:maxCallbackFaultCount>>
 ****
 

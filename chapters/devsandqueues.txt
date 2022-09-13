@@ -417,8 +417,9 @@ include::{generated}/api/structs/VkPhysicalDeviceVulkanSC10Properties.txt[]
     multiple command buffers from the same command pool can: be in the
     <<commandbuffers-lifecycle, recording state>> at the same time.
   * [[limits-commandPoolResetCommandBuffer]]
-    pname:commandPoolResetCommandBuffer indicates whether command pools
-    support ename:VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT.
+    pname:commandPoolResetCommandBuffer indicates whether command buffers
+    support flink:vkResetCommandBuffer, and flink:vkBeginCommandBuffer when
+    not in the <<commandbuffers-lifecycle, initial state>>.
   * [[limits-commandBufferSimultaneousUse]]
     pname:commandBufferSimultaneousUse indicates whether command buffers
     support ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT.
@@ -1538,7 +1539,7 @@ If the slink:VkApplicationParametersEXT::pname:vendorID and
 slink:VkApplicationParametersEXT::pname:deviceID values do not match the
 slink:VkPhysicalDeviceProperties::pname:vendorID and
 slink:VkPhysicalDeviceProperties::pname:deviceID of pname:physicalDevice,
-flink:vkCreateDevice: must: return ename:VK_ERROR_INITIALIZATION_FAILED.
+flink:vkCreateDevice must: return ename:VK_ERROR_INITIALIZATION_FAILED.
 
 If slink:VkApplicationParametersEXT::pname:key is not a valid
 implementation-defined application parameter key for the device being
@@ -2275,6 +2276,12 @@ and pname:maxImmutableSamplersPerDescriptorSetLayout will be reserved.
 For the remaining members, the sum of the requested resources from all
 instances of sname:VkDeviceObjectReservationCreateInfo will be reserved.
 
+If
+slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,
+pname:deviceDestroyFreesMemory>> is ename:VK_TRUE, the reserved memory is
+returned to the system when the device is destroyed, otherwise it may: not
+be returned to the system until the process is terminated.
+
 ifdef::hidden[]
 // tag::scaddition[]
   * slink:VkDeviceObjectReservationCreateInfo <<SCID-4>>
@@ -2350,6 +2357,40 @@ endif::hidden[]
 include::{generated}/validity/structs/VkPerformanceQueryReservationInfoKHR.txt[]
 --
 endif::VK_KHR_performance_query[]
+
+ifdef::VK_NV_external_sci_sync2[]
+[open,refpage='VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV',desc='Request memory reservation',type='structs']
+--
+If the pname:pNext chain of slink:VkDeviceObjectReservationCreateInfo
+includes a slink:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV
+structure, then the structure indicates the maximum number of
+slink:VkSemaphoreSciSyncPoolNV objects that can: exist at the same time.
+
+The sname:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV structure is
+defined as:
+
+include::{generated}/api/structs/VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV.txt[]
+
+  * pname:sType is the type of this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:semaphoreSciSyncPoolRequestCount is the requested maximum number
+    of slink:VkSemaphoreSciSyncPoolNV objects that can: exist at the same
+    time.
+
+If the sname:VkDeviceObjectReservationCreateInfo::pname:pNext chain does not
+include this structure, then pname:semaphoreSciSyncPoolRequestCount defaults
+to `0`.
+
+Multiple sname:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV
+structures can: be chained together.
+The sum of the pname:semaphoreSciSyncPoolRequestCount values from all
+instances of sname:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV will
+be reserved.
+
+include::{generated}/validity/structs/VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV.txt[]
+--
+endif::VK_NV_external_sci_sync2[]
 
 [open,refpage='VkPipelinePoolSize',desc='Request memory for pipelines',type='structs']
 --
@@ -2563,10 +2604,16 @@ fname:vkDestroyDevice.
 
 .Valid Usage
 ****
+ifdef::VKSC_VERSION_1_0[]
+  * [[VUID-vkDestroyDevice-device-05137]]
+    All child objects created on pname:device except query pools, descriptor
+    pools, command pools, and device memory must: have been destroyed prior
+    to destroying pname:device
+endif::VKSC_VERSION_1_0[]
+ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroyDevice-device-00378]]
     All child objects created on pname:device must: have been destroyed
     prior to destroying pname:device
-ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroyDevice-device-00379]]
     If sname:VkAllocationCallbacks were provided when pname:device was
     created, a compatible set of callbacks must: be provided here

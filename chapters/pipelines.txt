@@ -4266,6 +4266,9 @@ ifdef::VKSC_VERSION_1_0[]
     must: be the same as specified in one of the
     slink:VkDeviceObjectReservationCreateInfo::pname:pPipelineCacheCreateInfos
     structures when the device was created
+  * [[VUID-VkPipelineCacheCreateInfo-pInitialData-05139]]
+    The pipeline cache data pointed to by pname:pInitialData must: not
+    contain any pipelines with duplicate pipeline identifiers.
 endif::VKSC_VERSION_1_0[]
 ****
 ifdef::VKSC_VERSION_1_0[]
@@ -4573,6 +4576,14 @@ bytes into the cache and the location of pipeline code:i is calculated as:
 The slink:VkPipelineCacheSafetyCriticalIndexEntry structures may: not be
 tightly packed, enabling additional implementation-specific data to be
 stored with each entry, or for future extensibility.
+
+[NOTE]
+.Note
+====
+Because the pipeline cache index is keyed by pipeline identifier,
+applications and offline compilers must ensure that there are no pipelines
+with identical pipeline indentifiers in the same pipeline cache.
+====
 
 Unlike most structures declared by the Vulkan API, all fields of this
 structure are written with the least significant byte first, regardless of

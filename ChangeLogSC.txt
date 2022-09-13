@@ -1,21 +1,62 @@
 Copyright 2022 The Khronos Group Inc.
 SPDX-License-Identifier: CC-BY-4.0
 
-Update Log for the VulkanSC-Docs repository on Github. Updates are in reverse
-chronological order starting with the latest public release.
+Update Log for the VulkanSC-Docs repository on Github.
+Updates are in reverse chronological order starting with the latest public
+release.
 
-This summarizes the periodic public updates, not individual commits. Updates
-on Github are done as single large patches at the release point, collecting
-together the resolution of many Khronos internal issues, along with any
-public pull requests that have been accepted.
+This summarizes the periodic public updates, not individual commits.
+Updates on Github are done as single large patches at the release point,
+collecting together the resolution of many Khronos internal issues, along
+with any public pull requests that have been accepted.
+
+-----------------------------------------------------
+
+Change log for September 9, 2022 Vulkan SC 1.0.11 spec update:
+
+  * update release number to 11 for this update
+  * reserve VUID range for NV_private_vendor_info
+  * Reflow / Assign VUIDs using: python3 scripts/reflow.py -overwrite -tagvu
+    chapters/*txt chapters/*/*txt appendices/*txt
+
+Public issues:
+
+  * Remove Vulkan-Hpp from CI (#2)
+
+Internal issues:
+
+  * Clarify vkDestroyDevice VUID (!291)
+  * Restore VK_OBJECT_TYPE_SHADER_MODULE for VulkanSC (!293)
+  * Change SciSync import structures to use non-const pointer type for
+    handle (!294)
+  * Make Philosophy section sound safer (!295)
+  * Allow poolSizeCount to be zero (#160, !296)
+  * Fix formatting (stray colon) (!297)
+  * fix indenting of Valid Usage blocks and remove VUID 5116 and 5117 (!298)
+  * Tweak the meaning of commandPoolResetCommandBuffer to allow the command
+    pool creation flag, but not allow vkResetCommandBuffer (!299)
+  * Update cgenerator to replace C-style casts with static_casts in defines
+    (!300)
+  * Update CI to refer to container hash rather than name and update to
+    latest CI image (!301)
+  * Conditionalize text for VKSC (#159, !303)
+  * Fix parser allocations with sizes greater than tab size (!304)
+  * Disallow duplicate pipeline identifiers (#158, !305)
+  * Make application provided fault callback memory optional (#157, !302)
+
+New Extensions:
+
+  * apiext:VK_NV_external_sci_sync2 (deprecating
+    apiext:VK_NV_external_sci_sync) and apiext:VK_NV_private_vendor_info
+    (!306,!307)
 
 -----------------------------------------------------
 
 Change log for May 20, 2022 Vulkan SC 1.0.10 spec update:
 
   * update release number to 10 for this update
-  * Reflow / Assign VUIDs using:
-    python3 scripts/reflow.py -overwrite -tagvu chapters/*txt chapters/*/*txt appendices/*txt
+  * Reflow / Assign VUIDs using: python3 scripts/reflow.py -overwrite -tagvu
+    chapters/*txt chapters/*/*txt appendices/*txt
 
 Internal issues:
 

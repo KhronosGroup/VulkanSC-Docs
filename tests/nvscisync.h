@@ -5,3 +5,5 @@
 // "nvscisync.h" for non-SCI compilation environment
 
 typedef int NvSciSyncAttrList;
+typedef int NvSciSyncObj;
+typedef int NvSciSyncFence;

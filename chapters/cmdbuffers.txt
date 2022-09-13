@@ -215,11 +215,6 @@ ifdef::VK_VERSION_1_1[]
     be set
 endif::VK_VERSION_1_1[]
 ifdef::VKSC_VERSION_1_0[]
-  * [[VUID-VkCommandPoolCreateInfo-commandPoolResetCommandBuffer-05001]]
-    If
-    <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
-    is ename:VK_FALSE, pname:flags must: not include
-    ename:VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
   * [[VUID-VkCommandPoolCreateInfo-pNext-05002]]
     The pname:pNext chain must: include a
     slink:VkCommandPoolMemoryReservationCreateInfo structure
@@ -228,11 +223,6 @@ endif::VKSC_VERSION_1_0[]
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
 // tag::scdeviation[]
-  * If
-    slink:VkPhysicalDeviceVulkanSC10Properties::pname:commandPoolResetCommandBuffer
-    is ename:VK_FALSE, slink:VkCommandPoolCreateInfo::pname:flags must: not
-    include ename:VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
-    <<SCID-8>>.
   * The slink:VkCommandPoolCreateInfo::pname:pNext chain must: include a
     valid slink:VkCommandPoolMemoryReservationCreateInfo structure
     <<SCID-4>>.
@@ -756,7 +746,20 @@ it, becomes <<commandbuffers-lifecycle, invalid>>.
   * [[VUID-vkResetCommandBuffer-commandBuffer-00046]]
     pname:commandBuffer must: have been allocated from a pool that was
     created with the ename:VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
+ifdef::VKSC_VERSION_1_0[]
+  * [[VUID-vkResetCommandBuffer-commandPoolResetCommandBuffer-05135]]
+    <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
+    must: be supported
+endif::VKSC_VERSION_1_0[]
 ****
+ifdef::VKSC_VERSION_1_0[]
+ifdef::hidden[]
+// tag::scdeviation[]
+  * <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
+    must: be supported <<SCID-8>>.
+// end::scdeviation[]
+endif::hidden[]
+endif::VKSC_VERSION_1_0[]
 
 include::{generated}/validity/protos/vkResetCommandBuffer.txt[]
 --
@@ -862,6 +865,13 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
     did not have the ename:VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
     flag set, pname:commandBuffer must: be in the
     <<commandbuffers-lifecycle, initial state>>
+ifdef::VKSC_VERSION_1_0[]
+  * [[VUID-vkBeginCommandBuffer-commandPoolResetCommandBuffer-05136]]
+    If
+    <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
+    is not supported, pname:commandBuffer must: be in the
+    <<commandbuffers-lifecycle, initial state>>
+endif::VKSC_VERSION_1_0[]
   * [[VUID-vkBeginCommandBuffer-commandBuffer-00051]]
     If pname:commandBuffer is a secondary command buffer, the
     pname:pInheritanceInfo member of pname:pBeginInfo must: be a valid
@@ -905,6 +915,10 @@ ifdef::hidden[]
     is ename:VK_FALSE, then slink:VkCommandBufferBeginInfo::pname:flags
     must: not include ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
     <<SCID-8>>.
+  * If
+    <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
+    is not supported, pname:commandBuffer must: be in the
+    <<commandbuffers-lifecycle, initial state>> <<SCID-8>>.
 // end::scdeviation[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]
@@ -1945,12 +1959,12 @@ ifdef::VK_KHR_device_group_creation,VK_VERSION_1_1[]
     If the pname:device that pname:semaphore was created on is a device
     group, pname:deviceIndex must: be a valid device index
 endif::VK_KHR_device_group_creation,VK_VERSION_1_1[]
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
   * [[VUID-VkSemaphoreSubmitInfoKHR-semaphore-05094]]
     If pname:semaphore has a payload of stext:NvSciSyncObj, pname:value
     must: be calculated by application via <<NvSciSync-extension-page,
     NvSciSync APIs>>.
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 
 ****
 
@@ -2348,7 +2362,7 @@ not created with a elink:VkSemaphoreType of
 ename:VK_SEMAPHORE_TYPE_TIMELINE, the implementation must: ignore the value
 in the pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues entry.
 
-ifdef::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 If the semaphore in slink:VkSubmitInfo::pname:pWaitSemaphores or
 slink:VkSubmitInfo::pname:pSignalSemaphores corresponding to an entry in
 pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues respectively was
@@ -2356,7 +2370,7 @@ created with a elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_TIMELINE,
 and has stext:NvSciSyncObj as the payload, the value in the
 pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues entry must: be
 calculated by application via <<NvSciSync-extension-page, NvSciSync APIs>>.
-endif::VK_NV_external_sci_sync[]
+endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 
 include::{generated}/validity/structs/VkTimelineSemaphoreSubmitInfo.txt[]
 --

@@ -3087,6 +3087,75 @@ include::{generated}/validity/structs/VkPhysicalDeviceExternalSciSyncFeaturesNV.
 --
 endif::VK_NV_external_sci_sync[]
 
+ifdef::VK_NV_external_sci_sync2[]
+[open,refpage='VkPhysicalDeviceExternalSciSync2FeaturesNV',desc='Structure describing SciSync features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceExternalSciSync2FeaturesNV structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDeviceExternalSciSync2FeaturesNV.txt[]
+
+The members of the sname:VkPhysicalDeviceExternalSciSync2FeaturesNV
+structure describe the following features:
+
+  * [[features-sciSyncFence-2]] pname:sciSyncFence indicates whether
+    external fences created with a handle type of
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_OBJ_BIT_NV and
+    ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_SCI_SYNC_FENCE_BIT_NV are supported
+    for import and/or export.
+  * [[features-sciSyncSemaphore2]] pname:sciSyncSemaphore2 indicates whether
+    semaphore SciSync pools are supported and semaphores can be created from
+    stext:NvSciSyncObj via slink:VkSemaphoreSciSyncPoolNV objects.
+    In this case, the application is responsible for the resource management
+    of the stext:NvSciSyncObj.
+  * [[features-sciSyncImport-2]] pname:sciSyncImport indicates whether
+    stext:NvSciSyncObj import functionality is supported.
+    If pname:sciSyncImport is set to ename:VK_TRUE, slink:VkFence and/or
+    slink:VkSemaphore support importing stext:NvSciSyncObj from
+    applications.
+    In this case, the application is responsible for the resource management
+    of the stext:NvSciSyncObj.
+  * [[features-sciSyncExport-2]] pname:sciSyncExport indicates whether
+    stext:NvSciSyncObj export functionality is supported.
+    If pname:sciSyncExport is set to ename:VK_TRUE, slink:VkFence supports
+    exporting stext:NvSciSyncObj created by the driver to applications.
+    In this case, the driver is responsible for the resource management of
+    the stext:NvSciSyncObj.
+
+[[features-externalscisync2-table]]
+.Functionality supported for NvSciSync features
+|=====
+| Features           | pname:sciSyncImport | pname:sciSyncExport | Always supported^1^
+| pname:sciSyncFence
+  | flink:vkImportFenceSciSyncFenceNV, flink:vkImportFenceSciSyncObjNV
+  | slink:VkExportFenceSciSyncInfoNV
+  | flink:vkGetFenceSciSyncFenceNV, flink:vkGetFenceSciSyncObjNV, flink:vkGetPhysicalDeviceSciSyncAttributesNV (with ename:VK_SCI_SYNC_PRIMITIVE_TYPE_FENCE_NV)
+| pname:sciSyncSemaphore2
+  | flink:vkCreateSemaphoreSciSyncPoolNV, slink:VkSemaphoreSciSyncCreateInfoNV
+  | n/a
+  | flink:vkGetPhysicalDeviceSciSyncAttributesNV (with ename:VK_SCI_SYNC_PRIMITIVE_TYPE_SEMAPHORE_NV)
+|=====
+
+1::
+    Functionality in this column is always available.
+
+The <<features-externalscisync2-table, Functionality supported for NvSciSync
+features>> table summarizes the functionality enabled by the
+sname:VkPhysicalDeviceExternalSciSync2FeaturesNV structure.
+There are two orthogonal pieces of functionality: fence and semaphore
+support; import and export support.
+Each entry in the body of the table summarizes the functionality that can:
+be used when the given features are supported and enabled.
+This summarizes Valid Usage statements that are added elsewhere in this
+specification.
+
+:refpage: VkPhysicalDeviceExternalSciSync2FeaturesNV
+include::{chapters}/features.txt[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceExternalSciSync2FeaturesNV.txt[]
+--
+endif::VK_NV_external_sci_sync2[]
+
 ifdef::VK_NV_external_memory_sci_buf[]
 [open,refpage='VkPhysicalDeviceExternalSciBufFeaturesNV',desc='Structure describing NvSciBuf features that can be supported by an implementation',type='structs']
 --
@@ -5384,6 +5453,13 @@ ifdef::VK_NV_external_sci_sync[]
     <<features-sciSyncExport, pname:sciSyncExport>>, if the
     `apiext:VK_NV_external_sci_sync` extension is supported.
 endif::VK_NV_external_sci_sync[]
+ifdef::VK_NV_external_sci_sync2[]
+  * At least one of <<features-sciSyncFence2, pname:sciSyncFence>> and
+    <<features-sciSyncSemaphore2, pname:sciSyncSemaphore2>>, and at least
+    one of <<features-sciSyncImport2, pname:sciSyncImport>> and
+    <<features-sciSyncExport2, pname:sciSyncExport>>, if the
+    `apiext:VK_NV_external_sci_sync2` extension is supported.
+endif::VK_NV_external_sci_sync2[]
 ifdef::VK_NV_external_memory_sci_buf[]
   * At least one of <<features-sciBufImport, pname:sciBufImport>> and
     <<features-sciBufExport, pname:sciBufExport>>, if the
