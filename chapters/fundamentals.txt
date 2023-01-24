@@ -378,6 +378,9 @@ executing commands that use the object:
   * sname:VkCommandBuffer
 ifndef::VKSC_VERSION_1_0[]
   * sname:VkCommandPool
+ifdef::VK_NV_external_sci_sync2[]
+  * sname:VkSemaphoreSciSyncPoolNV
+endif::VK_NV_external_sci_sync2[]
 endif::VKSC_VERSION_1_0[]
 
 In general, objects can: be destroyed or freed in any order, even if the
@@ -427,9 +430,11 @@ ifndef::VKSC_VERSION_1_0[]
     objects that were allocated from it.
 endif::VKSC_VERSION_1_0[]
 ifdef::VKSC_VERSION_1_0[]
-  * Device memory (slink:VkDeviceMemory) allocations,
+  * [[fundamentals-objectmodel-no-destroy]] Device memory
+    (slink:VkDeviceMemory) allocations,
 ifdef::VK_KHR_swapchain[swapchains (slink:VkSwapchainKHR),]
     and pool objects (slink:VkCommandPool, slink:VkDescriptorPool,
+ifdef::VK_NV_external_sci_sync2[slink:VkSemaphoreSciSyncPoolNV,]
     slink:VkQueryPool) cannot: be explicitly freed or destroyed.
     Instead, they are implicitly freed or destroyed when the sname:VkDevice
     object they are created from is destroyed.

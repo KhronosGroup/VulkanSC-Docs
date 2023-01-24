@@ -4950,6 +4950,7 @@ be returned by the corresponding ftext:vkCreate*Pipelines command.
 ifdef::hidden[]
 // tag::scaddition[]
   * slink:VkPipelineOfflineCreateInfo <<SCID-1>>, <<SCID-8>>
+  * elink:VkPipelineMatchControl <<SCID-1>>
 // end::scaddition[]
 endif::hidden[]
 

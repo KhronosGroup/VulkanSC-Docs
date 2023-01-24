@@ -4160,9 +4160,11 @@ include::{generated}/api/structs/VkSemaphoreSciSyncPoolCreateInfoNV.txt[]
 During flink:vkCreateSemaphoreSciSyncPoolNV, the external stext:NvSciSyncObj
 is imported to sname:VkSemaphoreSciSyncPoolNV.
 The import does not transfer the ownership of the stext:NvSciSyncObj to the
-implementation, but will increment the reference count of that object and
+implementation, but will increment the reference count of that object.
+ifndef::VKSC_VERSION_1_0[]
 flink:vkDestroySemaphoreSciSyncPoolNV will decrement the reference count of
 that object.
+endif::VKSC_VERSION_1_0[]
 The application must: delete other references of the original
 stext:NvSciSyncObj using <<NvSciSync2-extension-page, NvSciSync APIs>> when
 it is no longer needed.
@@ -4179,6 +4181,24 @@ access permissions to multiple instances of sname:VkSemaphoreSciSyncPoolNV.
 include::{generated}/validity/structs/VkSemaphoreSciSyncPoolCreateInfoNV.txt[]
 --
 
+ifdef::VKSC_VERSION_1_0[]
+ifdef::hidden[]
+// tag::scremoved[]
+ifdef::VK_NV_external_sci_sync2[]
+  * fname:vkDestroySemaphoreSciSyncPoolNV <<SCID-4>>
+endif::VK_NV_external_sci_sync2[]
+// end::scremoved[]
+endif::hidden[]
+
+Semaphore SciSync pools cannot: be freed <<SCID-4>>.
+If
+slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,pname:deviceDestroyFreesMemory>>
+is ename:VK_TRUE, the memory is returned to the system and the reference to
+the stext:NvSciSyncObj that was imported is releasd when the device is
+destroyed.
+endif::VKSC_VERSION_1_0[]
+
+ifndef::VKSC_VERSION_1_0[]
 [open,refpage='vkDestroySemaphoreSciSyncPoolNV',desc='Destroy a slink:VkSemaphoreSciSyncPoolNV object',type='protos']
 --
 To destroy a slink:VkSemaphoreSciSyncPoolNV, call:
@@ -4205,6 +4225,7 @@ include::{generated}/api/protos/vkDestroySemaphoreSciSyncPoolNV.txt[]
 
 include::{generated}/validity/protos/vkDestroySemaphoreSciSyncPoolNV.txt[]
 --
+endif::VKSC_VERSION_1_0[]
 endif::VK_NV_external_sci_sync2[]
 
 

@@ -12,6 +12,38 @@ with any public pull requests that have been accepted.
 
 -----------------------------------------------------
 
+Change log for January 20, 2023 Vulkan SC 1.0.12 spec update:
+
+  * update release number to 12 for this update
+  * Assign/partition VU range for sc_1_0 branch
+  * Reflow / Assign VUIDs using: python3 scripts/reflow.py -overwrite -tagvu
+    chapters/*txt chapters/*/*txt appendices/*txt
+
+Public issues:
+
+  * Add VkPipelineMatchControl to list of scadditions (#3/!323)
+  * Remove scremoval for VkDebugReportObjectTypeEXT (#6/!324)
+
+Internal issues:
+
+  * Fixes for VK_NV_external_sci_sync2 (#164)
+  * json_gen: Remove unneccessary extensions for layer (!309)
+  * Fix misleading deviation text for commandPoolResetCommandBuffer (!311)
+  * Clarify vkDestroyDevice by mentioning deviceDestroyFreesMemory (!312)
+  * Fix VulkanSC apiVersion valid usage (#170/!313)
+  * Resolve duplicated VUID 05089 (!314)
+  * revision 2 of VK_NV_external_memory_sci_buf (!316)
+  * json_gen: Fix undefined print_ / parse_ functions for NV SCI extensions (!317)
+  * Mark VkFaultData returnedonly in the XML (#173/!318)
+  * JSON parser memory allocation fixes (!320)
+  * Fix CTS compilation errors in json parser (!321)
+  * Remove TLS WAR for CTS (!322)
+  * Simplify description of vkEnumerateDeviceLayerProperties (#172/!325)
+  * Add 'U' suffixes in VERSION macros (!326)
+  * Remove requiredbitmask VU for VkSubmitInfo->pWaitDstStageMask (!328)
+
+-----------------------------------------------------
+
 Change log for September 9, 2022 Vulkan SC 1.0.11 spec update:
 
   * update release number to 11 for this update

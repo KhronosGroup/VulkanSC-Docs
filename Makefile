@@ -141,7 +141,7 @@ VERBOSE =
 NOTEOPTS     = -a editing-notes -a implementation-guide
 BASEOPTS     =
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
-PATCHVERSION = 11
+PATCHVERSION = 12
 SPECREVISION = 1.0.$(PATCHVERSION)
 VKSPECREVISION = 1.2.202
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"

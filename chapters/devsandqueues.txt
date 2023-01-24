@@ -2602,13 +2602,22 @@ explicitly free all of these resources prior to calling
 fname:vkDestroyDevice.
 ====
 
+ifdef::VKSC_VERSION_1_0[]
+If
+slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,
+pname:deviceDestroyFreesMemory>> is ename:VK_TRUE, the reserved memory for
+child objects without explicit free or destroy commands is returned to the
+system when the device is destroyed, otherwise it may: not be returned to
+the system until the process is terminated.
+endif::VKSC_VERSION_1_0[]
+
 .Valid Usage
 ****
 ifdef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroyDevice-device-05137]]
-    All child objects created on pname:device except query pools, descriptor
-    pools, command pools, and device memory must: have been destroyed prior
-    to destroying pname:device
+    All child objects created on pname:device, except those with no explicit
+    <<fundamentals-objectmodel-no-destroy, free or destroy command>>, must:
+    have been destroyed prior to destroying pname:device
 endif::VKSC_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroyDevice-device-00378]]

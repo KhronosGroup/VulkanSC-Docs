@@ -108,9 +108,11 @@ endif::VKSC_VERSION_1_0[]
      flink:vkCreateSemaphore.
   ** Can call flink:vkDestroySemaphore to destroy the slink:VkSemaphore
      immediately after all the batches that refer to it are submitted.
+ifndef::VKSC_VERSION_1_0[]
   ** Call flink:vkDestroySemaphoreSciSyncPoolNV to destroy the semaphore
      SciSync pool after all submitted batches that refer to it have
      completed execution.
+endif::VKSC_VERSION_1_0[]
 
 === Version History
 

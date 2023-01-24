@@ -57,6 +57,11 @@ CHECK_MEMBER_PNEXT_OPTIONAL_EXCEPTIONS = (
     'VkVideoEncodeRateControlLayerInfoKHR',
 )
 
+# Exceptions to enumeration of array rules
+CHECK_ENUMERATION_OF_ARRAY_EXCEPTIONS = (
+    'vkEnumerateDeviceLayerProperties',
+)
+
 def get_extension_commands(reg):
     extension_cmds = set()
     for ext in reg.extensions:
@@ -198,8 +203,12 @@ class Checker(XMLChecker):
         if countParams:
             assert(len(countParams) == 1)
             if 'VK_INCOMPLETE' not in successcodes:
-                self.record_error(
-                    "Apparent enumeration of an array without VK_INCOMPLETE in successcodes.")
+                if self.entity in CHECK_ENUMERATION_OF_ARRAY_EXCEPTIONS:
+                    self.record_warning('(Allowed exception)',
+                        "Apparent enumeration of an array without VK_INCOMPLETE in successcodes.")
+                else:
+                    self.record_error(
+                        "Apparent enumeration of an array without VK_INCOMPLETE in successcodes.")
 
         elif 'VK_INCOMPLETE' in successcodes:
             self.record_error(

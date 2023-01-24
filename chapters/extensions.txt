@@ -442,6 +442,7 @@ commands operating on that instance or any of its child objects.
 At the time of deprecation there were no known device-only layers and no
 compelling reason to create one.
 
+ifndef::VKSC_VERSION_1_0[]
 In order to maintain compatibility with implementations released prior to
 device-layer deprecation, applications should: still enumerate and enable
 device layers.
@@ -449,6 +450,7 @@ The behavior of fname:vkEnumerateDeviceLayerProperties and valid usage of
 the pname:ppEnabledLayerNames member of slink:VkDeviceCreateInfo maximizes
 compatibility with applications written to work with the previous
 requirements.
+endif::VKSC_VERSION_1_0[]
 
 [open,refpage='vkEnumerateDeviceLayerProperties',desc='Returns properties of available physical device layers',type='protos']
 --
@@ -463,6 +465,7 @@ include::{generated}/api/protos/vkEnumerateDeviceLayerProperties.txt[]
   * pname:pProperties is either `NULL` or a pointer to an array of
     slink:VkLayerProperties structures.
 
+ifndef::VKSC_VERSION_1_0[]
 If pname:pProperties is `NULL`, then the number of layer properties
 available is returned in pname:pPropertyCount.
 Otherwise, pname:pPropertyCount must: point to a variable set by the user to
@@ -479,8 +482,11 @@ must: be exactly the sequence of layers enabled for the instance.
 The members of sname:VkLayerProperties for each enumerated layer must: be
 the same as the properties when the layer was enumerated by
 fname:vkEnumerateInstanceLayerProperties.
-
-include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
+endif::VKSC_VERSION_1_0[]
+ifdef::VKSC_VERSION_1_0[]
+Physical device layers are not supported.
+pname:pPropertyCount is set to `0` and ename:VK_SUCCESS is returned.
+endif::VKSC_VERSION_1_0[]
 
 include::{generated}/validity/protos/vkEnumerateDeviceLayerProperties.txt[]
 --
@@ -488,12 +494,16 @@ include::{generated}/validity/protos/vkEnumerateDeviceLayerProperties.txt[]
 The pname:ppEnabledLayerNames and pname:enabledLayerCount members of
 slink:VkDeviceCreateInfo are deprecated and their values must: be ignored by
 implementations.
+ifndef::VKSC_VERSION_1_0[]
 However, for compatibility, only an empty list of layers or a list that
 exactly matches the sequence enabled at instance creation time are valid,
 and validation layers should: issue diagnostics for other cases.
 
 Regardless of the enabled layer list provided in slink:VkDeviceCreateInfo,
-the sequence of layers active for a device will be exactly the sequence of
+the
+endif::VKSC_VERSION_1_0[]
+ifdef::VKSC_VERSION_1_0[The]
+sequence of layers active for a device will be exactly the sequence of
 layers enabled when the parent instance was created.
 
 

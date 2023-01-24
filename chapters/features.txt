@@ -3157,14 +3157,17 @@ include::{generated}/validity/structs/VkPhysicalDeviceExternalSciSync2FeaturesNV
 endif::VK_NV_external_sci_sync2[]
 
 ifdef::VK_NV_external_memory_sci_buf[]
-[open,refpage='VkPhysicalDeviceExternalSciBufFeaturesNV',desc='Structure describing NvSciBuf features that can be supported by an implementation',type='structs']
+[open,refpage='VkPhysicalDeviceExternalMemorySciBufFeaturesNV',desc='Structure describing NvSciBuf features that can be supported by an implementation',type='structs']
 --
-The sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure is defined as:
+The sname:VkPhysicalDeviceExternalMemorySciBufFeaturesNV structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceExternalMemorySciBufFeaturesNV.txt[]
 
 include::{generated}/api/structs/VkPhysicalDeviceExternalSciBufFeaturesNV.txt[]
 
-The members of the sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure
-describe the following features:
+The members of the sname:VkPhysicalDeviceExternalMemorySciBufFeaturesNV
+structure describe the following features:
 
   * [[features-sciBufImport]] pname:sciBufImport indicates whether
     stext:NvSciBufObj import functionality is supported.
@@ -3194,16 +3197,16 @@ describe the following features:
 
 The <<features-externalscibuf-table, Functionality supported for NvSciBuf
 features>> table summarizes the functionality enabled by the
-sname:VkPhysicalDeviceExternalSciBufFeaturesNV structure.
+sname:VkPhysicalDeviceExternalMemorySciBufFeaturesNV structure.
 Each entry in the body of the table summarizes the functionality that can:
 be used when the given features are supported and enabled.
 This summarizes Valid Usage statements that are added elsewhere in this
 specification.
 
-:refpage: VkPhysicalDeviceExternalSciBufFeaturesNV
+:refpage: VkPhysicalDeviceExternalMemorySciBufFeaturesNV
 include::{chapters}/features.txt[tag=features]
 
-include::{generated}/validity/structs/VkPhysicalDeviceExternalSciBufFeaturesNV.txt[]
+include::{generated}/validity/structs/VkPhysicalDeviceExternalMemorySciBufFeaturesNV.txt[]
 --
 endif::VK_NV_external_memory_sci_buf[]
 

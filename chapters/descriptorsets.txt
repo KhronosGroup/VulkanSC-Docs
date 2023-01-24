@@ -466,6 +466,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 ****
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
 
+:uniqifier: layoutbindings
 :combinedobjectnameplural: descriptor set layout bindings
 :combinedparentobject: VkDescriptorSetLayout
 :combinedobjectcount: pname:pCreateInfo->bindingCount
@@ -3937,9 +3938,6 @@ ifdef::hidden[]
   * ename:VkDescriptorUpdateTemplateType
   ** ename:VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET_KHR <<SCID-8>>
   ** ename:VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_PUSH_DESCRIPTORS_KHR
-     <<SCID-8>>
-  * ename:VkDebugReportObjectTypeEXT
-  ** ename:VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_KHR_EXT
      <<SCID-8>>
 // end::scremoved[]
 endif::hidden[]

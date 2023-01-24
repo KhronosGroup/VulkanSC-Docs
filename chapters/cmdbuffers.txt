@@ -755,8 +755,10 @@ endif::VKSC_VERSION_1_0[]
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
 // tag::scdeviation[]
-  * <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
-    must: be supported <<SCID-8>>.
+  * If
+    <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
+    is not supported <<SCID-8>>, flink:vkResetCommandBuffer must: not be
+    called.
 // end::scdeviation[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]
@@ -918,7 +920,8 @@ ifdef::hidden[]
   * If
     <<limits-commandPoolResetCommandBuffer,pname:commandPoolResetCommandBuffer>>
     is not supported, pname:commandBuffer must: be in the
-    <<commandbuffers-lifecycle, initial state>> <<SCID-8>>.
+    <<commandbuffers-lifecycle, initial state>> when
+    flink:vkBeginCommandBuffer is called <<SCID-8>>.
 // end::scdeviation[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]

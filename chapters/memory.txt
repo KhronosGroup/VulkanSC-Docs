@@ -1612,13 +1612,13 @@ ifdef::VK_NV_external_memory_sci_buf[]
   * [[VUID-VkMemoryAllocateInfo-pNext-05097]]
     If the pname:pNext chain includes a slink:VkExportMemorySciBufInfoNV
     structure,
-    slink:VkPhysicalDeviceExternalSciBufFeaturesNV::pname:sciBufExport must:
-    be enabled
+    slink:VkPhysicalDeviceExternalMemorySciBufFeaturesNV::pname:sciBufExport
+    must: be enabled
   * [[VUID-VkMemoryAllocateInfo-pNext-05098]]
     If the pname:pNext chain includes a slink:VkImportMemorySciBufInfoNV
     structure,
-    slink:VkPhysicalDeviceExternalSciBufFeaturesNV::pname:sciBufImport must:
-    be enabled
+    slink:VkPhysicalDeviceExternalMemorySciBufFeaturesNV::pname:sciBufImport
+    must: be enabled
   * [[VUID-VkMemoryAllocateInfo-memoryTypeIndex-05099]]
     If the parameters define an import operation and the external handle is
     a stext:NvSciBufObj, the value of pname:memoryTypeIndex must: be one of
@@ -3066,8 +3066,8 @@ flink:vkAllocateMemory.
     pname:handleType must: be
     ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_SCI_BUF_BIT_NV
   * [[VUID-vkGetPhysicalDeviceExternalMemorySciBufPropertiesNV-sciBufImport-05105]]
-    slink:VkPhysicalDeviceExternalSciBufFeaturesNV::pname:sciBufImport must:
-    be enabled
+    slink:VkPhysicalDeviceExternalMemorySciBufFeaturesNV::pname:sciBufImport
+    must: be enabled
 ****
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceExternalMemorySciBufPropertiesNV.txt[]

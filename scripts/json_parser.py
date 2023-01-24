@@ -57,6 +57,8 @@ namespace vk_json_parser {
 
 template <typename T1, typename T2>
 class GlobalMem {
+    static constexpr size_t MAX_ALIGNMENT = alignof(std::max_align_t);
+
     void grow(T1 size = 0) {
         //push_back new single vector of size m_tabSize onto vec
         void * p = calloc(size > m_tabSize ? size : m_tabSize, sizeof(T2));
@@ -65,6 +67,9 @@ class GlobalMem {
         m_pointer = 0U;
     }
     void * alloc(T1 size) {
+        // Align to the next multiple of MAX_ALIGNMENT.
+        size = (size + static_cast<T1>(MAX_ALIGNMENT) - 1) & ~(static_cast<T1>(MAX_ALIGNMENT) - 1);
+
         void* result = static_cast<%s *>(m_vec.back()) + m_pointer;
         m_pointer += size;
         return result;
@@ -74,12 +79,11 @@ public:
     GlobalMem(T1 tabSize_ = 32768U)
       : m_tabSize(tabSize_), m_pointer(0U)
     {
-        grow();
     }
 
     void* allocate (T1 size)
     {
-        if (m_pointer+size >= m_tabSize) {
+        if (m_vec.empty() || m_pointer+size >= m_tabSize) {
             grow();
         }
         return alloc(size);
@@ -88,7 +92,7 @@ public:
     void* allocate (T1 count, T1 size)
     {
         T1 totalSize = count * size;
-        if (m_pointer+totalSize >= m_tabSize)
+        if (m_vec.empty() || m_pointer+totalSize >= m_tabSize)
         {
             grow(totalSize);
         }
@@ -101,14 +105,18 @@ public:
         for (size_t i=1 ; i<m_vec.size(); i++) {
             free(m_vec[i]);
         }
-        m_vec.resize(1);
+        if (!m_vec.empty()) {
+            m_vec.resize(1);
+        }
         m_pointer = 0;
     }
 
     ~GlobalMem()
     {
         clear();
-        free(m_vec[0]);
+        if (!m_vec.empty()) {
+            free(m_vec[0]);
+        }
     }
 
 private:
@@ -117,13 +125,7 @@ private:
     T1 m_pointer;
 };
 
-#if defined(USE_THREAD_LOCAL_WAR)
-// Workaround (off by default) for certain platforms that have a thread_local libc bug
-vk_json_parser::GlobalMem<%s, %s> & TLSGetGlobalMem();
-#define s_globalMem TLSGetGlobalMem()
-#else
 static thread_local GlobalMem<%s, %s> s_globalMem(32768U);
-#endif
 
 // To make sure the generated data is consistent across platforms,
 // we typecast to 32-bit.
@@ -331,13 +333,17 @@ class JSONParserGenerator(OutputGenerator):
                                   "int"      : "obj.asInt()",
                                   "double"   : "obj.asDouble()",
                                   "int64_t"  : "obj.asInt64()",
-                                  "uint16_t" : "obj.asUInt()"
+                                  "uint16_t" : "obj.asUInt()",
+                                  "NvSciBufAttrList"  : "obj.asInt()",
+                                  "NvSciBufObj"       : "obj.asInt()",
+                                  "NvSciSyncAttrList" : "obj.asInt()",
+                                  "NvSciSyncObj"      : "obj.asInt()"
                                   }
 
     def parseBaseTypes(self):
         for baseType in self.baseTypeDict:
             printStr = self.baseTypeDict[baseType]
-            if baseType == "uint8_t" or baseType == "uint16_t":
+            if baseType == "uint8_t" or baseType == "uint16_t" or baseType.startswith('NvSci'):
                 write("static void parse_%s(const char* s, Json::Value& obj, %s& o)\n" %(baseType, self.baseTypeListMap[baseType]) +
                     "{\n"
                     "     o = static_cast<%s>(%s);\n" %(self.baseTypeListMap[baseType],printStr)                                                                                   +
@@ -504,14 +510,16 @@ class JSONParserGenerator(OutputGenerator):
                                   "int"       : "int",
                                   "double"    : "double",
                                   "int64_t"   : "deInt64" if self.isCTS else "int64_t",
-                                  "uint16_t"  : "deUint16" if self.isCTS else "uint16_t"
+                                  "uint16_t"  : "deUint16" if self.isCTS else "uint16_t",
+                                  "NvSciBufAttrList"  : "vk::pt::NvSciBufAttrList" if self.isCTS else "NvSciBufAttrList",
+                                  "NvSciBufObj"       : "vk::pt::NvSciBufObj" if self.isCTS else "NvSciBufObj",
+                                  "NvSciSyncAttrList" : "vk::pt::NvSciSyncAttrList" if self.isCTS else "NvSciSyncAttrList",
+                                  "NvSciSyncObj"      : "vk::pt::NvSciSyncObj" if self.isCTS else "NvSciSyncObj"
                                 }
 
         write(headerGuardTop, file=self.outFile, end='')
         write(copyright, file=self.outFile)
         write(predefinedCode % (self.baseTypeListMap["uint8_t"],
-                                self.baseTypeListMap["uint32_t"],
-                                self.baseTypeListMap["uint8_t"],
                                 self.baseTypeListMap["uint32_t"],
                                 self.baseTypeListMap["uint8_t"],
                                 self.baseTypeListMap["uint32_t"],
@@ -905,6 +913,9 @@ class JSONParserGenerator(OutputGenerator):
                 code += "     parse_%s(\"%s\", obj[\"%s\"], &%s%s));\n" %(typeName, memberName, memberName, str2, memberName)
             else:
                 code += "     /** TODO: Handle this - %s **/\n" %(memberName)
+
+        elif typeName in "NvSciSyncFence":
+            code += "     /** TODO: Handle this - %s **/\n" %(memberName)
 
         else:
             code += "     parse_%s(\"%s\", obj[\"%s\"], %s%s));\n" %(typeName, memberName, memberName, str2, memberName)

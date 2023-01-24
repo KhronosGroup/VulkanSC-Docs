@@ -95,7 +95,7 @@ ifeq ($(VULKAN_API),vulkansc)
 HEADERS_HPP = $(VULKAN)/vulkan$(API_SUFFIX)_core.hpp
 STATIC_JSON = $(STATIC_JSON_SRC)/vkpcc.json
 JSON_PCC    = $(JSON)/vkpcc.json
-STATIC_CTS_COPY = $(JSON)/cts/tlsWrapper.hpp \
+STATIC_CTS_COPY = \
          $(JSON)/cts/vkjson_data_default.h \
          $(JSON)/cts/vkjson_parser_default.h
 JSON_SCHEMA = $(JSON)/vk.json
@@ -205,10 +205,6 @@ $(JSON_CTS_FILES): $(VKH_DEPENDS) $(JSON_SCRIPTS)
 	$(QUIET)$(MKDIR) $(JSON)/cts
 	$(PYTHON) $(GENSCRIPT) $(GENOPTS) -registry $(VKXML) --iscts \
 	    -o $(JSON)/cts $(notdir $@)
-
-$(JSON)/cts/tlsWrapper.hpp: $(STATIC_JSON_SRC)/tlsWrapper.hpp
-	$(QUIET)$(MKDIR) $(JSON)/cts
-	$(CP) $? $@
 
 $(JSON)/cts/vkjson_data_default.h: $(STATIC_JSON_SRC)/vkjson_data_default.h
 	$(QUIET)$(MKDIR) $(JSON)/cts

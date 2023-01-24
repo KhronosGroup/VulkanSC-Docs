@@ -54,7 +54,19 @@ To avoid an explosion of extensions, we include the capability to import and
 export memory in one extension but include separate features in case
 implementations only implement (or safety certify) a subset.
 
+2) What changed in revision 2?
+
+RESOLVED.
+The slink:VkPhysicalDeviceExternalSciBufFeaturesNV struct was renamed to
+slink:VkPhysicalDeviceExternalMemorySciBufFeaturesNV to follow naming
+conventions (previous names retained as aliases), and drop const on
+pname:pNext pointer.
+
+
 === Version History
 
   * Revision 1, 2022-04-12 (Kai Zhang, Daniel Koch)
     - Internal revisions
+  * Revision 2, 2023-01-03 (Daniel Koch)
+    - fix the feature structure to address naming convention and cts
+      autogeneration issues

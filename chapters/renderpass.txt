@@ -1000,12 +1000,14 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 ****
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
 
+:uniqifier: subpasses
 :combinedobjectnameplural: subpasses
 :combinedparentobject: VkRenderPass
 :combinedobjectcount: pname:pCreateInfo->subpassCount
 :combinedobjectnamecamelcase: subpassDescription
 include::{chapters}/commonvalidity/memory_reservation_request_count_combined_common.txt[]
 
+:uniqifier: attachments
 :combinedobjectnameplural: attachments
 :combinedparentobject: VkRenderPass
 :combinedobjectcount: pname:pCreateInfo->attachmentCount
@@ -2870,12 +2872,14 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.txt[]
 ****
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.txt[]
 
+:uniqifier: subpasses
 :combinedobjectnameplural: subpasses
 :combinedparentobject: VkRenderPass
 :combinedobjectcount: pname:pCreateInfo->subpassCount
 :combinedobjectnamecamelcase: subpassDescription
 include::{chapters}/commonvalidity/memory_reservation_request_count_combined_common.txt[]
 
+:uniqifier: attachments
 :combinedobjectnameplural: attachments
 :combinedparentobject: VkRenderPass
 :combinedobjectcount: pname:pCreateInfo->attachmentCount
