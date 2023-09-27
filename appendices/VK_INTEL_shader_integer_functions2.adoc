@@ -1,0 +1,44 @@
+// Copyright (c) 2019-2020 Intel Corporation
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_INTEL_shader_integer_functions2.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2019-04-30
+*IP Status*::
+    No known IP claims.
+*Interactions and External Dependencies*::
+  - This extension requires
+    {spirv}/INTEL/SPV_INTEL_shader_integer_functions2.html[`SPV_INTEL_shader_integer_functions2`].
+  - This extension provides API support for
+    {GLregistry}/INTEL/INTEL_shader_integer_functions2.txt[`GL_INTEL_shader_integer_functions2`].
+*Contributors*::
+  - Ian Romanick, Intel
+  - Ben Ashbaugh, Intel
+
+=== Description
+
+This extension adds support for several new integer instructions in SPIR-V
+for use in graphics shaders.
+Many of these instructions have pre-existing counterparts in the Kernel
+environment.
+
+The added integer functions are defined by the
+{spirv}/INTEL/SPV_INTEL_shader_integer_functions2.html[`SPV_INTEL_shader_integer_functions2`]
+SPIR-V extension and can be used with the GL_INTEL_shader_integer_functions2
+GLSL extension.
+
+include::{generated}/interfaces/VK_INTEL_shader_integer_functions2.adoc[]
+
+=== New SPIR-V Capabilities
+
+  * <<spirvenv-capabilities-table-IntegerFunctions2INTEL,
+    code:IntegerFunctions2INTEL>>
+
+=== Version History
+
+  * Revision 1, 2019-04-30 (Ian Romanick)
+  ** Initial draft

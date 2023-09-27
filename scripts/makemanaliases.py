@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2020-2021 The Khronos Group Inc.
+# Copyright 2020-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 """Script to create symbolic links for aliases in reference pages
@@ -15,17 +15,17 @@ if __name__ == '__main__':
 
     parser.add_argument('-genpath', action='store',
                         default=None,
-                        help='Path to directory containing generated *api.py module')
+                        help='Path to directory containing generated apimap.py module')
     parser.add_argument('-refdir', action='store',
                         required=True,
                         help='Path to directory containing reference pages to symlink')
 
     args = parser.parse_args()
 
-    # Look for api.py in the specified directory
+    # Look for apimap.py in the specified directory
     if args.genpath is not None:
         sys.path.insert(0, args.genpath)
-    import api
+    import apimap as api
 
     # Change to refpage directory
     try:
@@ -53,7 +53,7 @@ if __name__ == '__main__':
             continue
 
         if os.access(alias, os.R_OK):
-            # If the link already exists, that is not neccessarily a
+            # If the link already exists, that is not necessarily a
             # problem, so do not fail, but it should be checked out.
             # The usual case for this is not cleaning the target directory
             # prior to generating refpages.

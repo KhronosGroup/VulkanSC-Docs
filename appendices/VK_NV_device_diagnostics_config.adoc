@@ -1,0 +1,33 @@
+// Copyright (c) 2019-2020 NVIDIA Corporation
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_NV_device_diagnostics_config.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+  2022-04-06
+*Contributors*::
+  - Kedarnath Thangudu, NVIDIA
+  - Thomas Klein, NVIDIA
+
+=== Description
+
+Applications using Nvidia Nsight^(TM)^ Aftermath SDK for Vulkan to integrate
+device crash dumps into their error reporting mechanisms, may: use this
+extension to configure options related to device crash dump creation.
+
+Version 2 of this extension adds
+ename:VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_ERROR_REPORTING_BIT_NV
+which when set enables enhanced reporting of shader execution errors.
+
+include::{generated}/interfaces/VK_NV_device_diagnostics_config.adoc[]
+
+=== Version History
+
+  * Revision 1, 2019-11-21 (Kedarnath Thangudu)
+  ** Internal revisions
+  * Revision 2, 2022-04-06 (Kedarnath Thangudu)
+  ** Added a config bit
+     ename:VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_ERROR_REPORTING_BIT_NV

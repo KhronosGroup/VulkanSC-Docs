@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2020-2021 The Khronos Group, Inc.
+# Copyright 2020-2023 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 # scripts/ci/check_undefined
@@ -9,7 +9,7 @@
 # Ideally we would skip NOTES too, but that would require parsing.
 
 undefined=/tmp/undefined
-ls chapters/*txt chapters/*/*txt appendices/[A-UW-Za-z]*txt | \
+ls chapters/*.adoc chapters/*/*.adoc appendices/[A-UW-Za-z]*.adoc | \
     xargs egrep -E '(^|[[:space:]])undefined($|[^:])' > $undefined
 if test `cat $undefined | wc -l` -gt 0 ; then
     echo "*** Found un-tagged uses of 'undefined'"

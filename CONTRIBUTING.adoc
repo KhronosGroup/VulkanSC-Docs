@@ -1,4 +1,4 @@
-// Copyright 2020-2021 The Khronos Group Inc.
+// Copyright 2020-2023 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 = Contributing
@@ -20,7 +20,7 @@ If you are adding a new file, it must be under one of the following
 licenses:
 
   * Creative Commons Attribution 4.0 International, for specification text
-    (for example, link:vkspec.txt[`vkspec.txt`])
+    (for example, link:vkspec.adoc[`vkspec.adoc`])
   * Apache 2.0, for all other changes (for example,
     link:scripts/reg.py[`reg.py`])
   * Apache 2.0 OR MIT, for source-like files that may need to used in GPL
@@ -28,7 +28,8 @@ licenses:
 
 We use a short license in each file consisting of just the copyright
 statement and the SPDX license identifier of the license applying to that
-file, and link to the full license text from link:LICENSE.adoc.
+file, and link to the full license text from
+link:LICENSE.adoc[`LICENSE.adoc`].
 
 == Contributor License Agreement
 

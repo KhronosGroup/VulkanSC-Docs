@@ -1,0 +1,59 @@
+// Copyright 2014-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+// Core versions and extensions to enable
+// Must be included before the header and attribs.adoc
+include::{generated}/specattribs.adoc[]
+
+= Vulkan^®^ Documentation and Extensions: Procedures and Conventions
+Jon Leech, Tobias Hector
+:data-uri:
+:icons: font
+:toc2:
+:toclevels: 3
+:numbered:
+:source-highlighter: rouge
+:rouge-style: github
+:doctype: book
+:imagewidth: 800
+:fullimagewidth: width="800"
+:cl: &#x3a;
+:style: style
+
+// Various special / math symbols. This is easier to edit with than Unicode.
+include::{config}/attribs.adoc[]
+
+// Where the current Asciidoctor documentation is found.
+:docguide: https://docs.asciidoctor.org/asciidoc/latest
+
+:leveloffset: 1
+
+<<<<
+
+include::{config}/copyright-ccby.adoc[]
+
+<<<<
+
+include::{style}/introduction.adoc[]
+
+include::{style}/naming.adoc[]
+
+include::{style}/extensions.adoc[]
+
+include::{style}/markup.adoc[]
+
+include::{style}/writing.adoc[]
+
+include::{style}/misc.adoc[]
+
+// Appendices
+
+include::{style}/vuid.adoc[]
+
+ifdef::VKSC_VERSION_1_0[]
+include::{style}/scid.adoc[]
+endif::VKSC_VERSION_1_0[]
+
+include::{style}/revisions.adoc[]
+

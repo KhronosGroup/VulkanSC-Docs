@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Khronos Group Inc.
+# Copyright 2018-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -101,9 +101,9 @@ File.open('vk.xml', 'w') do |out|
 end
 
 def rename_text_files(dir, renames, extension_name)
-  Dir[dir + '/*.txt'].each do |name|
+  Dir[dir + '/*.adoc'].each do |name|
     # Skip renaming in the extension appendix, since this should preserve the old names.
-    if (name != ('../appendices/' + extension_name + '.txt'))
+    if (name != ('../appendices/' + extension_name + '.adoc'))
       old_file = File.read(name)
 
       new_file = old_file.clone

@@ -1,0 +1,105 @@
+// Copyright 2020-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+// Common Valid Usage
+// Common to VkPipelineStageFlags2 parameters
+// Set "stageMaskName" attribute to the name of the stage mask to validate
+  * [[VUID-{refpage}-{stageMaskName}-03929]]
+    If the <<features-geometryShader, pname:geometryShader>> feature is not
+    enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT
+  * [[VUID-{refpage}-{stageMaskName}-03930]]
+    If the <<features-tessellationShader, pname:tessellationShader>> feature
+    is not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT or
+    ename:VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT
+ifdef::VK_EXT_conditional_rendering[]
+  * [[VUID-{refpage}-{stageMaskName}-03931]]
+    If the <<features-conditionalRendering, pname:conditionalRendering>>
+    feature is not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_CONDITIONAL_RENDERING_BIT_EXT
+endif::VK_EXT_conditional_rendering[]
+ifdef::VK_EXT_fragment_density_map[]
+  * [[VUID-{refpage}-{stageMaskName}-03932]]
+    If the <<features-fragmentDensityMap, pname:fragmentDensityMap>> feature
+    is not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_FRAGMENT_DENSITY_PROCESS_BIT_EXT
+endif::VK_EXT_fragment_density_map[]
+ifdef::VK_EXT_transform_feedback[]
+  * [[VUID-{refpage}-{stageMaskName}-03933]]
+    If the <<features-transformFeedback, pname:transformFeedback>> feature
+    is not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_TRANSFORM_FEEDBACK_BIT_EXT
+endif::VK_EXT_transform_feedback[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
+  * [[VUID-{refpage}-{stageMaskName}-03934]]
+    If the <<features-meshShader, pname:meshShader>> feature is not enabled,
+    pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_EXT
+  * [[VUID-{refpage}-{stageMaskName}-03935]]
+    If the <<features-taskShader, pname:taskShader>> feature is not enabled,
+    pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_EXT
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
+ifdef::VK_NV_shading_rate_image[]
+ifndef::VK_KHR_fragment_shading_rate[]
+  * [[VUID-{refpage}-{stageMaskName}-04956]]
+    If the <<features-shadingRateImage, pname:shadingRateImage>> feature is
+    not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV
+endif::VK_KHR_fragment_shading_rate[]
+endif::VK_NV_shading_rate_image[]
+ifdef::VK_KHR_fragment_shading_rate[]
+ifdef::VK_NV_shading_rate_image[]
+  * [[VUID-{refpage}-{stageMaskName}-07316]]
+    If neither the <<features-shadingRateImage, pname:shadingRateImage>> or
+    <<features-attachmentFragmentShadingRate,
+    pname:attachmentFragmentShadingRate>> are enabled, pname:{stageMaskName}
+    must: not contain
+    ename:VK_PIPELINE_STAGE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR
+endif::VK_NV_shading_rate_image[]
+ifndef::VK_NV_shading_rate_image[]
+  * [[VUID-{refpage}-{stageMaskName}-07317]]
+    If the <<features-attachmentFragmentShadingRate,
+    pname:attachmentFragmentShadingRate>> feature is not enabled,
+    pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR
+endif::VK_NV_shading_rate_image[]
+endif::VK_KHR_fragment_shading_rate[]
+ifdef::VK_HUAWEI_subpass_shading[]
+  * [[VUID-{refpage}-{stageMaskName}-04957]]
+    If the <<features-subpassShading, pname:subpassShading>> feature is not
+    enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_SUBPASS_SHADER_BIT_HUAWEI
+endif::VK_HUAWEI_subpass_shading[]
+ifdef::VK_HUAWEI_invocation_mask[]
+  * [[VUID-{refpage}-{stageMaskName}-04995]]
+    If the <<features-invocationMask, pname:invocationMask>> feature is not
+    enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI
+endif::VK_HUAWEI_invocation_mask[]
+ifdef::VK_NV_ray_tracing[]
+ifndef::VK_KHR_ray_tracing_pipeline[]
+  * [[VUID-{refpage}-{stageMaskName}-07945]]
+    If the apiext:VK_NV_ray_tracing extension is not enabled,
+    pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV
+endif::VK_KHR_ray_tracing_pipeline[]
+endif::VK_NV_ray_tracing[]
+ifdef::VK_KHR_ray_tracing_pipeline[]
+ifdef::VK_NV_ray_tracing[]
+  * [[VUID-{refpage}-{stageMaskName}-07946]]
+    If neither the apiext:VK_NV_ray_tracing extension or
+    <<features-rayTracingPipeline, pname:rayTracingPipeline feature>> are
+    enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR
+endif::VK_NV_ray_tracing[]
+ifndef::VK_NV_ray_tracing[]
+  * [[VUID-{refpage}-{stageMaskName}-07947]]
+    If the <<features-rayTracingPipeline, pname:rayTracingPipeline feature>>
+    is not enabled, pname:{stageMaskName} must: not contain
+    ename:VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR
+endif::VK_NV_ray_tracing[]
+endif::VK_KHR_ray_tracing_pipeline[]
+// Common Valid Usage

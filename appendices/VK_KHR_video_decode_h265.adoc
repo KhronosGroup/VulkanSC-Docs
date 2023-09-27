@@ -1,0 +1,67 @@
+// Copyright 2018-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_KHR_video_decode_h265.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2022-11-14
+*IP Status*::
+    No known IP claims.
+*Contributors*::
+  - Ahmed Abdelkhalek, AMD
+  - HoHin Lau, AMD
+  - Jake Beju, AMD
+  - Peter Fang, AMD
+  - Ping Liu, Intel
+  - Srinath Kumarapuram, NVIDIA
+  - Tony Zlatinski, NVIDIA
+  - Daniel Rakos, RasterGrid
+
+=== Description
+
+This extension builds upon the `apiext:VK_KHR_video_decode_queue` extension
+by adding support for decoding elementary video stream sequences compliant
+with the H.265/HEVC video compression standard.
+
+[NOTE]
+.Note
+====
+This extension was promoted to `KHR` from the provisional extension
+`VK_EXT_video_decode_h265`.
+====
+
+include::{generated}/interfaces/VK_KHR_video_decode_h265.adoc[]
+
+=== Version History
+
+  * Revision 1, 2018-6-11 (Peter Fang)
+  ** Initial draft
+  * Revision 1.6, March 29 2021 (Tony Zlatinski)
+  ** Spec and API updates.
+  * Revision 2, 2022-03-16 (Ahmed Abdelkhalek)
+  ** Relocate Std header version reporting/requesting from this extension to
+     VK_KHR_video_queue extension.
+  ** Remove the now empty VkVideoDecodeH265SessionCreateInfoEXT.
+  * Revision 3, 2022-03-31 (Ahmed Abdelkhalek)
+  ** Use type StdVideoH265Level for VkVideoDecodeH265Capabilities.maxLevel
+  * Revision 4, 2022-08-09 (Daniel Rakos)
+  ** Rename `VkVideoDecodeH265ProfileEXT` to
+     `VkVideoDecodeH265ProfileInfoEXT`
+  * Revision 5, 2022-09-18 (Daniel Rakos)
+  ** Rename `vpsStdCount`, `pVpsStd`, `spsStdCount`, `pSpsStd`,
+     `ppsStdCount`, and `pPpsStd` to `stdVPSCount`, `pStdVPSs`,
+     `stdSPSCount`, `pStdSPSs`, `stdPPSCount`, and `pStdPPSs`, respectively,
+     in `VkVideoDecodeH265SessionParametersAddInfoEXT`
+  ** Rename `maxVpsStdCount`, `maxSpsStdCount`, and `maxPpsStdCount` to
+     `maxStdVPSCount`, `maxStdSPSCount` and `maxStdPPSCount`, respectively,
+     in `VkVideoDecodeH265SessionParametersCreateInfoEXT`
+  ** Rename `slicesCount` and `pSlicesDataOffsets` to `sliceCount` and
+     `pSliceOffsets`, respectively, in `VkVideoDecodeH265PictureInfoEXT`
+  * Revision 6, 2022-11-14 (Daniel Rakos)
+  ** Rename `slice` to `sliceSegment` in the APIs for better clarity
+  * Revision 7, 2022-11-14 (Daniel Rakos)
+  ** Change extension from `EXT` to `KHR`
+  ** Extension is no longer provisional

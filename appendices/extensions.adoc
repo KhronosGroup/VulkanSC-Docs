@@ -1,0 +1,62 @@
+// Copyright 2015-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+[appendix]
+
+[[extensions]]
+= Layers & Extensions (Informative)
+
+Extensions to the Vulkan API can: be defined by authors, groups of authors,
+and the Khronos Vulkan
+ifdef::VKSC_VERSION_1_0[Safety Critical]
+Working Group.
+In order not to compromise the readability of the Vulkan Specification, the
+core Specification does not incorporate most extensions.
+The online Registry of extensions is available at URL
+
+ifndef::VKSC_VERSION_1_0[https://registry.khronos.org/vulkan/]
+ifdef::VKSC_VERSION_1_0[https://registry.khronos.org/vulkansc/]
+
+and allows generating versions of the Specification incorporating different
+extensions.
+
+Authors creating extensions and layers must: follow the mandatory procedures
+described in the <<vulkan-styleguide, Vulkan Documentation and Extensions>>
+document when creating extensions and layers.
+
+The remainder of this appendix documents a set of extensions chosen when
+this document was built.
+Versions of the Specification published in the Registry include:
+
+  * Core API + mandatory extensions required of all Vulkan implementations.
+ifndef::VKSC_VERSION_1_0[]
+  * Core API + all registered and published Khronos (`KHR`) extensions.
+endif::VKSC_VERSION_1_0[]
+  * Core API + all registered and published extensions.
+
+Extensions are grouped as Khronos `KHR`, multivendor `EXT`, and then
+alphabetically by author ID.
+Within each group, extensions are listed in alphabetical order by their
+name.
+
+== Extension Dependencies
+
+Extensions which have dependencies on specific core versions or on other
+extensions will list such dependencies.
+
+For core versions, the specified version must be supported at runtime.
+All extensions implicitly require support for Vulkan 1.0.
+
+For a device extension, use of any device-level functionality defined by
+that extension requires that any extensions that extension depends on be
+enabled.
+
+For any extension, use of any instance-level functionality defined by that
+extension requires only that any extensions that extension depends on be
+supported at runtime.
+
+
+include::{generated}/meta/current_extensions_appendix.adoc[]
+include::{generated}/meta/provisional_extensions_appendix.adoc[]
+include::{generated}/meta/deprecated_extensions_appendix.adoc[]

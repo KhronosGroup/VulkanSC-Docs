@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright (c) 2020 The Khronos Group Inc.
+# Copyright 2020-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -113,7 +113,7 @@ headerGuardTop = """#ifndef _VULKAN_JSON_DATA_HPP
 headerGuardBottom = """#endif // _VULKAN_JSON_DATA_HPP"""
 
 encodeBase64CodeCTS = """
-// Base 64 formater class from executor/xeTestLogWriter.cpp
+// Base 64 formatter class from executor/xeTestLogWriter.cpp
 
 class Base64Formatter
 {
@@ -182,7 +182,7 @@ static void print_void_data(const void * o, int oSize, const std::string& s, boo
 }
 """
 encodeBase64Code = """
-// Base 64 formater class from executor/xeTestLogWriter.cpp
+// Base 64 formatter class from executor/xeTestLogWriter.cpp
 
 class Base64Formatter
 {

@@ -1,0 +1,29 @@
+// Copyright 2019-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+// Common Valid Usage
+// common to VkRayTracingPipelineCreateInfo* structures
+  * [[VUID-{refpage}-pStages-03426]]
+    The shader code for the entry points identified by pname:pStages, and
+    the rest of the state identified by this structure must: adhere to the
+    pipeline linking rules described in the <<interfaces,Shader Interfaces>>
+    chapter
+  * [[VUID-{refpage}-layout-03428]]
+    The number of resources in pname:layout accessible to each shader stage
+    that is used by the pipeline must: be less than or equal to
+    slink:VkPhysicalDeviceLimits::pname:maxPerStageResources
+ifdef::VK_NV_device_generated_commands[]
+  * [[VUID-{refpage}-flags-02904]]
+    pname:flags must: not include
+    ename:VK_PIPELINE_CREATE_INDIRECT_BINDABLE_BIT_NV
+endif::VK_NV_device_generated_commands[]
+ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
+  * [[VUID-{refpage}-pipelineCreationCacheControl-02905]]
+    If the <<features-pipelineCreationCacheControl,
+    pname:pipelineCreationCacheControl>> feature is not enabled, pname:flags
+    must: not include
+    ename:VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT or
+    ename:VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT
+endif::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
+// Common Valid Usage

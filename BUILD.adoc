@@ -1,4 +1,4 @@
-// Copyright 2014-2021 The Khronos Group Inc.
+// Copyright 2014-2023 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 = Vulkan^(R)^ Specification Build Instructions and Notes
@@ -9,6 +9,7 @@ ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
 
+
 [[intro]]
 == Introduction
 
@@ -18,39 +19,40 @@ pages, and/or other related targets.
 It documents how to set up your build environment, build steps and targets,
 and contains some troubleshooting advice.
 
+
 [[building]]
 == Building The Spec
 
-First, clone the Khronos Github repository containing the Vulkan
+First, clone the Khronos GitHub repository containing the Vulkan
 specification to your local Linux, Windows, or Mac PC.
 The repository is located at https://github.com/KhronosGroup/Vulkan-Docs/.
 
 Next, install all the necessary build tools (see <<depends,Software
 Dependencies>> below).
 If you are using the <<depends-docker, Khronos-Provided Docker Image>>,
-which we strongly recommend, then one way to build using the image (assuming
-a Linux docker host) is:
+which we strongly recommend, one way to build using the image (assuming a
+Linux docker host) is:
 
-    $ docker run --user `id -u`:`id -g` -it --rm \
-      -v <vulkan-path>:/vulkan \
-      khronosgroup/docker-images:asciidoctor-spec /bin/bash
+    $ scripts/runDocker
 
-where <vulkan-path> is the path to the cloned repository. This runs the
-image with the cloned repository under /vulkan and accesses it as a
-specified user (set to your own user and group ID above), so that it does
-not get filled with files owned by another user.
+executed from the specification repository root.
 
-Then in the running image,
+`runDocker` runs the Docker image with the cloned repository mounted under
+/vulkan and accesses it as a specified user (set to your own user and group
+ID), so that it does not get filled with files owned by another user.
+The script leaves you inside a bash shell in the running image.
+Execute the commands:
 
     $ cd /vulkan
     $ ./makeSpec -spec core html
 
-which builds an HTML5 specification output for the core Vulkan 1.2
+to build an HTML5 specification output for the core Vulkan 1.3
 specification, with no extensions included, or
 
+    $ cd /vulkan
     $ ./makeSpec -spec all all
 
-which builds the spec targets `html`, `pdf`, `styleguide`, `registry`,
+to build the spec targets `html`, `pdf`, `styleguide`, `registry`,
 `manhtmlpages`, and `allchecks`, with *all* registered extensions included.
 
 There are many other ways of using the image, including inside a Continuous
@@ -59,8 +61,16 @@ repository; and so on.
 
 If you are not using our Docker image to build with, and you have a
 <<depends-nondocker, Non-Docker Build Environment>> with the entire
-toolchain installed, you can go to <vulkan-path> and invoke the same `make`
-commands there.
+toolchain installed, you can just invoke the same `make` commands from the
+repository root.
+
+[NOTE]
+.Note
+====
+You can modify the `runDocker` script to change the `docker` command-line
+options, but it is important to always use the Docker image specified in
+that script, so you have the latest version of the spec toolchain.
+====
 
 [NOTE]
 .Note
@@ -76,7 +86,7 @@ commands there.
     are irrelevant for most users.
     The `html` target just generates the HTML output, which is often all
     that is needed for spec bugfixes not involving extensions.
-  * The default `make` options build a Vulkan 1.2 specification with no
+  * The default `make` options build a Vulkan 1.3 specification with no
     optional extensions.
   * The `validusage` target is not built as part of the `all` target, due to
     it needing to be built with all extensions enabled (`-spec all`).
@@ -122,7 +132,7 @@ If you encounter problems refer to the <<troubleshooting>> section.
 [[building-versions]]
 === Building Specifications For Different API Versions
 
-The `Makefile` defaults to building a Vulkan 1.2 specification.
+The `Makefile` defaults to building a Vulkan 1.3 specification.
 This is controlled by Asciidoctor attributes passed in the Makefile variable
 `$(VERSIONS)`
 To instead build a Vulkan 1.1 specification, pass
@@ -133,6 +143,33 @@ VERSIONS="VK_VERSION_1_0 VK_VERSION_1_1"
 
 on the `makeSpec` command line.
 
+
+[[building-vulkansc]]
+=== Building the Vulkan SC Specification
+
+To build the Vulkan SC 1.0 specification, it is necessary both specify the
+API type via the `VULKAN_API` environment variable and specify the `sc1.0`
+version to the `makeSpec` command.
+
+To build the html spec for Vulkan SC API:
+
+----
+VULKAN_API="vulkansc" ./makeAllExts -version sc1.0 html
+----
+
+To build the Vulkan SC header files:
+
+----
+cd xml
+VULKAN_API="vulkansc" make
+----
+
+Valid values for the `VULKAN_API` environment are:
+
+  * `vulkan` - build the Vulkan API variant.
+  * `vulkansc` - build the Vulkan SC API variant.
+
+If `VULKAN_API` is not set, the repository default is used.
 
 [[building-extensions]]
 === Building With Extensions Included
@@ -160,10 +197,11 @@ It accepts these options:
   * -v - print actions as well as executing them
   * -n - print actions without executing them
   * -genpath *path* - specify path to generated files (default `gen`)
-  * -spec *type* - build with sepcified sets of extensions.
+  * -spec *type* - build with specified sets of extensions.
     *type* may be
   ** *core* - no extensions added (default if not specified)
   ** *khr* - all KHR extensions added
+  ** *ratified* - all ratified extensions (KHR and some EXT) added
   ** *all* - all registered extensions added
   * -extension *extname* - build with specified extension included,
     as well as the set specified by `-spec`.
@@ -230,11 +268,12 @@ It may instead result in visible `+++[.added]##content##+++` and
 But such visible markup still correctly encapsulates the modified content.
 ====
 
+
 [[building-test]]
 === Alternate and Test Builds
 
 If you are just testing Asciidoctor formatting, macros, stylesheets, etc.,
-you may want to edit `vkspec.txt` to just include your test code.
+you may want to edit `vkspec.adoc` to just include your test code.
 The asciidoctor HTML build is very fast, even for the whole Specification,
 but PDF builds take several minutes.
 
@@ -274,8 +313,8 @@ The supported macros are defined in the `config/spec-macros/extension.rb`
 asciidoctor extension script.
 
 The tags used are described in the
-link:https://www.khronos.org/registry/vulkan/specs/1.1/styleguide.html[style
-guide] (generated from `styleguide.txt`).
+link:https://registry.khronos.org/vulkan/specs/1.1/styleguide.html[style
+guide] (generated from `styleguide.adoc`).
 
 We (may) eventually tool up the spec and reference pages to the point that
 anywhere there is a type or token referred to, clicking on (or perhaps
@@ -305,7 +344,7 @@ To regenerate the reference page sources from scratch yourself, execute:
 
 The `genRef.py` script will generate many warnings, but most are just
 reminders that some pages are automatically generated.
-If everything is working correctly, all the `$(GENERATED)/refpage/*.txt`
+If everything is working correctly, all the `$(GENERATED)/refpage/*.adoc`
 files will be regenerated, but their contents will not change.
 
 If you add new API features to the Specification in a branch, make sure that
@@ -319,7 +358,7 @@ created.
 
 
 [[styles]]
-== Our stylesheets
+== Our Stylesheets
 
 We use an HTML stylesheet `config/khronos.css` derived from the
 https://asciidoctor.org/docs/produce-custom-themes-using-asciidoctor-stylesheet-factory/[Asciidoctor
@@ -331,9 +370,8 @@ font family].
 [[styleguide]]
 == Vulkan Style Guide
 
-
 If you are writing new spec language or modifying existing language, see the
-link:https://www.khronos.org/registry/vulkan/specs/1.2/styleguide.html["`style
+link:https://registry.khronos.org/vulkan/specs/1.3/styleguide.html["`style
 guide`"] (formally titled "`Vulkan Documentation and Extensions: Procedures
 and Conventions`") document for details of our asciidoctor macros,
 extensions, mathematical equation markup, writing style, etc.
@@ -365,28 +403,32 @@ Docker installation is beyond the scope of this document.
 Refer to link:https://docs.docker.com/get-docker/[the Docker website] for
 information about installing Docker on Linux, Windows, and MacOS X.
 
-The name of the build image is
+The build image is *named* `khronosgroup/docker-images:asciidoctor-spec`.
+However, due to local and CI caching problems when this image is updated on
+dockerhub, we use the SHA256 of the latest image update, rather than the
+image name. The SHA256 can be determined from
 
-    khronosgroup/docker-images:asciidoctor-spec
+    $ git grep -h sha256: .gitlab-ci.yml
 
-It can be pulled from the
-link:https://hub.docker.com/repository/docker/khronosgroup/docker-images[Dockerhub
-repository] with the command
+which will print a line like
 
-    docker pull khronosgroup/docker-images:asciidoctor-spec
+    image: khronosgroup/docker-images@sha256:42123ba13792c4e809d037b69152c2230ad97fbf43b677338075ab9c928ab6ed
 
-Once docker is installed and the image is available, it can be executed as
-described above under <<building, Building the Spec>> to generate
-Specification output documents or other Makefile targets.
+Everything following `image: ` is the <imagename> to use. The first time you
+try to run Docker with this <imagename>, as is done by the `runDocker`
+script described above under <<building, Building the Spec>>, the image will
+be pulled from Dockerhub and cached locally on your machine.
+
+This image is used to build Specification output documents or other Makefile
+targets.
 
 [NOTE]
 .Note
 ====
-The old `vulkan-docs-base` and `vulkan-docs` images continue to be hosted,
-but the new `asciidoctor-spec` image is preferred - the added functionality
-of `vulkan-docs`, to set the user/group inside Docker based on environment
-variables passed into Docker, is no longer needed with the Docker `--user`
-option.
+When we update the image on Dockerhub, it is to add new components or update
+versions of components used in the specification toolchain.
+To save space, you may want to periodically purge old images using `docker
+images` and `docker rmi -f`.
 ====
 
 
@@ -396,7 +438,7 @@ option.
 We do not actively support building outside of our Docker image, but it is
 straightforward to reproduce our toolchain in a Debian (or similar APT-based
 Linux) distribution by executing the same steps as the
-link:https://github.com/KhronosGroup/DockerContainers/blob/master/asciidoctor-spec.dockerfile[Dockerfile]
+link:https://github.com/KhronosGroup/DockerContainers/blob/main/asciidoctor-spec.Dockerfile[Dockerfile]
 used to build our Docker image.
 
 It should be possible to apply the same steps in a Windows Subsystem for
@@ -413,16 +455,21 @@ version of BUILD.adoc in the v1.2.135 repository tag]
 [NOTE]
 .Note
 ====
-While we have no intention of forcing people to use our Docker image, we
-cannot support every possible environment.
-The Docker image is a straightforward way to use the Vulkan-Docs repository
-with almost all modern desktop environments.
+While you do not have to use our Docker image, we cannot support every
+possible build environment.
+The Docker image is a straightforward way to build the specification in most
+modern desktop environments, without needing to install and update the spec
+toolchain yourself.
 ====
 
 
 [[history]]
 == Revision History
 
+  * 2023-05-29 - Add Vulkan SC spec build instructions.
+  * 2022-10-11 - Update descriptions of using the Docker image to use the
+    `runDocker` script and the same SHA256 of the latest image as used by
+    CI.
   * 2021-03-12 - Use the new Docker image.
   * 2020-07-15 - Update to use `makeSpec` instead of `makeAllExts`.
   * 2020-03-23 - Document Khronos' published Docker image for building the

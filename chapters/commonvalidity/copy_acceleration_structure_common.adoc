@@ -1,0 +1,33 @@
+// Copyright 2019-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+// Common Valid Usage
+// Common to acceleration structure copy commands
+  * [[VUID-{refpage}-mode-03410]]
+    pname:mode must: be
+    ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR or
+    ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_CLONE_KHR
+  * [[VUID-{refpage}-src-04963]]
+    The source acceleration structure pname:src must: have been constructed
+    prior to the execution of this command
+  * [[VUID-{refpage}-src-03411]]
+    If pname:mode is ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR,
+    pname:src must: have been constructed with
+    ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_COMPACTION_BIT_KHR in the
+    build
+  * [[VUID-{refpage}-buffer-03718]]
+    The pname:buffer used to create pname:src must: be bound to device
+    memory
+  * [[VUID-{refpage}-buffer-03719]]
+    The pname:buffer used to create pname:dst must: be bound to device
+    memory
+  * [[VUID-{refpage}-dst-07791]]
+    The range of memory backing pname:dst that is accessed by this command
+    must: not overlap the memory backing pname:src that is accessed by this
+    command
+  * [[VUID-{refpage}-dst-07792]]
+    pname:dst must: be bound completely and contiguously to a single
+    sname:VkDeviceMemory object via
+    flink:vkBindAccelerationStructureMemoryNV
+// Common Valid Usage

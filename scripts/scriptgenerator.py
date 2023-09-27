@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2021 The Khronos Group Inc.
+# Copyright 2013-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -23,7 +23,7 @@ def mostOfficial(api, newapi):
 
 class ScriptOutputGenerator(OutputGenerator):
     """ScriptOutputGenerator - subclass of OutputGenerator.
-    Base class to Generate script (Python/Ruby/etc.) data structures
+    Base class to Generate script (Python/Ruby/JS/etc.) data structures
     describing API names and relationships.
     Similar to DocOutputGenerator, but writes a single file."""
 
@@ -79,7 +79,9 @@ class ScriptOutputGenerator(OutputGenerator):
         - api - name of the API
         - feature - name of the feature requiring it
         - required - None, or an additional feature dependency within
-          'feature' """
+          'feature'. The additional dependency is a boolean expression of
+          one or more extension and/or core version names, which is passed
+          through to the output script intact."""
 
         # Each entry in self.apimap contains one or more
         # ( feature, required ) tuples.
@@ -253,13 +255,8 @@ class ScriptOutputGenerator(OutputGenerator):
                 elif category == 'define':
                     self.defines[name] = None
                 elif category == 'basetype':
-                    # Do not add an entry for base types that are not API types
-                    # e.g. an API Bool type gets an entry, uint32_t does not
-                    if self.apiName(name):
-                        self.basetypes[name] = None
-                        self.addName(self.typeCategory, name, 'basetype')
-                    else:
-                        self.logMsg('diag', 'ScriptOutputGenerator::genType: unprocessed type:', name, 'category:', category)
+                    self.basetypes[name] = None
+                    self.addName(self.typeCategory, name, 'basetype')
             else:
                 self.logMsg('diag', 'ScriptOutputGenerator::genType: unprocessed type:', name)
 
@@ -314,7 +311,7 @@ class ScriptOutputGenerator(OutputGenerator):
         self.enums[groupName] = sorted(enumerants)
 
     def genEnum(self, enuminfo, name, alias):
-        """Generate enumerant (compile-time constants).
+        """Generate enumerant (compile time constant).
 
         - Add the constant name to the 'consts' dictionary, with the
           value being None to indicate that the constant is not

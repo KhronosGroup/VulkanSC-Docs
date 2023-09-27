@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2021 The Khronos Group Inc.
+# Copyright 2013-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -57,24 +57,15 @@ class HostSynchronizationOutputGenerator(OutputGenerator):
 
     def writeInclude(self):
         "Generates the asciidoc include files."""
-        self.writeBlock('parameters.txt',
+        self.writeBlock('parameters.adoc',
                         'Externally Synchronized Parameters',
                         self.threadsafety['parameters'])
-        self.writeBlock('parameterlists.txt',
+        self.writeBlock('parameterlists.adoc',
                         'Externally Synchronized Parameter Lists',
                         self.threadsafety['parameterlists'])
-        self.writeBlock('implicit.txt',
+        self.writeBlock('implicit.adoc',
                         'Implicit Externally Synchronized Parameters',
                         self.threadsafety['implicit'])
-
-    def paramIsArray(self, param):
-        """Check if the parameter passed in is a pointer to an array."""
-        return param.get('len') is not None
-
-    def paramIsPointer(self, param):
-        """Check if the parameter passed in is a pointer."""
-        tail = param.find('type').tail
-        return tail is not None and '*' in tail
 
     def makeThreadSafetyBlocks(self, cmd, paramtext):
         # See also makeThreadSafetyBlock in validitygenerator.py - similar but not entirely identical

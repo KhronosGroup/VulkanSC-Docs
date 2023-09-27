@@ -1,0 +1,33 @@
+// Copyright (c) 2019-2020 Imagination Technologies Limited
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_IMG_format_pvrtc.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2019-09-02
+*IP Status*::
+    Imagination Technologies Proprietary
+*Contributors*::
+  - Stuart Smith, Imagination Technologies
+
+=== Description
+
+`VK_IMG_format_pvrtc` provides additional texture compression functionality
+specific to Imagination Technologies PowerVR Texture compression format
+(called PVRTC).
+
+=== Deprecation
+
+Both PVRTC1 and PVRTC2 are slower than standard image formats on PowerVR
+GPUs, and support will be removed from future hardware.
+
+include::{generated}/interfaces/VK_IMG_format_pvrtc.adoc[]
+
+=== Version History
+
+  * Revision 1, 2019-09-02 (Stuart Smith)
+  ** Initial version
+

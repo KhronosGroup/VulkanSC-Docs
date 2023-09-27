@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2020-2021 The Khronos Group Inc.
+# Copyright 2020-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -12,6 +12,7 @@
 
 import argparse
 import re
+import sys
 from lxml import etree
 
 SECTNAME = re.compile(r'sect(?P<level>\d+)')
@@ -87,7 +88,9 @@ if __name__ == '__main__':
                 # print('Skipping external href:', ref)
 
         # Check for hrefs not found in ids
-        print('Bad links in {}:'.format(filename))
-        for (elem, href) in refs:
-            parents = find_parent_ids(elem, href)
-            print('{:<40} in {:<28} ({})'.format(href, parents[0], parents[1]))
+        if len(refs) > 0:
+            print('Found bad links in {}:'.format(filename))
+            for (elem, href) in refs:
+                parents = find_parent_ids(elem, href)
+                print('{:<40} in {:<28} ({})'.format(href, parents[0], parents[1]))
+            sys.exit(1)

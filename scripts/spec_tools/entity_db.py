@@ -411,6 +411,13 @@ class EntityDatabase(ABC):
         """Return the collection of all known entity-related markup macros."""
         return self._categoriesByMacro.keys()
 
+    def childTypes(self, typename):
+        """Return the list of types specifying typename as their parent type."""
+        children = [childname
+                    for childname, entity in self._byEntity.items()
+                    if entity.elem is not None and entity.elem.get("parentstruct") == typename]
+        return children
+
     ###
     # Methods only used during initial setup/population of this data structure
     ###
@@ -511,7 +518,7 @@ class EntityDatabase(ABC):
 
         # Don't generate a filename if this entity doesn't generate includes.
         if filename is None and generates:
-            filename = '{}/{}.txt'.format(directory, entityName)
+            filename = f'{directory}/{entityName}.adoc'
 
         data = EntityData(
             entity=entityName,
@@ -562,7 +569,7 @@ class EntityDatabase(ABC):
         # Retrieve from subclass, if overridden, then store locally.
         self._supportExclusionSet = set(self.getExclusionSet())
 
-        # Entities that get a generated/api/category/entity.txt file.
+        # Entities that get a generated/api/category/entity.adoc file.
         self._generating_entities = {}
 
         # Name prefix members

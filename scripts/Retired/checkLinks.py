@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2015-2021 The Khronos Group Inc.
+# Copyright 2015-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -127,10 +127,10 @@ def initChecks():
 
     # Matches asciidoc include:: directives used in spec/ref pages (and also
     # others such as validity). This is specific to the layout of the api/
-    # includes and allows any path precding 'api/' followed by the category
+    # includes and allows any path preceding 'api/' followed by the category
     # (protos, structs, enums, etc.) followed by the name of the proto,
     # struct, etc. file.
-    incPat = re.compile('^.*api/(\w+)/(\w+)\.txt')
+    incPat = re.compile('^.*api/(\w+)/(\w+)\.adoc')
 
     # Lists of current /protos/ (functions) and /structs/ includes. There
     # can be several protos contiguously for different forms of a command

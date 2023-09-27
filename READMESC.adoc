@@ -1,0 +1,64 @@
+// Copyright 2017-2023 The Khronos Group Inc.
+// SPDX-License-Identifier: CC-BY-4.0
+
+ifdef::env-github[]
+:note-caption: :information_source:
+endif::[]
+
+= Vulkan^(R)^ SC API Documentation Project
+
+The link:https://github.com/KhronosGroup/VulkanSC-Docs[VulkanSC-Docs]
+repository (or the equivalent internal Khronos tracking repository)
+contains sources for the formal documentation of the Vulkan SC
+API. This includes:
+
+[options="compact"]
+  * The Vulkan SC API Specification
+  * Specification of API extensions
+  * API reference ("`man`") pages
+  * The XML API Registry (also mirrored at
+    link:https://github.com/KhronosGroup/Vulkan-Headers[Vulkan-Headers] under the `sc_main` branch)
+  * Vulkan SC header files (also mirrored at
+    link:https://github.com/KhronosGroup/Vulkan-Headers[Vulkan-Headers] under the `sc_main` branch)
+  * Related tools and scripts.
+
+The authoritative public repository is located at
+link:https://github.com/KhronosGroup/VulkanSC-Docs[VulkanSC-Docs].
+It hosts a public Issue tracker, and outside developers can file proposed
+changes (Pull Requests) against the Specification, subject to approval by
+Khronos.
+
+Questions and feedback on the Vulkan SC specification can be made using the GitHub
+link:https://github.com/KhronosGroup/VulkanSC-Docs/issues/[Issues]
+and
+link:https://github.com/KhronosGroup/VulkanSC-Docs/discussions[Discussions]
+features on the
+link:https://github.com/KhronosGroup/VulkanSC-Docs/[VulkanSC-Docs]
+repository.
+
+For standard Vulkan (not Vulkan SC) related issues, consult the
+link:https://github.com/KhronosGroup/Vulkan-Web-Registry/blob/main/Vulkan-Projects.adoc[Vulkan-Projects] list on the link:https://github.com/KhronosGroup/Vulkan-Web-Registry[Vulkan-Web-Registry]
+repository.
+
+== External Contributions
+
+Khronos welcomes feedback in GitHub Issues, and proposed changes in GitHub
+Pull Requests (PRs), but will not necessarily accept all such changes.
+
+Please keep your issues and pull requests focused on solving a single
+problem. Broader feedback that tries to solve multiple problems, or touches
+many parts of the Specification at once, is difficult for the Vulkan SC Working
+Group to review in a timely fashion.
+
+
+== Branch Structure
+
+The current Specification is maintained in the default branch (currently
+`sc_main`) of the repository.
+From this branch it is possible to generate Specifications for any published
+version of Vulkan SC, and incorporating any desired set of extensions.
+Each published update is tagged in the form `vksc1.0.*release*` where *release*
+is a constantly incrementing release number and `1.0` is the latest
+published version of the API.
+
+

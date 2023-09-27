@@ -1,0 +1,128 @@
+// Copyright 2018-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_KHR_video_encode_queue.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2023-06-06
+*IP Status*::
+    No known IP claims.
+*Contributors*::
+  - Ahmed Abdelkhalek, AMD
+  - Damien Kessler, NVIDIA
+  - George Hao, AMD
+  - Jake Beju, AMD
+  - Peter Fang, AMD
+  - Piers Daniell, NVIDIA
+  - Srinath Kumarapuram, NVIDIA
+  - Thomas J. Meier, NVIDIA
+  - Tony Zlatinski, NVIDIA
+  - Ravi Chaudhary, NVIDIA
+  - Yang Liu, AMD
+  - Daniel Rakos, RasterGrid
+  - Ping Liu, Intel
+  - Aidan Fabius, Core Avionics & Industrial Inc.
+
+=== Description
+
+This extension builds upon the `apiext:VK_KHR_video_queue` extension by
+adding common APIs specific to video encoding and thus enabling
+implementations to expose queue families supporting video encode operations.
+
+More specifically, it adds video encode specific capabilities and a new
+command buffer command that allows recording video encode operations against
+a video session.
+
+This extension is to be used in conjunction with other codec specific video
+encode extensions that enable encoding video sequences of specific video
+compression standards.
+
+include::{generated}/interfaces/VK_KHR_video_encode_queue.adoc[]
+
+=== Issues
+
+1) Why is there no `VK_PIPELINE_STAGE_VIDEO_ENCODE_BIT_KHR`?
+
+*RESOLVED*: This extension requires `VK_KHR_synchronization2` because the
+new access flags introduced did not fit in the 32-bit enum
+`VkAccessFlagBits`.
+Accordingly, all new pipeline stage and access flags have been added to the
+corresponding 64-bit enum and no new flags have been added to the legacy
+32-bit enums.
+While the new pipeline stage flag introduced uses bit #27 which would also
+fit in the legacy `VkPipelineStageFlagBits` enum, there is no real benefit
+to include it.
+Instead the bit is marked reserved.
+
+=== Version History
+
+  * Revision 1, 2018-07-23 (Ahmed Abdelkhalek)
+  ** Initial draft
+  * Revision 1.1, 10/29/2019 (Tony Zlatinski)
+  ** Updated the reserved spec tokens and renamed VkVideoEncoderKHR to
+     VkVideoSessionKHR
+  * Revision 1.6, Jan 08 2020 (Tony Zlatinski)
+  ** API unify with the video_decode_queue spec
+  * Revision 2, March 29 2021 (Tony Zlatinski)
+  ** Spec and API updates.
+  * Revision 3, 2021-09-30 (Jon Leech)
+  ** Add interaction with `apiext:VK_KHR_format_feature_flags2` to `vk.xml`
+  * Revision 4, 2022-02-10 (Ahmed Abdelkhalek)
+  ** Updates to encode capability interface
+  * Revision 5, 2022-03-31 (Ahmed Abdelkhalek)
+  ** Remove redundant VkVideoEncodeInfoKHR.codedExtent
+  * Revision 6, 2022-07-18 (Daniel Rakos)
+  ** Remove `VkVideoEncodeRateControlFlagBitsKHR` and
+     `VkVideoEncodeFlagBitsKHR` as they contain no defined flags for now
+  ** Add `VK_VIDEO_CODING_CONTROL_ENCODE_RATE_CONTROL_BIT_KHR` and
+     `VK_VIDEO_CODING_CONTROL_ENCODE_RATE_CONTROL_LAYER_BIT_KHR` to indicate
+     rate control and rate control layer change requests, respectively, in
+     video coding control operations
+  * Revision 7, 2022-08-12 (Daniel Rakos)
+  ** Add VkVideoEncodeUsageInfoKHR structure and related flags
+  * Revision 8, 2023-03-06 (Daniel Rakos)
+  ** Replace `VK_QUERY_TYPE_VIDEO_ENCODE_BITSTREAM_BUFFER_RANGE_KHR` queries
+     with more generic `VK_QUERY_TYPE_VIDEO_ENCODE_FEEDBACK_KHR` queries
+     that can be extended in the future with more feedback values
+  ** Rename `dstBitstreamBuffer`, `dstBitstreamBufferOffset`, and
+     `dstBitstreamBufferMaxRange` in `VkVideoEncodeInfoKHR` to `dstBuffer`,
+     `dstBufferOffset`, and `dstBufferRange`, respectively, for consistency
+     with the naming convention in the video decode extensions
+  ** Change the type of `rateControlLayerCount` and `qualityLevelCount` in
+     `VkVideoEncodeCapabilitiesKHR` from `uint8_t` to `uint32_t` and rename
+     them to `maxRateControlLayers` and `maxQualityLevels`, respectively
+  ** Change the type of `averageBitrate` and `maxBitrate` in
+     `VkVideoEncodeRateControlLayerInfoKHR`` from `uint32_t` to `uint64_t`
+  ** Fixed the definition of rate control flag bits and added the new
+     `VK_VIDEO_ENCODE_RATE_CONTROL_MODE_DEFAULT_KHR` constant to indicate
+     implementation-specific automatic rate control
+  ** Change the type of `VkVideoEncodeRateControlInfoKHR::layerCount` from
+     `uint8_t` to `uint32_t`
+  ** Rename `pLayerConfigs` to `pLayers` in
+     `VkVideoEncodeRateControlInfoKHR`
+  * Revision 9, 2023-03-28 (Daniel Rakos)
+  ** Removed `VK_VIDEO_CODING_CONTROL_ENCODE_RATE_CONTROL_LAYER_BIT_KHR` and
+     the ability to change the state of individual rate control layers
+  ** Added new `VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_HAS_OVERRIDES_BIT_KHR`
+     flag to video encode feedback queries
+  ** Added new video session create flag
+     `VK_VIDEO_SESSION_CREATE_ALLOW_ENCODE_PARAMETER_OPTIMIZATIONS_BIT_KHR`
+     to opt-in to video session and encoding parameter optimizations
+  ** Added the `vkGetEncodedVideoSessionParametersKHR` command to enable
+     retrieving encoded video session parameter data
+  ** Moved `virtualBufferSizeInMs` and `initialVirtualBufferSizeInMs` from
+     `VkVideoEncodeRateControlLayerInfoKHR` to
+     `VkVideoEncodeRateControlInfoKHR`
+  ** Added `maxBitrate` capability
+  ** Renamed `inputImageDataFillAlignment` capability to
+     `encodeInputPictureGranularity` to better reflect its purpose
+  ** Added new `vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR`
+     command and related structures to enable querying recommended settings
+     for video encode quality levels
+  ** Added `VK_VIDEO_CODING_CONTROL_ENCODE_QUALITY_LEVEL_BIT_KHR` flag and
+     `VkVideoEncodeQualityLevelInfoKHR` structure to allow controlling video
+     encode quality level and removed `qualityLevel` from the encode
+     operation parameters

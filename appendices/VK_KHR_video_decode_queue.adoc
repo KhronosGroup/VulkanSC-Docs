@@ -1,0 +1,63 @@
+// Copyright 2018-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_KHR_video_decode_queue.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2022-09-29
+*IP Status*::
+    No known IP claims.
+*Contributors*::
+  - Ahmed Abdelkhalek, AMD
+  - Jake Beju, AMD
+  - Olivier Lapicque, NVIDIA
+  - Peter Fang, AMD
+  - Piers Daniell, NVIDIA
+  - Srinath Kumarapuram, NVIDIA
+  - Tony Zlatinski, NVIDIA
+  - Daniel Rakos, RasterGrid
+
+=== Description
+
+This extension builds upon the `apiext:VK_KHR_video_queue` extension by
+adding common APIs specific to video decoding and thus enabling
+implementations to expose queue families supporting video decode operations.
+
+More specifically, it adds video decode specific capabilities and a new
+command buffer command that allows recording video decode operations against
+a video session.
+
+This extension is to be used in conjunction with other codec specific video
+decode extensions that enable decoding video sequences of specific video
+compression standards.
+
+include::{generated}/interfaces/VK_KHR_video_decode_queue.adoc[]
+
+=== Version History
+
+  * Revision 1, 2018-6-11 (Peter Fang)
+  ** Initial draft
+  * Revision 1.5, Nov 09 2018 (Tony Zlatinski)
+  ** API Updates
+  * Revision 1.6, Jan 08 2020 (Tony Zlatinski)
+  ** API unify with the video_encode_queue spec
+  * Revision 1.7, March 29 2021 (Tony Zlatinski)
+  ** Spec and API updates.
+  * Revision 2, September 30 2021 (Jon Leech)
+  ** Add interaction with `apiext:VK_KHR_format_feature_flags2` to `vk.xml`
+  * Revision 3, 2022-02-25 (Ahmed Abdelkhalek)
+  ** Add VkVideoDecodeCapabilitiesKHR with new flags to report support for
+     decode DPB and output coinciding in the same image, or in distinct
+     images.
+  * Revision 4, 2022-03-31 (Ahmed Abdelkhalek)
+  ** Remove redundant VkVideoDecodeInfoKHR.coded{Offset|Extent}
+  * Revision 5, 2022-07-18 (Daniel Rakos)
+  ** Remove `VkVideoDecodeFlagBitsKHR` as it contains no defined flags for
+     now
+  * Revision 6, 2022-08-12 (Daniel Rakos)
+  ** Add VkVideoDecodeUsageInfoKHR structure and related flags
+  * Revision 7, 2022-09-29 (Daniel Rakos)
+  ** Extension is no longer provisional

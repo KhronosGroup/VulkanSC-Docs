@@ -34,7 +34,7 @@ INTERNAL_PLACEHOLDER = re.compile(
 
 # Matches a generated (api or validity) include line.
 INCLUDE = re.compile(
-    r'include::(?P<directory_traverse>((../){1,4}|\{(INCS-VAR|generated)\}/)(generated/)?)(?P<generated_type>[\w]+)/(?P<category>\w+)/(?P<entity_name>[^./]+).txt[\[][\]]')
+    r'include::(?P<directory_traverse>((../){1,4}|\{generated\}/)(generated/)?)(?P<generated_type>(api|validity))/(?P<category>\w+)/(?P<entity_name>[^./]+).adoc[\[][\]]')
 
 # Matches an [[AnchorLikeThis]]
 ANCHOR = re.compile(r'\[\[(?P<entity_name>[^\]]+)\]\]')
@@ -81,6 +81,31 @@ BRACKETS = re.compile(r'\[(?P<tags>.*)\]')
 REF_PAGE_ATTRIB = re.compile(
     r"(?P<key>[a-z]+)='(?P<value>[^'\\]*(?:\\.[^'\\]*)*)'")
 
+# Exceptions to:
+# error: Definition of link target {} with macro etext (used for category enums) does not exist. (-Wwrong_macro)
+# typically caused by using Vulkan-only enums in Vulkan SC blocks with "etext", or because they
+# are suffixed differently.
+CHECK_UNRECOGNIZED_ETEXT_EXCEPTIONS = (
+    'VK_COLORSPACE_SRGB_NONLINEAR_KHR',
+    'VK_COLOR_SPACE_DCI_P3_LINEAR_EXT',
+    'VK_PIPELINE_CACHE_CREATE_READ_ONLY_BIT',
+    'VK_STENCIL_FRONT_AND_BACK',
+    'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES',
+    'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES',
+    'VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES2_EXT',
+)
+
+# Exceptions to:
+# warning: Definition of link target {} with macro ename (used for category enums) does not exist. (-Wbad_enumerant)
+# typically caused by Vulkan SC enums not being recognized in Vulkan build
+CHECK_UNRECOGNIZED_ENAME_EXCEPTIONS = (
+    'VK_ERROR_INVALID_PIPELINE_CACHE_DATA',
+    'VK_ERROR_NO_PIPELINE_MATCH',
+    'VK_ERROR_VALIDATION_FAILED',
+    'VK_MEMORY_HEAP_SEU_SAFE_BIT',
+    'VK_PIPELINE_CACHE_CREATE_USE_APPLICATION_STORAGE_BIT',
+    'VK_PIPELINE_CACHE_HEADER_VERSION_SAFETY_CRITICAL_ONE',
+)
 
 class Attrib(Enum):
     """Attributes of a ref page."""
@@ -438,7 +463,7 @@ class MacroCheckerFile(object):
         if self.pname_data is not None and '* pname:' in line:
             context_entity = self.pname_data.entity
             if self.pname_mentions[context_entity] is None:
-                # First time seeting * pname: after an api include, prepare the set that
+                # First time seeing * pname: after an api include, prepare the set that
                 # tracks
                 self.pname_mentions[context_entity] = set()
 
@@ -721,6 +746,9 @@ class MacroCheckerFile(object):
 
         data = self.checker.findEntity(entity)
         if data:
+            if entity in CHECK_UNRECOGNIZED_ETEXT_EXCEPTIONS:
+                return False
+
             # We found the goof: incorrect macro
             msg.append('Apparently matching entity in category {} found.'.format(
                 data.category))
@@ -777,7 +805,10 @@ class MacroCheckerFile(object):
             # hard to check this.
             if self.checker.likelyRecognizedEntity(entity):
                 if not self.checkText():
-                    self.warning(MessageId.BAD_ENUMERANT, msg +
+                    if entity in CHECK_UNRECOGNIZED_ENAME_EXCEPTIONS:
+                        return False
+                    else:
+                        self.warning(MessageId.BAD_ENUMERANT, msg +
                                  ['Unrecognized ename:{} that we would expect to recognize since it fits the pattern for this API.'.format(entity)], see_also=see_also)
         else:
             # This is fine:
@@ -816,6 +847,9 @@ class MacroCheckerFile(object):
                 "No asterisk/leading or trailing underscore/bracket in the entity, so this might be a mistaken use of the 'text' macro {}:".format(macro)]
             data = self.checker.findEntity(entity)
             if data:
+                if entity in CHECK_UNRECOGNIZED_ETEXT_EXCEPTIONS:
+                    return False
+
                 # We found the goof: incorrect macro
                 msg.append('Apparently matching entity in category {} found.'.format(
                     data.category))
@@ -927,6 +961,14 @@ class MacroCheckerFile(object):
             # OK, we are in a ref page block that doesn't match
             self.handleIncludeMismatchRefPage(entity, generated_type)
 
+    def perform_entity_check(self, type):
+        """Returns True if an entity check should be performed on this
+           refpage type.
+
+           May override."""
+
+        return True
+
     def checkRefPage(self):
         """Check if the current line (a refpage tag) meets requirements.
 
@@ -978,25 +1020,25 @@ class MacroCheckerFile(object):
                            context=context)
             self.checker.addRefPage(text)
 
-            # Skip entity check if it's a spir-v built in
-            type = ''
+            # Entity check can be skipped depending on the refpage type
+            # Determine page type for use in several places
+            type_text = ''
             if Attrib.TYPE.value in attribs:
-                type = attribs[Attrib.TYPE.value].value
+                type_text = attribs[Attrib.TYPE.value].value
 
-            if type != 'builtins' and type != 'spirv':
+            if self.perform_entity_check(type_text):
                 data = self.checker.findEntity(text)
-                self.current_ref_page = data
                 if data:
                     # OK, this is a known entity that we're seeing a refpage for.
                     directory = data.directory
+                    self.current_ref_page = data
                 else:
                     # TODO suggest fixes here if applicable
                     self.error(MessageId.REFPAGE_NAME,
                                [ "Found reference page markup, but refpage='{}' type='{}' does not refer to a recognized entity".format(
-                                   text, type),
+                                   text, type_text),
                                  'If this is intentional, add the entity to EXTRA_DEFINES or EXTRA_REFPAGES in check_spec_links.py.' ],
                                context=context)
-
         else:
             self.error(MessageId.REFPAGE_TAG,
                        "Found apparent reference page markup, but missing refpage='...'",
@@ -1132,6 +1174,15 @@ class MacroCheckerFile(object):
         for entity in unique_refs.keys():
             self.checkRefPageXref(entity, context)
 
+    @property
+    def allowEnumXrefs(self):
+        """Returns True if enums can be specified in the 'xrefs' attribute
+        of a refpage.
+
+        May override.
+        """
+        return False
+
     def checkRefPageXref(self, referenced_entity, line_context):
         """Check a single cross-reference entry for a refpage.
 
@@ -1142,14 +1193,24 @@ class MacroCheckerFile(object):
         line_context -- A MessageContext referring to the entire line.
         """
         data = self.checker.findEntity(referenced_entity)
-        if data:
-            # This is OK
-            return
         context = line_context
         match = re.search(r'\b{}\b'.format(referenced_entity), self.line)
         if match:
             context = self.storeMessageContext(
                 group=None, match=match)
+
+        if data and data.category == "enumvalues" and not self.allowEnumXrefs:
+            msg = ["Found reference page markup, with an enum value listed: {}".format(
+                referenced_entity)]
+            self.error(MessageId.REFPAGE_XREFS,
+                    msg,
+                    context=context)
+            return
+
+        if data:
+            # This is OK: we found it, and it's not an enum value
+            return
+
         msg = ["Found reference page markup, with an unrecognized entity listed: {}".format(
             referenced_entity)]
 

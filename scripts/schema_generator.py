@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright (c) 2020 The Khronos Group Inc.
+# Copyright 2020-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -205,7 +205,6 @@ class SchemaOutputGenerator(OutputGenerator):
     def genMemberSchema(self, structure, param):
         paramdecl = ""
         storeType = ""
-        arrRegex  = r'\[\d+\]'
         isArr = param.get('len') not in (None, "null-terminated")
         isPtr = False
 
@@ -228,13 +227,16 @@ class SchemaOutputGenerator(OutputGenerator):
                     if isPtr and text != "pNext":
                         paramdecl += "{\"oneOf\": [{\"$ref\": \"#/definitions/void\"},"
 
-                    if isArr or re.match(arrRegex, tail):
+                    if isArr or tail.startswith('['):
                         # TODO: How to get maxCount here?
                         paramdecl += " {\"type\": \"array\", \"minItems\": 0, \"maxItems\": 255, \"items\": {\"$ref\": \"#/definitions/"
                         if (structure == "VkPipelineLayoutCreateInfo" and text == "pSetLayouts") or \
                            (structure == "VkDescriptorSetLayoutBinding" and text == "pImmutableSamplers") or \
                            (structure == "VkSamplerYcbcrConversionInfo" and text == "conversion"):
                             paramdecl += "char\"}}"
+                        elif (storeType == "void"):
+                            # void* data can be NULL, an array of uint8_t data, or a Base64-encoded string
+                            paramdecl += "uint8_t\"}}, {\"type\": \"string\"}"
                         else:
                             paramdecl += storeType + "\"}}"
                     else:

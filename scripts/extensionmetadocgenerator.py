@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2021 The Khronos Group Inc.
+# Copyright 2013-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -9,6 +9,7 @@ import re
 import sys
 from functools import total_ordering
 from generator import GeneratorOptions, OutputGenerator, regSortFeatures, write
+from parse_dependency import dependencyMarkup
 
 class ExtensionMetaDocGeneratorOptions(GeneratorOptions):
     """ExtensionMetaDocGeneratorOptions - subclass of GeneratorOptions.
@@ -16,10 +17,6 @@ class ExtensionMetaDocGeneratorOptions(GeneratorOptions):
     Represents options during extension metainformation generation for Asciidoc"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-
-EXT_NAME_DECOMPOSE_RE = re.compile(r'[A-Z]+_(?P<tag>[A-Z]+)_(?P<name>[\w_]+)')
-
 
 @total_ordering
 class Extension:
@@ -29,23 +26,23 @@ class Extension:
                  name,
                  number,
                  ext_type,
-                 requires,
-                 requiresCore,
+                 depends,
                  contact,
                  promotedTo,
                  deprecatedBy,
                  obsoletedBy,
                  provisional,
                  revision,
-                 specialuse ):
+                 specialuse,
+                 ratified
+                ):
         self.generator = generator
         self.conventions = generator.genOpts.conventions
         self.filename = filename
         self.name = name
         self.number = number
         self.ext_type = ext_type
-        self.requires = requires
-        self.requiresCore = requiresCore
+        self.depends = depends
         self.contact = contact
         self.promotedTo = promotedTo
         self.deprecatedBy = deprecatedBy
@@ -53,6 +50,7 @@ class Extension:
         self.provisional = provisional
         self.revision = revision
         self.specialuse = specialuse
+        self.ratified = ratified
 
         self.deprecationType = None
         self.supercedingAPIVersion = None
@@ -87,10 +85,6 @@ class Extension:
                 self.supercedingExtension = supercededBy
             else:
                 self.generator.logMsg('error', 'Unrecognized ' + self.deprecationType + ' attribute value \'' + supercededBy + '\'!')
-
-        match = EXT_NAME_DECOMPOSE_RE.match(self.name)
-        self.vendor = match.group('tag')
-        self.bare_name = match.group('name')
 
     def __str__(self):
         return self.name
@@ -175,7 +169,12 @@ class Extension:
         return doc
 
     def resolveDeprecationChain(self, extensionsList, succeededBy, isRefpage, file):
-        ext = next(x for x in extensionsList if x.name == succeededBy)
+        ext = next((x for x in extensionsList if x.name == succeededBy), None)
+
+        if ext is None:
+            write(f'  ** *NOTE* The extension `{succeededBy}` is not supported for the API specification being generated', file=file)
+            self.generator.logMsg('warn', f'resolveDeprecationChain: {self.name} defines a superseding interface {succeededBy} which is not in the supported extensions list')
+            return
 
         if ext.deprecationType:
             if ext.deprecationType == 'promotion':
@@ -254,15 +253,30 @@ class Extension:
         self.writeTag('Registered Extension Number', self.number, isRefpage, fp)
         self.writeTag('Revision', self.revision, isRefpage, fp)
 
+        if self.conventions.xml_api_name in self.ratified.split(','):
+            ratstatus = 'Ratified'
+        else:
+            ratstatus = 'Not ratified'
+        self.writeTag('Ratification Status', ratstatus, isRefpage, fp)
+
         # Only API extension dependencies are coded in XML, others are explicit
         self.writeTag('Extension and Version Dependencies', None, isRefpage, fp)
 
-        write('  * Requires ' + self.conventions.api_name() + ' ' + self.requiresCore, file=fp)
-        if self.requires:
-            for dep in self.requires.split(','):
-                write('  * Requires', self.conventions.formatExtension(dep),
-                      file=fp)
-        if self.provisional == 'true':
+        # Transform the boolean 'depends' expression into equivalent
+        # human-readable asciidoc markup.
+        if self.depends is not None:
+            if isRefpage:
+                separator = ''
+            else:
+                separator = '+'
+            write(separator + '\n--\n' +
+                  dependencyMarkup(self.depends) +
+                  '--', file=fp)
+        else:
+            # Do not bother specifying the base Vulkan 1.0 API redundantly
+            True
+
+        if self.provisional == 'true' and self.conventions.provisional_extension_warning:
             write('  * *This is a _provisional_ extension and must: be used with caution.', file=fp)
             write('    See the ' +
                   self.specLink(xrefName = 'boilerplate-provisional-header',
@@ -333,7 +347,7 @@ class Extension:
                     prettyHandle = 'icon:gitlab[alt=GitLab, role="red"]' + handle.replace('gitlab:@', '')
                 elif handle.startswith('@'):
                     issuePlaceholderText = '[' + self.name + '] ' + handle
-                    issuePlaceholderText += '%0A<<Here describe the issue or question you have about the ' + self.name + ' extension>>'
+                    issuePlaceholderText += '%0A*Here describe the issue or question you have about the ' + self.name + ' extension*'
                     trackerLink = 'link:++https://github.com/KhronosGroup/Vulkan-Docs/issues/new?body=' + issuePlaceholderText + '++'
                     prettyHandle = trackerLink + '[icon:github[alt=GitHub,role="black"]' + handle[1:] + ',window=_blank,opts=nofollow]'
                 else:
@@ -346,10 +360,10 @@ class Extension:
         # current repository, and link to the same document (parameterized
         # by a URL prefix attribute) if it does.
         # The assumption is that a proposal document for an extension
-        # VK_name will be located in 'proposals/VK_name.asciidoc' relative
+        # VK_name will be located in 'proposals/VK_name.adoc' relative
         # to the repository root, and that this script will be invoked from
         # the repository root.
-        path = 'proposals/{}.asciidoc'.format(self.name)
+        path = 'proposals/{}.adoc'.format(self.name)
         if os.path.exists(path) and os.access(path, os.R_OK):
             self.writeTag('Extension Proposal',
                 'link:{{specRepositoryURL}}/{}[{}]'.format(path, self.name), isRefpage, fp)
@@ -357,7 +371,7 @@ class Extension:
         # If this is metadata to be included in a refpage, adjust the
         # leveloffset to account for the relative structure of the extension
         # appendices vs. refpages.
-        if isRefpage:
+        if isRefpage and self.conventions.include_extension_appendix_in_refpage:
             write(':leveloffset: -1', file=fp)
 
         fp.close()
@@ -372,8 +386,7 @@ class ExtensionMetaDocOutputGenerator(OutputGenerator):
     - number        extension number (optional)
     - contact       name and GitHub login or email address (optional)
     - type          'instance' | 'device' (optional)
-    - requires      list of comma-separated required API extensions (optional)
-    - requiresCore  required core version of API (optional)
+    - depends       boolean expression of core version and extension names this depends on (optional)
     - promotedTo    extension or API version it was promoted to
     - deprecatedBy  extension or API version which deprecated this extension,
                     or empty string if deprecated without replacement
@@ -438,8 +451,8 @@ class ExtensionMetaDocOutputGenerator(OutputGenerator):
 
         return doc
 
-    def makeExtensionInclude(self, ext):
-        return self.conventions.extension_include_string(ext)
+    def makeExtensionInclude(self, extname):
+        return self.conventions.extension_include_string(extname)
 
     def endFile(self):
         self.extensions.sort()
@@ -543,7 +556,7 @@ class ExtensionMetaDocOutputGenerator(OutputGenerator):
             write('endif::HAS_PROVISIONAL_EXTENSIONS[]', file=provisional_extensions_appendix_fp)
 
             for ext in self.extensions:
-                include = self.makeExtensionInclude(ext)
+                include = self.makeExtensionInclude(ext.name)
                 link = '  * ' + self.conventions.formatExtension(ext.name)
                 if ext.provisional == 'true':
                     write(self.conditionalExt(ext.name, include), file=provisional_extension_appendices_fp)
@@ -584,14 +597,14 @@ class ExtensionMetaDocOutputGenerator(OutputGenerator):
 
         # These attributes are optional
         OPTIONAL = False
-        requires = self.getAttrib(interface, 'requires', OPTIONAL)
-        requiresCore = self.getAttrib(interface, 'requiresCore', OPTIONAL, '1.0') # TODO update this line with update_version.py
+        depends = self.getAttrib(interface, 'depends', OPTIONAL)    # TODO should default to VK_VERSION_1_0?
         contact = self.getAttrib(interface, 'contact', OPTIONAL)
         promotedTo = self.getAttrib(interface, 'promotedto', OPTIONAL)
         deprecatedBy = self.getAttrib(interface, 'deprecatedby', OPTIONAL)
         obsoletedBy = self.getAttrib(interface, 'obsoletedby', OPTIONAL)
         provisional = self.getAttrib(interface, 'provisional', OPTIONAL, 'false')
         specialuse = self.getAttrib(interface, 'specialuse', OPTIONAL)
+        ratified = self.getAttrib(interface, 'ratified', OPTIONAL, '')
 
         filename = self.directory + '/' + name + self.file_suffix
 
@@ -601,15 +614,15 @@ class ExtensionMetaDocOutputGenerator(OutputGenerator):
             name = name,
             number = number,
             ext_type = ext_type,
-            requires = requires,
-            requiresCore = requiresCore,
+            depends = depends,
             contact = contact,
             promotedTo = promotedTo,
             deprecatedBy = deprecatedBy,
             obsoletedBy = obsoletedBy,
             provisional = provisional,
             revision = revision,
-            specialuse = specialuse)
+            specialuse = specialuse,
+            ratified = ratified)
         self.extensions.append(extdata)
 
 

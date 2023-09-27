@@ -1,0 +1,263 @@
+// Copyright 2015-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+
+[[introduction]]
+= Introduction
+
+This document, referred to as the
+ifdef::VKSC_VERSION_1_0["`Vulkan SC Specification`", ]
+"`Vulkan Specification`" or just the "`Specification`" hereafter, describes
+the Vulkan
+ifdef::VKSC_VERSION_1_0[SC]
+Application Programming Interface (API).
+ifdef::VKSC_VERSION_1_0[]
+"`Base Vulkan Specification`" refers to the Vulkan Specification
+(https://registry.khronos.org/vulkan/) that Vulkan SC is based on.
+"`Vulkan`" and "`Vulkan SC`" refer to the Vulkan SC API and "`Base Vulkan`"
+refers to the Vulkan API that Vulkan SC is based on.
+endif::VKSC_VERSION_1_0[]
+Vulkan is a http://www.open-std.org/jtc1/sc22/wg14/www/standards[C99] API
+designed for explicit control of low-level graphics and compute
+functionality.
+
+ifndef::VKSC_VERSION_1_0[]
+The canonical version of the Specification is available in the official
+https://registry.khronos.org/vulkan/[Vulkan Registry]
+(https://registry.khronos.org/vulkan/).
+The source files used to generate the Vulkan specification are stored in the
+https://github.com/KhronosGroup/Vulkan-Docs[Vulkan Documentation Repository]
+(https://github.com/KhronosGroup/Vulkan-Docs).
+endif::VKSC_VERSION_1_0[]
+
+ifdef::VKSC_VERSION_1_0[]
+The canonical version of the Specification is available in the official
+https://registry.khronos.org/vulkansc/[Vulkan SC Registry]
+(https://registry.khronos.org/vulkansc/).
+The source files used to generate the Vulkan SC specification are stored in
+the https://github.com/KhronosGroup/VulkanSC-Docs[Vulkan SC Documentation
+Repository] (https://github.com/KhronosGroup/VulkanSC-Docs).
+endif::VKSC_VERSION_1_0[]
+The source repository additionally has a public issue tracker and allows the
+submission of pull requests that improve the specification.
+
+
+[[introduction-conventions]]
+== Document Conventions
+
+The Vulkan specification is intended for use by both implementors of the API
+and application developers seeking to make use of the API, forming a
+contract between these parties.
+Specification text may address either party; typically the intended audience
+can be inferred from context, though some sections are defined to address
+only one of these parties.
+(For example, <<fundamentals-validusage>> sections only address application
+developers).
+Any requirements, prohibitions, recommendations or options defined by
+<<introduction-normative-terminology, normative terminology>> are imposed
+only on the audience of that text.
+
+[NOTE]
+.Note
+====
+Structure and enumerated types defined in extensions that were promoted to
+core in a later version of Vulkan are now defined in terms of the equivalent
+Vulkan core interfaces.
+This affects the Vulkan Specification, the Vulkan header files, and the
+corresponding XML Registry.
+====
+
+
+[[introduction-informative-language]]
+=== Informative Language
+
+Some language in the specification is purely informative, intended to give
+background or suggestions to implementors or developers.
+
+If an entire chapter or section contains only informative language, its
+title will be suffixed with "`(Informative)`".
+
+All NOTEs are implicitly informative.
+
+
+[[introduction-normative-terminology]]
+=== Normative Terminology
+
+Within this specification, the key words *must*, *required*, *should*,
+*recommended*, *may*, and *optional* are to be interpreted as described in
+https://www.ietf.org/rfc/rfc2119.txt[RFC 2119 - Key words for use in RFCs to
+Indicate Requirement Levels] (https://www.ietf.org/rfc/rfc2119.txt).
+The additional key word *optionally* is an alternate form of *optional*, for
+use where grammatically appropriate.
+
+These key words are highlighted in the specification for clarity.
+In text addressing application developers, their use expresses requirements
+that apply to application behavior.
+In text addressing implementors, their use expresses requirements that apply
+to implementations.
+
+In text addressing application developers, the additional key words *can*
+and *cannot* are to be interpreted as describing the capabilities of an
+application, as follows:
+
+*can*::
+This word means that the application is able to perform the action
+described.
+
+*cannot*::
+This word means that the API and/or the execution environment provide no
+mechanism through which the application can express or accomplish the action
+described.
+
+These key words are never used in text addressing implementors.
+
+[NOTE]
+.Note
+====
+There is an important distinction between *cannot* and *must not*, as used
+in this Specification.
+*Cannot* means something the application literally is unable to express or
+accomplish through the API, while *must not* means something that the
+application is capable of expressing through the API, but that the
+consequences of doing so are undefined: and potentially unrecoverable for
+the implementation (see <<fundamentals-validusage>>).
+====
+
+Unless otherwise noted in the section heading, all sections and appendices
+in this document are normative.
+
+
+[[introduction-technical-terminology]]
+=== Technical Terminology
+
+The Vulkan Specification makes use of common engineering and graphics terms
+such as *Pipeline*, *Shader*, and *Host* to identify and describe Vulkan API
+constructs and their attributes, states, and behaviors.
+The <<glossary,Glossary>> defines the basic meanings of these terms in the
+context of the Specification.
+The Specification text provides fuller definitions of the terms and may
+elaborate, extend, or clarify the <<glossary,Glossary>> definitions.
+When a term defined in the <<glossary,Glossary>> is used in normative
+language within the Specification, the definitions within the Specification
+govern and supersede any meanings the terms may have in other technical
+contexts (i.e. outside the Specification).
+
+
+[[introduction-normative-references]]
+=== Normative References
+
+References to external documents are considered normative references if the
+Specification uses any of the normative terms defined in
+<<introduction-normative-terminology>> to refer to them or their
+requirements, either as a whole or in part.
+
+The following documents are referenced by normative sections of the
+specification:
+
+[[ieee-754]]
+IEEE.
+August, 2008.
+_IEEE Standard for Floating-Point Arithmetic_.
+IEEE Std 754-2008.
+https://dx.doi.org/10.1109/IEEESTD.2008.4610935 .
+
+[[data-format]] Andrew Garrard.
+_Khronos Data Format Specification, version 1.3_.
+https://registry.khronos.org/DataFormat/specs/1.3/dataformat.1.3.html .
+
+[[spirv-extended]] John Kessenich.
+_SPIR-V Extended Instructions for GLSL, Version 1.00_ (February 10, 2016).
+https://registry.khronos.org/spir-v/ .
+
+[[spirv-spec]] John Kessenich, Boaz Ouriel, and Raun Krisch.
+_SPIR-V Specification, Version 1.5, Revision 3, Unified_ (April 24, 2020).
+https://registry.khronos.org/spir-v/ .
+
+[[itu-t-h264]]
+ITU-T.
+_H.264 Advanced Video Coding for Generic Audiovisual Services_ (August,
+2021).
+https://www.itu.int/rec/T-REC-H.264-202108-I/ .
+
+[[itu-t-h265]]
+ITU-T.
+_H.265 High Efficiency Video Coding_ (August, 2021).
+https://www.itu.int/rec/T-REC-H.265-202108-I/ .
+
+[[vulkan-registry]] Jon Leech.
+_The Khronos Vulkan API Registry_ (February 26, 2023).
+https://registry.khronos.org/vulkan/specs/1.3/registry.html .
+
+[[vulkan-styleguide]] Jon Leech and Tobias Hector.
+_Vulkan Documentation and Extensions: Procedures and Conventions_ (February
+26, 2023).
+https://registry.khronos.org/vulkan/specs/1.3/styleguide.html .
+
+[[LoaderInterfaceArchitecture]]
+_Architecture of the Vulkan Loader Interfaces_ (October, 2021).
+https://github.com/KhronosGroup/Vulkan-Loader/blob/master/docs/LoaderInterfaceArchitecture.md
+.
+
+ifdef::VKSC_VERSION_1_0[]
+[[introduction-vulkansc-philosophy]]
+== Safety Critical Philosophy
+
+Vulkan SC {revnumber} is based on Vulkan 1.2 and, except where explicitly
+noted, supports all of the same features, properties, and limits as Vulkan
+1.2.
+
+Throughout the Vulkan SC specification, changes have been made to the Base
+Vulkan Specification in order to align it with safety critical use cases and
+certification.
+In general changes were made to meet the following categories:
+
+  * Deterministic Execution (predictable execution times and results)
+  * Robustness (error handling, removing ambiguity, clarifying undefined:
+    behavior)
+  * Simplification (changes made to reduce certification effort and
+    challenges)
+
+To simplify capturing the reasoning behind deviations made from the Base
+Vulkan Specification, the Vulkan SC specification utilizes change
+identifications to give the reader insight into why the change was made in a
+concise manner.
+The change identifications are captured in
+<<introduction-vulkansc-change-justification-table>>.
+In addition, the Vulkan SC specification contains <<vulkansc-deviations>>
+which is a complete list of changes between Base Vulkan and Vulkan SC.
+This is targeted at readers who are familiar with Base Vulkan and would like
+to understand the differences between Vulkan SC and the Base Vulkan
+specification.
+
+Vulkan SC follows the Base Vulkan philosophy of requiring valid usage from
+the application.
+It is left to each implementation to determine how to ensure safe operation
+with respect to invalid usage.
+This may: involve determining that certain invalid usage does not pose a
+safety risk, adding valid usage checks in the driver, requiring valid usage
+checks in the application, or some combination of these.
+Additionally, validation layers are supported during development.
+
+[[introduction-vulkansc-change-justification-table]]
+=== Change Justification Table
+
+The following is a list of the safety critical change identifications used
+to concisely capture the justification for deviations from the Base Vulkan
+Specification.
+
+.Change Justifications
+[width="100%",options="header",cols="15h,~"]
+|====
+| Change ID     | Description
+| SCID-1[[SCID-1]]      | *Deterministic behavior* - no randomness or unpredictability, always produce the same output from a given starting condition or initial state
+| SCID-2[[SCID-2]]      | *Asynchronous calls* - calls initiated by the application but may not execute or use their parameter data until a later time shall be clearly defined when any parameter data is used, especially data which is passed by reference or pointer
+| SCID-3[[SCID-3]]      | *Notification of change of state* - avoid the use of asynchronous events causing code to execute (i.e. callbacks) as this can cause the worst case execution time of a system to be indeterminate
+| SCID-4[[SCID-4]]      | *Garbage collection methods* - avoid the use of garbage collection as this can cause the worst case execution time of a system to be indeterminate.  Avoid memory fragmentation by deleting entire buffers instead of individual items within a buffer
+| SCID-5[[SCID-5]]      | *Fully testable* - all behavior of the API must be testable in a repeatable manner, consistent from test run to test run (in some cases this may mean testable by inspection)
+| SCID-6[[SCID-6]]      | *Undefined behavior* - the API must behave as expected under valid input conditions, clearly document conditions that would result in 'fatal error' leaving the system in an unrecoverable state, and document conditions that would result in undefined: behavior based on invalid input
+| SCID-7[[SCID-7]]      | *Unique ID* - provide a facility to return a run time implementation unique identifier specific
+to that runtime so that is may be interrogated at any time.  For example, such information could be the version number, name, date, release build number or a combination of these that is unique and comprehensible
+| SCID-8[[SCID-8]]      | *Code complexity* - reducing code complexity to help facilitate certification (for example if there are multiple ways to do the same thing, potentially eliminating one or more of the alternative methods)
+|====
+endif::VKSC_VERSION_1_0[]

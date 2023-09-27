@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Khronos Group Inc.
+# Copyright 2016-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -7,7 +7,7 @@ require 'asciidoctor/extensions' unless RUBY_ENGINE == 'opal'
 include ::Asciidoctor
 
 # This is the generated map of API interfaces in this spec build
-require 'api.rb'
+require 'apimap.rb'
 $apiNames = APInames.new
 
 class SpecInlineMacroBase < Extensions::InlineMacroProcessor
@@ -63,7 +63,13 @@ end
 
 class CodeInlineMacroBase < SpecInlineMacroBase
     def process parent, target, attributes
-        create_inline parent, :quoted, '<code>' + target.gsub('&#8594;', '-&gt;') + '</code>'
+      if $apiNames.nonexistent.has_key? target
+        oldtarget = target
+        target = $apiNames.nonexistent[oldtarget]
+        msg = 'Rewriting nonexistent name macro target: ' + @name.to_s + ':' + oldtarget + ' to ' + target
+        Asciidoctor::LoggerManager.logger.info msg
+      end
+      create_inline parent, :quoted, '<code>' + target.gsub('&#8594;', '-&gt;') + '</code>'
     end
 end
 
@@ -270,9 +276,13 @@ class TlinkInlineMacro < LinkInlineMacroBase
     end
 end
 
-class BasetypeInlineMacro < CodeInlineMacroBase
+class BasetypeInlineMacro < LinkInlineMacroBase
     named :basetype
     match /basetype:(\w+)/
+
+    def exists? target
+        $apiNames.basetypes.has_key? target
+    end
 end
 
 # This does not include the full range of code: use
@@ -284,7 +294,7 @@ class CodeInlineMacro < CodeInlineMacroBase
     match /code:(\w+([.*]\w+)*\**)/
 end
 
-# The tag: and attr: macros are only used in registry.txt
+# The tag: and attr: macros are only used in registry.adoc
 
 class TagInlineMacro < StrongInlineMacroBase
     named :tag

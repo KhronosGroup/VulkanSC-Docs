@@ -1,0 +1,149 @@
+// Copyright 2018-2023 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+include::{generated}/meta/{refprefix}VK_EXT_video_encode_h265.adoc[]
+
+=== Other Extension Metadata
+
+*Last Modified Date*::
+    2023-06-06
+*IP Status*::
+    No known IP claims.
+*Contributors*::
+  - Ahmed Abdelkhalek, AMD
+  - George Hao, AMD
+  - Jake Beju, AMD
+  - Chunbo Chen, Intel
+  - Ping Liu, Intel
+  - Srinath Kumarapuram, NVIDIA
+  - Tony Zlatinski, NVIDIA
+  - Ravi Chaudhary, NVIDIA
+  - Daniel Rakos, RasterGrid
+  - Aidan Fabius, Core Avionics & Industrial Inc.
+
+=== Description
+
+This extension builds upon the `apiext:VK_KHR_video_encode_queue` extension
+by adding support for encoding elementary video stream sequences compliant
+with the H.265/HEVC video compression standard.
+
+include::{generated}/interfaces/VK_EXT_video_encode_h265.adoc[]
+
+=== Version History
+
+  * Revision 0, 2019-11-14 (Ahmed Abdelkhalek)
+  ** Initial draft
+  * Revision 0.5, 2020-02-13 (Tony Zlatinski)
+  ** General Spec cleanup
+  ** Added DPB structures
+  ** Change the VCL frame encode structure
+  ** Added a common Non-VCL Picture Paramarameters structure
+  * Revision 2, Oct 10 2021 (Srinath Kumarapuram)
+  ** Vulkan Video Encode h.265 update and spec edits
+  * Revision 3, 2021-12-08 (Ahmed Abdelkhalek)
+  ** Rate control updates
+  * Revision 4, 2022-01-11 (Ahmed Abdelkhalek)
+  ** Replace occurrences of "`slice`" by "`slice segment`" and rename
+     structures/enums to reflect this.
+  * Revision 5, 2022-02-10 (Ahmed Abdelkhalek)
+  ** Updates to encode capability interface
+  * Revision 6, 2022-03-16 (Ahmed Abdelkhalek)
+  ** Relocate Std header version reporting/requesting from this extension to
+     VK_KHR_video_queue extension.
+  ** Remove the now empty VkVideoEncodeH265SessionCreateInfoEXT.
+  * Revision 7, 2022-03-24 (Ahmed Abdelkhalek)
+  ** Add capability flags to report support to disable transform skip and
+     support to use B frame in L1 reference list.
+  * Revision 8, 2022-07-18 (Daniel Rakos)
+  ** Replace `VkVideoEncodeH265RateControlStructureFlagBitsEXT` bit enum
+     with `VkVideoEncodeH265RateControlStructureEXT` enum
+  ** Rename `VkVideoEncodeH265ProfileEXT` to
+     `VkVideoEncodeH265ProfileInfoEXT`
+  ** Rename `VkVideoEncodeH265ReferenceListsEXT` to
+     `VkVideoEncodeH265ReferenceListsInfoEXT`
+  ** Rename `VkVideoEncodeH265EmitPictureParametersEXT` to
+     `VkVideoEncodeH265EmitPictureParametersInfoEXT`
+  ** Rename `VkVideoEncodeH265NaluSliceSegmentEXT` to
+     `VkVideoEncodeH265NaluSliceSegmentInfoEXT`
+  * Revision 9, 2022-09-18 (Daniel Rakos)
+  ** Rename `vpsStdCount`, `pVpsStd`, `spsStdCount`, `pSpsStd`,
+     `ppsStdCount`, and `pPpsStd` to `stdVPSCount`, `pStdVPSs`,
+     `stdSPSCount`, `pStdSPSs`, `stdPPSCount`, and `pStdPPSs`, respectively,
+     in `VkVideoEncodeH265SessionParametersAddInfoEXT`
+  ** Rename `maxVpsStdCount`, `maxSpsStdCount`, and `maxPpsStdCount` to
+     `maxStdVPSCount`, `maxStdSPSCount` and `maxStdPPSCount`, respectively,
+     in `VkVideoEncodeH265SessionParametersCreateInfoEXT`
+  * Revision 10, 2023-03-06 (Daniel Rakos)
+  ** Removed `VkVideoEncodeH265EmitPictureParametersInfoEXT`
+  ** Changed member types in `VkVideoEncodeH265CapabilitiesEXT` and
+     `VkVideoEncodeH265ReferenceListsInfoEXT` from `uint8_t` to `uint32_t`
+  ** Changed the type of
+     `VkVideoEncodeH265RateControlInfoEXT::subLayerCount` and
+     `VkVideoEncodeH264RateControlLayerInfoEXT::temporalId` from `uint8_t`
+     to `uint32_t`
+  ** Removed `VkVideoEncodeH265InputModeFlagsEXT` and
+     `VkVideoEncodeH265OutputModeFlagsEXT` as we only support
+     frame-in-frame-out mode for now
+  ** Rename `pCurrentPictureInfo` in `VkVideoEncodeH265VclFrameInfoEXT` to
+     `pStdPictureInfo`
+  ** Rename `pSliceSegmentHeaderStd` in `VkVideoEncodeH265NaluSliceInfoEXT`
+     to `pStdSliceSegmentHeader`
+  ** Rename `pReferenceFinalLists` in `VkVideoEncodeH264VclFrameInfoEXT` and
+     `VkVideoEncodeH264NaluSliceInfoEXT` to `pStdReferenceFinalLists`
+  ** Removed the `slotIndex` member of `VkVideoEncodeH265DpbSlotInfoEXT` and
+     changed it to be chained to `VkVideoReferenceSlotInfoKHR`
+  ** Replaced `VkVideoEncodeH265ReferenceListsInfoEXT` with the new Video
+     Std header structure `StdVideoEncodeH265ReferenceLists`
+  ** Added new capability flag
+     `VK_VIDEO_ENCODE_H265_CAPABILITY_DIFFERENT_REFERENCE_FINAL_LISTS_BIT_EXT`
+  * Revision 11, 2023-05-26 (Daniel Rakos)
+  ** Renamed `VkVideoEncodeH265VclFrameInfoEXT` to
+     `VkVideoEncodeH265PictureInfoEXT`
+  ** Removed `VkVideoEncodeH265RateControlLayerInfoEXT::temporalId`
+  ** Added `expectDyadicTemporalSubLayerPattern` capability
+  ** Added the `VkVideoEncodeH265SessionParametersGetInfoEXT` structure to
+     identify the H.265 parameter sets to retrieve encoded parameter data
+     for, and the `VkVideoEncodeH265SessionParametersFeedbackInfoEXT`
+     structure to retrieve H.265 parameter set override information when
+     using the new `vkGetEncodedVideoSessionParametersKHR` command
+  ** Added `VkVideoEncodeH265NaluSliceSegmentInfoEXT::constantQp` to specify
+     per-slice segment constant QP when rate control mode is
+     `VK_VIDEO_ENCODE_RATE_CONTROL_MODE_DISABLED_BIT_KHR`
+  ** Added `VkVideoEncodeH265QualityLevelPropertiesEXT` for retrieving H.265
+     specific quality level recommendations
+  ** Replaced `VkVideoEncodeH265RateControlStructureEXT` enum with the flags
+     type `VkVideoEncodeH265RateControlFlagsEXT` and bits defined in
+     `VkVideoEncodeH265RateControlFlagBitsEXT` and added HRD compliance flag
+  ** Removed `useInitialRcQp` and `initialRcQp` members of
+     `VkVideoEncodeH265RateControlLayerInfoEXT`
+  ** Added `prefersGopRemainingFrames` and `requiresGopRemainingFrames`, and
+     the new `VkVideoEncodeH265GopRemainingFrameInfoEXT` structure to allow
+     specifying remaining frames of each type in the rate control GOP
+  ** Renamed `maxSubLayersCount` capability to `maxSubLayerCount`
+  ** Added `maxQp`, and `minQp` capabilities
+  ** Added `maxLevelIdc` capability and new
+     `VkVideoEncodeH265SessionCreateInfoEXT` structure to specify upper
+     bounds on the H.265 level of the produced video bitstream
+  ** Moved capability flags specific to codec syntax restrictions from
+     `VkVideoEncodeH265CapabilityFlagsEXT` to the new
+     `VkVideoEncodeH265StdFlagsEXT` which is now included as a separate
+     `stdSyntaxFlags` member in `VkVideoEncodeH265CapabilitiesEXT`
+  ** Added `std` prefix to codec syntax capabilities in
+     `VkVideoEncodeH265CapabilitiesEXT`
+  ** Removed `VkVideoEncodeH265NaluSliceSegmentInfoEXT::ctbCount` and
+     `VK_VIDEO_ENCODE_H265_CAPABILITY_SLICE_SEGMENT_CTB_COUNT_BIT_EXT`
+  ** Replaced
+     `VK_VIDEO_ENCODE_H265_CAPABILITY_MULTIPLE_SLICE_SEGMENTS_PER_FRAME_BIT_EXT`
+     with the new `maxSliceSegmentCount` capability
+  ** Added `maxTiles` capability
+  ** Removed codec syntax min/max capabilities from
+     `VkVideoEncodeH265CapabilitiesEXT`
+  ** Removed capability flag
+     `VK_VIDEO_ENCODE_H265_CAPABILITY_DIFFERENT_REFERENCE_FINAL_LISTS_BIT_EXT`
+     and removed `pStdReferenceFinalLists` members from the
+     `VkVideoEncodeH265PictureInfoEXT` and
+     `VkVideoEncodeH265NaluSliceSegmentInfoEXT` structures as reference
+     lists info is now included in `pStdPictureInfo`
+  ** Added capability flag
+     `VK_VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_EXT`

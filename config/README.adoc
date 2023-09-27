@@ -1,4 +1,4 @@
-// Copyright 2015-2021 The Khronos Group Inc.
+// Copyright 2015-2023 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -8,7 +8,7 @@
 
 The macros in `spec-macros.rb` and `spec-macros/extension.rb` are described
 in the "`Vulkan Documentation and Extensions: Procedures and Conventions`"
-document (see the link:../styleguide.txt[style guide].
+document (see the link:../styleguide.adoc[style guide].
 
 == Support for Math
 
@@ -29,6 +29,16 @@ It is a slightly tweaked version of the Asciidoctor 'Colony' theme.
 `chunkindex` contains scripts for building and using a search index for the
 Vulkan chunked HTML specification.
 
+== Title Page Images
+
+Asciidoctor requires use of `docinfo` files to get logos onto the title
+page, and has very restrictive naming conventions forcing the
+subdirectories:
+
+* `vulkan/docinfo-header.html` - Vulkan logo in docinfo HTML form
+* `vulkansc/docinfo-header.html` - Vulkan SC logo in docinfo HTML form
+* `makedocinfologo` - script to convert SVG file to docinfo HTML file
+
 == Asciidoctor Extensions
 
 We use a number of Asciidoctor customizations written in Ruby, described
@@ -40,7 +50,7 @@ briefly below.
 * `loadable_html.rb` - add some status messages for slow-loading documents
 * `rouge-extend-css.rb` - override parts of the 'rouge' highlighter CSS
 * `spec-macros.rb` - custom asciidoctor macros used in spec markup
-* `tilde_open_block.rb` - allow '~~~~' as an open block delimiter
+* `open_listing_block.rb` - allow '----' as a nested open block delimiter when tagged by '[open]'
 * `vuid-expander.rb` - add anchors to valid usage ID tags
 * `vu-to-json.rb` - extract valid usage statements to JSON as part of a dummy spec build
 

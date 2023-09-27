@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2021 The Khronos Group Inc.
+# Copyright 2013-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,8 +10,7 @@
 import re
 import os
 
-from conventions import ConventionsBase
-
+from spec_tools.conventions import ConventionsBase
 
 # Modified from default implementation - see category_requires_validation() below
 CATEGORIES_REQUIRING_VALIDATION = set(('handle', 'enum', 'bitmask'))
@@ -22,6 +21,8 @@ CATEGORIES_REQUIRING_VALIDATION = set(('handle', 'enum', 'bitmask'))
 # Ideally these would be listed in the spec as exceptions, as OpenXR does.
 SPECIAL_WORDS = set((
     '16Bit',  # VkPhysicalDevice16BitStorageFeatures
+    '2D',     # VkPhysicalDeviceImage2DViewOf3DFeaturesEXT
+    '3D',     # VkPhysicalDeviceImage2DViewOf3DFeaturesEXT
     '8Bit',  # VkPhysicalDevice8BitStorageFeaturesKHR
     'AABB',  # VkGeometryAABBNV
     'ASTC',  # VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT
@@ -48,6 +49,10 @@ class VulkanConventions(ConventionsBase):
     def null(self):
         """Preferred spelling of NULL."""
         return '`NULL`'
+
+    def formatExtension(self, name):
+        """Mark up an extension name as a link the spec."""
+        return '`apiext:{}`'.format(name)
 
     @property
     def struct_macro(self):
@@ -105,6 +110,8 @@ class VulkanConventions(ConventionsBase):
             [ r'_VULKAN_([0-9])([0-9])_',   r'_VULKAN_\1_\2_' ],
             [ r'_VULKAN_SC_([0-9])([0-9])_',r'_VULKAN_SC_\1_\2_' ],
             [ r'_DIRECT_FB_',               r'_DIRECTFB_' ],
+            [ r'_VULKAN_SC_10',             r'_VULKAN_SC_1_0' ],
+
         ]
 
         for subpat in subpats:
@@ -119,7 +126,7 @@ class VulkanConventions(ConventionsBase):
     @property
     def file_suffix(self):
         """Return suffix of generated Asciidoctor files"""
-        return '.txt'
+        return '.adoc'
 
     def api_name(self, spectype='api'):
         """Return API or specification name for citations in ref pages.ref
@@ -174,16 +181,12 @@ class VulkanConventions(ConventionsBase):
            instead. N.b. this may need to change on a per-refpage basis if
            there are multiple documents involved.
         """
-        return 'https://www.khronos.org/registry/vulkansc/specs/1.0-extensions/html/vkspec.html'
+        return 'https://registry.khronos.org/vulkan/specs/1.3-extensions/html/vkspec.html'
 
     @property
     def xml_api_name(self):
         """Return the name used in the default API XML registry for the default API"""
-        # Allow the API to be overridden by environment variable - default to 'vulkansc' if not set
-        VulkanAPI = os.getenv('VULKAN_API')
-        if VulkanAPI:
-            return VulkanAPI
-        return 'vulkansc'
+        return 'vulkan'
 
     @property
     def registry_path(self):
@@ -200,11 +203,6 @@ class VulkanConventions(ConventionsBase):
         """Return asciidoctor anchor name in the API Specification of the
         section describing extension special uses in detail."""
         return 'extendingvulkan-compatibility-specialuse'
-
-    @property
-    def extra_refpage_headers(self):
-        """Return any extra text to add to refpage headers."""
-        return 'include::{config}/attribs.txt[]'
 
     @property
     def extension_index_prefixes(self):
@@ -254,21 +252,12 @@ class VulkanConventions(ConventionsBase):
 
         return True
 
-    def extension_include_string(self, ext):
-        """Return format string for include:: line for an extension appendix
-           file. ext is an object with the following members:
-            - name - extension string string
-            - vendor - vendor portion of name
-            - barename - remainder of name"""
+    def extension_file_path(self, name):
+        """Return file path to an extension appendix relative to a directory
+           containing all such appendices.
+           - name - extension name"""
 
-        return 'include::{{appendices}}/{name}{suffix}[]'.format(
-                name=ext.name, suffix=self.file_suffix)
-
-    @property
-    def refpage_generated_include_path(self):
-        """Return path relative to the generated reference pages, to the
-           generated API include files."""
-        return "{generated}"
+        return f'{name}{self.file_suffix}'
 
     def valid_flag_bit(self, bitpos):
         """Return True if bitpos is an allowed numeric bit position for
@@ -278,3 +267,32 @@ class VulkanConventions(ConventionsBase):
            cause Vk*FlagBits values with bit 31 set to result in a 64 bit
            enumerated type, so disallows such flags."""
         return bitpos >= 0 and bitpos < 31
+
+    @property
+    def extra_refpage_headers(self):
+        """Return any extra text to add to refpage headers."""
+        return 'include::{config}/attribs.adoc[]'
+
+    @property
+    def extra_refpage_body(self):
+        """Return any extra text (following the title) for generated
+           reference pages."""
+        return 'include::{generated}/specattribs.adoc[]'
+
+
+class VulkanSCConventions(VulkanConventions):
+
+    def specURL(self, spectype='api'):
+        """Return public registry URL which ref pages should link to for the
+           current all-extensions HTML specification, so xrefs in the
+           asciidoc source that are not to ref pages can link into it
+           instead. N.b. this may need to change on a per-refpage basis if
+           there are multiple documents involved.
+        """
+        return 'https://registry.khronos.org/vulkansc/specs/1.0-extensions/html/vkspec.html'
+
+    @property
+    def xml_api_name(self):
+        """Return the name used in the default API XML registry for the default API"""
+        return 'vulkansc'
+

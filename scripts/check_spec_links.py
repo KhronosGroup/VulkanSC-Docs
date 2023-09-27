@@ -39,6 +39,7 @@ EXTRA_REFPAGES = (
     'VK_VERSION_1_0',
     'VK_VERSION_1_1',
     'VK_VERSION_1_2',
+    'VK_VERSION_1_3',
     'WSIheaders',
     'provisional-headers',
     )
@@ -111,6 +112,15 @@ class VulkanEntityDatabase(EntityDatabase):
 class VulkanMacroCheckerFile(MacroCheckerFile):
     """Vulkan-specific subclass of MacroCheckerFile."""
 
+    def perform_entity_check(self, type):
+        """Returns True if an entity check should be performed on this
+           refpage type.
+
+           Overrides base class definition for Vulkan, since we have refpage
+           types which do not correspond to entities in the API."""
+
+        return type != 'builtins' and type != 'spirv'
+
     def handleWrongMacro(self, msg, data):
         """Report an appropriate message when we found that the macro used is incorrect.
 
@@ -144,6 +154,13 @@ class VulkanMacroCheckerFile(MacroCheckerFile):
         self.diag(message_type, message_id, msg,
                   group=group, replacement=self.makeMacroMarkup(data=data), fix=self.makeFix(data=data))
 
+    def allowEnumXrefs(self):
+        """Returns True if enums can be specified in the 'xrefs' attribute
+        of a refpage.
+
+        Overrides base class behavior. OpenXR does not allow this.
+        """
+        return True
 
 def makeMacroChecker(enabled_messages):
     """Create a correctly-configured MacroChecker instance."""
@@ -156,9 +173,9 @@ if __name__ == '__main__':
         DEFAULT_DISABLED_MESSAGES)
 
     all_docs = [str(fn)
-                for fn in sorted((ROOT / 'chapters/').glob('**/*.txt'))]
+                for fn in sorted((ROOT / 'chapters/').glob('**/[A-Za-z]*.adoc'))]
     all_docs.extend([str(fn)
-                     for fn in sorted((ROOT / 'appendices/').glob('**/*.txt'))])
+                     for fn in sorted((ROOT / 'appendices/').glob('**/[A-Za-z]*.adoc'))])
 
     checkerMain(default_enabled_messages, makeMacroChecker,
                 all_docs)

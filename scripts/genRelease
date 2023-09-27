@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2016-2021 The Khronos Group Inc.
-#
+# Copyright 2016-2023 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
@@ -11,7 +10,8 @@ import sys
 from genspec import *
 
 # Eventually, these may be defined by the extdependency module
-allVersions = [ 'VK_VERSION_1_0', 'VK_VERSION_1_1', 'VK_VERSION_1_2' ]
+Version1_3 = [ 'VK_VERSION_1_0', 'VK_VERSION_1_1', 'VK_VERSION_1_2', 'VK_VERSION_1_3' ]
+Version1_2 = [ 'VK_VERSION_1_0', 'VK_VERSION_1_1', 'VK_VERSION_1_2' ]
 Version1_1 = [ 'VK_VERSION_1_0', 'VK_VERSION_1_1' ]
 Version1_0 = [ 'VK_VERSION_1_0' ]
 
@@ -29,8 +29,10 @@ if __name__ == '__main__':
     parser.add_argument('-pdf', action='store_true',
                         help='Generate PDF outputs')
 
-    parser.add_argument('-nov12', action='store_false', dest='v12',
-                        help='Suppress Vulkan 1.2 targets')
+    parser.add_argument('-nov13', action='store_false', dest='v13',
+                        help='Suppress Vulkan 1.3 targets')
+    parser.add_argument('-v12', action='store_true',
+                        help='Generate Vulkan 1.2 targets')
     parser.add_argument('-v11', action='store_true',
                         help='Generate Vulkan 1.1 targets')
     parser.add_argument('-v10', action='store_true',
@@ -38,8 +40,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-nocorespec', action='store_false', dest='corespec',
                         help='Do not generate core API-only targets')
-    parser.add_argument('-nokhrspec', action='store_false', dest='khrspec',
-                        help='Do not generate core API + KHR extensions-only targets')
+    parser.add_argument('-noratspec', action='store_false', dest='ratspec',
+                        help='Do not generate core API + ratified extensions-only targets')
     parser.add_argument('-noallspec', action='store_false', dest='allspec',
                         help='Do not generate full API + all extensions targets')
 
@@ -50,6 +52,9 @@ if __name__ == '__main__':
                         default=None,
                         help='API name to generate')
 
+    parser.add_argument('-gitroot', action='store',
+                        default='/home/tree/git',
+                        help='Set the directory containing gitlab vulkan and github Vulkan-Docs repo clones to build from')
     parser.add_argument('-repodir', action='store', dest='repoDir',
                         default=None,
                         help='Set the repository directory to build from (overrides defaults)')
@@ -68,20 +73,20 @@ if __name__ == '__main__':
     deps = ApiDependencies(args.registry, args.apiname)
 
     allExts = deps.allExtensions()
-    khrExts = deps.khrExtensions()
+    ratifiedExts = deps.ratifiedExtensions()
 
     if args.internal:
         # For internal build & pseudo-release
-        if args.repoDir == None:
-            args.repoDir = '/home/tree/git/vulkan'
-        if args.outDir == None:
-            args.outDir = '/home/tree/git/vulkan/out'
+        if args.repoDir is None:
+            args.repoDir = f'{args.gitroot}/vulkan'
+        if args.outDir is None:
+            args.outDir = f'{args.gitroot}/vulkan/out'
     else:
         # For public release
-        if args.repoDir == None:
-            args.repoDir = '/home/tree/git/Vulkan-Docs'
-        if args.outDir == None:
-            args.outDir = '/home/tree/git/registry/vulkan/specs'
+        if args.repoDir is None:
+            args.repoDir = f'{args.gitroot}/Vulkan-Docs'
+        if args.outDir is None:
+            args.outDir = f'{args.gitroot}/registry/vulkan/specs'
 
     refPageTargets = ''
 
@@ -106,14 +111,14 @@ if __name__ == '__main__':
     print('echo Info: Building spec targets', specTargets)
     print('')
 
-    # Current Vulkan 1.2 specs
-    if args.v12:
+    # Current Vulkan 1.3 specs
+    if args.v13:
         if args.allspec:
-            # Build ref pages and validusage targets only for 1.2 + all exts
+            # Build ref pages and validusage targets only for 1.3 + all exts
             # Formerly set xmlTargets = 'clobber install', but we no longer
             # generate headers in the registry tree.
-            buildBranch(targetDir = '1.2-extensions',
-                        versions = allVersions,
+            buildBranch(targetDir = '1.3-extensions',
+                        versions = Version1_3,
                         extensions = allExts,
                         ratified = False,
                         apititle = '(with all registered Vulkan extensions)',
@@ -121,12 +126,47 @@ if __name__ == '__main__':
                         repoDir = args.repoDir,
                         outDir = args.outDir)
 
-        if args.khrspec:
-            buildBranch(targetDir = '1.2-khr-extensions',
-                        versions = allVersions,
-                        extensions = khrExts,
+        if args.ratspec:
+            buildBranch(targetDir = '1.3-khr-extensions',
+                        versions = Version1_3,
+                        extensions = ratifiedExts,
                         ratified = True,
-                        apititle = '(with KHR extensions)',
+                        apititle = '(with all ratified extensions)',
+                        specTargets = specTargets,
+                        repoDir = args.repoDir,
+                        outDir = args.outDir)
+
+        if args.corespec:
+            # Build style guide and registry documentation targets only for 1.3
+            # + no extensions.
+            buildBranch(targetDir = '1.3',
+                        versions = Version1_3,
+                        extensions = None,
+                        ratified = True,
+                        apititle = None,
+                        specTargets = specTargets + ' styleguide registry',
+                        repoDir = args.repoDir,
+                        outDir = args.outDir,
+                        needRefSources = True)
+
+    # Vulkan 1.2 specs
+    if args.v12:
+        if args.allspec:
+            buildBranch(targetDir = '1.2-extensions',
+                        versions = Version1_2,
+                        extensions = allExts,
+                        ratified = False,
+                        apititle = '(with all registered Vulkan extensions)',
+                        specTargets = specTargets,
+                        repoDir = args.repoDir,
+                        outDir = args.outDir)
+
+        if args.ratspec:
+            buildBranch(targetDir = '1.2-khr-extensions',
+                        versions = Version1_2,
+                        extensions = ratifiedExts,
+                        ratified = True,
+                        apititle = '(with all ratified extensions)',
                         specTargets = specTargets,
                         repoDir = args.repoDir,
                         outDir = args.outDir)
@@ -135,7 +175,7 @@ if __name__ == '__main__':
             # Build style guide and registry documentation targets only for 1.2
             # + no extensions.
             buildBranch(targetDir = '1.2',
-                        versions = allVersions,
+                        versions = Version1_2,
                         extensions = None,
                         ratified = True,
                         apititle = None,
@@ -156,12 +196,12 @@ if __name__ == '__main__':
                         repoDir = args.repoDir,
                         outDir = args.outDir)
 
-        if args.khrspec:
+        if args.ratspec:
             buildBranch(targetDir = '1.1-khr-extensions',
                         versions = Version1_1,
-                        extensions = khrExts,
+                        extensions = ratifiedExts,
                         ratified = True,
-                        apititle = '(with KHR extensions)',
+                        apititle = '(with all ratified extensions)',
                         specTargets = specTargets,
                         repoDir = args.repoDir,
                         outDir = args.outDir)
@@ -191,12 +231,12 @@ if __name__ == '__main__':
                         repoDir = args.repoDir,
                         outDir = args.outDir)
 
-        if args.khrspec:
+        if args.ratspec:
             buildBranch(targetDir = '1.0-wsi_extensions',
                         versions = Version1_0,
-                        extensions = khrExts,
+                        extensions = ratifiedExts,
                         ratified = True,
-                        apititle = '(with KHR extensions)',
+                        apititle = '(with all ratified extensions)',
                         specTargets = specTargets,
                         repoDir = args.repoDir,
                         outDir = args.outDir)

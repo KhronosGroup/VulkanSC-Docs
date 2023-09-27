@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2016-2021 The Khronos Group Inc.
+# Copyright 2016-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -75,7 +75,7 @@ def replaceRef(specFile, outDir, overwrite = False, skipped = set()):
     #   'name'   : Name of the ref page being defined
     #   'desc'   : One-line description of the ref page being defined
     #   'type'   : Type of the ref page being defined, 'structs', 'protos', etc.
-    #   'refs'   : Space-separated string of crossreferenced pages
+    #   'refs'   : Space-separated string of cross-referenced pages
 
     actions = { }
 

@@ -1,4 +1,4 @@
-// Copyright 2014-2021 The Khronos Group Inc.
+// Copyright 2014-2023 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 = Vulkan^(R)^ Specification Repository Scripts
@@ -37,8 +37,6 @@ Scripts in this directory include:
     scripts shared with OpenXR and other APIs.
   * `extdependency.py` - generate extension dependencies for use when
     building the specification.
-  * `genanchorlinks.py` - add HTML `href` attributes to asciidoctor output
-    to improve UI for VUID anchors.
   * `genRelease`, `genspec.py` - build HTML and PDF Specifications with a
     variety of options to control target directories, extensions included
     while building, etc.
@@ -61,8 +59,7 @@ Scripts in this directory include:
   * `Retired/` - contains obsolete, unused, or single-purpose scripts. Not
     maintained.
 
-HTML Diff Script for Vulkan
-===========================
+== HTML Diff Script for Vulkan
 
 This is a first cut at a script to compare Vulkan HTML specifications. Usage
 is simply 'htmldiff file1.html file2.html > diff.html'. The script does not

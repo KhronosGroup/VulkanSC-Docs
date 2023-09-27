@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2016-2021 The Khronos Group Inc.
+# Copyright 2016-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 """This script builds a full release package including XHTML and PDF
@@ -108,7 +108,7 @@ def buildRelease(label,
 
     if miscSrc != None and miscDst != None:
         print('mkdir -p', miscDst)
-        print('cp', miscSrc + '/*.txt', miscDst + '/')
+        print('cp', miscSrc + '/*.adoc', miscDst + '/')
 
     print('')
 
@@ -134,7 +134,7 @@ def buildBranch(targetDir = '',
     specDir = repoDir
     # Directory containing misc. files to copy to registry.
     # At present there are none, since GLSL extensions have moved to the
-    # GLSL repository and are redirected from the Vulkan registy website.
+    # GLSL repository and are redirected from the Vulkan registry website.
     # These should be relative to repoDir and outDir, respectively
     miscSrc = None
     miscDst = None
@@ -160,5 +160,5 @@ def createTags(releaseNum, tagdate):
     now = tagdate.strftime('%Y%m%d')
 
     print('echo To tag the spec branch for this release, execute the command:')
-    print('echo git tag -a -m \\"Tag Vulkan API specification for 1.2.' +
-          releaseNum, 'release\\"', 'v1.2.' + releaseNum)
+    print('echo git tag -a -m \\"Tag Vulkan API specification for 1.3.' +
+          releaseNum, 'release\\"', 'v1.3.' + releaseNum)

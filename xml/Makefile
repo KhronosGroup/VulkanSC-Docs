@@ -1,4 +1,4 @@
-# Copyright 2013-2021 The Khronos Group Inc.
+# Copyright 2013-2023 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -18,11 +18,8 @@ RMRF	 = rm -rf
 
 PYTHON ?= python3
 SCRIPTS = ../scripts
+XML_CONSISTENCY = $(SCRIPTS)/xml_consistency.py
 GENOPTS =
-# default options for generating MISRA C or MISRA C++ headers
-# can be overridden from commandline
-MISRACOPTS ?= -misracstyle
-MISRACPPOPTS ?= -misracppstyle
 
 # Generate Vulkan headers from XML. Many other files can be generated
 # from vk.xml using the scripts, but they are all generated from
@@ -42,33 +39,26 @@ TESTS	    = ../tests
 VULKAN	    = $(INCLUDE)/vulkan
 JSON	    = $(GENERATED)/out/json
 SRC	    = ../src
-VULKAN_VIDEO_CODECS_STD_H = $(INCLUDE)/vk_video
 
 VULKAN_API ?= vulkansc
 ifeq ($(VULKAN_API),vulkan)
 API_SUFFIX :=
+MISRACOPTS ?=
+MISRACPPOPTS ?=
 else
 API_SUFFIX := _sc
+# default options for generating MISRA C or MISRA C++ headers
+# can be overridden from commandline
+MISRACOPTS ?= -misracstyle
+MISRACPPOPTS ?= -misracppstyle
 endif
 
 # Static files needed for a complete set of headers, cached in the
 # repository
-ifeq ($(VULKAN_API),vulkan)
-VULKAN_VIDEO_HEADERS := $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codecs_common.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_decode.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_encode.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_decode.h \
-		 $(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_encode.h
-else
-VULKAN_VIDEO_HEADERS :=
-endif
-STATIC_HEADERS = $(VULKAN)/vulkan$(API_SUFFIX).h $(VULKAN)/vk_platform.h $(VULKAN_VIDEO_HEADERS)
+STATIC_HEADERS = $(VULKAN)/vulkan$(API_SUFFIX).h $(VULKAN)/vk_platform.h
 
 # Where static headers are stored
 STATIC				 = ../include/vulkan
-STATIC_VULKAN_VIDEO_CODECS_STD_H = ../include/vk_video
 STATIC_JSON_SRC			 = ../json
 
 # Vulkan platform-specific headers
@@ -87,8 +77,12 @@ PLATFORM_HEADERS = \
     $(VULKAN)/vulkan_xlib_xrandr.h \
     $(VULKAN)/vulkan_metal.h \
     $(VULKAN)/vulkan_screen.h \
-    $(VULKAN)/vulkan_sci.h \
     $(VULKAN)/vulkan_beta.h
+
+#@ vulkan_sci.h is Vulkan SC-specific
+ifeq ($(VULKAN_API),vulkansc)
+PLATFORM_HEADERS := $(PLATFORM_HEADERS) $(VULKAN)/vulkan_sci.h
+endif
 
 HEADERS_H = $(VULKAN)/vulkan$(API_SUFFIX)_core.h $(PLATFORM_HEADERS)
 ifeq ($(VULKAN_API),vulkansc)
@@ -96,8 +90,8 @@ HEADERS_HPP = $(VULKAN)/vulkan$(API_SUFFIX)_core.hpp
 STATIC_JSON = $(STATIC_JSON_SRC)/vkpcc.json
 JSON_PCC    = $(JSON)/vkpcc.json
 STATIC_CTS_COPY = \
-         $(JSON)/cts/vkjson_data_default.h \
-         $(JSON)/cts/vkjson_parser_default.h
+	 $(JSON)/cts/vkjson_data_default.h \
+	 $(JSON)/cts/vkjson_parser_default.h
 JSON_SCHEMA = $(JSON)/vk.json
 JSON_GENERATOR = $(JSON)/vulkan_json_data.hpp \
 		 $(JSON)/vulkan_json_gen.h \
@@ -110,7 +104,9 @@ HEADERS = $(HEADERS_H) $(HEADERS_HPP)
 JSON_FILES = $(JSON_SCHEMA) $(JSON_GENERATOR) $(JSON_PARSER)
 JSON_CTS_FILES = $(JSON_CTS)
 
-default install: $(HEADERS) $(STATIC_HEADERS) $(JSON_FILES) $(JSON_PCC) $(JSON_CTS_FILES) $(STATIC_CTS_COPY)
+default: install
+
+install: $(HEADERS) $(STATIC_HEADERS) $(CODEC_HEADERS) $(JSON_FILES) $(JSON_PCC) $(JSON_CTS_FILES) $(STATIC_CTS_COPY)
 
 $(VULKAN)/vulkan$(API_SUFFIX).h: $(STATIC)/vulkan$(API_SUFFIX).h
 	$(QUIET)$(MKDIR) $(VULKAN)
@@ -122,34 +118,6 @@ $(VULKAN)/vulkan$(API_SUFFIX).hpp: $(STATIC)/vulkan$(API_SUFFIX).h
 
 $(VULKAN)/vk_platform.h: $(STATIC)/vk_platform.h
 	$(QUIET)$(MKDIR) $(VULKAN)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codecs_common.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codecs_common.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_decode.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_decode.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_encode.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h264std_encode.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_decode.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_decode.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
-	$(CP) $? $@
-
-$(VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_encode.h: $(STATIC_VULKAN_VIDEO_CODECS_STD_H)/vulkan_video_codec_h265std_encode.h
-	$(QUIET)$(MKDIR) $(VULKAN_VIDEO_CODECS_STD_H)
 	$(CP) $? $@
 
 ################################################
@@ -173,25 +141,59 @@ $(HEADERS_HPP): $(VKH_DEPENDS)
 
 platform: $(PLATFORM_HEADERS)
 
-# Verify registry XML file against the schema
+# Autogenerate video codec headers from XML
+
+VIDEO_INCLUDE = $(INCLUDE)/vk_video
+CODECS = vulkan_video_codecs_common.h \
+	 vulkan_video_codec_h264std.h \
+	 vulkan_video_codec_h264std_decode.h \
+	 vulkan_video_codec_h264std_encode.h \
+	 vulkan_video_codec_h265std.h \
+	 vulkan_video_codec_h265std_decode.h \
+	 vulkan_video_codec_h265std_encode.h
+CODECXML = video.xml
+# Do not build video headers for Vulkan SC
+ifeq ($(VULKAN_API),vulkan)
+CODEC_HEADERS = $(CODECS:%=$(VIDEO_INCLUDE)/%)
+else
+CODEC_HEADERS =
+endif
+
+codec_headers: $(CODEC_HEADERS)
+
+$(VIDEO_INCLUDE)/%.h: $(CODECXML) $(GENSCRIPT) $(SCRIPTS)/reg.py $(SCRIPTS)/generator.py
+	$(QUIET)$(MKDIR) $(VIDEO_INCLUDE)
+	$(QUIET)$(PYTHON) $(GENSCRIPT) $(GENOPTS) -registry $(CODECXML) -o $(VIDEO_INCLUDE) $(notdir $@)
+
+# Verify registry XML files against the schema
 validate:
 	jing -c registry.rnc $(VKXML)
-	$(PYTHON) $(GENSCRIPT) -validate -registry $(VKXML)
+	$(PYTHON) $(XML_CONSISTENCY) $(VKXML)
+	jing -c registry.rnc $(CODECXML)
 
-# Test that vulkan_core.h compiles
+# Test that generated Vulkan headers compile
 
 # Platforms to test
 TESTDEFS = -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR
 
 TESTFILE = $(TESTS)/htest$(API_SUFFIX).c
 
-test: $(HEADERS) $(STATIC_HEADERS)
-	gcc -Wall -std=c99 -c -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
-	gcc -Wall -std=c11 -c -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
-	g++ -Wall -c -std=c++98 -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
-	g++ -Wall -c -std=c++11 -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
-	g++ -Wall -c -std=c++11 -I$(INCLUDE) -I$(TESTS) -DUSE_HPP=1 $(TESTFILE)
-	$(RM) $(TESTS)/test.o
+#@ -DUSE_HPP=1 is used only for Vulkan SC build
+test: $(HEADERS) $(STATIC_HEADERS) $(CODEC_HEADERS)
+	gcc -Wall -pedantic-errors -std=c99 -c -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
+	gcc -Wall -pedantic-errors -std=c11 -c -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
+	g++ -Wall -pedantic-errors -c -std=c++11 -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
+ifeq ($(VULKAN_API),vulkansc)
+	g++ -Wall -pedantic-errors -c -std=c++98 -I$(INCLUDE) -I$(TESTS) $(TESTFILE)
+	g++ -Wall -pedantic-errors -c -std=c++11 -I$(INCLUDE) -I$(TESTS) -DUSE_HPP=1 $(TESTFILE)
+endif
+	$(RM) htest.o $(TESTS)/test.o
+
+# Test that generated video codec headers compile
+
+vtest: $(CODEC_HEADERS)
+	gcc -Wall -std=c99 -c -I$(INCLUDE) $(TESTS)/vtest.c
+	$(RM) vtest.o
 
 ################################################
 
@@ -222,12 +224,13 @@ $(JSON_PCC): $(STATIC_JSON)
 
 # Files to clean up
 PYDIRT = diag.txt dumpReg.txt errwarn.txt *.pyc regdump.txt
-DIRT = $(PYDIRT) ERRS \#*
+DIRT = $(PYDIRT) ERRS *.o
 
 # Clean intermediate files
 clean_dirt:
-	-$(RM) $(DIRT)
+	-$(RM) $(DIRT) \#*
 
 # Clean generated targets and intermediates
 clean clobber: clean_dirt
 	-$(RMRF) $(INCLUDE) $(JSON)
+	-$(RMRF) $(INCLUDE) $(VIDEO_INCLUDE)
