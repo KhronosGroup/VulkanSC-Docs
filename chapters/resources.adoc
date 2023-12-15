@@ -10,6 +10,15 @@ Resources are views of memory with associated formatting and dimensionality.
 Buffers provide access to raw arrays of bytes, whereas images can: be
 multidimensional and may: have associated metadata.
 
+ifdef::VK_NV_ray_tracing,VK_KHR_acceleration_structure[]
+Other resource types, such as <<resources-acceleration-structures,
+acceleration structures>>
+ifdef::VK_EXT_opacity_micromap[]
+and <<resources-micromaps, micromaps>>
+endif::VK_EXT_opacity_micromap[]
+use buffers as the backing store for opaque data structures.
+endif::VK_NV_ray_tracing,VK_KHR_acceleration_structure[]
+
 
 [[resources-buffers]]
 == Buffers
@@ -52,10 +61,40 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkCreateBuffer-flags-00911]]
     If the pname:flags member of pname:pCreateInfo includes
-    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT, creating this sname:VkBuffer
-    must: not cause the total required sparse memory for all currently valid
-    sparse resources on the device to exceed
+    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT,
+ifdef::VK_NV_extended_sparse_address_space[]
+    and the <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is not enabled,
+endif::VK_NV_extended_sparse_address_space[]
+    creating this sname:VkBuffer must: not cause the total required sparse
+    memory for all currently valid sparse resources on the device to exceed
     sname:VkPhysicalDeviceLimits::pname:sparseAddressSpaceSize
+ifdef::VK_NV_extended_sparse_address_space[]
+  * [[VUID-vkCreateBuffer-flags-09383]]
+    If the pname:flags member of pname:pCreateInfo includes
+    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT, the
+    <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is enabled, and the
+    pname:usage member of pname:pCreateInfo contains bits not in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseBufferUsageFlags,
+    creating this sname:VkBuffer must: not cause the total required sparse
+    memory for all currently valid sparse resources on the device, excluding
+    sname:VkBuffer created with pname:usage member of pname:pCreateInfo
+    containing bits in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseBufferUsageFlags
+    and sname:VkImage created with pname:usage member of pname:pCreateInfo
+    containing bits in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseImageUsageFlags,
+    to exceed sname:VkPhysicalDeviceLimits::pname:sparseAddressSpaceSize
+  * [[VUID-vkCreateBuffer-flags-09384]]
+    If the pname:flags member of pname:pCreateInfo includes
+    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT and the
+    <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is enabled, creating this
+    sname:VkBuffer must: not cause the total required sparse memory for all
+    currently valid sparse resources on the device to exceed
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseAddressSpaceSize
+endif::VK_NV_extended_sparse_address_space[]
 endif::VKSC_VERSION_1_0[]
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
 ifdef::VK_FUCHSIA_buffer_collection[]
@@ -96,6 +135,12 @@ include::{generated}/api/structs/VkBufferCreateInfo.adoc[]
     It is ignored if pname:sharingMode is not
     ename:VK_SHARING_MODE_CONCURRENT.
 
+ifdef::VK_KHR_maintenance5[]
+If a slink:VkBufferUsageFlags2CreateInfoKHR structure is present in the
+pname:pNext chain, slink:VkBufferUsageFlags2CreateInfoKHR::pname:usage from
+that structure is used instead of pname:usage from this structure.
+endif::VK_KHR_maintenance5[]
+
 .Valid Usage
 ****
   * [[VUID-VkBufferCreateInfo-size-00912]]
@@ -107,46 +152,39 @@ include::{generated}/api/structs/VkBufferCreateInfo.adoc[]
   * [[VUID-VkBufferCreateInfo-sharingMode-00914]]
     If pname:sharingMode is ename:VK_SHARING_MODE_CONCURRENT,
     pname:queueFamilyIndexCount must: be greater than `1`
-ifndef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-  * [[VUID-VkBufferCreateInfo-sharingMode-01391]]
-    If pname:sharingMode is ename:VK_SHARING_MODE_CONCURRENT, each element
-    of pname:pQueueFamilyIndices must: be unique and must: be less than
-    pname:pQueueFamilyPropertyCount returned by
-    flink:vkGetPhysicalDeviceQueueFamilyProperties for the
-    pname:physicalDevice that was used to create pname:device
-endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
   * [[VUID-VkBufferCreateInfo-sharingMode-01419]]
     If pname:sharingMode is ename:VK_SHARING_MODE_CONCURRENT, each element
     of pname:pQueueFamilyIndices must: be unique and must: be less than
-    pname:pQueueFamilyPropertyCount returned by either
-    flink:vkGetPhysicalDeviceQueueFamilyProperties or
-    flink:vkGetPhysicalDeviceQueueFamilyProperties2 for the
-    pname:physicalDevice that was used to create pname:device
+    pname:pQueueFamilyPropertyCount returned by
+ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+    either flink:vkGetPhysicalDeviceQueueFamilyProperties2 or
 endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-ifndef::VKSC_VERSION_1_0[]
+    flink:vkGetPhysicalDeviceQueueFamilyProperties for the
+    pname:physicalDevice that was used to create pname:device
   * [[VUID-VkBufferCreateInfo-flags-00915]]
+ifndef::VKSC_VERSION_1_0[]
     If the <<features-sparseBinding, pname:sparseBinding>> feature is not
-    enabled, pname:flags must: not contain
-    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT
+    enabled,
+endif::VKSC_VERSION_1_0[]
+    pname:flags must: not contain ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT
   * [[VUID-VkBufferCreateInfo-flags-00916]]
+ifndef::VKSC_VERSION_1_0[]
     If the <<features-sparseResidencyBuffer, pname:sparseResidencyBuffer>>
-    feature is not enabled, pname:flags must: not contain
+    feature is not enabled,
+endif::VKSC_VERSION_1_0[]
+    pname:flags must: not contain
     ename:VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT
   * [[VUID-VkBufferCreateInfo-flags-00917]]
+ifndef::VKSC_VERSION_1_0[]
     If the <<features-sparseResidencyAliased, pname:sparseResidencyAliased>>
-    feature is not enabled, pname:flags must: not contain
-    ename:VK_BUFFER_CREATE_SPARSE_ALIASED_BIT
+    feature is not enabled,
+endif::VKSC_VERSION_1_0[]
+    pname:flags must: not contain ename:VK_BUFFER_CREATE_SPARSE_ALIASED_BIT
+ifndef::VKSC_VERSION_1_0[]
   * [[VUID-VkBufferCreateInfo-flags-00918]]
     If pname:flags contains ename:VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT or
     ename:VK_BUFFER_CREATE_SPARSE_ALIASED_BIT, it must: also contain
     ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT
-endif::VKSC_VERSION_1_0[]
-ifdef::VKSC_VERSION_1_0[]
-  * [[VUID-VkBufferCreateInfo-flags-05061]]
-    pname:flags must: not contain ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT,
-    ename:VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT, or
-    ename:VK_BUFFER_CREATE_SPARSE_ALIASED_BIT
 endif::VKSC_VERSION_1_0[]
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkBufferCreateInfo-pNext-00920]]
@@ -196,22 +234,18 @@ ifdef::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
     is not zero, pname:flags must: include
     ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT
 endif::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
-ifdef::VK_EXT_buffer_device_address[]
   * [[VUID-VkBufferCreateInfo-flags-03338]]
     If pname:flags includes
     ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT, the
-    <<features-bufferDeviceAddressCaptureReplay,
-    pname:bufferDeviceAddressCaptureReplay>> or
-    <<features-bufferDeviceAddressCaptureReplayEXT,
-    pname:bufferDeviceAddressCaptureReplayEXT>> feature must: be enabled
-endif::VK_EXT_buffer_device_address[]
 ifndef::VK_EXT_buffer_device_address[]
-  * [[VUID-VkBufferCreateInfo-flags-06549]]
-    If pname:flags includes
-    ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT, the
     <<features-bufferDeviceAddressCaptureReplay,
-    pname:bufferDeviceAddressCaptureReplay>> feature must: be enabled
+    pname:bufferDeviceAddressCaptureReplay>> feature
 endif::VK_EXT_buffer_device_address[]
+ifdef::VK_EXT_buffer_device_address[]
+    <<features-bufferDeviceAddressCaptureReplayEXT,
+    pname:bufferDeviceAddressCaptureReplay>> feature
+endif::VK_EXT_buffer_device_address[]
+    must: be enabled
 endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
 ifdef::VK_KHR_video_decode_queue[]
   * [[VUID-VkBufferCreateInfo-usage-04813]]
@@ -242,17 +276,17 @@ ifdef::VK_EXT_descriptor_buffer[]
     ename:VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT, creating this
     sname:VkBuffer must: not cause the total required space for all
     currently valid buffers using this flag on the device to exceed
-    VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:samplerDescriptorBufferAddressSpaceSize
+    slink:VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:samplerDescriptorBufferAddressSpaceSize
     or
-    VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:descriptorBufferAddressSpaceSize
+    slink:VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:descriptorBufferAddressSpaceSize
   * [[VUID-VkBufferCreateInfo-usage-08098]]
     If pname:usage includes
     ename:VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT, creating this
     sname:VkBuffer must: not cause the total required space for all
     currently valid buffers using this flag on the device to exceed
-    VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:resourceDescriptorBufferAddressSpaceSize
+    slink:VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:resourceDescriptorBufferAddressSpaceSize
     or
-    VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:descriptorBufferAddressSpaceSize
+    slink:VkPhysicalDeviceDescriptorBufferPropertiesEXT::pname:descriptorBufferAddressSpaceSize
   * [[VUID-VkBufferCreateInfo-flags-08099]]
     If pname:flags includes
     ename:VK_BUFFER_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT, the
@@ -281,6 +315,21 @@ ifdef::VK_EXT_descriptor_buffer[]
     ename:VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT or
     ename:VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT
 endif::VK_EXT_descriptor_buffer[]
+  * [[VUID-VkBufferCreateInfo-None-09205]]
+    {empty}
+ifdef::VK_KHR_maintenance5[]
+    If the pname:pNext chain does not include a
+    slink:VkBufferUsageFlags2CreateInfoKHR structure,
+endif::VK_KHR_maintenance5[]
+    pname:usage must be a valid combination of elink:VkBufferUsageFlagBits
+    values
+  * [[VUID-VkBufferCreateInfo-None-09206]]
+    {empty}
+ifdef::VK_KHR_maintenance5[]
+    If the pname:pNext chain does not include a
+    slink:VkBufferUsageFlags2CreateInfoKHR structure,
+endif::VK_KHR_maintenance5[]
+    pname:usage must: not be `0`
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -296,12 +345,184 @@ endif::VKSC_VERSION_1_0[]
 include::{generated}/validity/structs/VkBufferCreateInfo.adoc[]
 --
 
+ifdef::VK_KHR_maintenance5[]
+[open,refpage='VkBufferUsageFlags2CreateInfoKHR',desc='Extended buffer usage flags',type='structs']
+--
+The sname:VkBufferUsageFlags2CreateInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkBufferUsageFlags2CreateInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:usage is a bitmask of elink:VkBufferUsageFlagBits2KHR specifying
+    allowed usages of the buffer.
+
+If this structure is included in the pname:pNext chain of a buffer creation
+structure, pname:usage is used instead of the corresponding pname:usage
+value passed in that creation structure, allowing additional usage flags to
+be specified.
+If this structure is included in the pname:pNext chain of a buffer query
+structure, the usage flags of the buffer are returned in pname:usage of this
+structure, and the usage flags representable in pname:usage of the buffer
+query structure are also returned in that field.
+
+include::{generated}/validity/structs/VkBufferUsageFlags2CreateInfoKHR.adoc[]
+--
+
+[open,refpage='VkBufferUsageFlagBits2KHR',desc='Bitmask controlling how a pipeline is created',type='enums']
+--
+Bits which can: be set in
+slink:VkBufferUsageFlags2CreateInfoKHR::pname:usage, specifying usage
+behavior of a buffer, are:
+
+include::{generated}/api/enums/VkBufferUsageFlagBits2KHR.adoc[]
+
+// Note - when editing this section, make sure that any relevant changes
+// are mirrored in VkBufferUsageFlagBits2KHR/VkBufferUsageFlagBits
+
+  * ename:VK_BUFFER_USAGE_2_TRANSFER_SRC_BIT_KHR specifies that the buffer
+    can: be used as the source of a _transfer command_ (see the definition
+    of <<synchronization-pipeline-stages-transfer,
+    ename:VK_PIPELINE_STAGE_TRANSFER_BIT>>).
+  * ename:VK_BUFFER_USAGE_2_TRANSFER_DST_BIT_KHR specifies that the buffer
+    can: be used as the destination of a transfer command.
+  * ename:VK_BUFFER_USAGE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR specifies that the
+    buffer can: be used to create a sname:VkBufferView suitable for
+    occupying a sname:VkDescriptorSet slot of type
+    ename:VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER.
+  * ename:VK_BUFFER_USAGE_2_STORAGE_TEXEL_BUFFER_BIT_KHR specifies that the
+    buffer can: be used to create a sname:VkBufferView suitable for
+    occupying a sname:VkDescriptorSet slot of type
+    ename:VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER.
+  * ename:VK_BUFFER_USAGE_2_UNIFORM_BUFFER_BIT_KHR specifies that the buffer
+    can: be used in a sname:VkDescriptorBufferInfo suitable for occupying a
+    sname:VkDescriptorSet slot either of type
+    ename:VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER or
+    ename:VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC.
+  * ename:VK_BUFFER_USAGE_2_STORAGE_BUFFER_BIT_KHR specifies that the buffer
+    can: be used in a sname:VkDescriptorBufferInfo suitable for occupying a
+    sname:VkDescriptorSet slot either of type
+    ename:VK_DESCRIPTOR_TYPE_STORAGE_BUFFER or
+    ename:VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC.
+  * ename:VK_BUFFER_USAGE_2_INDEX_BUFFER_BIT_KHR specifies that the buffer
+    is suitable for passing as the pname:buffer parameter to
+ifdef::VK_KHR_maintenance5[flink:vkCmdBindIndexBuffer2KHR and]
+    flink:vkCmdBindIndexBuffer.
+  * ename:VK_BUFFER_USAGE_2_VERTEX_BUFFER_BIT_KHR specifies that the buffer
+    is suitable for passing as an element of the pname:pBuffers array to
+    flink:vkCmdBindVertexBuffers.
+  * ename:VK_BUFFER_USAGE_2_INDIRECT_BUFFER_BIT_KHR specifies that the
+    buffer is suitable for passing as the pname:buffer parameter to
+    flink:vkCmdDrawIndirect, flink:vkCmdDrawIndexedIndirect,
+ifdef::VK_NV_mesh_shader[]
+    flink:vkCmdDrawMeshTasksIndirectNV,
+    flink:vkCmdDrawMeshTasksIndirectCountNV,
+endif::VK_NV_mesh_shader[]
+ifdef::VK_EXT_mesh_shader[]
+    fname:vkCmdDrawMeshTasksIndirectEXT,
+    fname:vkCmdDrawMeshTasksIndirectCountEXT,
+endif::VK_EXT_mesh_shader[]
+ifdef::VK_HUAWEI_cluster_culling_shader[]
+    flink:vkCmdDrawClusterIndirectHUAWEI,
+endif::VK_HUAWEI_cluster_culling_shader[]
+    or flink:vkCmdDispatchIndirect.
+ifdef::VK_NV_device_generated_commands[]
+    It is also suitable for passing as the pname:buffer member of
+    sname:VkIndirectCommandsStreamNV, or pname:sequencesCountBuffer or
+    pname:sequencesIndexBuffer or pname:preprocessedBuffer member of
+    sname:VkGeneratedCommandsInfoNV
+endif::VK_NV_device_generated_commands[]
+ifdef::VK_EXT_conditional_rendering[]
+  * ename:VK_BUFFER_USAGE_2_CONDITIONAL_RENDERING_BIT_EXT specifies that the
+    buffer is suitable for passing as the pname:buffer parameter to
+    flink:vkCmdBeginConditionalRenderingEXT.
+endif::VK_EXT_conditional_rendering[]
+ifdef::VK_EXT_transform_feedback[]
+  * ename:VK_BUFFER_USAGE_2_TRANSFORM_FEEDBACK_BUFFER_BIT_EXT specifies that
+    the buffer is suitable for using for binding as a transform feedback
+    buffer with flink:vkCmdBindTransformFeedbackBuffersEXT.
+  * ename:VK_BUFFER_USAGE_2_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT
+    specifies that the buffer is suitable for using as a counter buffer with
+    flink:vkCmdBeginTransformFeedbackEXT and
+    flink:vkCmdEndTransformFeedbackEXT.
+endif::VK_EXT_transform_feedback[]
+ifdef::VK_EXT_descriptor_buffer[]
+  * ename:VK_BUFFER_USAGE_2_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT specifies that
+    the buffer is suitable to contain sampler and combined image sampler
+    descriptors when bound as a descriptor buffer.
+    Buffers containing combined image sampler descriptors must: also specify
+    ename:VK_BUFFER_USAGE_2_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT.
+  * ename:VK_BUFFER_USAGE_2_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT specifies
+    that the buffer is suitable to contain resource descriptors when bound
+    as a descriptor buffer.
+  * ename:VK_BUFFER_USAGE_2_PUSH_DESCRIPTORS_DESCRIPTOR_BUFFER_BIT_EXT
+    specifies that the buffer, when bound, can: be used by the
+    implementation to support push descriptors when using descriptor
+    buffers.
+endif::VK_EXT_descriptor_buffer[]
+ifdef::VK_NV_ray_tracing[]
+  * ename:VK_BUFFER_USAGE_2_RAY_TRACING_BIT_NV specifies that the buffer is
+    suitable for use in flink:vkCmdTraceRaysNV.
+endif::VK_NV_ray_tracing[]
+ifdef::VK_KHR_ray_tracing_pipeline[]
+  * ename:VK_BUFFER_USAGE_2_SHADER_BINDING_TABLE_BIT_KHR specifies that the
+    buffer is suitable for use as a <<shader-binding-table,Shader Binding
+    Table>>.
+endif::VK_KHR_ray_tracing_pipeline[]
+ifdef::VK_KHR_acceleration_structure[]
+  * ename:VK_BUFFER_USAGE_2_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR
+    specifies that the buffer is suitable for use as a read-only input to an
+    <<acceleration-structure-building,acceleration structure build>>.
+  * ename:VK_BUFFER_USAGE_2_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR specifies
+    that the buffer is suitable for storage space for a
+    slink:VkAccelerationStructureKHR.
+endif::VK_KHR_acceleration_structure[]
+ifdef::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
+  * ename:VK_BUFFER_USAGE_2_SHADER_DEVICE_ADDRESS_BIT_KHR specifies that the
+    buffer can: be used to retrieve a buffer device address via
+    flink:vkGetBufferDeviceAddress and use that address to access the
+    buffer's memory from a shader.
+endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
+ifdef::VK_KHR_video_decode_queue[]
+  * ename:VK_BUFFER_USAGE_2_VIDEO_DECODE_SRC_BIT_KHR specifies that the
+    buffer can: be used as the source video bitstream buffer in a
+    <<video-decode-operations, video decode operation>>.
+  * ename:VK_BUFFER_USAGE_2_VIDEO_DECODE_DST_BIT_KHR is reserved for future
+    use.
+endif::VK_KHR_video_decode_queue[]
+ifdef::VK_KHR_video_encode_queue[]
+  * ename:VK_BUFFER_USAGE_2_VIDEO_ENCODE_DST_BIT_KHR specifies that the
+    buffer can: be used as the destination video bitstream buffer in a
+    <<video-encode-operations, video encode operation>>.
+  * ename:VK_BUFFER_USAGE_2_VIDEO_ENCODE_SRC_BIT_KHR is reserved for future
+    use.
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_AMDX_shader_enqueue[]
+  * ename:VK_BUFFER_USAGE_2_EXECUTION_GRAPH_SCRATCH_BIT_AMDX specifies that
+    the buffer can: be used for as scratch memory for
+    <<executiongraphs,execution graph dispatch>>.
+endif::VK_AMDX_shader_enqueue[]
+--
+
+[open,refpage='VkBufferUsageFlags2KHR',desc='Bitmask of VkBufferUsageFlagBits2KHR',type='flags']
+--
+include::{generated}/api/flags/VkBufferUsageFlags2KHR.adoc[]
+
+tname:VkBufferUsageFlags2KHR is a bitmask type for setting a mask of zero or
+more elink:VkBufferUsageFlagBits2KHR.
+--
+endif::VK_KHR_maintenance5[]
+
 [open,refpage='VkBufferUsageFlagBits',desc='Bitmask specifying allowed usage of a buffer',type='enums']
 --
 Bits which can: be set in slink:VkBufferCreateInfo::pname:usage, specifying
 usage behavior of a buffer, are:
 
 include::{generated}/api/enums/VkBufferUsageFlagBits.adoc[]
+
+// Note - when editing this section, make sure that any relevant changes
+// are mirrored in VkBufferUsageFlagBits2KHR/VkBufferUsageFlagBits
 
   * ename:VK_BUFFER_USAGE_TRANSFER_SRC_BIT specifies that the buffer can: be
     used as the source of a _transfer command_ (see the definition of
@@ -329,6 +550,7 @@ include::{generated}/api/enums/VkBufferUsageFlagBits.adoc[]
     ename:VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC.
   * ename:VK_BUFFER_USAGE_INDEX_BUFFER_BIT specifies that the buffer is
     suitable for passing as the pname:buffer parameter to
+ifdef::VK_KHR_maintenance5[flink:vkCmdBindIndexBuffer2KHR and]
     flink:vkCmdBindIndexBuffer.
   * ename:VK_BUFFER_USAGE_VERTEX_BUFFER_BIT specifies that the buffer is
     suitable for passing as an element of the pname:pBuffers array to
@@ -419,6 +641,11 @@ ifdef::VK_KHR_video_encode_queue[]
   * ename:VK_BUFFER_USAGE_VIDEO_ENCODE_SRC_BIT_KHR is reserved for future
     use.
 endif::VK_KHR_video_encode_queue[]
+ifdef::VK_AMDX_shader_enqueue[]
+  * ename:VK_BUFFER_USAGE_EXECUTION_GRAPH_SCRATCH_BIT_AMDX specifies that
+    the buffer can: be used for as scratch memory for
+    <<executiongraphs,execution graph dispatch>>.
+endif::VK_AMDX_shader_enqueue[]
 --
 
 [open,refpage='VkBufferUsageFlags',desc='Bitmask of VkBufferUsageFlagBits',type='flags']
@@ -769,15 +996,23 @@ include::{generated}/api/structs/VkBufferViewCreateInfo.adoc[]
     not a multiple of the <<texel-block-size, texel block size>> of
     pname:format, the nearest smaller multiple is used.
 
+[[resources-buffer-views-usage]]
+The buffer view has a _buffer view usage_ identifying which descriptor types
+can be created from it.
+This usage
+ifdef::VK_KHR_maintenance5[]
+can: be defined by including the slink:VkBufferUsageFlags2CreateInfoKHR
+structure in the pname:pNext chain, and specifying the pname:usage value
+there.
+If this structure is not included, it
+endif::VK_KHR_maintenance5[]
+is equal to the slink:VkBufferCreateInfo::pname:usage value used to create
+pname:buffer.
+
 .Valid Usage
 ****
   * [[VUID-VkBufferViewCreateInfo-offset-00925]]
     pname:offset must: be less than the size of pname:buffer
-ifndef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
-  * [[VUID-VkBufferViewCreateInfo-offset-00926]]
-    pname:offset must: be a multiple of
-    sname:VkPhysicalDeviceLimits::pname:minTexelBufferOffsetAlignment
-endif::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
   * [[VUID-VkBufferViewCreateInfo-range-00928]]
     If pname:range is not equal to ename:VK_WHOLE_SIZE, pname:range must: be
     greater than `0`
@@ -807,14 +1042,14 @@ endif::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
     pname:buffer must: have been created with a pname:usage value containing
     at least one of ename:VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT or
     ename:VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT
-  * [[VUID-VkBufferViewCreateInfo-buffer-00933]]
-    If pname:buffer was created with pname:usage containing
+  * [[VUID-VkBufferViewCreateInfo-format-08778]]
+    If the <<resources-buffer-views-usage, buffer view usage>> contains
     ename:VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT, then
     <<resources-buffer-view-format-features,format features>> of
     pname:format must: contain
     ename:VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT
-  * [[VUID-VkBufferViewCreateInfo-buffer-00934]]
-    If pname:buffer was created with pname:usage containing
+  * [[VUID-VkBufferViewCreateInfo-format-08779]]
+    If the <<resources-buffer-views-usage, buffer view usage>> contains
     ename:VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT, then
     <<resources-buffer-view-format-features,format features>> of
     pname:format must: contain
@@ -822,11 +1057,14 @@ endif::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
   * [[VUID-VkBufferViewCreateInfo-buffer-00935]]
     If pname:buffer is non-sparse then it must: be bound completely and
     contiguously to a single sname:VkDeviceMemory object
-ifdef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
   * [[VUID-VkBufferViewCreateInfo-offset-02749]]
+ifdef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
     If the <<features-texelBufferAlignment, pname:texelBufferAlignment>>
-    feature is not enabled, pname:offset must: be a multiple of
+    feature is not enabled,
+endif::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
+    pname:offset must: be a multiple of
     sname:VkPhysicalDeviceLimits::pname:minTexelBufferOffsetAlignment
+ifdef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
   * [[VUID-VkBufferViewCreateInfo-buffer-02750]]
     If the <<features-texelBufferAlignment, pname:texelBufferAlignment>>
     feature is enabled and if pname:buffer was created with pname:usage
@@ -857,6 +1095,20 @@ ifdef::VK_EXT_metal_objects[]
     pname:exportObjectType member must: be
     ename:VK_EXPORT_METAL_OBJECT_TYPE_METAL_TEXTURE_BIT_EXT
 endif::VK_EXT_metal_objects[]
+ifdef::VK_KHR_maintenance5[]
+  * [[VUID-VkBufferViewCreateInfo-pNext-08780]]
+    If the pname:pNext chain includes a
+    slink:VkBufferUsageFlags2CreateInfoKHR, its pname:usage must: not
+    contain any other bit than
+    ename:VK_BUFFER_USAGE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR or
+    ename:VK_BUFFER_USAGE_2_STORAGE_TEXEL_BUFFER_BIT_KHR
+  * [[VUID-VkBufferViewCreateInfo-pNext-08781]]
+    If the pname:pNext chain includes a
+    slink:VkBufferUsageFlags2CreateInfoKHR, its pname:usage must: be a
+    subset of the slink:VkBufferCreateInfo::pname:usage specified or
+    slink:VkBufferUsageFlags2CreateInfoKHR::pname:usage from
+    slink:VkBufferCreateInfo::pname:pNext when creating pname:buffer
+endif::VK_KHR_maintenance5[]
 ****
 
 include::{generated}/validity/structs/VkBufferViewCreateInfo.adoc[]
@@ -961,10 +1213,40 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkCreateImage-flags-00939]]
     If the pname:flags member of pname:pCreateInfo includes
-    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT, creating this sname:VkImage
-    must: not cause the total required sparse memory for all currently valid
-    sparse resources on the device to exceed
+    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT,
+ifdef::VK_NV_extended_sparse_address_space[]
+    and the <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is not enabled,
+endif::VK_NV_extended_sparse_address_space[]
+    creating this sname:VkImage must: not cause the total required sparse
+    memory for all currently valid sparse resources on the device to exceed
     sname:VkPhysicalDeviceLimits::pname:sparseAddressSpaceSize
+ifdef::VK_NV_extended_sparse_address_space[]
+  * [[VUID-vkCreateImage-flags-09385]]
+    If the pname:flags member of pname:pCreateInfo includes
+    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT, the
+    <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is enabled, and the
+    pname:usage member of pname:pCreateInfo contains bits not in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseImageUsageFlags,
+    creating this sname:VkImage must: not cause the total required sparse
+    memory for all currently valid sparse resources on the device, excluding
+    sname:VkBuffer created with pname:usage member of pname:pCreateInfo
+    containing bits in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseBufferUsageFlags
+    and sname:VkImage created with pname:usage member of pname:pCreateInfo
+    containing bits in
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseImageUsageFlags,
+    to exceed sname:VkPhysicalDeviceLimits::pname:sparseAddressSpaceSize
+  * [[VUID-vkCreateImage-flags-09386]]
+    If the pname:flags member of pname:pCreateInfo includes
+    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT and the
+    <<features-extendedSparseAddressSpace,
+    pname:extendedSparseAddressSpace>> feature is enabled, creating this
+    sname:VkImage must: not cause the total required sparse memory for all
+    currently valid sparse resources on the device to exceed
+    sname:VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::pname:extendedSparseAddressSpaceSize
+endif::VK_NV_extended_sparse_address_space[]
 endif::VKSC_VERSION_1_0[]
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
 ifdef::VK_FUCHSIA_buffer_collection[]
@@ -1066,6 +1348,17 @@ flink:vkCreateImage must: fail and return
 ename:VK_ERROR_OUT_OF_DEVICE_MEMORY.
 This failure may: occur even when all image creation parameters satisfy
 their valid usage requirements.
+
+ifdef::VK_EXT_host_image_copy[]
+If the implementation reports ename:VK_TRUE in
+slink:VkPhysicalDeviceHostImageCopyPropertiesEXT::pname:identicalMemoryTypeRequirements,
+usage of ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT must: not affect the
+memory type requirements of the image as described in
+ifndef::VKSC_VERSION_1_0[]
+<<sparsememory-memory-requirements,Sparse Resource Memory Requirements>> and
+endif::VKSC_VERSION_1_0[]
+<<resources-association,Resource Memory Association>>.
+endif::VK_EXT_host_image_copy[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_maintenance2[]
 [NOTE]
@@ -1457,6 +1750,11 @@ ifdef::VK_VERSION_1_1,VK_KHR_maintenance1[]
   * [[VUID-VkImageCreateInfo-flags-00950]]
     If pname:flags contains ename:VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT,
     pname:imageType must: be ename:VK_IMAGE_TYPE_3D
+  * [[VUID-VkImageCreateInfo-flags-09403]]
+    If pname:flags contains ename:VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT,
+    pname:flags must: not include ename:VK_IMAGE_CREATE_SPARSE_ALIASED_BIT,
+    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT, or
+    ename:VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT
 endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
 ifdef::VK_EXT_image_2d_view_of_3d[]
   * [[VUID-VkImageCreateInfo-flags-07755]]
@@ -1795,7 +2093,21 @@ ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
   * [[VUID-VkImageCreateInfo-pNext-02397]]
     If the pname:pNext chain includes a slink:VkExternalFormatANDROID
     structure whose pname:externalFormat member is not `0`, pname:usage
-    must: not include any usages except ename:VK_IMAGE_USAGE_SAMPLED_BIT
+    must: not include any usages except
+ifdef::VK_ANDROID_external_format_resolve[]
+    ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+    ename:VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, or
+endif::VK_ANDROID_external_format_resolve[]
+    ename:VK_IMAGE_USAGE_SAMPLED_BIT
+ifdef::VK_ANDROID_external_format_resolve[]
+  * [[VUID-VkImageCreateInfo-pNext-09457]]
+    If the pname:pNext chain includes a slink:VkExternalFormatANDROID
+    structure whose pname:externalFormat member is not `0`, and
+    <<features-externalFormatResolve, pname:externalFormatResolve>> feature
+    is not enabled, pname:usage must: not include
+    ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT or
+    ename:VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+endif::VK_ANDROID_external_format_resolve[]
   * [[VUID-VkImageCreateInfo-pNext-02398]]
     If the pname:pNext chain includes a slink:VkExternalFormatANDROID
     structure whose pname:externalFormat member is not `0`, pname:tiling
@@ -2072,6 +2384,13 @@ ifdef::VK_EXT_metal_objects[]
     then slink:VkImportMetalTextureInfoEXT::pname:plane must: not be
     ename:VK_IMAGE_ASPECT_PLANE_2_BIT
 endif::VK_EXT_metal_objects[]
+ifdef::VK_EXT_host_image_copy[]
+  * [[VUID-VkImageCreateInfo-imageCreateFormatFeatures-09048]]
+    If pname:imageCreateFormatFeatures (as defined in
+    <<resources-image-creation-limits,Image Creation Limits>>) does not
+    contain ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT_EXT, then
+    pname:usage must: not contain ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT
+endif::VK_EXT_host_image_copy[]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -2269,10 +2588,6 @@ endif::VK_NV_external_memory[]
 ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
 [open,refpage='VkExternalFormatANDROID',desc='Structure containing an Android hardware buffer external format',type='structs']
 --
-To create an image with an
-<<memory-external-android-hardware-buffer-external-formats,external
-format>>, add a sname:VkExternalFormatANDROID structure in the pname:pNext
-chain of slink:VkImageCreateInfo.
 sname:VkExternalFormatANDROID is defined as:
 
 include::{generated}/api/structs/VkExternalFormatANDROID.adoc[]
@@ -2283,9 +2598,14 @@ include::{generated}/api/structs/VkExternalFormatANDROID.adoc[]
   * pname:externalFormat is an implementation-defined identifier for the
     external format
 
-If pname:externalFormat is zero, the effect is as if the
-sname:VkExternalFormatANDROID structure was not present.
-Otherwise, the pname:image will have the specified external format.
+When included in the pname:pNext chain of another structure, it indicates
+<<memory-external-android-hardware-buffer-external-formats, additional
+format information>> beyond what is provided by ename:VkFormat values for an
+Android hardware buffer.
+If pname:externalFormat is zero, it indicates that no external format is
+used, and implementations should rely only on other format information.
+If this structure is not present, it is equivalent to setting
+pname:externalFormat to zero.
 
 .Valid Usage
 ****
@@ -2692,6 +3012,7 @@ ename:VK_IMAGE_COMPRESSION_FIXED_RATE_4BPC_BIT_EXT.
 To query the compression properties of an image, add a
 slink:VkImageCompressionPropertiesEXT structure to the pname:pNext chain of
 the slink:VkSubresourceLayout2EXT structure in a call to
+ifdef::VK_KHR_maintenance5[flink:vkGetImageSubresourceLayout2KHR or]
 flink:vkGetImageSubresourceLayout2EXT.
 
 To determine the compression rates that are supported for a given image
@@ -2832,6 +3153,10 @@ ifdef::VK_EXT_attachment_feedback_loop_layout[]
     and/or as a read-only input resource in a shader (sampled image,
     combined image sampler or input attachment) in the same render pass.
 endif::VK_EXT_attachment_feedback_loop_layout[]
+ifdef::VK_EXT_host_image_copy[]
+  * ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT specifies that the image can:
+    be used with host copy commands and host layout transitions.
+endif::VK_EXT_host_image_copy[]
 --
 
 [open,refpage='VkImageUsageFlags',desc='Bitmask of VkImageUsageFlagBits',type='flags']
@@ -3146,6 +3471,8 @@ memory, so applications must: not call flink:vkGetImageSubresourceLayout for
 such an image before it has been bound.
 endif::VK_ANDROID_external_memory_android_hardware_buffer,VK_QNX_external_memory_screen_buffer[]
 
+:imageparam: image
+
 .Valid Usage
 ****
 ifndef::VK_EXT_image_drm_format_modifier[]
@@ -3160,6 +3487,23 @@ ifdef::VK_EXT_image_drm_format_modifier[]
     ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT
 endif::VK_EXT_image_drm_format_modifier[]
 include::{chapters}/commonvalidity/get_image_subresource_layout_common.adoc[]
+ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
+  * [[VUID-vkGetImageSubresourceLayout-image-09432]]
+    If pname:image was created with the
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID
+    external memory handle type, then pname:image must: be bound to memory
+endif::VK_ANDROID_external_memory_android_hardware_buffer[]
+ifdef::VK_EXT_image_drm_format_modifier[]
+  * [[VUID-vkGetImageSubresourceLayout-tiling-09433]]
+    If the pname:tiling of the pname:image is
+    ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT, then the pname:aspectMask
+    member of pname:pSubresource must: be
+    `VK_IMAGE_ASPECT_MEMORY_PLANE__{ibit}__BIT_EXT` and the index _i_ must:
+    be less than the
+    slink:VkDrmFormatModifierPropertiesEXT::pname:drmFormatModifierPlaneCount
+    associated with the image's pname:format and
+    slink:VkImageDrmFormatModifierPropertiesEXT::pname:drmFormatModifier
+endif::VK_EXT_image_drm_format_modifier[]
 ****
 
 include::{generated}/validity/protos/vkGetImageSubresourceLayout.adoc[]
@@ -3302,76 +3646,202 @@ endif::VK_EXT_image_drm_format_modifier[]
 include::{generated}/validity/structs/VkSubresourceLayout.adoc[]
 --
 
-ifdef::VK_EXT_image_compression_control[]
-[open,refpage='vkGetImageSubresourceLayout2EXT',desc='Retrieve information about an image subresource',type='protos']
+ifdef::VK_KHR_maintenance5,VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
+[open,refpage='vkGetImageSubresourceLayout2KHR',desc='Retrieve information about an image subresource',type='protos']
 --
-:refpage: vkGetImageSubresourceLayout2EXT
+:refpage: vkGetImageSubresourceLayout2KHR
 
 To query the memory layout of an image subresource, call:
 
+ifdef::VK_KHR_maintenance5[]
+include::{generated}/api/protos/vkGetImageSubresourceLayout2KHR.adoc[]
+endif::VK_KHR_maintenance5[]
+
+ifdef::VK_KHR_maintenance5[]
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[or the equivalent command]
+endif::VK_KHR_maintenance5[]
+
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
 include::{generated}/api/protos/vkGetImageSubresourceLayout2EXT.adoc[]
+endif::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
 
   * pname:device is the logical device that owns the image.
   * pname:image is the image whose layout is being queried.
-  * pname:pSubresource is a pointer to a slink:VkImageSubresource2EXT
+  * pname:pSubresource is a pointer to a slink:VkImageSubresource2KHR
     structure selecting a specific image for the image subresource.
-  * pname:pLayout is a pointer to a slink:VkSubresourceLayout2EXT structure
+  * pname:pLayout is a pointer to a slink:VkSubresourceLayout2KHR structure
     in which the layout is returned.
 
-fname:vkGetImageSubresourceLayout2EXT behaves similarly to
+fname:vkGetImageSubresourceLayout2KHR behaves similarly to
 flink:vkGetImageSubresourceLayout, with the ability to specify extended
 inputs via chained input structures, and to return extended information via
 chained output structures.
 
-It is legal to call fname:vkGetImageSubresourceLayout2EXT with a pname:image
+It is legal to call fname:vkGetImageSubresourceLayout2KHR with a pname:image
 created with pname:tiling equal to ename:VK_IMAGE_TILING_OPTIMAL, but the
-members of slink:VkSubresourceLayout2EXT::pname:subresourceLayout will have
+members of slink:VkSubresourceLayout2KHR::pname:subresourceLayout will have
 undefined: values in this case.
 
 [NOTE]
 .Note
 ====
-Structures chained from slink:VkImageSubresource2EXT::pname:pNext will also
+Structures chained from slink:VkImageSubresource2KHR::pname:pNext will also
 be updated when pname:tiling is equal to ename:VK_IMAGE_TILING_OPTIMAL.
 ====
+
+:imageparam: image
 
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/get_image_subresource_layout_common.adoc[]
+ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
+  * [[VUID-vkGetImageSubresourceLayout2KHR-image-09434]]
+    If pname:image was created with the
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID
+    external memory handle type, then pname:image must: be bound to memory
+endif::VK_ANDROID_external_memory_android_hardware_buffer[]
+ifdef::VK_EXT_image_drm_format_modifier[]
+  * [[VUID-vkGetImageSubresourceLayout2KHR-tiling-09435]]
+    If the pname:tiling of the pname:image is
+    ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT, then the pname:aspectMask
+    member of pname:pSubresource must: be
+    `VK_IMAGE_ASPECT_MEMORY_PLANE__{ibit}__BIT_EXT` and the index _i_ must:
+    be less than the
+    slink:VkDrmFormatModifierPropertiesEXT::pname:drmFormatModifierPlaneCount
+    associated with the image's pname:format and
+    slink:VkImageDrmFormatModifierPropertiesEXT::pname:drmFormatModifier
+endif::VK_EXT_image_drm_format_modifier[]
 ****
 
-include::{generated}/validity/protos/vkGetImageSubresourceLayout2EXT.adoc[]
+include::{generated}/validity/protos/vkGetImageSubresourceLayout2KHR.adoc[]
 --
 
-[open,refpage='VkImageSubresource2EXT',desc='Structure specifying an image subresource',type='structs']
+[open,refpage='VkImageSubresource2KHR',desc='Structure specifying an image subresource',type='structs',alias='VkImageSubresource2EXT']
 --
-The sname:VkImageSubresource2EXT structure is defined as:
+The sname:VkImageSubresource2KHR structure is defined as:
 
+include::{generated}/api/structs/VkImageSubresource2KHR.adoc[]
+
+ifdef::VK_KHR_maintenance5[]
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[or the equivalent]
+endif::VK_KHR_maintenance5[]
+
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
 include::{generated}/api/structs/VkImageSubresource2EXT.adoc[]
+endif::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
 
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
   * pname:imageSubresource is a slink:VkImageSubresource structure.
 
-include::{generated}/validity/structs/VkImageSubresource2EXT.adoc[]
+include::{generated}/validity/structs/VkImageSubresource2KHR.adoc[]
 --
 
-[open,refpage='VkSubresourceLayout2EXT',desc='Structure specifying subresource layout',type='structs']
+[open,refpage='VkSubresourceLayout2KHR',desc='Structure specifying subresource layout',type='structs',alias='VkSubresourceLayout2EXT']
 --
 Information about the layout of the image subresource is returned in a
+sname:VkSubresourceLayout2KHR structure:
+
+ifdef::VK_KHR_maintenance5[]
+include::{generated}/api/structs/VkSubresourceLayout2KHR.adoc[]
+endif::VK_KHR_maintenance5[]
+
+ifdef::VK_KHR_maintenance5[]
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[or the equivalent]
+endif::VK_KHR_maintenance5[]
+
+ifdef::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
+
+ifndef::VK_KHR_maintenance5[]
+Information about the layout of the image subresource is returned in a
 sname:VkSubresourceLayout2EXT structure:
+endif::VK_KHR_maintenance5[]
 
 include::{generated}/api/structs/VkSubresourceLayout2EXT.adoc[]
+endif::VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
 
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
   * pname:subresourceLayout is a slink:VkSubresourceLayout structure.
 
-include::{generated}/validity/structs/VkSubresourceLayout2EXT.adoc[]
+include::{generated}/validity/structs/VkSubresourceLayout2KHR.adoc[]
 --
-endif::VK_EXT_image_compression_control[]
+
+ifdef::VK_EXT_host_image_copy[]
+[open,refpage='VkSubresourceHostMemcpySizeEXT',desc='Memory size needed to copy to or from an image on the host with VK_HOST_IMAGE_COPY_MEMCPY_EXT',type='structs']
+--
+To query the memory size needed to copy to or from an image using
+flink:vkCopyMemoryToImageEXT or flink:vkCopyImageToMemoryEXT when the
+ename:VK_HOST_IMAGE_COPY_MEMCPY_EXT flag is specified, add a
+slink:VkSubresourceHostMemcpySizeEXT structure to the pname:pNext chain of
+the slink:VkSubresourceLayout2EXT structure in a call to
+flink:vkGetImageSubresourceLayout2EXT.
+
+The sname:VkSubresourceHostMemcpySizeEXT structure is defined as:
+
+include::{generated}/api/structs/VkSubresourceHostMemcpySizeEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:size is the size in bytes of the image subresource.
+
+include::{generated}/validity/structs/VkSubresourceHostMemcpySizeEXT.adoc[]
+--
+endif::VK_EXT_host_image_copy[]
+endif::VK_KHR_maintenance5,VK_EXT_image_compression_control,VK_EXT_host_image_copy[]
+
+ifdef::VK_KHR_maintenance5[]
+[open,refpage='vkGetDeviceImageSubresourceLayoutKHR',desc='Retrieve information about an image subresource without an image object',type='protos']
+--
+To query the memory layout of an image subresource, without an image object,
+call:
+
+include::{generated}/api/protos/vkGetDeviceImageSubresourceLayoutKHR.adoc[]
+
+  * pname:device is the logical device that owns the image.
+  * pname:pInfo is a pointer to a slink:VkDeviceImageSubresourceInfoKHR
+    structure containing parameters required for the subresource layout
+    query.
+  * pname:pLayout is a pointer to a slink:VkSubresourceLayout2KHR structure
+    in which the layout is returned.
+
+fname:vkGetDeviceImageSubresourceLayoutKHR behaves similarly to
+flink:vkGetImageSubresourceLayout2KHR, but uses a slink:VkImageCreateInfo
+structure to specify the image rather than a slink:VkImage object.
+
+include::{generated}/validity/protos/vkGetDeviceImageSubresourceLayoutKHR.adoc[]
+--
+
+[open,refpage='VkDeviceImageSubresourceInfoKHR',desc='Image creation information for querying subresource layout',type='structs']
+--
+:refpage: VkDeviceImageSubresourceInfoKHR
+
+The sname:VkDeviceImageSubresourceInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkDeviceImageSubresourceInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pCreateInfo is a pointer to a slink:VkImageCreateInfo structure
+    containing parameters affecting creation of the image to query.
+  * pname:pSubresource pSubresource is a pointer to a
+    slink:VkImageSubresource2KHR structure selecting a specific image
+    subresource for the query.
+
+:imageparam: pCreateInfo
+
+.Valid Usage
+****
+include::{chapters}/commonvalidity/get_image_subresource_layout_common.adoc[]
+****
+
+include::{generated}/validity/structs/VkDeviceImageSubresourceInfoKHR.adoc[]
+--
+endif::VK_KHR_maintenance5[]
 
 ifdef::VK_EXT_image_drm_format_modifier[]
 [open,refpage='vkGetImageDrmFormatModifierPropertiesEXT',desc='Returns an image\'s DRM format modifier',type='protos']
@@ -4022,9 +4492,12 @@ include::{generated}/api/protos/vkCreateImageView.adoc[]
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
-ifdef::VKSC_VERSION_1_0[]
 .Valid Usage
 ****
+  * [[VUID-vkCreateImageView-image-09179]]
+    slink:VkImageViewCreateInfo::pname:image must: have been created from
+    pname:device
+ifdef::VKSC_VERSION_1_0[]
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
   * [[VUID-vkCreateImageView-subresourceRange-05063]]
     If slink:VkImageViewCreateInfo::pname:subresourceRange.layerCount is not
@@ -4037,8 +4510,8 @@ include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[
     image views requested via
     slink:VkDeviceObjectReservationCreateInfo::pname:layeredImageViewRequestCount
     specified when pname:device was created
-****
 endif::VKSC_VERSION_1_0[]
+****
 
 include::{generated}/validity/protos/vkCreateImageView.adoc[]
 --
@@ -4315,22 +4788,26 @@ endif::VK_NV_linear_color_attachment[]
     ename:VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, then the image view's
     <<resources-image-view-format-features,format features>> must: contain
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-ifndef::VK_NV_linear_color_attachment[]
-  * [[VUID-VkImageViewCreateInfo-usage-02652]]
-    If pname:usage contains ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, then
-    the image view's <<resources-image-view-format-features,format
+  * [[VUID-VkImageViewCreateInfo-usage-08932]]
+    If pname:usage contains ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+ifdef::VK_ANDROID_external_format_resolve[]
+    and any of the following is true:
+  ** the <<features-externalFormatResolve, pname:externalFormatResolve>>
+    feature is not enabled
+  ** the <<limits-nullColorAttachmentWithExternalFormatResolve,
+     pname:nullColorAttachmentWithExternalFormatResolve>> property is
+     ename:VK_FALSE
+  ** pname:image was created with an
+     slink:VkExternalFormatANDROID::pname:externalFormat value of 0
+endif::VK_ANDROID_external_format_resolve[]
+
++
+then the image view's <<resources-image-view-format-features,format
     features>> must: contain at least one of
     ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT or
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-endif::VK_NV_linear_color_attachment[]
 ifdef::VK_NV_linear_color_attachment[]
-  * [[VUID-VkImageViewCreateInfo-usage-08932]]
-    If pname:usage contains ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, then
-    the image view's <<resources-image-view-format-features,format
-    features>> must: contain at least one of
-    ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT,
-    ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT or,
-    ename:VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV
+    or ename:VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV
 endif::VK_NV_linear_color_attachment[]
   * [[VUID-VkImageViewCreateInfo-subresourceRange-01478]]
     pname:subresourceRange.baseMipLevel must: be less than the
@@ -4511,14 +4988,14 @@ ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     the pname:image is a
     <<formats-requiring-sampler-ycbcr-conversion,multi-planar>> format, and
     if pname:subresourceRange.aspectMask is one of the
-    <<formats-planes-image-aspect,multi-planar aspect masks>>, then
+    <<formats-planes-image-aspect,multi-planar aspect mask>> bits, then
     pname:format must: be compatible with the elink:VkFormat for the plane
     of the pname:image pname:format indicated by
     pname:subresourceRange.aspectMask, as defined in
     <<formats-compatible-planes>>
   * [[VUID-VkImageViewCreateInfo-subresourceRange-07818]]
     pname:subresourceRange.aspectMask must: only have at most 1 valid
-    <<formats-planes-image-aspect,multi-planar aspect mask>>
+    <<formats-planes-image-aspect,multi-planar aspect mask>> bit
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ifndef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 // The VU below comes in an alternate version when the extension is
@@ -5754,8 +6231,10 @@ Similarly to other objects in Vulkan, the acceleration structure creation
 merely creates an object with a specific "`shape`" as specified by the
 information in slink:VkAccelerationStructureInfoNV and pname:compactedSize
 in pname:pCreateInfo.
-Populating the data in the object after allocating and binding memory is
-done with flink:vkCmdBuildAccelerationStructureNV and
+
+Once memory has been bound to the acceleration structure using
+flink:vkBindAccelerationStructureMemoryNV, that memory is populated by calls
+to flink:vkCmdBuildAccelerationStructureNV and
 flink:vkCmdCopyAccelerationStructureNV.
 
 Acceleration structure creation uses the count and type information from the
@@ -5890,11 +6369,29 @@ The type and quantity of geometry that can be built into an acceleration
 structure is determined by the parameters of
 slink:VkAccelerationStructureCreateInfoKHR.
 
-Populating the data in the object after allocating and binding memory is
-done with commands such as flink:vkCmdBuildAccelerationStructuresKHR,
+The acceleration structure data is stored in the object referred to by
+sname:VkAccelerationStructureCreateInfoKHR::pname:buffer.
+Once memory has been bound to that buffer, it must: be populated by
+acceleration structure build or acceleration structure copy commands such as
+flink:vkCmdBuildAccelerationStructuresKHR,
 flink:vkBuildAccelerationStructuresKHR,
 flink:vkCmdCopyAccelerationStructureKHR, and
 flink:vkCopyAccelerationStructureKHR.
+
+[NOTE]
+.Note
+====
+The expected usage for a trace capture/replay tool is that it will serialize
+and later deserialize the acceleration structure data using acceleration
+structure copy commands.
+During capture the tool will use
+flink:vkCopyAccelerationStructureToMemoryKHR or
+flink:vkCmdCopyAccelerationStructureToMemoryKHR with a pname:mode of
+ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_SERIALIZE_KHR, and
+flink:vkCopyMemoryToAccelerationStructureKHR or
+flink:vkCmdCopyMemoryToAccelerationStructureKHR with a pname:mode of
+ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_DESERIALIZE_KHR during replay.
+====
 
 The input buffers passed to acceleration structure build commands will be
 referenced by the implementation for the duration of the command.
@@ -6127,8 +6624,9 @@ include::{generated}/api/protos/vkGetAccelerationStructureBuildSizesKHR.adoc[]
 
 The pname:srcAccelerationStructure, pname:dstAccelerationStructure, and
 pname:mode members of pname:pBuildInfo are ignored.
-Any slink:VkDeviceOrHostAddressKHR members of pname:pBuildInfo are ignored
-by this command, except that the pname:hostAddress member of
+Any slink:VkDeviceOrHostAddressKHR or slink:VkDeviceOrHostAddressConstKHR
+members of pname:pBuildInfo are ignored by this command, except that the
+pname:hostAddress member of
 slink:VkAccelerationStructureGeometryTrianglesDataKHR::pname:transformData
 will be examined to check if it is `NULL`.
 
@@ -7045,10 +7543,24 @@ object with a specific "`shape`".
 The type and quantity of geometry that can be built into a micromap is
 determined by the parameters of slink:VkMicromapCreateInfoEXT.
 
-Populating the data in the object after allocating and binding memory is
-done with commands such as flink:vkCmdBuildMicromapsEXT,
+The micromap data is stored in the object referred to by
+sname:VkMicromapCreateInfoEXT::pname:buffer.
+Once memory has been bound to that buffer, it must: be populated by micromap
+build or micromap copy commands such as flink:vkCmdBuildMicromapsEXT,
 flink:vkBuildMicromapsEXT, flink:vkCmdCopyMicromapEXT, and
 flink:vkCopyMicromapEXT.
+
+[NOTE]
+.Note
+====
+The expected usage for a trace capture/replay tool is that it will serialize
+and later deserialize the micromap data using micromap copy commands.
+During capture the tool will use flink:vkCopyMicromapToMemoryEXT or
+flink:vkCmdCopyMicromapToMemoryEXT with a pname:mode of
+ename:VK_COPY_MICROMAP_MODE_SERIALIZE_EXT, and
+flink:vkCopyMemoryToMicromapEXT or flink:vkCmdCopyMemoryToMicromapEXT with a
+pname:mode of ename:VK_COPY_MICROMAP_MODE_DESERIALIZE_EXT during replay.
+====
 
 The input buffers passed to micromap build commands will be referenced by
 the implementation for the duration of the command.
@@ -7210,6 +7722,9 @@ above conditions.
 
 .Valid Usage
 ****
+  * [[VUID-vkGetMicromapBuildSizesEXT-dstMicromap-09180]]
+    slink:VkMicromapBuildInfoEXT::pname:dstMicromap must: have been created
+    from pname:device
   * [[VUID-vkGetMicromapBuildSizesEXT-micromap-07439]]
     The <<features-micromap, pname:micromap>> feature must: be enabled
   * [[VUID-vkGetMicromapBuildSizesEXT-device-07440]]
@@ -7596,6 +8111,12 @@ ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
     the ename:VK_IMAGE_CREATE_SPLIT_INSTANCE_BIND_REGIONS_BIT bit of the
     pname:flags member,
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
+ifdef::VK_EXT_host_image_copy[]
+    the ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT bit of the pname:usage
+    member if the
+    slink:VkPhysicalDeviceHostImageCopyPropertiesEXT::pname:identicalMemoryTypeRequirements
+    property is ename:VK_FALSE,
+endif::VK_EXT_host_image_copy[]
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
     pname:handleTypes member of slink:VkExternalMemoryImageCreateInfo,
 endif::VK_VERSION_1_1,VK_KHR_external_memory[]
@@ -7611,6 +8132,12 @@ ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
     the ename:VK_IMAGE_CREATE_SPLIT_INSTANCE_BIND_REGIONS_BIT bit of the
     pname:flags member,
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
+ifdef::VK_EXT_host_image_copy[]
+    the ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT bit of the pname:usage
+    member if the
+    slink:VkPhysicalDeviceHostImageCopyPropertiesEXT::pname:identicalMemoryTypeRequirements
+    property is ename:VK_FALSE,
+endif::VK_EXT_host_image_copy[]
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
     pname:handleTypes member of slink:VkExternalMemoryImageCreateInfo,
 endif::VK_VERSION_1_1,VK_KHR_external_memory[]
@@ -7930,7 +8457,7 @@ endif::VK_EXT_image_drm_format_modifier[]
 
 .Valid Usage
 ****
-  * [[VUID-VkDeviceImageMemoryRequirementsKHR-pCreateInfo-06416]]
+  * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06416]]
     The pname:pCreateInfo::pname:pNext chain must: not contain a
     slink:VkImageSwapchainCreateInfoKHR structure
 ifdef::VK_EXT_image_drm_format_modifier[]
@@ -7956,18 +8483,18 @@ ifdef::VK_VERSION_1_3,VK_KHR_maintenance4[]
     with non-zero pname:externalFormat
 endif::VK_VERSION_1_3,VK_KHR_maintenance4[]
 endif::VK_QNX_external_memory_screen_buffer[]
-  * [[VUID-VkDeviceImageMemoryRequirementsKHR-pCreateInfo-06417]]
+  * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06417]]
     If pname:pCreateInfo::pname:format specifies a _multi-planar_ format and
     pname:pCreateInfo::pname:flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT
     set then pname:planeAspect must: not be ename:VK_IMAGE_ASPECT_NONE_KHR
-  * [[VUID-VkDeviceImageMemoryRequirementsKHR-pCreateInfo-06419]]
+  * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06419]]
     If pname:pCreateInfo::pname:flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT
     set and if the pname:pCreateInfo::pname:tiling is
     ename:VK_IMAGE_TILING_LINEAR or ename:VK_IMAGE_TILING_OPTIMAL, then
     pname:planeAspect must: be a single valid
-    <<formats-planes-image-aspect,multi-planar aspect mask>>
+    <<formats-planes-image-aspect,multi-planar aspect mask>> bit
 ifdef::VK_EXT_image_drm_format_modifier[]
-  * [[VUID-VkDeviceImageMemoryRequirementsKHR-pCreateInfo-06420]]
+  * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06420]]
     If pname:pCreateInfo::pname:tiling is
     ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT, then pname:planeAspect
     must: be a single valid _memory plane_ for the image (that is,
@@ -8010,7 +8537,7 @@ endif::VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-VkImagePlaneMemoryRequirementsInfo-planeAspect-02281]]
     If the image's pname:tiling is ename:VK_IMAGE_TILING_LINEAR or
     ename:VK_IMAGE_TILING_OPTIMAL, then pname:planeAspect must: be a single
-    valid <<formats-planes-image-aspect,multi-planar aspect mask>>
+    valid <<formats-planes-image-aspect,multi-planar aspect mask>> bit
 ifdef::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkImagePlaneMemoryRequirementsInfo-planeAspect-02282]]
     If the image's pname:tiling is
@@ -8820,7 +9347,7 @@ endif::VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-VkBindImagePlaneMemoryInfo-planeAspect-02283]]
     If the image's pname:tiling is ename:VK_IMAGE_TILING_LINEAR or
     ename:VK_IMAGE_TILING_OPTIMAL, then pname:planeAspect must: be a single
-    valid <<formats-planes-image-aspect,multi-planar aspect mask>>
+    valid <<formats-planes-image-aspect,multi-planar aspect mask>> bit
 ifdef::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkBindImagePlaneMemoryInfo-planeAspect-02284]]
     If the image's pname:tiling is
@@ -9259,7 +9786,7 @@ include::{generated}/api/handles/VkBufferCollectionFUCHSIA.adoc[]
     participation in the buffer collection
 
 
-=== Platform initialization for buffer collections
+=== Platform Initialization for Buffer Collections
 To initialize a buffer collection on Fuchsia:
 
   * Connect to the Sysmem service to initialize a Sysmem allocator
@@ -9269,7 +9796,7 @@ To initialize a buffer collection on Fuchsia:
     fuchsia.dev for more detailed information
 
 
-=== Create the buffer collection
+=== Create the Buffer Collection
 
 [open,refpage='vkCreateBufferCollectionFUCHSIA',desc='Create a new buffer collection',type='protos']
 --
@@ -9326,12 +9853,12 @@ include::{generated}/validity/structs/VkBufferCollectionCreateInfoFUCHSIA.adoc[]
 --
 
 
-=== Set the constraints
+=== Set the Constraints
 Buffer collections can be established for slink:VkImage allocations or
 slink:VkBuffer allocations.
 
 
-==== Set image-based buffer collection constraints
+==== Set Image-based Buffer Collection Constraints
 
 [open,refpage='vkSetBufferCollectionImageConstraintsFUCHSIA',desc='Set image-based constraints for a buffer collection',type='protos']
 --
@@ -9566,7 +10093,7 @@ include::{generated}/validity/structs/VkSysmemColorSpaceFUCHSIA.adoc[]
 --
 
 
-==== Set buffer-based buffer collection constraints
+==== Set Buffer-based Buffer Collection Constraints
 
 [open,refpage='vkSetBufferCollectionBufferConstraintsFUCHSIA',desc='Set buffer-based constraints for a buffer collection',type='protos']
 --
@@ -9625,7 +10152,7 @@ include::{generated}/validity/structs/VkBufferConstraintsInfoFUCHSIA.adoc[]
 --
 
 
-=== Retrieve buffer collection properties
+=== Retrieve Buffer Collection Properties
 
 [open,refpage='vkGetBufferCollectionPropertiesFUCHSIA',desc='Retrieve properties from a buffer collection',type='protos']
 --
@@ -9733,7 +10260,7 @@ include::{generated}/validity/structs/VkBufferCollectionPropertiesFUCHSIA.adoc[]
 --
 
 
-=== Memory allocation
+=== Memory Allocation
 
 To import memory from a buffer collection into a slink:VkImage or a
 slink:VkBuffer, chain a slink:VkImportMemoryBufferCollectionFUCHSIA

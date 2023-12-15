@@ -234,6 +234,7 @@ def refPageShell(pageName, pageDesc, fp, head_content = None, sections=None, tai
 
     print(':data-uri:',
           ':icons: font',
+          ':attribute-missing: warn',
           conventions.extra_refpage_headers,
           '',
           sep='\n', file=fp)
@@ -445,8 +446,12 @@ def emitPage(baseDir, specDir, pi, file):
             logWarn('emitPage:', pageName, 'INCLUDE is None, no page generated')
             return
 
-        # Specification text
-        lines = remapIncludes(file[pi.begin:pi.include + 1], baseDir, specDir)
+        # Specification text from beginning to just before the parameter
+        # section. This covers the description, the prototype, the version
+        # note, and any additional version note text. If a parameter section
+        # is absent then go a line beyond the include.
+        remap_end = pi.include + 1 if pi.param is None else pi.param
+        lines = remapIncludes(file[pi.begin:remap_end], baseDir, specDir)
         specText = ''.join(lines)
 
         if pi.param is not None:
@@ -738,6 +743,7 @@ def genSinglePageRef(baseDir):
           ':data-uri:',
           ':toc2:',
           ':toclevels: 2',
+          ':attribute-missing: warn',
           '',
           sep='\n', file=head)
 

@@ -18,6 +18,7 @@ Jon Leech, Tobias Hector
 :doctype: book
 :imagewidth: 800
 :fullimagewidth: width="800"
+:attribute-missing: warn
 :cl: &#x3a;
 :style: style
 
@@ -36,6 +37,10 @@ include::{config}/copyright-ccby.adoc[]
 <<<<
 
 include::{style}/introduction.adoc[]
+
+apiext: apiext:VK_KHR_surface
+
+apiext (with backquotes): `apiext:VK_KHR_surface`
 
 include::{style}/naming.adoc[]
 

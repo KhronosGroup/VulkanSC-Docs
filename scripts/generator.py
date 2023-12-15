@@ -64,9 +64,8 @@ def regSortCategoryKey(feature):
             return 0.5
         else:
             return 0
-    if (feature.category == 'ARB'
-        or feature.category == 'KHR'
-            or feature.category == 'OES'):
+
+    if feature.category.upper() in ['ARB', 'KHR', 'OES']:
         return 1
 
     return 2
@@ -166,6 +165,7 @@ class GeneratorOptions:
                  reparentEnums=True,
                  sortProcedure=regSortFeatures,
                  requireCommandAliases=False,
+                 requireDepends=True,
                 ):
         """Constructor.
 
@@ -208,6 +208,11 @@ class GeneratorOptions:
         or <extension> being complete. Defaults to True.
         - sortProcedure - takes a list of FeatureInfo objects and sorts
         them in place to a preferred order in the generated output.
+        - requireCommandAliases - if True, treat command aliases
+        as required dependencies.
+        - requireDepends - whether to follow API dependencies when emitting
+        APIs.
+
         Default is
           - core API versions
           - Khronos (ARB/KHR/OES) extensions
@@ -294,6 +299,9 @@ class GeneratorOptions:
         self.requireCommandAliases = requireCommandAliases
         """True if alias= attributes of <command> tags are transitively
         required."""
+
+        self.requireDepends = requireDepends
+        """True if dependencies of API tags are transitively required."""
 
     def emptyRegex(self, pat):
         """Substitute a regular expression which matches no version

@@ -20,7 +20,7 @@ external materials not created by Khronos.
 ====
 
 
-=== H.264 encode profile
+=== H.264 Encode Profile
 
 [open,refpage='VkVideoEncodeH264ProfileInfoEXT',desc='Structure specifying H.264 encode profile',type='structs']
 --
@@ -231,6 +231,15 @@ include::{generated}/api/enums/VkVideoEncodeH264StdFlagBitsEXT.adoc[]
     code:STD_VIDEO_H264_DISABLE_DEBLOCKING_FILTER_IDC_PARTIAL from
     StdVideoH264DisableDeblockingFilterIdc is supported.
     An implementation must: support at least one deblocking filter mode.
+  * ename:VK_VIDEO_ENCODE_H264_STD_SLICE_QP_DELTA_BIT_EXT indicates whether
+    the implementation supports using the application-provided value for
+    code:StdVideoEncodeH264SliceHeader::code:slice_qp_delta when that value
+    is identical across the slices of the encoded frame.
+  * ename:VK_VIDEO_ENCODE_H264_STD_DIFFERENT_SLICE_QP_DELTA_BIT_EXT
+    indicates whether the implementation supports using the
+    application-provided value for
+    code:StdVideoEncodeH264SliceHeader::code:slice_qp_delta when that value
+    is different across the slices of the encoded frame.
 --
 
 [open,refpage='VkVideoEncodeH264StdFlagsEXT',desc='Bitmask of VkVideoEncodeH264StdFlagBitsEXT',type='flags']
@@ -544,7 +553,7 @@ include::{generated}/validity/structs/VkVideoEncodeH264DpbSlotInfoEXT.adoc[]
 --
 
 
-=== Rate control
+=== Rate Control
 
 [open,refpage='VkVideoEncodeH264RateControlInfoEXT',desc='Structure describing H.264 stream rate control parameters',type='structs']
 --

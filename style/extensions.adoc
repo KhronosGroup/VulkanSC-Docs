@@ -170,8 +170,10 @@ Khronos has registered some author IDs for specific uses:
 
   * KHR is used for Khronos-ratified extensions.
   * EXT is used for multi-vendor extensions.
-    These are extensions that have not been ratified, but are intended to be
-    exposed by implementations from multiple vendors.
+    These are extensions intended to be exposed by implementations from
+    multiple vendors.
+    Historically these extensions were not ratified, but Khronos has begun
+    retroactively ratifying selected `EXT` extensions.
 
 [NOTE]
 .Note
@@ -274,7 +276,7 @@ Validation Layers, and a variety of language bindings.
 
 
 [[extensions-author-ID]]
-== Registering an Author ID with Khronos
+== Registering an Author ID With Khronos
 
 Previous Khronos APIs could only officially be modified by Khronos members.
 In an effort to build a more flexible platform, Vulkan allows non-Khronos
@@ -305,7 +307,7 @@ faith.
 
 
 [[extensions-vendor-id]]
-== Registering a Vendor ID with Khronos
+== Registering a Vendor ID With Khronos
 
 Vulkan implementors must report a valid vendor ID for their implementation
 when queried by fname:vkGetPhysicalDeviceProperties, as described in the
@@ -431,8 +433,8 @@ conditionals.
 The changes are only visible in generated documentation when the
 Specification is built with an asciidoctor attribute of that name defined.
 Khronos publishes three forms of the Vulkan Specification: the core API
-(e.g. versions 1.x) only; core API with all registered `KHR` extensions; and
-core API with all registered extensions.
+(e.g. versions 1.x) only; core API with all registered `KHR` and `EXT`
+extensions; and core API with all registered extensions.
 
 
 [[extensions-documenting-extensions]]
@@ -880,6 +882,10 @@ An example reservation for a disabled extension is:
     <enum bitpos="6" extends="VkQueueFlagBits" name="VK_QUEUE_RESERVED_6_BIT_KHR"/>
 ----
 
+Bit position 31 may not be used, due to inconsistent behavior by C
+compilers.
+This is enforced by the generator scripts.
+
 [NOTE]
 .Note
 ====
@@ -898,7 +904,7 @@ When a 32-bit flags type is close to running out of bits, a corresponding
 tlink:VkAccessFlags and tlink:VkAccessFlags2KHR types.
 These flag types have corresponding 32- and 64-bit bitmask types
 (elink:VkAccessFlagBits and elink:VkAccessFlagBits2KHR).
-When reserving remaining bits at bit positions 0 through 31, a similarly
+When reserving remaining bits at bit positions 0 through 30, a similarly
 named bit should be reserved in both bitmask types
 (ename:VK_ACCESS_MEMORY_READ_BIT and ename:VK_ACCESS_2_MEMORY_READ_BIT), to
 avoid having the same bit used for different purposes in two otherwise very
@@ -1061,7 +1067,7 @@ implementations.
 ====
 
 
-== Accessing Extension Functions from Programs
+== Accessing Extension Functions From Programs
 
 fname:vkGetInstanceProcAddr and fname:vkGetDeviceProcAddr can be used in
 order to obtain function pointer addresses for core and extension commands
@@ -1133,8 +1139,8 @@ discouraged.
 ====
 
 Validation of structure types in pname:pNext chains is automatically
-generated from the registry, based on the description of attr:structextends
-in link:registry.html[the registry document].
+generated from the registry, based on the description of `structextends` in
+link:registry.html[the registry document].
 
 
 [[extensions-interactions-parent]]

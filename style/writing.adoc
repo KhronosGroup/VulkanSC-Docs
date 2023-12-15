@@ -23,6 +23,26 @@ link:https://blog.oxforddictionaries.com/2015/01/21/video-oxford-comma/[video
 discussion of the Oxford comma] provided by the Oxford Dictionary.
 
 
+[[writing-titlecase]]
+=== Use AP Title Case for Chapter and Section Titles
+
+Here is a link:https://titlecaseconverter.com/rules/[summary] of the rules:
+
+  * Capitalize the first word and the last word of the title.
+  * Capitalize the principal words.
+  * Capitalize "`to`" in infinitives.
+  * Capitalize all words of four letters or more.
+  * Do not capitalize articles, conjunctions, and prepositions of three
+    letters or fewer.
+
+[NOTE]
+.Note
+====
+The actual AP style guide is behind a paywall.
+The summary here is from a commercial website.
+====
+
+
 === Date Format
 
 Whenever possible, write dates in the <<iso-8601,ISO 8601>> format:
@@ -377,7 +397,7 @@ Occasional non-normative explanations can be included in the
 
 
 [[writing-describing-errors]]
-=== Commands which Return Error Codes
+=== Commands Which Return Error Codes
 
 Commands which return elink:VkResult values must list all possible error
 codes for the command in the `errorcodes` XML attribute for the command.
@@ -578,14 +598,14 @@ Some workarounds we use are:
 .LaTeX math replacements for KaTeX compatibility
 [width="70%",options="header",cols="20%,20%,60%"]
 |====
-| Replace              | With              | Comments
-| `\begin{equation}`   | _nothing_         | Unnecessary in blocks. Should not be used for inline.
-| `\end{equation}`     | _nothing_         | Unnecessary in blocks. Should not be used for inline.
-| `\begin{align*}`     | `\begin{aligned}` |
-| `\end{align*}`       | `\end{aligned}`   |
-| `\operatorname{foo}` | `\mathbin{foo}`   |
-| `{\rm A}`            | `\mathrm{A}`      |
-| `\text{for }`        | `\text{for}\ `    | Text ending in spaces is unpredictable - favour escaped spaces after text
+| Replace                  | With                  | Comments
+| `++\begin{equation}++`, +
+  `++\end{equation}++`     | _nothing_             | Unnecessary in blocks. Should not be used for inline.
+| `\begin{align*}`         | `++\begin{aligned}++` |
+| `\end{align*}`           | `++\end{aligned}++`   |
+| `++\operatorname{foo}++` | `++\mathbin{foo}++`   |
+| `{\rm A}`                | `++\mathrm{A}++`      |
+| `\text{for }`            | `\text{++for++}\`     | Text ending in spaces is unpredictable - favour escaped spaces after text
 |====
 
 The KaTeX repository provides a
@@ -1075,10 +1095,17 @@ valid object`" when writing valid usage statements.
 See the "`Valid Usage`" section of the Vulkan Specification, and
 particularly the "`Valid Usage for Pointers`" section.
 
-When valid usage statements apply only when specific extensions and/or core
-API versions are enabled at runtime, surround those statements in their
-entirety with appropriate asciidoctor conditionals.
-Never use asciidoctor conditionals _inside_ a valid usage statement.
+When clauses in valid usage statements apply only when specific extensions
+and/or core API versions are enabled at runtime, use appropriate asciidoctor
+conditionals around such clauses.
+
+[NOTE]
+====
+Prior to specification update 1.3.255, there were stronger restrictions on
+placement of asciidoctor conditionals that have been relaxed, allowing
+writing such valid usage statements in a more natural manner and with less
+duplication of language.
+====
 
 Explicit valid usage statements must be assigned Valid Usage ID tags before
 publication.
@@ -1163,7 +1190,7 @@ valid usage statement), the original VUs can be left intact.
 
 
 [[writing-empty-enumerations]]
-== Markup For Empty Enumerated Types
+== Markup for Empty Enumerated Types
 
 Sometimes an enumerated type has all values defined by extensions, and each
 enumerated value defined by the type will be surrounded by an asciidoctor
@@ -1200,7 +1227,7 @@ extensions are enabled in this build of the specification.
 
 
 [[writing-refpages]]
-== Markup For Automatic Reference Page Extraction
+== Markup for Automatic Reference Page Extraction
 
 The Vulkan reference pages are (mostly) extracted from corresponding
 sections of the API Specification.

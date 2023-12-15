@@ -103,6 +103,12 @@ code:Location.
 For 16-bit and 32-bit data types, missing components are filled in with
 default values as described <<fxvertex-input-extraction,below>>.
 
+ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
+If an implementation supports <<features-storageInputOutput16,
+pname:storageInputOutput16>>, vertex shader input variables can: have a
+width of 16 bits.
+endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
+
 [[fxvertex-attrib-components]]
 .Input attribute components accessed by 16-bit and 32-bit input variables
 [width="65%",cols="<5,<3,<3",options="header"]
@@ -690,6 +696,11 @@ pname:pOffsets[i] from the start of the buffer pname:pBuffers[i].
 If pname:pSizes is not `NULL` then pname:pSizes[i] specifies the bound size
 of the vertex buffer starting from the corresponding elements of
 pname:pBuffers[i] plus pname:pOffsets[i].
+ifdef::VK_KHR_maintenance5[]
+If pname:pSizes[i] is ename:VK_WHOLE_SIZE then the bound size is from
+pname:pBuffers[i] plus pname:pOffsets[i] to the end of the buffer
+pname:pBuffers[i].
+endif::VK_KHR_maintenance5[]
 All vertex input attributes that use each of these bindings will use these
 updated addresses in their address calculations for subsequent drawing
 commands.
@@ -751,12 +762,16 @@ endif::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
     The sum of pname:firstBinding and pname:bindingCount must: be less than
     or equal to sname:VkPhysicalDeviceLimits::pname:maxVertexInputBindings
   * [[VUID-vkCmdBindVertexBuffers2-pOffsets-03357]]
-    All elements of pname:pOffsets must: be less than the size of the
-    corresponding element in pname:pBuffers
+    If pname:pSizes is not `NULL`, all elements of pname:pOffsets must: be
+    less than the size of the corresponding element in pname:pBuffers
   * [[VUID-vkCmdBindVertexBuffers2-pSizes-03358]]
     If pname:pSizes is not `NULL`, all elements of pname:pOffsets plus
-    pname:pSizes must: be less than or equal to the size of the
-    corresponding element in pname:pBuffers
+    pname:pSizes
+ifdef::VK_KHR_maintenance5[]
+    , where pname:pSizes is not ename:VK_WHOLE_SIZE,
+endif::VK_KHR_maintenance5[]
+    must: be less than or equal to the size of the corresponding element in
+    pname:pBuffers
   * [[VUID-vkCmdBindVertexBuffers2-pBuffers-03359]]
     All elements of pname:pBuffers must: have been created with the
     ename:VK_BUFFER_USAGE_VERTEX_BUFFER_BIT flag

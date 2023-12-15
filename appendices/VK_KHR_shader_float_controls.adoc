@@ -8,10 +8,6 @@ include::{generated}/meta/{refprefix}VK_KHR_shader_float_controls.adoc[]
 
 *Last Modified Date*::
     2018-09-11
-*Interactions and External Dependencies*::
-  - Promoted to Vulkan 1.2 Core
-  - This extension requires
-    {spirv}/KHR/SPV_KHR_float_controls.html[`SPV_KHR_float_controls`]
 *IP Status*::
     No known IP claims.
 *Contributors*::
@@ -92,7 +88,7 @@ is passed to them.
 
 
 [[VK_KHR_shader_controls_v4_incompatibility]]
-=== Version 4 API incompatibility
+=== Version 4 API Incompatibility
 
 The original versions of `VK_KHR_shader_float_controls` shipped with
 booleans named "`separateDenormSettings`" and

@@ -30,7 +30,7 @@ of whether any other alias is available.
 
 [open,refpage='vkGetInstanceProcAddr',desc='Return a function pointer for a command',type='protos',xrefs='PFN_vkVoidFunction']
 --
-Function pointers for all Vulkan commands can: be obtained with the command:
+Function pointers for all Vulkan commands can: be obtained by calling:
 
 include::{generated}/api/protos/vkGetInstanceProcAddr.adoc[]
 
@@ -103,13 +103,13 @@ include::{generated}/validity/protos/vkGetInstanceProcAddr.adoc[]
 [open,refpage='vkGetDeviceProcAddr',desc='Return a function pointer for a command',type='protos',xrefs='PFN_vkVoidFunction']
 --
 In order to support systems with multiple Vulkan implementations, the
-function pointers returned by fname:vkGetInstanceProcAddr may: point to
+function pointers returned by flink:vkGetInstanceProcAddr may: point to
 dispatch code that calls a different real implementation for different
 slink:VkDevice objects or their child objects.
 The overhead of the internal dispatch for slink:VkDevice objects can be
 avoided by obtaining device-specific function pointers for any commands that
 use a device or device-child object as their dispatchable object.
-Such function pointers can: be obtained with the command:
+Such function pointers can: be obtained by calling:
 
 include::{generated}/api/protos/vkGetDeviceProcAddr.adoc[]
 
@@ -142,9 +142,18 @@ first parameter) that is pname:device or a child of pname:device.
     Device-level commands which are part of the core version specified by
     slink:VkApplicationInfo::pname:apiVersion when creating the instance
     will always return a valid function pointer.
+ifndef::VK_KHR_maintenance5[]
     Core commands beyond that version which are supported by the
-    implementation may: either return `NULL` or a function pointer, though
-    the function pointer must: not be called.
+    implementation may: either return `NULL` or a function pointer.
+    If a function pointer is returned, it must: not be called.
+endif::VK_KHR_maintenance5[]
+ifdef::VK_KHR_maintenance5[]
+    If the <<features-maintenance5, pname:maintenance5>> feature is enabled,
+    core commands beyond that version which are supported by the
+    implementation will return `NULL`, otherwise the implementation may:
+    either return `NULL` or a function pointer.
+    If a function pointer is returned, it must: not be called.
+endif::VK_KHR_maintenance5[]
 
 3::
     In this function, device-level excludes all physical-device-level
@@ -398,7 +407,7 @@ ifdef::VK_KHR_portability_enumeration[]
     `apiext:VK_KHR_portability_enumeration`
 endif::VK_KHR_portability_enumeration[]
 ifdef::VK_LUNARG_direct_driver_loading[]
-  * [[VUID-VkInstanceCreateInfo-pNext]]
+  * [[VUID-VkInstanceCreateInfo-pNext-09400]]
     If the pname:pNext chain of sname:VkInstanceCreateInfo includes a
     slink:VkDirectDriverLoadingListLUNARG structure, the list of enabled
     extensions in pname:ppEnabledExtensionNames must: contain
@@ -452,6 +461,10 @@ endif::VK_EXT_validation_flags[]
 ifdef::VK_EXT_validation_features[]
 include::{chapters}/VK_EXT_validation_features.adoc[]
 endif::VK_EXT_validation_features[]
+
+ifdef::VK_EXT_layer_settings[]
+include::{chapters}/VK_EXT_layer_settings.adoc[]
+endif::VK_EXT_layer_settings[]
 
 ifdef::VK_LUNARG_direct_driver_loading[]
 [open,refpage='VkDirectDriverLoadingListLUNARG',desc='Structure specifying additional drivers to load',type='structs']

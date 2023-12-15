@@ -75,15 +75,26 @@ endif::VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_a
   * pname:attachmentCount is the number of
     slink:VkPipelineColorBlendAttachmentState elements in
     pname:pAttachments.
+ifdef::VK_EXT_extended_dynamic_state3[]
+    It is ignored if the pipeline is created with
+    ename:VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
+    ename:VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT, and
+    ename:VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT dynamic states set, and
+    either ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT set or
+    <<features-advancedBlendCoherentOperations,advancedBlendCoherentOperations>>
+    is not enabled on the device.
+endif::VK_EXT_extended_dynamic_state3[]
   * pname:pAttachments is a pointer to an array of
     slink:VkPipelineColorBlendAttachmentState structures defining blend
     state for each color attachment.
 ifdef::VK_EXT_extended_dynamic_state3[]
     It is ignored if the pipeline is created with
-    ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT, and
-    ename:VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT dynamic states set.
+    ename:VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT dynamic states set, and
+    either ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT set or
+    <<features-advancedBlendCoherentOperations,advancedBlendCoherentOperations>>
+    is not enabled on the device.
 endif::VK_EXT_extended_dynamic_state3[]
   * pname:blendConstants is a pointer to an array of four values used as the
     R, G, B, and A components of the blend constant that are used in
@@ -107,23 +118,17 @@ ifdef::VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_a
     pname:flags must: not include
     ename:VK_PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT
 endif::VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-ifdef::VK_EXT_extended_dynamic_state3[]
   * [[VUID-VkPipelineColorBlendStateCreateInfo-pAttachments-07353]]
-    If pname:attachmentCount is not `0`, and any of
-    ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT,
+    If pname:attachmentCount is not `0`
+ifdef::VK_EXT_extended_dynamic_state3[]
+    , and any of ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT, or
     ename:VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT are not set,
+endif::VK_EXT_extended_dynamic_state3[]
     pname:pAttachments must: be a valid pointer to an array of
     pname:attachmentCount valid slink:VkPipelineColorBlendAttachmentState
     structures
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-VkPipelineColorBlendStateCreateInfo-pAttachments-07354]]
-    If pname:attachmentCount is not `0`, pname:pAttachments must: be a valid
-    pointer to an array of pname:attachmentCount valid
-    slink:VkPipelineColorBlendAttachmentState structures
-endif::VK_EXT_extended_dynamic_state3[]
 ****
 
 include::{generated}/validity/structs/VkPipelineColorBlendStateCreateInfo.adoc[]
@@ -330,27 +335,12 @@ Otherwise, this state is specified by the
 slink:VkPipelineColorBlendAttachmentState::pname:blendEnable values used to
 create the currently active pipeline.
 
+:refpage: vkCmdSetColorBlendEnableEXT
+:requiredfeature: extendedDynamicState3ColorBlendEnable
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorBlendEnableEXT-None-08536]]
-    Either the <<features-extendedDynamicState3ColorBlendEnable,
-    pname:extendedDynamicState3ColorBlendEnable>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorBlendEnableEXT-None-08537]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetColorBlendEnableEXT-extendedDynamicState3ColorBlendEnable-07355]]
-    The <<features-extendedDynamicState3ColorBlendEnable,
-    pname:extendedDynamicState3ColorBlendEnable>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state3_feature_common.adoc[]
 ****
 
 include::{generated}/validity/protos/vkCmdSetColorBlendEnableEXT.adoc[]
@@ -393,27 +383,12 @@ slink:VkPipelineColorBlendAttachmentState::pname:dstAlphaBlendFactor, and
 slink:VkPipelineColorBlendAttachmentState::pname:alphaBlendOp values used to
 create the currently active pipeline.
 
+:refpage: vkCmdSetColorBlendEquationEXT
+:requiredfeature: extendedDynamicState3ColorBlendEquation
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorBlendEquationEXT-None-08538]]
-    Either the <<features-extendedDynamicState3ColorBlendEquation,
-    pname:extendedDynamicState3ColorBlendEquation>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorBlendEquationEXT-None-08539]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetColorBlendEquationEXT-extendedDynamicState3ColorBlendEquation-07356]]
-    The <<features-extendedDynamicState3ColorBlendEquation,
-    pname:extendedDynamicState3ColorBlendEquation>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state3_feature_common.adoc[]
 ****
 
 include::{generated}/validity/protos/vkCmdSetColorBlendEquationEXT.adoc[]
@@ -545,27 +520,22 @@ Otherwise, this state is specified by the
 slink:VkPipelineColorBlendAttachmentState::pname:colorWriteMask values used
 to create the currently active pipeline.
 
+[NOTE]
+.Note
+====
+Formats with bits that are shared between components specified by
+elink:VkColorComponentFlagBits, such as
+ename:VK_FORMAT_E5B9G9R9_UFLOAT_PACK32, cannot have their channels
+individually masked by this functionality; either all components that share
+bits have to be enabled, or none of them.
+====
+
+:refpage: vkCmdSetColorWriteMaskEXT
+:requiredfeature: extendedDynamicState3ColorWriteMask
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorWriteMaskEXT-None-08540]]
-    Either the <<features-extendedDynamicState3ColorWriteMask,
-    pname:extendedDynamicState3ColorWriteMask>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetColorWriteMaskEXT-None-08541]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetColorWriteMaskEXT-extendedDynamicState3ColorWriteMask-07364]]
-    The <<features-extendedDynamicState3ColorWriteMask,
-    pname:extendedDynamicState3ColorWriteMask>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state3_feature_common.adoc[]
 ****
 
 include::{generated}/validity/protos/vkCmdSetColorWriteMaskEXT.adoc[]
@@ -676,13 +646,12 @@ using dual-source blending functions is implementation-dependent and is
 reported as the pname:maxFragmentDualSrcAttachments member of
 sname:VkPhysicalDeviceLimits.
 
-When using a fragment shader with dual-source blending functions, the color
-outputs are bound to the first and second inputs of the blender using the
-code:Index decoration, as described in <<interfaces-fragmentoutput,Fragment
-Output Interface>>.
+Color outputs can: be bound to the first and second inputs of the blender
+using the code:Index decoration, as described in
+<<interfaces-fragmentoutput,Fragment Output Interface>>.
 If the second color input to the blender is not written in the shader, or if
-no output is bound to the second input of a blender, the result of the
-blending operation is not defined.
+no output is bound to the second input of a blender, the value of the second
+input is undefined:.
 
 
 [[framebuffer-blendoperations]]
@@ -909,27 +878,12 @@ Otherwise, this state is specified by the
 slink:VkPipelineColorBlendStateCreateInfo::pname:logicOpEnable value used to
 create the currently active pipeline.
 
+:refpage: vkCmdSetLogicOpEnableEXT
+:requiredfeature: extendedDynamicState3LogicOpEnable
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetLogicOpEnableEXT-None-08542]]
-    Either the <<features-extendedDynamicState3LogicOpEnable,
-    pname:extendedDynamicState3LogicOpEnable>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-vkCmdSetLogicOpEnableEXT-None-08543]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state3[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetLogicOpEnableEXT-extendedDynamicState3LogicOpEnable-07365]]
-    The <<features-extendedDynamicState3LogicOpEnable,
-    pname:extendedDynamicState3LogicOpEnable>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state3_feature_common.adoc[]
   * [[VUID-vkCmdSetLogicOpEnableEXT-logicOp-07366]]
     If the <<features-logicOp, pname:logicOp>> feature is not enabled,
     pname:logicOpEnable must: be ename:VK_FALSE
@@ -966,27 +920,12 @@ Otherwise, this state is specified by the
 slink:VkPipelineColorBlendStateCreateInfo::pname:logicOp value used to
 create the currently active pipeline.
 
+:refpage: vkCmdSetLogicOpEXT
+:requiredfeature: extendedDynamicState2LogicOp
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state2[]
-  * [[VUID-vkCmdSetLogicOpEXT-None-08544]]
-    Either the <<features-extendedDynamicState2LogicOp,
-    pname:extendedDynamicState2LogicOp>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state2[]
-ifndef::VK_EXT_extended_dynamic_state2[]
-  * [[VUID-vkCmdSetLogicOpEXT-None-08545]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state2[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetLogicOpEXT-None-04867]]
-    The <<features-extendedDynamicState2LogicOp,
-    pname:extendedDynamicState2LogicOp>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state2_optional_feature_common.adoc[]
 ****
 
 include::{generated}/validity/protos/vkCmdSetLogicOpEXT.adoc[]
@@ -1087,23 +1026,17 @@ Write Mask>> as follows:
     If the <<features-colorWriteEnable, pname:colorWriteEnable>> feature is
     not enabled, all elements of pname:pColorWriteEnables must: be
     ename:VK_TRUE
-ifdef::VK_EXT_extended_dynamic_state3[]
   * [[VUID-VkPipelineColorWriteCreateInfoEXT-attachmentCount-07608]]
+ifdef::VK_EXT_extended_dynamic_state3[]
     If the pipeline is being created with
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
     ename:VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT, or
     ename:VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT dynamic states not set,
+endif::VK_EXT_extended_dynamic_state3[]
     pname:attachmentCount must: be equal to the pname:attachmentCount member
     of the sname:VkPipelineColorBlendStateCreateInfo structure specified
     during pipeline creation
-endif::VK_EXT_extended_dynamic_state3[]
-ifndef::VK_EXT_extended_dynamic_state3[]
-  * [[VUID-VkPipelineColorWriteCreateInfoEXT-attachmentCount-04802]]
-    pname:attachmentCount must: be equal to the pname:attachmentCount member
-    of the sname:VkPipelineColorBlendStateCreateInfo structure specified
-    during pipeline creation
-endif::VK_EXT_extended_dynamic_state3[]
   * [[VUID-VkPipelineColorWriteCreateInfoEXT-attachmentCount-06655]]
     pname:attachmentCount must: be less than or equal to the
     pname:maxColorAttachments member of sname:VkPhysicalDeviceLimits

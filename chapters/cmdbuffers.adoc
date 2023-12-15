@@ -935,24 +935,17 @@ include::{generated}/api/structs/VkCommandBufferBeginInfo.adoc[]
   * pname:flags is a bitmask of elink:VkCommandBufferUsageFlagBits
     specifying usage behavior for the command buffer.
   * pname:pInheritanceInfo is a pointer to a
-    sname:VkCommandBufferInheritanceInfo structure, used if
+    slink:VkCommandBufferInheritanceInfo structure, used if
     pname:commandBuffer is a secondary command buffer.
     If this is a primary command buffer, then this value is ignored.
 
 .Valid Usage
 ****
-ifndef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-  * [[VUID-VkCommandBufferBeginInfo-flags-00053]]
+  * [[VUID-VkCommandBufferBeginInfo-flags-09123]]
     If pname:flags contains
     ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, the
-    pname:renderPass member of pname:pInheritanceInfo must: be a valid
-    sname:VkRenderPass
-  * [[VUID-VkCommandBufferBeginInfo-flags-00054]]
-    If pname:flags contains
-    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, the
-    pname:subpass member of pname:pInheritanceInfo must: be a valid subpass
-    index within the pname:renderPass member of pname:pInheritanceInfo
-endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    slink:VkCommandPool that pname:commandBuffer was allocated from must:
+    support graphics operations
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-VkCommandBufferBeginInfo-flags-00055]]
     If pname:flags contains
@@ -980,19 +973,12 @@ ifdef::VKSC_VERSION_1_0[]
     that includes ename:VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT
 endif::VKSC_VERSION_1_0[]
 ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-  * [[VUID-VkCommandBufferBeginInfo-flags-06000]]
+  * [[VUID-VkCommandBufferBeginInfo-flags-09240]]
     If pname:flags contains
     ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT and the
-    pname:renderPass member of pname:pInheritanceInfo is not
-    dlink:VK_NULL_HANDLE, pname:renderPass must: be a valid
-    sname:VkRenderPass
-  * [[VUID-VkCommandBufferBeginInfo-flags-06001]]
-    If pname:flags contains
-    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT and the
-    pname:renderPass member of pname:pInheritanceInfo is not
-    dlink:VK_NULL_HANDLE, the pname:subpass member of pname:pInheritanceInfo
-    must: be a valid subpass index within the pname:renderPass member of
-    pname:pInheritanceInfo
+    <<features-dynamicRendering,pname:dynamicRendering>> feature is not
+    enabled, the pname:renderPass member of pname:pInheritanceInfo must: not
+    be dlink:VK_NULL_HANDLE
   * [[VUID-VkCommandBufferBeginInfo-flags-06002]]
     If pname:flags contains
     ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT and the
@@ -1012,6 +998,25 @@ ifdef::VK_AMD_mixed_attachment_samples,VK_NV_framebuffer_mixed_samples[]
     slink:VkCommandBufferInheritanceRenderingInfo::pname:colorAttachmentCount
 endif::VK_AMD_mixed_attachment_samples,VK_NV_framebuffer_mixed_samples[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+  * [[VUID-VkCommandBufferBeginInfo-flags-06000]]
+    If pname:flags contains
+    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    and the pname:renderPass member of pname:pInheritanceInfo is not
+    dlink:VK_NULL_HANDLE,
+endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    the pname:renderPass member of pname:pInheritanceInfo must: be a valid
+    sname:VkRenderPass
+  * [[VUID-VkCommandBufferBeginInfo-flags-06001]]
+    If pname:flags contains
+    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    and the pname:renderPass member of pname:pInheritanceInfo is not
+    dlink:VK_NULL_HANDLE,
+endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    the pname:subpass member of pname:pInheritanceInfo must: be a valid
+    subpass index within the pname:renderPass member of
+    pname:pInheritanceInfo
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -1046,8 +1051,9 @@ include::{generated}/api/enums/VkCommandBufferUsageFlagBits.adoc[]
     pass.
     If this is a primary command buffer, then this bit is ignored.
   * ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT specifies that a
-    command buffer can: be resubmitted to a queue while it is in the
-    _pending state_, and recorded into multiple primary command buffers.
+    command buffer can: be resubmitted to any queue of the same queue family
+    while it is in the _pending state_, and recorded into multiple primary
+    command buffers.
 --
 
 [open,refpage='VkCommandBufferUsageFlags',desc='Bitmask of VkCommandBufferUsageFlagBits',type='flags']
@@ -1433,13 +1439,6 @@ and writes to those attachments are discarded.
     pname:variableMultisampleRate>> feature is not enabled,
     pname:rasterizationSamples must: be a valid elink:VkSampleCountFlagBits
     value
-ifndef::VK_NV_linear_color_attachment[]
-  * [[VUID-VkCommandBufferInheritanceRenderingInfo-pColorAttachmentFormats-06006]]
-    If any element of pname:pColorAttachmentFormats is not
-    ename:VK_FORMAT_UNDEFINED, it must: be a format with
-    <<potential-format-features, potential format features>> that include
-    ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT
-endif::VK_NV_linear_color_attachment[]
   * [[VUID-VkCommandBufferInheritanceRenderingInfo-depthAttachmentFormat-06540]]
     If pname:depthAttachmentFormat is not ename:VK_FORMAT_UNDEFINED, it
     must: be a format that includes a depth component
@@ -1448,13 +1447,13 @@ endif::VK_NV_linear_color_attachment[]
     must: be a format with <<potential-format-features, potential format
     features>> that include
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-ifdef::VK_NV_linear_color_attachment[]
   * [[VUID-VkCommandBufferInheritanceRenderingInfo-pColorAttachmentFormats-06492]]
     If any element of pname:pColorAttachmentFormats is not
     ename:VK_FORMAT_UNDEFINED, it must: be a format with
     <<potential-format-features, potential format features>> that include
-    ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT, or
-    ename:VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV if the
+    ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT
+ifdef::VK_NV_linear_color_attachment[]
+    , or ename:VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV if the
     <<features-linearColorAttachment, pname:linearColorAttachment>> feature
     is enabled
 endif::VK_NV_linear_color_attachment[]
@@ -1766,24 +1765,17 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
     defined by the pname:semaphore member of any element of the
     pname:pWaitSemaphoreInfos member of any element of pname:pSubmits, there
     must: be no other queues waiting on the same semaphore
-ifndef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
-  * [[VUID-vkQueueSubmit2-semaphore-03872]]
-    The pname:semaphore member of any element of the
-    pname:pWaitSemaphoreInfos member of any element of pname:pSubmits must:
-    be semaphores that are signaled, or have
-    <<synchronization-semaphores-signaling, semaphore signal operations>>
-    previously submitted for execution
-endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
-ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
   * [[VUID-vkQueueSubmit2-semaphore-03873]]
-    Any pname:semaphore member of any element of the
-    pname:pWaitSemaphoreInfos member of any element of pname:pSubmits that
-    was created with a elink:VkSemaphoreTypeKHR of
-    ename:VK_SEMAPHORE_TYPE_BINARY_KHR must: reference a semaphore signal
-    operation that has been submitted for execution and any
-    <<synchronization-semaphores-signaling, semaphore signal operations>> on
-    which it depends (if any) must: have also been submitted for execution
+    The pname:semaphore member of any element of the
+    pname:pWaitSemaphoreInfos member of any element of pname:pSubmits
+ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
+    that was created with a elink:VkSemaphoreTypeKHR of
+    ename:VK_SEMAPHORE_TYPE_BINARY_KHR
 endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
+    must: reference a semaphore signal operation that has been submitted for
+    execution and any <<synchronization-semaphores-signaling, semaphore
+    signal operations>> on which it depends must: have also been submitted
+    for execution
   * [[VUID-vkQueueSubmit2-commandBuffer-03874]]
     The pname:commandBuffer member of any element of the
     pname:pCommandBufferInfos member of any element of pname:pSubmits must:
@@ -2078,11 +2070,68 @@ ifdef::VK_KHR_device_group_creation,VK_VERSION_1_1[]
   * [[VUID-VkCommandBufferSubmitInfo-deviceMask-03891]]
     If pname:deviceMask is not `0`, it must: be a valid device mask
 endif::VK_KHR_device_group_creation,VK_VERSION_1_1[]
+ifdef::VK_ARM_render_pass_striped[]
+  * [[VUID-VkCommandBufferSubmitInfo-commandBuffer-09445]]
+    If any render pass instance in pname:commandBuffer was recorded with a
+    slink:VkRenderPassStripeBeginInfoARM structure in its pNext chain, a
+    slink:VkRenderPassStripeSubmitInfoARM must: be included in the
+    pname:pNext chain
+  * [[VUID-VkCommandBufferSubmitInfo-pNext-09446]]
+    If a slink:VkRenderPassStripeSubmitInfoARM is included in the
+    pname:pNext chain, the value of
+    slink:VkRenderPassStripeSubmitInfoARM::pname:stripeSemaphoreInfoCount
+    must: be equal to the sum of the
+    slink:VkRenderPassStripeBeginInfoARM::pname:stripeInfoCount parameters
+    provided to render pass instances recorded in pname:commandBuffer
+endif::VK_ARM_render_pass_striped[]
 ****
 
 include::{generated}/validity/structs/VkCommandBufferSubmitInfo.adoc[]
 --
 endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
+
+ifdef::VK_ARM_render_pass_striped[]
+[open,refpage='VkRenderPassStripeSubmitInfoARM',desc='Structure specifying striped rendering submit information',type='structs']
+--
+The sname:VkRenderPassStripeSubmitInfoARM structure is defined as:
+
+include::{generated}/api/structs/VkRenderPassStripeSubmitInfoARM.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:stripeSemaphoreInfoCount is the number of semaphores used to
+    signal stripe completion in the render pass instances in the submitted
+    command buffer.
+  * pname:pStripeSemaphoreInfos is a pointer to an array of
+    pname:stripeSemaphoreInfoCount slink:VkSemaphoreSubmitInfo structures
+    describing the semaphores used to signal stripe completion.
+
+This structure can be included in the pname:pNext chain of
+slink:VkCommandBufferSubmitInfo to provide a set of semaphores to be
+signaled for each striped render pass instance.
+
+The elements of pname:pStripeSemaphoreInfos are mapped to render pass
+instances in slink:VkCommandBufferSubmitInfo::pname:commandBuffer in
+submission order and in stripe order within each render pass instance.
+Each semaphore in pname:pStripeSemaphoreInfos is signaled when the
+implementation has completed execution of the associated stripe.
+In a render pass instance that has multiview enabled, the stripe includes
+all views in the view mask.
+In a render pass instance with pname:layerCount greater than 1, the stripe
+includes all layers.
+
+.Valid Usage
+****
+  * [[VUID-VkRenderPassStripeSubmitInfoARM-semaphore-09447]]
+    The pname:semaphore member of each element of
+    pname:pStripeSemaphoreInfos must: have been created with a
+    elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_BINARY
+****
+
+include::{generated}/validity/structs/VkRenderPassStripeSubmitInfoARM.adoc[]
+--
+endif::VK_ARM_render_pass_striped[]
 
 [open,refpage='vkQueueSubmit',desc='Submits a sequence of semaphores or command buffers to a queue',type='protos']
 --
@@ -2179,22 +2228,16 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
     by any element of the pname:pWaitSemaphores member of any element of
     pname:pSubmits executes on pname:queue, there must: be no other queues
     waiting on the same semaphore
-ifndef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
-  * [[VUID-vkQueueSubmit-pWaitSemaphores-00069]]
-    All elements of the pname:pWaitSemaphores member of all elements of
-    pname:pSubmits must: be semaphores that are signaled, or have
-    <<synchronization-semaphores-signaling, semaphore signal operations>>
-    previously submitted for execution
-endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
-ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
   * [[VUID-vkQueueSubmit-pWaitSemaphores-03238]]
     All elements of the pname:pWaitSemaphores member of all elements of
-    pname:pSubmits created with a elink:VkSemaphoreType of
-    ename:VK_SEMAPHORE_TYPE_BINARY must: reference a semaphore signal
-    operation that has been submitted for execution and any
-    <<synchronization-semaphores-signaling, semaphore signal operations>> on
-    which it depends (if any) must: have also been submitted for execution
+    pname:pSubmits
+ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
+    created with a elink:VkSemaphoreType of ename:VK_SEMAPHORE_TYPE_BINARY
 endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
+    must: reference a semaphore signal operation that has been submitted for
+    execution and any <<synchronization-semaphores-signaling, semaphore
+    signal operations>> on which it depends must: have also been submitted
+    for execution
   * [[VUID-vkQueueSubmit-pCommandBuffers-00070]]
     Each element of the pname:pCommandBuffers member of each element of
     pname:pSubmits must: be in the <<commandbuffers-lifecycle, pending or
@@ -2760,9 +2803,9 @@ not be used.
 
 [open,refpage='vkCmdExecuteCommands',desc='Execute a secondary command buffer from a primary command buffer',type='protos']
 --
-A secondary command buffer must: not be directly submitted to a queue.
-Instead, secondary command buffers are recorded to execute as part of a
-primary command buffer with the command:
+Secondary command buffers must: not be directly submitted to a queue.
+To record a secondary command buffer to execute as part of a primary command
+buffer, call:
 
 include::{generated}/api/protos/vkCmdExecuteCommands.adoc[]
 
@@ -2780,6 +2823,12 @@ ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT flag, and it was recorded
 into any other primary command buffer which is currently in the
 <<commandbuffers-lifecycle, executable or recording state>>, that primary
 command buffer becomes <<commandbuffers-lifecycle, invalid>>.
+
+ifdef::VK_EXT_nested_command_buffer[]
+If the <<features-nestedCommandBuffer, pname:nestedCommandBuffer>> feature
+is enabled it is valid usage for fname:vkCmdExecuteCommands to also be
+recorded to a <<glossary, secondary command buffer>>.
+endif::VK_EXT_nested_command_buffer[]
 
 .Valid Usage
 ****
@@ -2820,6 +2869,7 @@ command buffer becomes <<commandbuffers-lifecycle, invalid>>.
     instance begun with flink:vkCmdBeginRenderPass, its pname:contents
     parameter must: have been set to
     ename:VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
+ifdef::VK_EXT_nested_command_buffer[, or ename:VK_SUBPASS_CONTENTS_INLINE_AND_SECONDARY_COMMAND_BUFFERS_EXT]
   * [[VUID-vkCmdExecuteCommands-pCommandBuffers-06019]]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRenderPass, each element of
@@ -3142,11 +3192,113 @@ ifdef::VK_AMD_mixed_attachment_samples,VK_NV_framebuffer_mixed_samples[]
     slink:VkCommandBufferInheritanceRenderingInfo::pname:rasterizationSamples
     must: be equal to the sample count used to create that image view
 endif::VK_AMD_mixed_attachment_samples,VK_NV_framebuffer_mixed_samples[]
+ifdef::VK_ANDROID_external_format_resolve[]
+  * [[VUID-vkCmdExecuteCommands-pNext-09299]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance begun with flink:vkCmdBeginRendering, with any color attachment
+    using a resolve mode of
+    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_ANDROID, the
+    pname:pNext chain of slink:VkCommandBufferInheritanceInfo used to create
+    each element of pname:pCommandBuffers must: include a
+    slink:VkExternalFormatANDROID structure with a pname:externalFormat
+    matching that used to create the resolve attachment in the render pass
+  * [[VUID-vkCmdExecuteCommands-pNext-09300]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance begun with flink:vkCmdBeginRendering with any color attachment
+    using a resolve mode of
+    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_ANDROID, and the
+    pname:pNext chain of slink:VkCommandBufferInheritanceInfo does not
+    include a slink:VkAttachmentSampleCountInfoAMD or
+    slink:VkAttachmentSampleCountInfoNV structure, the value of
+    slink:VkCommandBufferInheritanceRenderingInfo::pname:rasterizationSamples
+    must: be ename:VK_SAMPLE_COUNT_1_BIT
+endif::VK_ANDROID_external_format_resolve[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+  * [[VUID-vkCmdExecuteCommands-commandBuffer-09375]]
+    pname:commandBuffer must: not be a <<glossary, secondary command
+    buffer>>
+ifdef::VK_EXT_nested_command_buffer[]
+    unless the <<features-nestedCommandBuffer, pname:nestedCommandBuffer>>
+    feature is enabled
+  * [[VUID-vkCmdExecuteCommands-nestedCommandBuffer-09376]]
+    If the <<features-nestedCommandBuffer, pname:nestedCommandBuffer>>
+    feature is enabled, the <<glossary, command buffer nesting level>> of
+    each element of pname:pCommandBuffers must: be less than
+    <<limits-maxCommandBufferNestingLevel,
+    pname:maxCommandBufferNestingLevel>>
+  * [[VUID-vkCmdExecuteCommands-nestedCommandBufferRendering-09377]]
+    If the <<features-nestedCommandBufferRendering,
+    pname:nestedCommandBufferRendering>> feature is not enabled, and
+    pname:commandBuffer is a <<glossary, secondary command buffer>>,
+    pname:commandBuffer must: not have been recorded with
+    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+  * [[VUID-vkCmdExecuteCommands-nestedCommandBufferSimultaneousUse-09378]]
+    If the <<features-nestedCommandBufferSimultaneousUse,
+    pname:nestedCommandBufferSimultaneousUse>> feature is not enabled, and
+    pname:commandBuffer is a <<glossary, secondary command buffer>>, each
+    element of pname:pCommandBuffers must: not have been recorded with
+    ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
+endif::VK_EXT_nested_command_buffer[]
 ****
 
 include::{generated}/validity/protos/vkCmdExecuteCommands.adoc[]
 --
+
+ifdef::VK_EXT_nested_command_buffer[]
+[[commandbuffers-nested]]
+== Nested Command Buffers
+
+In addition to secondary command buffer execution from primary command
+buffers, an implementation may: support <<glossary, nested command
+buffers>>, which enable secondary command buffers to be executed from other
+secondary command buffers.
+If the <<features-nestedCommandBuffer, pname:nestedCommandBuffer>> feature
+is enabled, the implementation supports <<glossary, nested command
+buffers>>.
+
+Nested command buffer execution works the same as primary-to-secondary
+execution, except that it is subject to some additional
+implementation-defined limits.
+
+Each secondary command buffer has a <<glossary, command buffer nesting
+level>>, which is determined at flink:vkEndCommandBuffer time and evaluated
+at flink:vkCmdExecuteCommands time.
+A secondary command buffer that executes no other secondary command buffers
+has a <<glossary, command buffer nesting level>> of zero.
+Otherwise, the <<glossary, command buffer nesting level>> of a secondary
+command buffer is equal to the maximum nesting level of all secondary
+command buffers executed by that command buffer plus one.
+Some implementations may: have a limit on the maximum nesting level of
+secondary command buffers that can: be recorded.
+This limit is advertised in <<limits-maxCommandBufferNestingLevel,
+pname:maxCommandBufferNestingLevel>>.
+
+If the <<features-nestedCommandBufferRendering,
+pname:nestedCommandBufferRendering>> feature is enabled, the implementation
+supports calling flink:vkCmdExecuteCommands inside secondary command buffers
+recorded with ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT.
+If the <<features-nestedCommandBufferSimultaneousUse,
+pname:nestedCommandBufferSimultaneousUse>> feature is enabled, the
+implementation supports calling flink:vkCmdExecuteCommands with secondary
+command buffers recorded with
+ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT.
+
+Whenever flink:vkCmdExecuteCommands is recorded inside a secondary command
+buffer recorded with ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
+each member of pname:pCommandBuffers must: have been recorded with a
+slink:VkCommandBufferBeginInfo with slink:VkCommandBufferInheritanceInfo
+compatible with the slink:VkCommandBufferInheritanceInfo of the command
+buffer into which the flink:vkCmdExecuteCommands call is being recorded.
+The slink:VkCommandBufferInheritanceRenderingInfo structures are compatible
+when the sname:VkCommandBufferInheritanceRenderingInfo::pname:renderpass are
+<<renderpass-compatibility, compatible>>, or if they are
+dlink:VK_NULL_HANDLE then the slink:VkCommandBufferInheritanceRenderingInfo
+members match, and all other members of
+sname:VkCommandBufferInheritanceRenderingInfo match.
+This requirement applies recursively, down to the most nested command buffer
+and up to the command buffer where the render pass was originally begun.
+
+endif::VK_EXT_nested_command_buffer[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
 [[commandbuffers-devicemask]]

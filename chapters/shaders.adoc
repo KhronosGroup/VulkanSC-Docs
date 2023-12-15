@@ -113,7 +113,7 @@ is not dlink:VK_NULL_HANDLE.
     ename:VK_SHADER_STAGE_GEOMETRY_BIT, or
     ename:VK_SHADER_STAGE_FRAGMENT_BIT must: also include
     ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCreateShadersEXT-pCreateInfos-08403]]
     If the pname:flags member of any element of pname:pCreateInfos includes
     ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT, the pname:flags member of all
@@ -136,33 +136,7 @@ ifdef::VK_EXT_mesh_shader[]
     of pname:pCreateInfos whose pname:stage is
     ename:VK_SHADER_STAGE_TASK_BIT_EXT and whose pname:flags member includes
     ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-vkCreateShadersEXT-pCreateInfos-08406]]
-    If the pname:flags member of any element of pname:pCreateInfos includes
-    ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT, the pname:flags member of all
-    other elements of pname:pCreateInfos whose pname:stage is
-    ename:VK_SHADER_STAGE_TASK_BIT_NV or ename:VK_SHADER_STAGE_MESH_BIT_NV
-    must: also include ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT
-  * [[VUID-vkCreateShadersEXT-pCreateInfos-08407]]
-    If the pname:flags member of any element of pname:pCreateInfos whose
-    pname:stage is ename:VK_SHADER_STAGE_TASK_BIT_NV or
-    ename:VK_SHADER_STAGE_MESH_BIT_NV includes
-    ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT, there must: be no member of
-    pname:pCreateInfos whose pname:stage is ename:VK_SHADER_STAGE_VERTEX_BIT
-    and whose pname:flags member includes
-    ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT
-  * [[VUID-vkCreateShadersEXT-pCreateInfos-08408]]
-    If there is any element of pname:pCreateInfos whose pname:stage is
-    ename:VK_SHADER_STAGE_MESH_BIT_NV and whose pname:flags includes both
-    ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT and
-    ename:VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT, there must: be no element
-    of pname:pCreateInfos whose pname:stage is
-    ename:VK_SHADER_STAGE_TASK_BIT_NV and whose pname:flags includes
-    ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCreateShadersEXT-pCreateInfos-08409]]
     For each element of pname:pCreateInfos whose pname:flags member includes
     ename:VK_SHADER_CREATE_LINK_STAGE_BIT_EXT, if there is any other element
@@ -309,37 +283,36 @@ ifdef::VK_EXT_fragment_density_map[]
     ename:VK_SHADER_CREATE_FRAGMENT_DENSITY_MAP_ATTACHMENT_BIT_EXT
 endif::VK_EXT_fragment_density_map[]
 ifdef::VK_VERSION_1_1,VK_EXT_subgroup_size_control[]
-ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
+  * [[VUID-VkShaderCreateInfoEXT-flags-09404]]
+    If pname:flags includes
+    ename:VK_SHADER_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT_EXT, the
+    <<features-subgroupSizeControl, pname:subgroupSizeControl>> feature
+    must: be enabled
+  * [[VUID-VkShaderCreateInfoEXT-flags-09405]]
+    If pname:flags includes
+    ename:VK_SHADER_CREATE_REQUIRE_FULL_SUBGROUPS_BIT_EXT, the
+    <<features-computeFullSubgroups, pname:computeFullSubgroups>> feature
+    must: be enabled
   * [[VUID-VkShaderCreateInfoEXT-flags-08992]]
     If pname:flags includes
     ename:VK_SHADER_CREATE_REQUIRE_FULL_SUBGROUPS_BIT_EXT, pname:stage must:
-    be one of ename:VK_SHADER_STAGE_MESH_BIT_EXT,
-    ename:VK_SHADER_STAGE_TASK_BIT_EXT, or ename:VK_SHADER_STAGE_COMPUTE_BIT
+    be
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
+    one of ename:VK_SHADER_STAGE_MESH_BIT_EXT,
+    ename:VK_SHADER_STAGE_TASK_BIT_EXT, or
 endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
-ifndef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
-  * [[VUID-VkShaderCreateInfoEXT-flags-08413]]
-    If pname:flags includes
-    ename:VK_SHADER_CREATE_REQUIRE_FULL_SUBGROUPS_BIT_EXT, pname:stage must:
-    be ename:VK_SHADER_STAGE_COMPUTE_BIT
-endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
+    ename:VK_SHADER_STAGE_COMPUTE_BIT
 endif::VK_VERSION_1_1,VK_EXT_subgroup_size_control[]
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
   * [[VUID-VkShaderCreateInfoEXT-flags-08485]]
     If pname:stage is not ename:VK_SHADER_STAGE_COMPUTE_BIT, pname:flags
     must: not include ename:VK_SHADER_CREATE_DISPATCH_BASE_BIT_EXT
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-VkShaderCreateInfoEXT-flags-08414]]
     If pname:stage is not ename:VK_SHADER_STAGE_MESH_BIT_EXT, pname:flags
     must: not include ename:VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-VkShaderCreateInfoEXT-flags-08415]]
-    If pname:stage is not ename:VK_SHADER_STAGE_MESH_BIT_NV, pname:flags
-    must: not include ename:VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
 ifdef::VK_VERSION_1_1,VK_EXT_subgroup_size_control[]
   * [[VUID-VkShaderCreateInfoEXT-flags-08416]]
     If pname:flags includes both
@@ -367,24 +340,14 @@ endif::VK_VERSION_1_1,VK_EXT_subgroup_size_control[]
   * [[VUID-VkShaderCreateInfoEXT-stage-08420]]
     If the <<features-geometryShader, pname:geometryShader>> feature is not
     enabled, pname:stage must: not be ename:VK_SHADER_STAGE_GEOMETRY_BIT
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-VkShaderCreateInfoEXT-stage-08421]]
     If the <<features-taskShader, pname:taskShader>> feature is not enabled,
     pname:stage must: not be ename:VK_SHADER_STAGE_TASK_BIT_EXT
   * [[VUID-VkShaderCreateInfoEXT-stage-08422]]
     If the <<features-meshShader, pname:meshShader>> feature is not enabled,
     pname:stage must: not be ename:VK_SHADER_STAGE_MESH_BIT_EXT
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-VkShaderCreateInfoEXT-stage-08423]]
-    If the <<features-taskShader, pname:taskShader>> feature is not enabled,
-    pname:stage must: not be ename:VK_SHADER_STAGE_TASK_BIT_NV
-  * [[VUID-VkShaderCreateInfoEXT-stage-08424]]
-    If the <<features-meshShader, pname:meshShader>> feature is not enabled,
-    pname:stage must: not be ename:VK_SHADER_STAGE_MESH_BIT_NV
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
 ifdef::VK_HUAWEI_subpass_shading[]
   * [[VUID-VkShaderCreateInfoEXT-stage-08425]]
     pname:stage must: not be
@@ -425,24 +388,14 @@ endif::VK_HUAWEI_cluster_culling_shader[]
   * [[VUID-VkShaderCreateInfoEXT-nextStage-08434]]
     If pname:stage is ename:VK_SHADER_STAGE_FRAGMENT_BIT or
     ename:VK_SHADER_STAGE_COMPUTE_BIT, pname:nextStage must: be 0
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-VkShaderCreateInfoEXT-nextStage-08435]]
     If pname:stage is ename:VK_SHADER_STAGE_TASK_BIT_EXT, pname:nextStage
     must: not include any bits other than ename:VK_SHADER_STAGE_MESH_BIT_EXT
   * [[VUID-VkShaderCreateInfoEXT-nextStage-08436]]
     If pname:stage is ename:VK_SHADER_STAGE_MESH_BIT_EXT, pname:nextStage
     must: not include any bits other than ename:VK_SHADER_STAGE_FRAGMENT_BIT
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-VkShaderCreateInfoEXT-nextStage-08437]]
-    If pname:stage is ename:VK_SHADER_STAGE_TASK_BIT_NV, pname:nextStage
-    must: not include any bits other than ename:VK_SHADER_STAGE_MESH_BIT_NV
-  * [[VUID-VkShaderCreateInfoEXT-nextStage-08438]]
-    If pname:stage is ename:VK_SHADER_STAGE_MESH_BIT_NV, pname:nextStage
-    must: not include any bits other than ename:VK_SHADER_STAGE_FRAGMENT_BIT
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-VkShaderCreateInfoEXT-pName-08440]]
     If pname:codeType is ename:VK_SHADER_CODE_TYPE_SPIRV_EXT, pname:pName
     must: be the name of an code:OpEntryPoint in pname:pCode with an
@@ -815,7 +768,7 @@ unbound).
   * [[VUID-vkCmdBindShadersEXT-pStages-08464]]
     pname:pStages must: not contain ename:VK_SHADER_STAGE_ALL_GRAPHICS or
     ename:VK_SHADER_STAGE_ALL
-ifdef::VK_KHR_ray_tracing_pipeline[]
+ifdef::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
   * [[VUID-vkCmdBindShadersEXT-pStages-08465]]
     pname:pStages must: not contain ename:VK_SHADER_STAGE_RAYGEN_BIT_KHR,
     ename:VK_SHADER_STAGE_ANY_HIT_BIT_KHR,
@@ -823,18 +776,7 @@ ifdef::VK_KHR_ray_tracing_pipeline[]
     ename:VK_SHADER_STAGE_MISS_BIT_KHR,
     ename:VK_SHADER_STAGE_INTERSECTION_BIT_KHR, or
     ename:VK_SHADER_STAGE_CALLABLE_BIT_KHR
-endif::VK_KHR_ray_tracing_pipeline[]
-ifndef::VK_KHR_ray_tracing_pipeline[]
-ifdef::VK_NV_ray_tracing[]
-  * [[VUID-vkCmdBindShadersEXT-pStages-08466]]
-    pname:pStages must: not contain ename:VK_SHADER_STAGE_RAYGEN_BIT_NV,
-    ename:VK_SHADER_STAGE_ANY_HIT_BIT_NV,
-    ename:VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV,
-    ename:VK_SHADER_STAGE_MISS_BIT_NV,
-    ename:VK_SHADER_STAGE_INTERSECTION_BIT_NV, or
-    ename:VK_SHADER_STAGE_CALLABLE_BIT_NV
-endif::VK_NV_ray_tracing[]
-endif::VK_KHR_ray_tracing_pipeline[]
+endif::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
 ifdef::VK_HUAWEI_subpass_shading[]
   * [[VUID-vkCmdBindShadersEXT-pStages-08467]]
     pname:pStages must: not contain
@@ -850,7 +792,7 @@ endif::VK_HUAWEI_cluster_culling_shader[]
     the element of the pname:pShaders array with the same index is not
     dlink:VK_NULL_HANDLE, it must: have been created with a pname:stage
     equal to the corresponding element of pname:pStages
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCmdBindShadersEXT-pShaders-08470]]
     If pname:pStages contains both ename:VK_SHADER_STAGE_TASK_BIT_EXT and
     ename:VK_SHADER_STAGE_VERTEX_BIT, and pname:pShaders is not `NULL`, and
@@ -865,25 +807,7 @@ ifdef::VK_EXT_mesh_shader[]
     in pname:pStages is not dlink:VK_NULL_HANDLE, the same index in
     pname:pShaders as ename:VK_SHADER_STAGE_VERTEX_BIT in pname:pStages
     must: be dlink:VK_NULL_HANDLE
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-vkCmdBindShadersEXT-pShaders-08472]]
-    If pname:pStages contains both ename:VK_SHADER_STAGE_TASK_BIT_NV and
-    ename:VK_SHADER_STAGE_VERTEX_BIT, and pname:pShaders is not `NULL`, and
-    the same index in pname:pShaders as ename:VK_SHADER_STAGE_TASK_BIT_NV in
-    pname:pStages is not dlink:VK_NULL_HANDLE, the same index in
-    pname:pShaders as ename:VK_SHADER_STAGE_VERTEX_BIT in pname:pStages
-    must: be dlink:VK_NULL_HANDLE
-  * [[VUID-vkCmdBindShadersEXT-pShaders-08473]]
-    If pname:pStages contains both ename:VK_SHADER_STAGE_MESH_BIT_NV and
-    ename:VK_SHADER_STAGE_VERTEX_BIT, and pname:pShaders is not `NULL`, and
-    the same index in pname:pShaders as ename:VK_SHADER_STAGE_MESH_BIT_NV in
-    pname:pStages is not dlink:VK_NULL_HANDLE, the same index in
-    pname:pShaders as ename:VK_SHADER_STAGE_VERTEX_BIT in pname:pStages
-    must: be dlink:VK_NULL_HANDLE
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCmdBindShadersEXT-pShaders-08474]]
     If the <<features-tessellationShader, pname:tessellationShader>> feature
     is not enabled, and pname:pStages contains
@@ -896,7 +820,7 @@ endif::VK_EXT_mesh_shader[]
     enabled, and pname:pStages contains ename:VK_SHADER_STAGE_GEOMETRY_BIT,
     and pname:pShaders is not `NULL`, the same index in pname:pShaders must:
     be dlink:VK_NULL_HANDLE
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCmdBindShadersEXT-pShaders-08490]]
     If the <<features-taskShader, pname:taskShader>> feature is not enabled,
     and pname:pStages contains ename:VK_SHADER_STAGE_TASK_BIT_EXT, and
@@ -907,7 +831,7 @@ ifdef::VK_EXT_mesh_shader[]
     and pname:pStages contains ename:VK_SHADER_STAGE_MESH_BIT_EXT, and
     pname:pShaders is not `NULL`, the same index in pname:pShaders must: be
     dlink:VK_NULL_HANDLE
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCmdBindShadersEXT-pShaders-08476]]
     If pname:pStages contains ename:VK_SHADER_STAGE_COMPUTE_BIT, the
     sname:VkCommandPool that pname:commandBuffer was allocated from must:
@@ -919,20 +843,12 @@ endif::VK_EXT_mesh_shader[]
     ename:VK_SHADER_STAGE_GEOMETRY_BIT, or
     ename:VK_SHADER_STAGE_FRAGMENT_BIT, the sname:VkCommandPool that
     pname:commandBuffer was allocated from must: support graphics operations
-ifdef::VK_EXT_mesh_shader[]
+ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
   * [[VUID-vkCmdBindShadersEXT-pShaders-08478]]
     If pname:pStages contains ename:VK_SHADER_STAGE_MESH_BIT_EXT or
     ename:VK_SHADER_STAGE_TASK_BIT_EXT, the sname:VkCommandPool that
     pname:commandBuffer was allocated from must: support graphics operations
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-ifdef::VK_NV_mesh_shader[]
-  * [[VUID-vkCmdBindShadersEXT-pShaders-08480]]
-    If pname:pStages contains ename:VK_SHADER_STAGE_MESH_BIT_NV or
-    ename:VK_SHADER_STAGE_TASK_BIT_NV, the sname:VkCommandPool that
-    pname:commandBuffer was allocated from must: support graphics operations
-endif::VK_NV_mesh_shader[]
-endif::VK_EXT_mesh_shader[]
+endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
 ****
 
 include::{generated}/validity/protos/vkCmdBindShadersEXT.adoc[]
@@ -986,10 +902,7 @@ endif::VK_EXT_mesh_shader,VK_NV_mesh_shader[]
     ename:VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT or
     ename:VK_SHADER_STAGE_GEOMETRY_BIT stage
   * flink:vkCmdSetCullMode
-  * flink:vkCmdSetFrontFace, if pname:cullMode is not
-    ename:VK_CULL_MODE_NONE, or if pname:stencilTestEnable is ename:VK_TRUE,
-    or if the fragment shader uses a variable decorated with
-    code:FrontFacing
+  * flink:vkCmdSetFrontFace
   * flink:vkCmdSetDepthTestEnable
   * flink:vkCmdSetDepthWriteEnable
   * flink:vkCmdSetDepthCompareOp, if pname:depthTestEnable is ename:VK_TRUE
@@ -998,13 +911,23 @@ endif::VK_EXT_mesh_shader,VK_NV_mesh_shader[]
   * flink:vkCmdSetDepthBounds, if pname:depthBoundsTestEnable is
     ename:VK_TRUE
   * flink:vkCmdSetDepthBiasEnable
-  * flink:vkCmdSetDepthBias
-ifdef::VK_EXT_depth_bias_control[or flink:vkCmdSetDepthBias2EXT]
-    , if pname:depthBiasEnable is ename:VK_TRUE
+ifdef::VK_EXT_depth_bias_control[]
+  * flink:vkCmdSetDepthBias or flink:vkCmdSetDepthBias2EXT,
+endif::VK_EXT_depth_bias_control[]
+ifndef::VK_EXT_depth_bias_control[]
+  * flink:vkCmdSetDepthBias,
+endif::VK_EXT_depth_bias_control[]
+    if pname:depthBiasEnable is ename:VK_TRUE
   * flink:vkCmdSetDepthClampEnableEXT, if the <<features-depthClamp,
     depthClamp>> feature is enabled on the device
   * flink:vkCmdSetStencilTestEnable
   * flink:vkCmdSetStencilOp, if pname:stencilTestEnable is ename:VK_TRUE
+  * flink:vkCmdSetStencilCompareMask, if pname:stencilTestEnable is
+    ename:VK_TRUE
+  * flink:vkCmdSetStencilWriteMask, if pname:stencilTestEnable is
+    ename:VK_TRUE
+  * flink:vkCmdSetStencilReference, if pname:stencilTestEnable is
+    ename:VK_TRUE
 
 If a shader is bound to the ename:VK_SHADER_STAGE_FRAGMENT_BIT stage, and
 pname:rasterizerDiscardEnable is ename:VK_FALSE, the following commands
@@ -1054,8 +977,8 @@ endif::VK_EXT_transform_feedback[]
 
 ifdef::VK_EXT_discard_rectangles[]
 If the `apiext:VK_EXT_discard_rectangles` extension is enabled on the
-device, the following commands must: have been called in the command buffer
-prior to drawing:
+device, and pname:rasterizerDiscardEnable is ename:VK_FALSE, the following
+commands must: have been called in the command buffer prior to drawing:
 
   * flink:vkCmdSetDiscardRectangleEnableEXT
   * flink:vkCmdSetDiscardRectangleModeEXT, if `discardRectangleEnable` is
@@ -1095,8 +1018,9 @@ endif::VK_EXT_sample_locations[]
 
 ifdef::VK_EXT_provoking_vertex[]
 If the `apiext:VK_EXT_provoking_vertex` extension is enabled on the device,
-and pname:rasterizerDiscardEnable is ename:VK_FALSE, the following command
-must: have been called in the command buffer prior to drawing:
+and pname:rasterizerDiscardEnable is ename:VK_FALSE, and a shader is bound
+to the ename:VK_SHADER_STAGE_VERTEX_BIT stage, the following command must:
+have been called in the command buffer prior to drawing:
 
   * flink:vkCmdSetProvokingVertexModeEXT
 endif::VK_EXT_provoking_vertex[]
@@ -1127,7 +1051,7 @@ endif::VK_EXT_depth_clip_control[]
 
 ifdef::VK_EXT_color_write_enable[]
 If the <<features-colorWriteEnable, pname:colorWriteEnable>> feature is
-enabled on the device, a shader is bound to the
+enabled on the device, and a shader is bound to the
 ename:VK_SHADER_STAGE_FRAGMENT_BIT stage, and pname:rasterizerDiscardEnable
 is ename:VK_FALSE, the following command must: have been called in the
 command buffer prior to drawing:
@@ -1138,14 +1062,12 @@ endif::VK_EXT_color_write_enable[]
 
 ifdef::VK_EXT_attachment_feedback_loop_dynamic_state[]
 If the <<features-attachmentFeedbackLoopDynamicState,
-attachmentFeedbackLoopDynamicState>> feature is enabled on the device, a
+attachmentFeedbackLoopDynamicState>> feature is enabled on the device, and a
 shader is bound to the ename:VK_SHADER_STAGE_FRAGMENT_BIT stage, and
 pname:rasterizerDiscardEnable is ename:VK_FALSE, the following command must:
 have been called in the command buffer prior to drawing:
 
-  * flink:vkCmdSetAttachmentFeedbackLoopEnableEXT, for each image aspect
-    corresponding to an attachment type used by the render pass instance
-    which can: use feedback loops
+  * flink:vkCmdSetAttachmentFeedbackLoopEnableEXT
 endif::VK_EXT_attachment_feedback_loop_dynamic_state[]
 
 ifdef::VK_NV_clip_space_w_scaling[]
@@ -1235,7 +1157,7 @@ bound, but all required state must: be set prior to issuing drawing
 commands.
 
 [[shaders-objects-pipeline-interaction]]
-=== Interaction with Pipelines
+=== Interaction With Pipelines
 
 Calling flink:vkCmdBindShadersEXT causes the pipeline bind points
 <<shaders-binding,corresponding to each stage>> in pname:pStages to be
@@ -1350,27 +1272,35 @@ Once a shader module has been created, any entry points it contains can: be
 used in pipeline shader stages as described in <<pipelines-compute,Compute
 Pipelines>> and <<pipelines-graphics,Graphics Pipelines>>.
 
+ifdef::VK_EXT_graphics_pipeline_libraries,VK_KHR_maintenance5[]
+[NOTE]
+.Note
+====
+If
 ifdef::VK_EXT_graphics_pipeline_libraries[]
-If the <<features-graphicsPipelineLibrary, pname:graphicsPipelineLibrary>>
-feature is enabled, shader module creation can: be omitted entirely.
-Instead, applications should: provide the slink:VkShaderModuleCreateInfo
+the <<features-graphicsPipelineLibrary, pname:graphicsPipelineLibrary>>
+feature
+endif::VK_EXT_graphics_pipeline_libraries[]
+ifdef::VK_EXT_graphics_pipeline_libraries+VK_KHR_maintenance5[or]
+ifdef::VK_KHR_maintenance5[]
+the <<features-maintenance5,pname:maintenance5>> feature
+endif::VK_KHR_maintenance5[]
+is enabled, shader module creation can be omitted entirely.
+Instead, applications should provide the slink:VkShaderModuleCreateInfo
 structure directly in to pipeline creation by chaining it to
 slink:VkPipelineShaderStageCreateInfo.
 This avoids the overhead of creating and managing an additional object.
-endif::VK_EXT_graphics_pipeline_libraries[]
+====
+endif::VK_EXT_graphics_pipeline_libraries,VK_KHR_maintenance5[]
 
 .Valid Usage
 ****
-ifdef::VK_EXT_validation_cache[]
   * [[VUID-vkCreateShaderModule-pCreateInfo-06904]]
     If pname:pCreateInfo is not `NULL`, pname:pCreateInfo->pNext must: be
-    `NULL` or a pointer to a
-    slink:VkShaderModuleValidationCacheCreateInfoEXT structure
-endif::VK_EXT_validation_cache[]
-ifndef::VK_EXT_validation_cache[]
-  * [[VUID-vkCreateShaderModule-pCreateInfo-06905]]
-    If pname:pCreateInfo is not `NULL`, pname:pCreateInfo->pNext must: be
     `NULL`
+ifdef::VK_EXT_validation_cache[]
+    or a pointer to a slink:VkShaderModuleValidationCacheCreateInfoEXT
+    structure
 endif::VK_EXT_validation_cache[]
 ****
 
@@ -1398,13 +1328,14 @@ include::{generated}/api/structs/VkShaderModuleCreateInfo.adoc[]
 
 .Valid Usage
 ****
-ifndef::VK_NV_glsl_shader[]
 :prefixCondition:
-include::{chapters}/commonvalidity/shader_create_spv_common.adoc[]
-endif::VK_NV_glsl_shader[]
 ifdef::VK_NV_glsl_shader[]
 :prefixCondition: If pCode is a pointer to SPIR-V code,
+endif::VK_NV_glsl_shader[]
+
 include::{chapters}/commonvalidity/shader_create_spv_common.adoc[]
+
+ifdef::VK_NV_glsl_shader[]
   * [[VUID-VkShaderModuleCreateInfo-pCode-07912]]
     If the apiext:VK_NV_glsl_shader extension is not enabled, pname:pCode
     must: be a pointer to SPIR-V code
@@ -1640,6 +1571,12 @@ a| * ename:VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI
 | ename:VK_PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI
 | flink:vkCmdSubpassShadingHUAWEI
 endif::VK_HUAWEI_subpass_shading[]
+
+ifdef::VK_AMDX_shader_enqueue[]
+a| * ename:VK_SHADER_STAGE_COMPUTE_BIT
+| ename:VK_PIPELINE_BIND_POINT_EXECUTION_GRAPH_AMDX
+| all <<executiongraphs, execution graph commands>>
+endif::VK_AMDX_shader_enqueue[]
 |====
 
 [[shaders-execution]]
@@ -2063,27 +2000,12 @@ Otherwise, this state is specified by the
 slink:VkPipelineTessellationStateCreateInfo::pname:patchControlPoints value
 used to create the currently active pipeline.
 
+:refpage: vkCmdSetPatchControlPointsEXT
+:requiredfeature: extendedDynamicState2PatchControlPoints
+
 .Valid Usage
 ****
-ifdef::VK_EXT_shader_object[]
-ifdef::VK_EXT_extended_dynamic_state2[]
-  * [[VUID-vkCmdSetPatchControlPointsEXT-None-08574]]
-    Either the <<features-extendedDynamicState2PatchControlPoints,
-    pname:extendedDynamicState2PatchControlPoints>> feature or the
-    <<features-shaderObject, pname:shaderObject>> feature or both must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state2[]
-ifndef::VK_EXT_extended_dynamic_state2[]
-  * [[VUID-vkCmdSetPatchControlPointsEXT-None-08575]]
-    The <<features-shaderObject, pname:shaderObject>> feature must: be
-    enabled
-endif::VK_EXT_extended_dynamic_state2[]
-endif::VK_EXT_shader_object[]
-ifndef::VK_EXT_shader_object[]
-  * [[VUID-vkCmdSetPatchControlPointsEXT-None-04873]]
-    The <<features-extendedDynamicState2PatchControlPoints,
-    pname:extendedDynamicState2PatchControlPoints>> feature must: be enabled
-endif::VK_EXT_shader_object[]
+include::{chapters}/commonvalidity/dynamic_state2_optional_feature_common.adoc[]
   * [[VUID-vkCmdSetPatchControlPointsEXT-patchControlPoints-04874]]
     pname:patchControlPoints must: be greater than zero and less than or
     equal to sname:VkPhysicalDeviceLimits::pname:maxTessellationPatchSize
@@ -2335,7 +2257,7 @@ endif::VK_NV_ray_tracing,VK_KHR_ray_tracing_pipeline[]
 
 
 [[shaders-interpolation-decorations]]
-== Interpolation decorations
+== Interpolation Decorations
 
 Variables in the code:Input storage class in a fragment shader's interface
 are interpolated from the values specified by the primitive being
@@ -2628,6 +2550,7 @@ Buffer Layout>> rules, and with code:Boolean values considered as 32-bit
 integer values for the purpose of this calculation.
 (This is equivalent to using the GLSL std430 layout rules.)
 
+
 ifdef::VK_VERSION_1_1[]
 [[shaders-scope-subgroup]]
 === Subgroup
@@ -2657,6 +2580,94 @@ In other shader stages, each invocation in a subgroup must: be in the same
 
 Only <<limits-subgroup-supportedStages, shader stages that support subgroup
 operations>> have defined subgroups.
+
+[NOTE]
+.Note
+====
+In shaders, there are two kinds of uniformity that are of primary interest
+to applications: uniform within an invocation group (a.k.a.
+dynamically uniform), and uniform within a subgroup scope.
+
+While one could make the assumption that being uniform in invocation group
+implies being uniform in subgroup scope, it is not necessarily the case for
+shader stages without defined workgroups.
+
+For shader stages with defined workgroups however, the relationship between
+invocation group and subgroup scope is well defined as a subgroup is a
+subset of the workgroup, and the workgroup is the invocation group.
+If a value is uniform in invocation group, it is by definition also uniform
+in subgroup scope.
+This is important if writing code like:
+
+[source,glsl]
+----
+uniform texture2D Textures[];
+uint dynamicallyUniformValue = gl_WorkGroupID.x;
+vec4 value = texelFetch(Textures[dynamicallyUniformValue], coord, 0);
+
+// subgroupUniformValue is guaranteed to be uniform within the subgroup.
+// This value also happens to be dynamically uniform.
+vec4 subgroupUniformValue = subgroupBroadcastFirst(dynamicallyUniformValue);
+----
+
+In shader stages without defined workgroups, this gets complicated.
+Due to scoping rules, there is no guarantee that a subgroup is a subset of
+the invocation group, which in turn defines the scope for dynamically
+uniform.
+In graphics, the invocation group is a single draw command, except for
+multi-draw situations, and indirect draws with drawCount > 1, where there
+are multiple invocation groups, one per code:DrawIndex.
+
+[source,glsl]
+----
+// Assume SubgroupSize = 8, where 3 draws are packed together.
+// Two subgroups were generated.
+uniform texture2D Textures[];
+
+// DrawIndex builtin is dynamically uniform
+uint dynamicallyUniformValue = gl_DrawID;
+//              | gl_DrawID = 0 | gl_DrawID = 1 | }
+// Subgroup 0: { 0, 0, 0, 0,      1, 1, 1, 1 }
+//              | DrawID = 2 | DrawID = 1 | }
+// Subgroup 1: { 2, 2, 2, 2,      1, 1, 1, 1 }
+
+uint notActuallyDynamicallyUniformAnymore =
+    subgroupBroadcastFirst(dynamicallyUniformValue);
+//              | gl_DrawID = 0 | gl_DrawID = 1 | }
+// Subgroup 0: { 0, 0, 0, 0,      0, 0, 0, 0 }
+//              | gl_DrawID = 2 | gl_DrawID = 1 | }
+// Subgroup 1: { 2, 2, 2, 2,      2, 2, 2, 2 }
+
+// Bug. gl_DrawID = 1's invocation group observes both index 0 and 2.
+vec4 value = texelFetch(Textures[notActuallyDynamicallyUniformAnymore],
+                        coord, 0);
+----
+
+Another problematic scenario is when a shader attempts to help the compiler
+notice that a value is uniform in subgroup scope to potentially improve
+performance.
+
+[source,c]
+----
+layout(location = 0) flat in dynamicallyUniformIndex;
+// Vertex shader might have emitted a value that depends only on gl_DrawID,
+// making it dynamically uniform.
+// Give knowledge to compiler that the flat input is dynamically uniform,
+// as this is not a guarantee otherwise.
+
+uint uniformIndex = subgroupBroadcastFirst(dynamicallyUniformIndex);
+// Hazard: If different draw commands are packed into one subgroup, the uniformIndex is wrong.
+
+DrawData d = UBO.perDrawData[uniformIndex];
+----
+
+For implementations where subgroups are packed across draws, the
+implementation must make sure to handle descriptor indexing correctly.
+From the specification's point of view, a dynamically uniform index does not
+require code:NonUniform decoration, and such an implementation will likely
+either promote descriptor indexing into code:NonUniform on its own, or
+handle non-uniformity implicitly.
+====
 endif::VK_VERSION_1_1[]
 
 
@@ -3241,6 +3252,8 @@ flink:vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR.
 At least one entry in the list must: have power of two values for all of
 pname:MSize, pname:KSize, and pname:NSize.
 
+pname:scope must: be ename:VK_SCOPE_SUBGROUP_KHR.
+
 include::{generated}/validity/structs/VkCooperativeMatrixPropertiesKHR.adoc[]
 --
 endif::VK_KHR_cooperative_matrix[]
@@ -3596,3 +3609,7 @@ include::{generated}/api/protos/vkDestroyValidationCacheEXT.adoc[]
 include::{generated}/validity/protos/vkDestroyValidationCacheEXT.adoc[]
 --
 endif::VK_EXT_validation_cache[]
+
+ifdef::VK_NV_cuda_kernel_launch[]
+include::{chapters}/VK_NV_cuda_kernel_launch/module.adoc[]
+endif::VK_NV_cuda_kernel_launch[]

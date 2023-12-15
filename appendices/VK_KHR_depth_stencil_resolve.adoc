@@ -8,8 +8,6 @@ include::{generated}/meta/{refprefix}VK_KHR_depth_stencil_resolve.adoc[]
 
 *Last Modified Date*::
     2018-04-09
-*Interactions and External Dependencies*::
-  - Promoted to Vulkan 1.2 Core
 *Contributors*::
   - Jan-Harald Fredriksen, Arm
   - Andrew Garrard, Samsung Electronics
@@ -60,9 +58,9 @@ ifdef::isrefpage[]
 
 === Additional Resources
 
-* GDC 2019
-** https://www.youtube.com/watch?v=GnnEmJFFC7Q&feature=youtu.be&t=1983[`video`]
-** https://www.khronos.org/assets/uploads/developers/library/2019-gdc/Vulkan-Depth-Stencil-Resolve-GDC-Mar19.pdf[`slides`]
+  * GDC 2019
+  ** https://www.youtube.com/watch?v=GnnEmJFFC7Q&feature=youtu.be&t=1983[`video`]
+  ** https://www.khronos.org/assets/uploads/developers/library/2019-gdc/Vulkan-Depth-Stencil-Resolve-GDC-Mar19.pdf[`slides`]
 
 endif::isrefpage[]
 

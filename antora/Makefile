@@ -28,7 +28,7 @@ setup_spec: xrefmaps spec_pages
 # apimap.cjs) from spec HTML
 xrefmaps:
 	$(RMRF) gen
-	makeSpec QUIET=@ -clean -spec all -genpath gen generated jsapi html
+	./makeSpec QUIET=@ -clean -spec all -genpath gen generated jsapi html
 	scripts/map_html_anchors.py gen/out/html/vkspec.html \
 	    -pyfile $(PYXREFMAP) -jsfile $(JSXREFMAP)
 
@@ -45,7 +45,7 @@ spec_pages:
 	    ./config/copyright-ccby.adoc \
 	    ./config/copyright-spec.adoc \
 	    ./images/*.svg \
-	    `find ./gen ./chapters ./appendices -name '[A-Za-z]*.adoc'` \
+	    `find ./gen ./chapters ./appendices -name '[A-Za-z]*.adoc' | grep -v /vulkanscdeviations.adoc` \
 	    $(JSAPIMAP)
 
 # Rewrite proposals into the module directory, 'proposals' component

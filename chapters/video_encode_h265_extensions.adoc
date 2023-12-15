@@ -20,7 +20,7 @@ external materials not created by Khronos.
 ====
 
 
-=== H.265 encode profile
+=== H.265 Encode Profile
 
 An H.265 encode profile is specified by including the
 slink:VkVideoEncodeH265ProfileInfoEXT structure in the pname:pNext chain of
@@ -253,6 +253,15 @@ include::{generated}/api/enums/VkVideoEncodeH265StdFlagBitsEXT.adoc[]
   * ename:VK_VIDEO_ENCODE_H265_STD_DEPENDENT_SLICE_SEGMENT_FLAG_SET_BIT_EXT
     indicates if enabling code:dependent_slice_segment_flag in
     code:StdVideoEncodeH265SliceHeaderFlags is supported.
+  * ename:VK_VIDEO_ENCODE_H265_STD_SLICE_QP_DELTA_BIT_EXT indicates whether
+    the implementation supports using the application-provided value for
+    code:StdVideoEncodeH265SliceSegmentHeader::code:slice_qp_delta when that
+    value is identical across the slice segments of the encoded frame.
+  * ename:VK_VIDEO_ENCODE_H265_STD_DIFFERENT_SLICE_QP_DELTA_BIT_EXT
+    indicates whether the implementation supports using the
+    application-provided value for
+    code:StdVideoEncodeH265SliceSegmentHeader::code:slice_qp_delta when that
+    value is different across the slice segments of the encoded frame.
 --
 
 [open,refpage='VkVideoEncodeH265StdFlagsEXT',desc='Bitmask of VkVideoEncodeH265StdFlagBitsEXT',type='flags']
@@ -647,7 +656,7 @@ include::{generated}/validity/structs/VkVideoEncodeH265DpbSlotInfoEXT.adoc[]
 --
 
 
-=== Rate control
+=== Rate Control
 
 [open,refpage='VkVideoEncodeH265RateControlInfoEXT',desc='Structure describing H.265 stream rate control parameters',type='structs']
 --

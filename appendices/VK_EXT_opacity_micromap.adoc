@@ -9,8 +9,6 @@ include::{generated}/meta/{refprefix}VK_EXT_opacity_micromap.adoc[]
 *Last Modified Date*::
     2022-08-24
 *Interactions and External Dependencies*::
-  - This extension requires
-    {spirv}/EXT/SPV_EXT_opacity_micromap.html[`SPV_EXT_opacity_micromap`]
   - This extension provides API support for
     {GLSLregistry}/ext/GLSL_EXT_opacity_micromap.txt[`GLSL_EXT_opacity_micromap`]
 *Contributors*::
@@ -21,9 +19,9 @@ include::{generated}/meta/{refprefix}VK_EXT_opacity_micromap.adoc[]
 
 === Description
 
-When adding adding transparency to a ray traced scene, an application can
-choose between further tessellating the geometry or using an any hit shader
-to allow the ray through specific parts of the geometry.
+When adding transparency to a ray traced scene, an application can choose
+between further tessellating the geometry or using an any-hit shader to
+allow the ray through specific parts of the geometry.
 These options have the downside of either significantly increasing memory
 consumption or adding runtime overhead to run shader code in the middle of
 traversal, respectively.

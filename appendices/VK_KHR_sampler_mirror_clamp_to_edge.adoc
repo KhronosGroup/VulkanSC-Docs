@@ -8,8 +8,6 @@ include::{generated}/meta/{refprefix}VK_KHR_sampler_mirror_clamp_to_edge.adoc[]
 
 *Last Modified Date*::
     2019-08-17
-*Interactions and External Dependencies*::
-  - Promoted to Vulkan 1.2 Core
 *Contributors*::
   - Tobias Hector, Imagination Technologies
   - Jon Leech, Khronos
@@ -47,7 +45,7 @@ Creating a sampler with the new address mode in each dimension
 ----
     VkSamplerCreateInfo createInfo =
     {
-        VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO // sType
+        .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         // Other members set to application-desired values
     };
 

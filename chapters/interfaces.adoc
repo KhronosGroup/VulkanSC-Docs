@@ -109,9 +109,8 @@ or code:Output storage class form the _user-defined variable interface_.
 These must: have <<formats-numericformat, numeric type>> or, recursively,
 composite types of such types.
 ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-By default, the components of such types have a width of 32 or 64 bits.
 If an implementation supports <<features-storageInputOutput16,
-pname:storageInputOutput16>>, components can: also have a width of 16 bits.
+pname:storageInputOutput16>>, components can: have a width of 16 bits.
 endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
 These variables must: be identified with a code:Location decoration and can:
 also be identified with a code:Component decoration.
@@ -1272,36 +1271,36 @@ If the struct is contained in pointer types of multiple storage classes, it
 must: satisfy the requirements for every storage class used to reference it.
 
 ifdef::VK_VERSION_1_2,VK_EXT_scalar_block_layout[]
-. If the code:scalarBlockLayout feature is enabled on the device and the
-  storage class is code:Uniform, code:StorageBuffer,
+  . If the code:scalarBlockLayout feature is enabled on the device and the
+    storage class is code:Uniform, code:StorageBuffer,
 ifdef::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
-  code:PhysicalStorageBuffer,
+    code:PhysicalStorageBuffer,
 endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
 ifdef::VK_KHR_ray_tracing_pipeline[]
-  code:ShaderRecordBufferKHR,
+    code:ShaderRecordBufferKHR,
 endif::VK_KHR_ray_tracing_pipeline[]
-  or code:PushConstant then every member must: be aligned according to its
-  scalar alignment.
+    or code:PushConstant then every member must: be aligned according to its
+    scalar alignment.
 endif::VK_VERSION_1_2,VK_EXT_scalar_block_layout[]
 ifdef::VK_KHR_workgroup_memory_explicit_layout[]
-. If the code:workgroupMemoryExplicitLayoutScalarBlockLayout feature is
-  enabled on the device and the storage class is code:Workgroup then every
-  member must: be aligned according to its scalar alignment.
+  . If the code:workgroupMemoryExplicitLayoutScalarBlockLayout feature is
+    enabled on the device and the storage class is code:Workgroup then every
+    member must: be aligned according to its scalar alignment.
 endif::VK_KHR_workgroup_memory_explicit_layout[]
 ifdef::VK_VERSION_1_1,VK_KHR_relaxed_block_layout[]
-. All vectors must: be aligned according to their scalar alignment.
+  . All vectors must: be aligned according to their scalar alignment.
 endif::VK_VERSION_1_1,VK_KHR_relaxed_block_layout[]
 ifdef::VK_VERSION_1_2,VK_KHR_uniform_buffer_standard_layout[]
-. If the pname:uniformBufferStandardLayout feature is not enabled on the
-  device, then any
+  . If the pname:uniformBufferStandardLayout feature is not enabled on the
+    device, then any
 endif::VK_VERSION_1_2,VK_KHR_uniform_buffer_standard_layout[]
 ifndef::VK_VERSION_1_2,VK_KHR_uniform_buffer_standard_layout[]
-. Any
+  . Any
 endif::VK_VERSION_1_2,VK_KHR_uniform_buffer_standard_layout[]
-  member of an code:OpTypeStruct with a storage class of code:Uniform and a
-  decoration of code:Block must: be aligned according to its extended
-  alignment.
-. Every other member must: be aligned according to its base alignment.
+    member of an code:OpTypeStruct with a storage class of code:Uniform and
+    a decoration of code:Block must: be aligned according to its extended
+    alignment.
+  . Every other member must: be aligned according to its base alignment.
 
 ifdef::VK_VERSION_1_2,VK_EXT_scalar_block_layout[]
 [NOTE]
@@ -1328,7 +1327,7 @@ ifdef::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[
     code:PhysicalStorageBuffer,
 endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
 ifdef::VK_KHR_ray_tracing_pipeline[]
-  code:ShaderRecordBufferKHR,
+    code:ShaderRecordBufferKHR,
 endif::VK_KHR_ray_tracing_pipeline[]
     or code:PushConstant, and the code:scalarBlockLayout feature is not
     enabled on the device.
@@ -1797,11 +1796,11 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:ClusterIDHUAWEI::
 
-The ClusterIDHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this variable will contain an integer value that
-specifies the id of cluster being rendered by this drawing command.
-When Cluster Culling Shader enable, ClusterIDHUAWEI will replace gl_DrawID
-pass to vertex shader for cluster-related information fetching.
+The code:ClusterIDHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this variable will contain an integer value
+that specifies the id of cluster being rendered by this drawing command.
+When Cluster Culling Shader enable, code:ClusterIDHUAWEI will replace
+gl_DrawID pass to vertex shader for cluster-related information fetching.
 
 
 .Valid Usage
@@ -1815,6 +1814,32 @@ pass to vertex shader for cluster-related information fetching.
 ****
 --
 endif::VK_HUAWEI_cluster_culling_shader[]
+
+ifdef::VK_HUAWEI_cluster_culling_shader[]
+[[interfaces-builtin-variables-clustershadingratehuawei]]
+[open,refpage='ClusterShadingRateHUAWEI',desc='cluster culling shader output variable',type='builtins']
+--
+:refpage: ClusterShadingRateHUAWEI
+
+code:ClusterShadingRateHUAWEI::
+
+The code:ClusterShadingRateHUAWEI decoration can be used to decorate a
+cluster culling shader output variable.
+This variable will contain an integer value specifying the shading rate of a
+rendering cluster.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-ClusterShadingRateHUAWEI-09448]]
+    The code:ClusterShadingRateHUAWEI decoration must: be used only within
+    the code:ClusterCullingHUAWEI {ExecutionModel}
+  * [[VUID-{refpage}-ClusterShadingRateHUAWEI-09449]]
+    The variable decorated with code:ClusterShadingRateHUAWEI must: be
+    declared as a scalar 32-bit integer value
+****
+--
+endif::VK_HUAWEI_cluster_culling_shader[]
+
 
 
 [[interfaces-builtin-variables-culldistance]]
@@ -1907,7 +1932,7 @@ ifdef::VK_EXT_mesh_shader[]
 :refpage: CullPrimitiveEXT
 
 code:CullPrimitiveEXT::
-+
+
 Decorating a variable with the code:CullPrimitiveEXT built-in decoration
 will make that variable contain the culling state of output primitives.
 If the per-primitive boolean value is code:true, the primitive will be
@@ -2029,17 +2054,17 @@ code:DrawIndex::
 
 Decorating a variable with the code:DrawIndex built-in will make that
 variable contain the integer value corresponding to the zero-based index of
-the drawing command that invoked the current
+the draw that invoked the current
 ifdef::VK_NV_mesh_shader,VK_EXT_mesh_shader[task, mesh, or]
 vertex shader invocation.
 For _indirect drawing commands_, code:DrawIndex begins at zero and
-increments by one for each drawing command executed.
-The number of drawing commands is given by the pname:drawCount parameter.
+increments by one for each draw executed.
+The number of draws is given by the pname:drawCount parameter.
 For _direct drawing commands_,
 ifdef::VK_EXT_multi_draw[]
 if flink:vkCmdDrawMultiEXT or flink:vkCmdDrawMultiIndexedEXT is used, this
 variable contains the integer value corresponding to the zero-based index of
-the draw command.
+the draw.
 Otherwise
 endif::VK_EXT_multi_draw[]
 code:DrawIndex is always zero.
@@ -2074,10 +2099,10 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:FirstIndexHUAWEI::
 
-The FirstIndexHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this indexed mode specific variable will contain an
-integer value that specifies the base index within the index buffer
-corresponding to a cluster.
+The code:FirstIndexHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this indexed mode specific variable will
+contain an integer value that specifies the base index within the index
+buffer corresponding to a cluster.
 
 
 .Valid Usage
@@ -2178,9 +2203,9 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:FirstInstanceHUAWEI::
 
-The FirstInstanceHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this variable will contain an integer value that
-specifies the instance ID of the first instance to draw.
+The code:FirstInstanceHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this variable will contain an integer value
+that specifies the instance ID of the first instance to draw.
 
 .Valid Usage
 ****
@@ -2203,16 +2228,16 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:FirstVertexHUAWEI::
 
-The FirstVertexHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this non-indexed mode specific variable will contain
-an integer value that specifies the index of the first vertex in a cluster
-to draw.
+The code:FirstVertexHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this non-indexed mode specific variable will
+contain an integer value that specifies the index of the first vertex in a
+cluster to draw.
 
 .Valid Usage
 ****
   * [[VUID-{refpage}-FirstVertexHUAWEI-07803]]
     The code:FirstVertexHUAWEI decoration must: be used only within the
-    code:FirstVertexHUAWEI{ExecutionModel}
+    code:FirstVertexHUAWEI {ExecutionModel}
   * [[VUID-{refpage}-FirstVertexHUAWEI-07804]]
     The variable decorated with code:FirstVertexHUAWEI must: be declared as
     a scalar 32-bit integer value
@@ -2614,10 +2639,10 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:IndexCountHUAWEI::
 
-The IndexCountHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this indexed mode specific variable will contain an
-integer value that specifies the number of indexed vertices in a cluster to
-draw.
+The code:IndexCountHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this indexed mode specific variable will
+contain an integer value that specifies the number of indexed vertices in a
+cluster to draw.
 
 .Valid Usage
 ****
@@ -2639,9 +2664,9 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:InstanceCountHUAWEI::
 
-The InstanceCountHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this variable will contain an integer value that
-specifies the number of instance to draw in a cluster.
+The code:InstanceCountHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this variable will contain an integer value
+that specifies the number of instance to draw in a cluster.
 
 .Valid Usage
 ****
@@ -3330,11 +3355,23 @@ Depending on how the point is rasterized, code:PointCoord may: never reach
 code:PointSize::
 
 Decorating a variable with the code:PointSize built-in decoration will make
-that variable contain the size of point primitives.
+that variable contain the size of point primitives
+ifdef::VK_KHR_maintenance5[]
+or the final rasterization of polygons if <<primsrast-polygonmode, polygon
+mode>> is ename:VK_POLYGON_MODE_POINT when
+sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:polygonModePointSize
+is set to ename:VK_TRUE
+endif::VK_KHR_maintenance5[]
+.
 The value written to the variable decorated with code:PointSize by the last
 <<pipelines-graphics-subsets-pre-rasterization,pre-rasterization shader
 stage>> in the pipeline is used as the framebuffer-space size of points
 produced by rasterization.
+ifdef::VK_KHR_maintenance5[]
+If <<features-maintenance5, pname:maintenance5>> is enabled and a value is
+not written to a variable decorated with code:PointSize, a value of 1.0 is
+used as the size of points.
+endif::VK_KHR_maintenance5[]
 
 [NOTE]
 .Note
@@ -4611,9 +4648,10 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:VertexCountHUAWEI::
 
-The VertexCountHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this non-indexed mode specific variable will contain
-an integer value that specifies the number of vertices in a cluster to draw.
+The code:VertexCountHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this non-indexed mode specific variable will
+contain an integer value that specifies the number of vertices in a cluster
+to draw.
 
 .Valid Usage
 ****
@@ -4674,10 +4712,10 @@ ifdef::VK_HUAWEI_cluster_culling_shader[]
 
 code:VertexOffsetHUAWEI::
 
-The VertexOffsetHUAWEI decoration can be used to decorate a cluster culling
-shader output variable,this indexed mode specific variable will contain an
-integer value that specifies a offset value added to the vertex index of a
-cluster before indexing into the vertex buffer.
+The code:VertexOffsetHUAWEI decoration can be used to decorate a cluster
+culling shader output variable,this indexed mode specific variable will
+contain an integer value that specifies a offset value added to the vertex
+index of a cluster before indexing into the vertex buffer.
 
 .Valid Usage
 ****
@@ -5255,3 +5293,55 @@ This variable is in the range [eq]#[0, code:WarpMaxIDARM]#.
 ****
 --
 endif::VK_ARM_shader_core_builtins[]
+
+ifdef::VK_AMDX_shader_enqueue[]
+[[interfaces-builtin-variables-coalescedinputcountamd]]
+[open,refpage='CoalescedInputCountAMDX',desc='Number of inputs coalesced for a coalescing node in a work graph',type='builtins']
+--
+:refpage: CoalescedInputCountAMDX
+
+code:CoalescedInputCountAMDX::
+
+Decorating a variable with the code:CoalescedInputCountAMDX built-in
+decoration will make that variable contain the number of node dispatches
+that the implementation coalesced into the input for the current shader.
+This variable will take a value in the range [eq]#[1, arraySize)#, where
+[eq]#arraySize# is the maximum size of the input payload array for the
+shader.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-CoalescedInputCountAMDX-09172]]
+    The variable decorated with code:CoalescedInputCountAMDX must: be
+    declared using the code:Input {StorageClass}
+  * [[VUID-{refpage}-CoalescedInputCountAMDX-09173]]
+    If a variable is decorated with code:CoalescedInputCountAMDX, the
+    code:CoalescingAMDX execution mode must: be declared
+  * [[VUID-{refpage}-CoalescedInputCountAMDX-09174]]
+    The variable decorated with code:CoalescedInputCountAMDX must: be
+    declared as a scalar 32-bit integer value
+****
+--
+
+[open,refpage='ShaderIndexAMDX',desc='Index assigned to the shader within the workgraph',type='builtins']
+--
+:refpage: ShaderIndexAMDX
+
+code:ShaderIndexAMDX::
+
+Decorating a variable with the code:ShaderIndexAMDX built-in decoration will
+make that variable contain the index of the shader specified when it was
+compiled, either via slink:VkPipelineShaderStageNodeCreateInfoAMDX::index or
+by the code:ShaderIndexAMDX execution mode.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-ShaderIndexAMDX-09175]]
+    The variable decorated with code:ShaderIndexAMDX must: be declared using
+    the code:Input {StorageClass}
+  * [[VUID-{refpage}-ShaderIndexAMDX-09176]]
+    The variable decorated with code:ShaderIndexAMDX must: be declared as a
+    scalar 32-bit integer value
+****
+--
+endif::VK_AMDX_shader_enqueue[]

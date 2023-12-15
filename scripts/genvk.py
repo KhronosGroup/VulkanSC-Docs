@@ -417,16 +417,19 @@ def makeGenOpts(args):
         'VK_EXT_video_encode_h264',
         'VK_EXT_video_encode_h265',
         'VK_NV_displacement_micromap',
+        'VK_AMDX_shader_enqueue',
     ]
 
     betaSuppressExtensions = [
         'VK_KHR_video_queue',
         'VK_EXT_opacity_micromap',
+        'VK_KHR_pipeline_library',
     ]
 
     platforms = [
         [ 'vulkan_android.h',     [ 'VK_KHR_android_surface',
-                                    'VK_ANDROID_external_memory_android_hardware_buffer'
+                                    'VK_ANDROID_external_memory_android_hardware_buffer',
+                                    'VK_ANDROID_external_format_resolve'
                                                                   ], commonSuppressExtensions +
                                                                      [ 'VK_KHR_format_feature_flags2',
                                                                      ] ],
@@ -836,8 +839,9 @@ def makeGenOpts(args):
     ]
 
     # Video extension 'Std' interfaces, each in its own header files
-    # These are not Vulkan extensions, or a part of the Vulkan API at all,
-    # but are treated in a similar fashion for generation purposes.
+    # These are not Vulkan extensions, or a part of the Vulkan API at all.
+    # They are treated in a similar fashion for generation purposes, but
+    # all required APIs for each interface must be explicitly required.
     #
     # Each element of the videoStd[] array is an extension name defining an
     # interface, and is also the basis for the generated header file name.
@@ -852,7 +856,8 @@ def makeGenOpts(args):
         'vulkan_video_codec_h265std_encode',
     ]
 
-    addExtensionRE = makeREstring(videoStd)
+    # Unused at present
+    # addExtensionRE = makeREstring(videoStd)
     for codec in videoStd:
         headername = f'{codec}.h'
 
@@ -869,10 +874,11 @@ def makeGenOpts(args):
             profile           = None,
             versions          = None,
             emitversions      = None,
-            defaultExtensions = defaultAPIName,
-            addExtensions     = addExtensionRE,
+            defaultExtensions = None,
+            addExtensions     = emitExtensionRE,
             removeExtensions  = None,
             emitExtensions    = emitExtensionRE,
+            requireDepends    = False,
             prefixText        = prefixStrings + vkPrefixStrings,
             genFuncPointers   = False,
             protectFile       = protectFile,
