@@ -1,10 +1,10 @@
-// Copyright 2021-2023 The Khronos Group Inc.
+// Copyright 2021-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
 = VK_KHR_video_queue
 :toc: left
-:refpage: https://registry.khronos.org/vulkan/specs/1.2-extensions/man/html/
+:refpage: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/
 :sectnums:
 
 This document outlines a proposal to enable performing video coding operations in Vulkan.
@@ -21,7 +21,7 @@ Integrating video coding operations into Vulkan applications enable a wide set o
 
 It is also not uncommon for Vulkan capable devices to feature dedicated hardware acceleration for video compression and decompression.
 
-The goal of this proposal is to enable these use cases, allow exposing the underlying hardware capabilities, and provide tight integration with other functionalities of the Vulkan API.
+The goal of this proposal is to enable these use cases, expose the underlying hardware capabilities, and provide tight integration with other functionalities of the Vulkan API.
 
 
 == Solution Space
@@ -427,7 +427,7 @@ typedef struct VkQueueFamilyQueryResultStatusPropertiesKHR {
 } VkQueueFamilyQueryResultStatusPropertiesKHR;
 ----
 
-Quries also work slightly differently within a video coding scope due to the special behavior of video coding operations. Instead of a query being bound to the scope determined by the corresponding `vkCmdBeginQuery` and `vkCmdEndQuery` calls, in case of video coding each video coding operation consumes its own query slot. Thus if a command issues multiple video coding operations, then those may consume multiple subsequent query slots within the query pool. However, as no new commands are introduced by this extension to start queries with multiple activatable query slots, currently only a single video coding operation is allowed between a `vkCmdBeginQuery` and `vkCmdEndQuery` call.
+Queries also work slightly differently within a video coding scope due to the special behavior of video coding operations. Instead of a query being bound to the scope determined by the corresponding `vkCmdBeginQuery` and `vkCmdEndQuery` calls, in case of video coding each video coding operation consumes its own query slot. Thus if a command issues multiple video coding operations, then those may consume multiple subsequent query slots within the query pool. However, as no new commands are introduced by this extension to start queries with multiple activatable query slots, currently only a single video coding operation is allowed between a `vkCmdBeginQuery` and `vkCmdEndQuery` call.
 
 An unsuccessfully completed video coding operation may also have an effect on subsequently executed video coding operations against the same video session. In particular, if a video coding operation requests the setup (activation) of a DPB slot with a reference picture and that video coding operation completes unsuccessfully, then the corresponding DPB slot will end up having an invalid picture reference. This will cause subsequent video coding operations using reference pictures associated with that DPB slot to produce unexpected results, and may even cause such dependent video coding operations themselves to complete unsuccessfully in response to the invalid input data.
 
@@ -697,7 +697,7 @@ vkGetPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice, &formatInfo, &format
 VkVideoFormatPropertiesKHR* formatProps = calloc(formatCount, sizeof(VkVideoFormatPropertiesKHR));
 
 for (uint32_t i = 0; i < formatCount; ++i) {
-    formatProps.sType = VK_STRUCTURE_TYPE_VIDEO_FORMAT_PROPERTIES_KHR;
+    formatProps[i].sType = VK_STRUCTURE_TYPE_VIDEO_FORMAT_PROPERTIES_KHR;
 }
 
 vkGetPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice, &formatInfo, &formatCount, formatProps);
@@ -729,7 +729,7 @@ VkVideoSessionCreateInfoKHR createInfo = {
     .pStdHeaderVersion = ... // pointer to the video std header information (typically the same as reported in the capabilities)
 };
 
-vkCreateVideoSession(device, &createInfo, NULL, &videoSession);
+vkCreateVideoSessionKHR(device, &createInfo, NULL, &videoSession);
 ----
 
 
@@ -744,7 +744,7 @@ vkGetVideoSessionMemoryRequirementsKHR(device, videoSession, &memReqCount, NULL)
 VkVideoSessionMemoryRequirementsKHR* memReqs = calloc(memReqCount, sizeof(VkVideoSessionMemoryRequirementsKHR));
 
 for (uint32_t i = 0; i < memReqCount; ++i) {
-    memReqs.sType = VK_STRUCTURE_TYPE_VIDEO_SESSION_MEMORY_REQUIREMENTS_KHR;
+    memReqs[i].sType = VK_STRUCTURE_TYPE_VIDEO_SESSION_MEMORY_REQUIREMENTS_KHR;
 }
 
 vkGetVideoSessionMemoryRequirementsKHR(device, videoSession, &memReqCount, memReqs);
@@ -1069,6 +1069,6 @@ Currently the following layered extensions are available:
   * `VK_KHR_video_decode_queue` - adds general support for video decode operations
   * `VK_KHR_video_decode_h264` - adds support for decoding H.264/AVC video sequences
   * `VK_KHR_video_decode_h265` - adds support for decoding H.265/HEVC video sequences
-  * `VK_KHR_video_encode_queue` (provisional) - adds general support for video encode operations
-  * `VK_EXT_video_encode_h264` (provisional) - adds support for encoding H.264/AVC video sequences
-  * `VK_EXT_video_encode_h265` (provisional) - adds support for encoding H.265/HEVC video sequences
+  * `VK_KHR_video_encode_queue` - adds general support for video encode operations
+  * `VK_KHR_video_encode_h264` - adds support for encoding H.264/AVC video sequences
+  * `VK_KHR_video_encode_h265` - adds support for encoding H.265/HEVC video sequences

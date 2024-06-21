@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The Khronos Group, Inc.
+// Copyright 2022-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -246,7 +246,7 @@ vkQueueSubmit( frame:N-1 ); // Some other submissions for an other frame
 vkQueueSubmit( frame:N+1 ); // Some other submissions for an other frame
 
 // 2nd submit of frame N, logically the last one, but waits on a TLS not yet
-// signalled for that value
+// signaled for that value
 vkQueueSubmit( frame:N, frameEnd, wait:TLS(42) );
 
 vkQueueSubmit( frame:... ); // Some other submissions for other frames

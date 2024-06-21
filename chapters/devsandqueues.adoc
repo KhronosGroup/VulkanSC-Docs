@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -723,8 +723,9 @@ ifndef::VK_VERSION_1_2[:anchor-prefix:]
   * pname:driverInfo is an array of ename:VK_MAX_DRIVER_INFO_SIZE code:char
     containing a null-terminated UTF-8 string with additional information
     about the driver.
-  * pname:conformanceVersion is the version of the Vulkan conformance test
-    this driver is conformant against (see slink:VkConformanceVersion).
+  * pname:conformanceVersion is the latest version of the Vulkan conformance
+    test that the implementor has successfully tested this driver against
+    prior to release (see slink:VkConformanceVersion).
 // end::VK_KHR_driver_properties-properties[]
 
 :refpage: VkPhysicalDeviceDriverProperties
@@ -1477,9 +1478,10 @@ include::{generated}/validity/structs/VkQueueFamilyProperties2.adoc[]
 ifdef::VK_EXT_global_priority_query,VK_KHR_global_priority[]
 [open,refpage='VkQueueFamilyGlobalPriorityPropertiesKHR',desc='Return structure for queue family global priority information query',type='structs']
 --
-The definition of slink:VkQueueFamilyGlobalPriorityPropertiesKHR is:
+The slink:VkQueueFamilyGlobalPriorityPropertiesKHR structure is defined as:
 
 include::{generated}/api/structs/VkQueueFamilyGlobalPriorityPropertiesKHR.adoc[]
+
 ifdef::VK_EXT_global_priority_query[]
 or the equivalent
 
@@ -1491,8 +1493,8 @@ endif::VK_EXT_global_priority_query[]
     structure.
   * pname:priorityCount is the number of supported global queue priorities
     in this queue family, and it must: be greater than 0.
-  * pname:priorities is an array of ename:VK_MAX_GLOBAL_PRIORITY_SIZE_EXT
-    elink:VkQueueGlobalPriorityEXT enums representing all supported global
+  * pname:priorities is an array of ename:VK_MAX_GLOBAL_PRIORITY_SIZE_KHR
+    elink:VkQueueGlobalPriorityKHR enums representing all supported global
     queue priorities in this queue family.
     The first pname:priorityCount elements of the array will be valid.
 
@@ -1824,6 +1826,24 @@ ifdef::hidden[]
     is a pointer to incompatible pipeline cache data <<SCID-1>>.
 // end::scdeviation[]
 endif::hidden[]
+
+Some implementations may: only accept pipeline cache data pointers that
+conform to platform and/or implementation specific alignment requirements.
+These alignment requirements cannot exceed 8 bytes.
+If any of the pipeline cache data pointers specified in the
+pname:pInitialData member of the elements of
+slink:VkDeviceObjectReservationCreateInfo::pname:pPipelineCacheCreateInfos
+are not aligned according to these requirements, then fname:vkCreateDevice
+will return ename:VK_ERROR_INVALID_PIPELINE_CACHE_DATA.
+ifdef::hidden[]
+// tag::scdeviation[]
+  * flink:vkCreateDevice returns ename:VK_ERROR_INVALID_PIPELINE_CACHE_DATA
+    if the pname:pInitialData member of any element of
+    slink:VkDeviceObjectReservationCreateInfo::pname:pPipelineCacheCreateInfos
+    is not aligned according to the platform and/or implementation specific
+    pipeline cache data alignment requirements <<SCID-8>>.
+// end::scdeviation[]
+endif::hidden[]
 endif::VKSC_VERSION_1_0[]
 
 ifdef::VK_EXT_application_parameters[]
@@ -2139,13 +2159,13 @@ ifdef::VK_ARM_scheduling_controls[]
     If the pname:pNext chain includes a
     slink:VkDeviceQueueShaderCoreControlCreateInfoARM structure, then it
     must: not be included in the pname:pNext chain of any of the
-    slink:VkDeviceQueueCreateInfo structures in pname:pQueueCreateInfos.
+    slink:VkDeviceQueueCreateInfo structures in pname:pQueueCreateInfos
   * [[VUID-VkDeviceCreateInfo-pNext-09397]]
     If the pname:pNext chain includes a
     slink:VkDeviceQueueShaderCoreControlCreateInfoARM structure then
     slink:VkPhysicalDeviceSchedulingControlsPropertiesARM::pname:schedulingControlsFlags
     must: contain
-    ename:VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM.
+    ename:VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM
 endif::VK_ARM_scheduling_controls[]
 ****
 
@@ -3126,7 +3146,7 @@ ifdef::VK_ARM_scheduling_controls[]
     slink:VkDeviceQueueShaderCoreControlCreateInfoARM structure then
     slink:VkPhysicalDeviceSchedulingControlsPropertiesARM::pname:schedulingControlsFlags
     must: contain
-    ename:VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM.
+    ename:VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM
 endif::VK_ARM_scheduling_controls[]
 ****
 
@@ -3181,7 +3201,7 @@ endif::VK_EXT_global_priority[]
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
   * pname:globalPriority is the system-wide priority associated to these
-    queues as specified by elink:VkQueueGlobalPriorityEXT
+    queues as specified by elink:VkQueueGlobalPriorityKHR
 
 Queues created without specifying
 sname:VkDeviceQueueGlobalPriorityCreateInfoKHR will default to
@@ -3279,7 +3299,7 @@ the shader cores available.
   * [[VUID-VkDeviceQueueShaderCoreControlCreateInfoARM-shaderCoreCount-09399]]
     pname:shaderCoreCount must: be greater than 0 and less than or equal to
     the total number of shader cores as reported via
-    slink:VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM::pname:shaderCoreCount.
+    slink:VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM::pname:shaderCoreCount
 ****
 
 include::{generated}/validity/structs/VkDeviceQueueShaderCoreControlCreateInfoARM.adoc[]
@@ -3392,7 +3412,7 @@ In cases where these implementations returned `NULL`, the corresponding
 queues are instead located in the extended range described in the preceding
 two paragraphs.
 
-This behaviour will not be observed on any driver that has passed Vulkan
+This behavior will not be observed on any driver that has passed Vulkan
 conformance test suite version 1.3.3.0, or any subsequent version.
 This information can be found by querying
 sname:VkPhysicalDeviceDriverProperties::pname:conformanceVersion.

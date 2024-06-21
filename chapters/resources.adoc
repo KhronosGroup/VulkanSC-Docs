@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -40,6 +40,7 @@ include::{generated}/api/handles/VkBuffer.adoc[]
 :refpage: vkCreateBuffer
 :objectnameplural: buffers
 :objectnamecamelcase: buffer
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create buffers, call:
@@ -58,6 +59,17 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
+  * [[VUID-vkCreateBuffer-device-09664]]
+    pname:device must: support at least one queue family with one of the
+ifdef::VK_KHR_video_encode_queue[]
+    ename:VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_VIDEO_DECODE_BIT_KHR,
+endif::VK_KHR_video_decode_queue[]
+ifndef::VKSC_VERSION_1_0[ename:VK_QUEUE_SPARSE_BINDING_BIT,]
+    ename:VK_QUEUE_TRANSFER_BIT, ename:VK_QUEUE_COMPUTE_BIT, or
+    ename:VK_QUEUE_GRAPHICS_BIT capabilities
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkCreateBuffer-flags-00911]]
     If the pname:flags member of pname:pCreateInfo includes
@@ -114,6 +126,8 @@ include::{generated}/validity/protos/vkCreateBuffer.adoc[]
 
 [open,refpage='VkBufferCreateInfo',desc='Structure specifying the parameters of a newly created buffer object',type='structs']
 --
+:refpage: VkBufferCreateInfo
+
 The sname:VkBufferCreateInfo structure is defined as:
 
 include::{generated}/api/structs/VkBufferCreateInfo.adoc[]
@@ -143,6 +157,7 @@ endif::VK_KHR_maintenance5[]
 
 .Valid Usage
 ****
+include::{chapters}/commonvalidity/buffer_usage_flags_common.adoc[]
   * [[VUID-VkBufferCreateInfo-size-00912]]
     pname:size must: be greater than `0`
   * [[VUID-VkBufferCreateInfo-sharingMode-00913]]
@@ -250,21 +265,37 @@ endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[
 ifdef::VK_KHR_video_decode_queue[]
   * [[VUID-VkBufferCreateInfo-usage-04813]]
     If pname:usage includes ename:VK_BUFFER_USAGE_VIDEO_DECODE_SRC_BIT_KHR
-    or ename:VK_BUFFER_USAGE_VIDEO_DECODE_DST_BIT_KHR, then the pname:pNext
-    chain must: include a slink:VkVideoProfileListInfoKHR structure with
-    pname:profileCount greater than `0` and pname:pProfiles including at
-    least one slink:VkVideoProfileInfoKHR structure with a
-    pname:videoCodecOperation member specifying a decode operation
+    or ename:VK_BUFFER_USAGE_VIDEO_DECODE_DST_BIT_KHR,
+ifdef::VK_KHR_video_maintenance1[]
+    and pname:flags does not include
+    ename:VK_BUFFER_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR,
+endif::VK_KHR_video_maintenance1[]
+    then the pname:pNext chain must: include a
+    slink:VkVideoProfileListInfoKHR structure with pname:profileCount
+    greater than `0` and pname:pProfiles including at least one
+    slink:VkVideoProfileInfoKHR structure with a pname:videoCodecOperation
+    member specifying a decode operation
 endif::VK_KHR_video_decode_queue[]
 ifdef::VK_KHR_video_encode_queue[]
   * [[VUID-VkBufferCreateInfo-usage-04814]]
     If pname:usage includes ename:VK_BUFFER_USAGE_VIDEO_ENCODE_SRC_BIT_KHR
-    or ename:VK_BUFFER_USAGE_VIDEO_ENCODE_DST_BIT_KHR, then the pname:pNext
-    chain must: include a slink:VkVideoProfileListInfoKHR structure with
-    pname:profileCount greater than `0` and pname:pProfiles including at
-    least one slink:VkVideoProfileInfoKHR structure with a
-    pname:videoCodecOperation member specifying an encode operation
+    or ename:VK_BUFFER_USAGE_VIDEO_ENCODE_DST_BIT_KHR,
+ifdef::VK_KHR_video_maintenance1[]
+    and pname:flags does not include
+    ename:VK_BUFFER_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR,
+endif::VK_KHR_video_maintenance1[]
+    then the pname:pNext chain must: include a
+    slink:VkVideoProfileListInfoKHR structure with pname:profileCount
+    greater than `0` and pname:pProfiles including at least one
+    slink:VkVideoProfileInfoKHR structure with a pname:videoCodecOperation
+    member specifying an encode operation
 endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_maintenance1[]
+  * [[VUID-VkBufferCreateInfo-flags-08325]]
+    If pname:flags includes
+    ename:VK_BUFFER_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR, then
+    <<features-videoMaintenance1,pname:videoMaintenance1>> must: be enabled
+endif::VK_KHR_video_maintenance1[]
 ifdef::VK_VERSION_1_3,VK_KHR_maintenance4[]
   * [[VUID-VkBufferCreateInfo-size-06409]]
     pname:size must: be less than or equal to
@@ -315,21 +346,20 @@ ifdef::VK_EXT_descriptor_buffer[]
     ename:VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT or
     ename:VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT
 endif::VK_EXT_descriptor_buffer[]
-  * [[VUID-VkBufferCreateInfo-None-09205]]
-    {empty}
-ifdef::VK_KHR_maintenance5[]
-    If the pname:pNext chain does not include a
-    slink:VkBufferUsageFlags2CreateInfoKHR structure,
-endif::VK_KHR_maintenance5[]
-    pname:usage must be a valid combination of elink:VkBufferUsageFlagBits
-    values
-  * [[VUID-VkBufferCreateInfo-None-09206]]
-    {empty}
-ifdef::VK_KHR_maintenance5[]
-    If the pname:pNext chain does not include a
-    slink:VkBufferUsageFlags2CreateInfoKHR structure,
-endif::VK_KHR_maintenance5[]
-    pname:usage must: not be `0`
+  * [[VUID-VkBufferCreateInfo-flags-09641]]
+    If pname:flags includes ename:VK_BUFFER_CREATE_PROTECTED_BIT, then
+    pname:usage must: not contain any of the following bits
+ifdef::VK_EXT_transform_feedback[** ename:VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_BUFFER_BIT_EXT]
+ifdef::VK_EXT_transform_feedback[** ename:VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT]
+ifdef::VK_EXT_conditional_rendering[** ename:VK_BUFFER_USAGE_CONDITIONAL_RENDERING_BIT_EXT]
+ifdef::VK_KHR_acceleration_structure[** ename:VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR]
+ifdef::VK_KHR_acceleration_structure[** ename:VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR]
+ifdef::VK_KHR_ray_tracing_pipeline[** ename:VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR]
+ifdef::VK_EXT_descriptor_buffer[** ename:VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT]
+ifdef::VK_EXT_descriptor_buffer[** ename:VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT]
+ifdef::VK_EXT_descriptor_buffer[** ename:VK_BUFFER_USAGE_PUSH_DESCRIPTORS_DESCRIPTOR_BUFFER_BIT_EXT]
+ifdef::VK_EXT_opacity_micromap[** ename:VK_BUFFER_USAGE_MICROMAP_BUILD_INPUT_READ_ONLY_BIT_EXT]
+ifdef::VK_EXT_opacity_micromap[** ename:VK_BUFFER_USAGE_MICROMAP_STORAGE_BIT_EXT]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -700,6 +730,12 @@ ifdef::VK_EXT_descriptor_buffer[]
     capturing and replaying (e.g. for trace capture and replay), see
     slink:VkOpaqueCaptureDescriptorDataCreateInfoEXT for more detail.
 endif::VK_EXT_descriptor_buffer[]
+ifdef::VK_KHR_video_maintenance1[]
+  * ename:VK_BUFFER_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR specifies that
+    the buffer can: be used in <<video-coding,video coding operations>>
+    without having to specify at buffer creation time the set of video
+    profiles the buffer will be used with.
+endif::VK_KHR_video_maintenance1[]
 
 See <<sparsememory-sparseresourcefeatures,Sparse Resource Features>> and
 <<features, Physical Device Features>> for details of the sparse memory
@@ -947,6 +983,7 @@ include::{generated}/api/handles/VkBufferView.adoc[]
 :refpage: vkCreateBufferView
 :objectnameplural: buffer views
 :objectnamecamelcase: bufferView
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a buffer view, call:
@@ -963,12 +1000,15 @@ include::{generated}/api/protos/vkCreateBufferView.adoc[]
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
-ifdef::VKSC_VERSION_1_0[]
 .Valid Usage
 ****
+  * [[VUID-vkCreateBufferView-device-09665]]
+    pname:device must: support at least one queue family with one of the
+    ename:VK_QUEUE_COMPUTE_BIT or ename:VK_QUEUE_GRAPHICS_BIT capabilities
+ifdef::VKSC_VERSION_1_0[]
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
-****
 endif::VKSC_VERSION_1_0[]
+****
 
 include::{generated}/validity/protos/vkCreateBufferView.adoc[]
 --
@@ -1192,6 +1232,7 @@ include::{generated}/api/handles/VkImage.adoc[]
 :refpage: vkCreateImage
 :objectnameplural: images
 :objectnamecamelcase: image
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create images, call:
@@ -1210,6 +1251,20 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
+  * [[VUID-vkCreateImage-device-09666]]
+    pname:device must: support at least one queue family with one of the
+ifdef::VK_KHR_video_encode_queue[]
+    ename:VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_VIDEO_DECODE_BIT_KHR,
+endif::VK_KHR_video_decode_queue[]
+ifdef::VK_NV_optical_flow[]
+    ename:VK_QUEUE_OPTICAL_FLOW_BIT_NV,
+endif::VK_NV_optical_flow[]
+ifndef::VKSC_VERSION_1_0[ename:VK_QUEUE_SPARSE_BINDING_BIT,]
+    ename:VK_QUEUE_TRANSFER_BIT, ename:VK_QUEUE_COMPUTE_BIT, or
+    ename:VK_QUEUE_GRAPHICS_BIT capabilities
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkCreateImage-flags-00939]]
     If the pname:flags member of pname:pCreateInfo includes
@@ -1669,7 +1724,9 @@ ifdef::VK_KHR_video_queue[]
   *** slink:VkImageCreateInfo::pname:tiling equals
       slink:VkVideoFormatPropertiesKHR::pname:imageTiling.
   *** slink:VkImageCreateInfo::pname:usage only contains bits also set in
-      slink:VkVideoFormatPropertiesKHR::pname:imageUsageFlags.
+      slink:VkVideoFormatPropertiesKHR::pname:imageUsageFlags, or
+      slink:VkImageCreateInfo::pname:flags includes
+      ename:VK_IMAGE_CREATE_EXTENDED_USAGE_BIT.
   ** Otherwise `supportedVideoFormat` is ename:VK_FALSE.
 endif::VK_KHR_video_queue[]
 ****
@@ -1861,8 +1918,8 @@ endif::VK_EXT_fragment_density_map[]
     ename:VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, or
     ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
   * [[VUID-VkImageCreateInfo-samples-02258]]
-    pname:samples must: be a bit value that is set in
-    pname:imageCreateSampleCounts (as defined in
+    pname:samples must: be a valid elink:VkSampleCountFlagBits value that is
+    set in pname:imageCreateSampleCounts (as defined in
     <<resources-image-creation-limits,Image Creation Limits>>)
   * [[VUID-VkImageCreateInfo-usage-00968]]
     If the <<features-shaderStorageImageMultisample,
@@ -2042,11 +2099,19 @@ ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     include ename:VK_IMAGE_CREATE_ALIAS_BIT, pname:flags must: not contain
     ename:VK_IMAGE_CREATE_DISJOINT_BIT
   * [[VUID-VkImageCreateInfo-format-04712]]
-    If pname:format has a code:_422 or code:_420 suffix, pname:width must:
-    be a multiple of 2
+    If pname:format has a code:_422 or code:_420 suffix, pname:extent.width
+    must: be a multiple of 2
   * [[VUID-VkImageCreateInfo-format-04713]]
-    If pname:format has a code:_420 suffix, pname:height must: be a multiple
-    of 2
+    If pname:format has a code:_420 suffix, pname:extent.height must: be a
+    multiple of 2
+ifdef::VK_IMG_format_pvrtc[]
+  * [[VUID-VkImageCreateInfo-format-09583]]
+    If pname:format is one of the etext:VK_FORMAT_PVTRC1_*_IMG formats,
+    pname:extent.width must: be a power of 2
+  * [[VUID-VkImageCreateInfo-format-09584]]
+    If pname:format is one of the etext:VK_FORMAT_PVTRC1_*_IMG formats,
+    pname:extent.height must: be a power of 2
+endif::VK_IMG_format_pvrtc[]
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ifdef::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkImageCreateInfo-tiling-02261]]
@@ -2275,22 +2340,53 @@ ifdef::VK_KHR_video_decode_queue[]
   * [[VUID-VkImageCreateInfo-usage-04815]]
     If pname:usage includes ename:VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
     ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR, or
-    ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR, then the pname:pNext
-    chain must: include a slink:VkVideoProfileListInfoKHR structure with
-    pname:profileCount greater than `0` and pname:pProfiles including at
-    least one slink:VkVideoProfileInfoKHR structure with a
-    pname:videoCodecOperation member specifying a decode operation
+    ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR,
+ifdef::VK_KHR_video_maintenance1[]
+    and pname:flags does not include
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR,
+endif::VK_KHR_video_maintenance1[]
+    then the pname:pNext chain must: include a
+    slink:VkVideoProfileListInfoKHR structure with pname:profileCount
+    greater than `0` and pname:pProfiles including at least one
+    slink:VkVideoProfileInfoKHR structure with a pname:videoCodecOperation
+    member specifying a decode operation
 endif::VK_KHR_video_decode_queue[]
 ifdef::VK_KHR_video_encode_queue[]
   * [[VUID-VkImageCreateInfo-usage-04816]]
     If pname:usage includes ename:VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR,
     ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR, or
-    ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR, then the pname:pNext
-    chain must: include a slink:VkVideoProfileListInfoKHR structure with
-    pname:profileCount greater than `0` and pname:pProfiles including at
-    least one slink:VkVideoProfileInfoKHR structure with a
-    pname:videoCodecOperation member specifying an encode operation
+    ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR,
+ifdef::VK_KHR_video_maintenance1[]
+    and pname:flags does not include
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR,
+endif::VK_KHR_video_maintenance1[]
+    then the pname:pNext chain must: include a
+    slink:VkVideoProfileListInfoKHR structure with pname:profileCount
+    greater than `0` and pname:pProfiles including at least one
+    slink:VkVideoProfileInfoKHR structure with a pname:videoCodecOperation
+    member specifying an encode operation
 endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_maintenance1[]
+  * [[VUID-VkImageCreateInfo-flags-08328]]
+    If pname:flags includes
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR, then
+    <<features-videoMaintenance1,pname:videoMaintenance1>> must: be enabled
+ifdef::VK_KHR_video_decode_queue[]
+  * [[VUID-VkImageCreateInfo-flags-08329]]
+    If pname:flags includes
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR and pname:usage
+    does not include ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR, then
+    pname:usage must: not include
+    ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR
+endif::VK_KHR_video_decode_queue[]
+ifdef::VK_KHR_video_encode_queue[]
+  * [[VUID-VkImageCreateInfo-flags-08331]]
+    If pname:flags includes
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR, then
+    pname:usage must: not include
+    ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR
+endif::VK_KHR_video_encode_queue[]
+endif::VK_KHR_video_maintenance1[]
 ifdef::VK_KHR_video_queue[]
   * [[VUID-VkImageCreateInfo-pNext-06811]]
     If the pname:pNext chain includes a slink:VkVideoProfileListInfoKHR
@@ -2391,6 +2487,18 @@ ifdef::VK_EXT_host_image_copy[]
     contain ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT_EXT, then
     pname:usage must: not contain ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT
 endif::VK_EXT_host_image_copy[]
+ifdef::VK_MESA_image_alignment_control[]
+  * [[VUID-VkImageCreateInfo-pNext-09653]]
+    If the pname:pNext chain contains a
+    slink:VkImageAlignmentControlCreateInfoMESA structure, pname:tiling
+    must: be ename:VK_IMAGE_TILING_OPTIMAL
+ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
+  * [[VUID-VkImageCreateInfo-pNext-09654]]
+    If the pname:pNext chain contains a
+    slink:VkImageAlignmentControlCreateInfoMESA structure, it must: not
+    contain a slink:VkExternalMemoryImageCreateInfo structure
+endif::VK_VERSION_1_1,VK_KHR_external_memory[]
+endif::VK_MESA_image_alignment_control[]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -2715,6 +2823,13 @@ endif::VK_KHR_image_format_list[]
 If pname:viewFormatCount is zero, pname:pViewFormats is ignored and the
 image is created as if the sname:VkImageFormatListCreateInfo structure were
 not included in the pname:pNext chain of slink:VkImageCreateInfo.
+
+.Valid Usage
+****
+  * [[VUID-VkImageFormatListCreateInfo-viewFormatCount-09540]]
+    If pname:viewFormatCount is not 0, each element of pname:pViewFormats
+    must: not be ename:VK_FORMAT_UNDEFINED
+****
 
 include::{generated}/validity/structs/VkImageFormatListCreateInfo.adoc[]
 --
@@ -3053,6 +3168,64 @@ include::{generated}/validity/structs/VkImageCompressionPropertiesEXT.adoc[]
 --
 endif::VK_EXT_image_compression_control[]
 
+ifdef::VK_MESA_image_alignment_control[]
+[open,refpage='VkImageAlignmentControlCreateInfoMESA',desc='Specify image alignment',type='structs']
+--
+If the pname:pNext list of slink:VkImageCreateInfo includes a
+sname:VkImageAlignmentControlCreateInfoMESA structure, then that structure
+describes desired alignment for this image.
+
+The sname:VkImageAlignmentControlCreateInfoMESA structure is defined as:
+
+include::{generated}/api/structs/VkImageAlignmentControlCreateInfoMESA.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:maximumRequestedAlignment specifies the maximum alignment for the
+    image.
+
+If pname:maximumRequestedAlignment is not 0, the implementation should:
+choose an image memory layout that requires an alignment no larger than
+pname:maximumRequestedAlignment as reported in
+slink:VkMemoryRequirements::pname:alignment.
+If such a layout does not exist for the given image creation parameters, the
+implementation should: return the smallest alignment which is supported in
+slink:VkMemoryRequirements.
+
+If an implementation needs to disable image compression for
+pname:maximumRequestedAlignment to be honored -
+where a larger alignment would enable image compression -
+the implementation should: not use pname:maximumRequestedAlignment, and
+should: return the smallest alignment which does not compromise compression.
+ifdef::VK_EXT_image_compression_control[]
+If <<features-imageCompressionControl,pname:imageCompressionControl>> is
+enabled, the application can: chain a slink:VkImageCompressionControlEXT
+with ename:VK_IMAGE_COMPRESSION_DISABLED_EXT.
+In this case, image compression considerations should: not apply when
+implementation decides alignment.
+endif::VK_EXT_image_compression_control[]
+
+.Valid Usage
+****
+  * [[VUID-VkImageAlignmentControlCreateInfoMESA-maximumRequestedAlignment-09655]]
+    If pname:maximumRequestedAlignment is not 0,
+    pname:maximumRequestedAlignment must: be a power of two
+  * [[VUID-VkImageAlignmentControlCreateInfoMESA-maximumRequestedAlignment-09656]]
+    If pname:maximumRequestedAlignment is not 0, the bitwise-and of
+    pname:maximumRequestedAlignment and
+    <<limits-supportedImageAlignmentMask,pname:supportedImageAlignmentMask>>
+    must: be non-zero
+  * [[VUID-VkImageAlignmentControlCreateInfoMESA-imageAlignmentControl-09657]]
+    <<features-imageAlignmentControl,pname:imageAlignmentControl>> must: be
+    enabled on the device
+****
+
+include::{generated}/validity/structs/VkImageAlignmentControlCreateInfoMESA.adoc[]
+
+--
+endif::VK_MESA_image_alignment_control[]
+
 [open,refpage='VkImageUsageFlagBits',desc='Bitmask specifying intended usage of an image',type='enums']
 --
 Bits which can: be set in
@@ -3367,6 +3540,51 @@ ifdef::VK_EXT_multisampled_render_to_single_sampled[]
     <<multisampled-render-to-single-sampled,multisampled rendering as a
     single-sampled framebuffer attachment>>
 endif::VK_EXT_multisampled_render_to_single_sampled[]
+ifdef::VK_KHR_video_maintenance1[]
+  * ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR specifies that
+    the image can: be used in <<video-coding,video coding operations>>
+    without having to specify at image creation time the set of video
+    profiles the image will be used with, except for images used only as
+    <<dpb,DPB>> pictures, as long as the image is otherwise
+    <<video-profile-compatibility,compatible>> with the video profile in
+    question.
++
+[NOTE]
+.Note
+====
+This enables exchanging video picture data without additional copies or
+conversions when used as:
+
+ifdef::VK_KHR_video_decode_queue[]
+  * <<decode-output-picture,Decode output pictures>>, indifferent of the
+    video profile used to produce them.
+endif::VK_KHR_video_decode_queue[]
+ifdef::VK_KHR_video_encode_queue[]
+  * <<encode-input-picture,Encode input pictures>>, indifferent of the video
+    profile used to consume them.
+endif::VK_KHR_video_encode_queue[]
+
+ifdef::VK_KHR_video_decode_queue[]
+This includes images created with both
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR and
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR, which is necessary to use the
+same video picture as the <<reconstructed-picture,reconstructed picture>>
+and <<decode-output-picture,decode output picture>> in a video decode
+operation on implementations supporting
+ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR.
+endif::VK_KHR_video_decode_queue[]
+
+However, images with only DPB usage remain tied to the video profiles the
+image was created with, as the data layout of such DPB-only images may: be
+implementation- and codec-dependent.
+
+If an application would like to share or reuse the device memory backing
+such images (e.g. for the purposes of temporal aliasing), then it should:
+create separate image objects for each video profile and bind them to the
+same underlying device memory range, similar to how memory resources can: be
+shared across separate video sessions or any other memory-backed resource.
+====
+endif::VK_KHR_video_maintenance1[]
 
 See <<sparsememory-sparseresourcefeatures,Sparse Resource Features>> and
 <<sparsememory-physicalfeatures,Sparse Physical Device Features>> for more
@@ -3677,10 +3895,11 @@ flink:vkGetImageSubresourceLayout, with the ability to specify extended
 inputs via chained input structures, and to return extended information via
 chained output structures.
 
-It is legal to call fname:vkGetImageSubresourceLayout2KHR with a pname:image
-created with pname:tiling equal to ename:VK_IMAGE_TILING_OPTIMAL, but the
-members of slink:VkSubresourceLayout2KHR::pname:subresourceLayout will have
-undefined: values in this case.
+It is legal to call fname:vkGetImageSubresourceLayout2KHR with an
+pname:image created with pname:tiling equal to
+ename:VK_IMAGE_TILING_OPTIMAL, but the members of
+slink:VkSubresourceLayout2KHR::pname:subresourceLayout will have undefined:
+values in this case.
 
 [NOTE]
 .Note
@@ -4353,6 +4572,16 @@ ifdef::VK_EXT_attachment_feedback_loop_layout[]
     ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT or
     ename:VK_IMAGE_USAGE_SAMPLED_BIT usage bits enabled.
 endif::VK_EXT_attachment_feedback_loop_layout[]
+ifdef::VK_KHR_dynamic_rendering_local_read[]
+  * ename:VK_IMAGE_LAYOUT_RENDERING_LOCAL_READ_KHR must: only be used as
+    either a storage image, or a color or depth/stencil attachment and an
+    input attachment.
+    This layout is valid only for image subresources of images created with
+    either ename:VK_IMAGE_USAGE_STORAGE_BIT, or both
+    ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT and either of
+    ename:VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT or
+    ename:VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT.
+endif::VK_KHR_dynamic_rendering_local_read[]
 
 The layout of each image subresource is not a state of the image subresource
 itself, but is rather a property of how the data in memory is organized, and
@@ -4476,6 +4705,7 @@ include::{generated}/api/enums/VkImageViewType.adoc[]
 :refpage: vkCreateImageView
 :objectnameplural: image views
 :objectnamecamelcase: imageView
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create an image view, call:
@@ -4494,6 +4724,15 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
+  * [[VUID-vkCreateImageView-device-09667]]
+    pname:device must: support at least one queue family with one of the
+ifdef::VK_KHR_video_encode_queue[]
+    ename:VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_VIDEO_DECODE_BIT_KHR,
+endif::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_COMPUTE_BIT, or ename:VK_QUEUE_GRAPHICS_BIT capabilities
   * [[VUID-vkCreateImageView-image-09179]]
     slink:VkImageViewCreateInfo::pname:image must: have been created from
     pname:device
@@ -4788,6 +5027,46 @@ endif::VK_NV_linear_color_attachment[]
     ename:VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, then the image view's
     <<resources-image-view-format-features,format features>> must: contain
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+ifdef::VK_KHR_video_maintenance1[]
+ifdef::VK_KHR_video_decode_queue[]
+  * [[VUID-VkImageViewCreateInfo-image-08333]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR and pname:usage
+    contains ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR, then the image
+    view's <<resources-image-view-format-features,format features>> must:
+    contain ename:VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR
+  * [[VUID-VkImageViewCreateInfo-image-08334]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR and pname:usage
+    contains ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR, then the image
+    view's <<resources-image-view-format-features,format features>> must:
+    contain ename:VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR
+  * [[VUID-VkImageViewCreateInfo-image-08335]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR, then
+    pname:usage must: not include
+    ename:VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR
+endif::VK_KHR_video_decode_queue[]
+ifdef::VK_KHR_video_encode_queue[]
+  * [[VUID-VkImageViewCreateInfo-image-08336]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR and pname:usage
+    contains ename:VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR, then the image
+    view's <<resources-image-view-format-features,format features>> must:
+    contain ename:VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR
+  * [[VUID-VkImageViewCreateInfo-image-08337]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR and pname:usage
+    contains ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR, then the image
+    view's <<resources-image-view-format-features,format features>> must:
+    contain ename:VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR
+  * [[VUID-VkImageViewCreateInfo-image-08338]]
+    If pname:image was created with
+    ename:VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR, then
+    pname:usage must: not include
+    ename:VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR
+endif::VK_KHR_video_encode_queue[]
+endif::VK_KHR_video_maintenance1[]
   * [[VUID-VkImageViewCreateInfo-usage-08932]]
     If pname:usage contains ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
 ifdef::VK_ANDROID_external_format_resolve[]
@@ -4969,8 +5248,18 @@ ifdef::VK_VERSION_1_1,VK_KHR_maintenance2[]
   * [[VUID-VkImageViewCreateInfo-image-07072]]
     If pname:image was created with the
     ename:VK_IMAGE_CREATE_BLOCK_TEXEL_VIEW_COMPATIBLE_BIT flag and
-    pname:format is a non-compressed format, the pname:levelCount and
-    pname:layerCount members of pname:subresourceRange must: both be `1`
+    pname:format is a non-compressed format, the pname:levelCount member of
+    pname:subresourceRange must: be `1`
+  * [[VUID-VkImageViewCreateInfo-image-09487]]
+    If pname:image was created with the
+    ename:VK_IMAGE_CREATE_BLOCK_TEXEL_VIEW_COMPATIBLE_BIT flag,
+ifdef::VK_KHR_maintenance6[]
+    the
+    sname:VkPhysicalDeviceMaintenance6PropertiesKHR::pname:blockTexelViewCompatibleMultipleLayers
+    property is not set to ename:VK_TRUE,
+endif::VK_KHR_maintenance6[]
+    and pname:format is a non-compressed format, then the pname:layerCount
+    member of pname:subresourceRange must: be `1`
 endif::VK_VERSION_1_1,VK_KHR_maintenance2[]
 ifdef::VK_VERSION_1_2,VK_KHR_image_format_list[]
   * [[VUID-VkImageViewCreateInfo-pNext-01585]]
@@ -5388,7 +5677,9 @@ ifdef::VK_QCOM_image_processing[]
     must: be less than or equal to <<limits-weightfilter-maxdimension,
     sname:VkPhysicalDeviceImageProcessingPropertiesQCOM::pname:maxWeightFilterDimension.height>>
 endif::VK_QCOM_image_processing[]
-
+  * [[VUID-VkImageViewCreateInfo-subresourceRange-09594]]
+    pname:subresourceRange.aspectMask must: be valid for the pname:format
+    the pname:image was created with
 ****
 
 include::{generated}/validity/structs/VkImageViewCreateInfo.adoc[]
@@ -5511,7 +5802,7 @@ equal to ename:VK_REMAINING_3D_SLICES_EXT.
     specified in <<resources-image-mip-level-sizing,Image Mip Level Sizing>>
   * [[VUID-VkImageViewSlicedCreateInfoEXT-sliceCount-07868]]
     If pname:sliceCount is not ename:VK_REMAINING_3D_SLICES_EXT, it must: be
-    be non-zero and [eq]#pname:sliceOffset {plus} pname:sliceCount# must: be
+    non-zero and [eq]#pname:sliceOffset {plus} pname:sliceCount# must: be
     less than or equal to the effective view depth as specified in
     <<resources-image-mip-level-sizing,Image Mip Level Sizing>>
   * [[VUID-VkImageViewSlicedCreateInfoEXT-image-07869]]
@@ -6393,6 +6684,13 @@ flink:vkCmdCopyMemoryToAccelerationStructureKHR with a pname:mode of
 ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_DESERIALIZE_KHR during replay.
 ====
 
+[NOTE]
+.Note
+====
+Memory does not need to be bound to the underlying buffer when
+flink:vkCreateAccelerationStructureKHR is called.
+====
+
 The input buffers passed to acceleration structure build commands will be
 referenced by the implementation for the duration of the command.
 After the command completes, the acceleration structure may: hold a
@@ -6447,14 +6745,7 @@ include::{generated}/api/structs/VkAccelerationStructureCreateInfoKHR.adoc[]
   * pname:deviceAddress is the device address requested for the acceleration
     structure if the <<features-accelerationStructureCaptureReplay,
     pname:accelerationStructureCaptureReplay>> feature is being used.
-
-If pname:deviceAddress is zero, no specific address is requested.
-
-If pname:deviceAddress is not zero, pname:deviceAddress must: be an address
-retrieved from an identically created acceleration structure on the same
-implementation.
-The acceleration structure must: also be placed on an identically created
-pname:buffer and at the same pname:offset.
+    If pname:deviceAddress is zero, no specific address is requested.
 
 Applications should: avoid creating acceleration structures with
 application-provided addresses and implementation-provided addresses in the
@@ -6525,6 +6816,22 @@ endif::VK_NV_ray_tracing_motion_blur[]
   * [[VUID-VkAccelerationStructureCreateInfoKHR-deviceAddress-03612]]
     If pname:deviceAddress is not zero, pname:createFlags must: include
     ename:VK_ACCELERATION_STRUCTURE_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_KHR
+  * [[VUID-VkAccelerationStructureCreateInfoKHR-deviceAddress-09488]]
+    If pname:deviceAddress is not zero, it must: have been retrieved from an
+    identically created acceleration structure, except for pname:buffer and
+    pname:deviceAddress
+  * [[VUID-VkAccelerationStructureCreateInfoKHR-deviceAddress-09489]]
+    If pname:deviceAddress is not zero, pname:buffer must: have been created
+    identically to the pname:buffer used to create the acceleration
+    structure from which pname:deviceAddress was retrieved, except for
+    slink:VkBufferOpaqueCaptureAddressCreateInfo::pname:opaqueCaptureAddress
+  * [[VUID-VkAccelerationStructureCreateInfoKHR-deviceAddress-09490]]
+    If pname:deviceAddress is not zero, pname:buffer must: have been created
+    with a
+    slink:VkBufferOpaqueCaptureAddressCreateInfo::pname:opaqueCaptureAddress
+    that was retrieved from flink:vkGetBufferOpaqueCaptureAddress for the
+    pname:buffer that was used to create the acceleration structure from
+    which pname:deviceAddress was retrieved
   * [[VUID-VkAccelerationStructureCreateInfoKHR-createFlags-03613]]
     If pname:createFlags includes
     ename:VK_ACCELERATION_STRUCTURE_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_KHR,
@@ -7478,6 +7785,14 @@ ename:VK_ACCELERATION_STRUCTURE_TYPE_GENERIC_KHR.
     If pname:device was created with multiple physical devices, then the
     <<features-bufferDeviceAddressMultiDevice,
     pname:bufferDeviceAddressMultiDevice>> feature must: be enabled
+  * [[VUID-vkGetAccelerationStructureDeviceAddressKHR-pInfo-09541]]
+    If the buffer on which pname:pInfo->accelerationStructure was placed is
+    non-sparse then it must: be bound completely and contiguously to a
+    single sname:VkDeviceMemory object
+  * [[VUID-vkGetAccelerationStructureDeviceAddressKHR-pInfo-09542]]
+    The buffer on which pname:pInfo->accelerationStructure was placed must:
+    have been created with the
+    ename:VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT usage flag
 ****
 
 include::{generated}/validity/protos/vkGetAccelerationStructureDeviceAddressKHR.adoc[]
@@ -7993,7 +8308,7 @@ ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
 The precise size of images that will be bound to external Android hardware
 buffer memory is unknown until the memory has been imported or allocated, so
 applications must: not call flink:vkGetImageMemoryRequirements or
-flink:vkGetImageMemoryRequirements2 with such an slink:VkImage before it has
+flink:vkGetImageMemoryRequirements2 with such a slink:VkImage before it has
 been bound to memory.
 ifdef::VK_VERSION_1_3,VK_KHR_maintenance4[]
 For this reason, applications also must: not call
@@ -8037,11 +8352,13 @@ flink:vkGetBufferMemoryRequirements and flink:vkGetImageMemoryRequirements:
 
   * The pname:memoryTypeBits member always contains at least one bit set.
   * If pname:buffer is a sname:VkBuffer not created with the
-    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT bit set, or if pname:image is
-    <<glossary-linear-resource,linear>> image, then the pname:memoryTypeBits
-    member always contains at least one bit set corresponding to a
-    sname:VkMemoryType with a pname:propertyFlags that has both the
-    ename:VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT bit and the
+    ename:VK_BUFFER_CREATE_SPARSE_BINDING_BIT or
+    ename:VK_BUFFER_CREATE_PROTECTED_BIT bits set, or if pname:image is a
+    <<glossary-linear-resource,linear>> image that was not created with the
+    ename:VK_IMAGE_CREATE_PROTECTED_BIT bit set, then the
+    pname:memoryTypeBits member always contains at least one bit set
+    corresponding to a sname:VkMemoryType with a pname:propertyFlags that
+    has both the ename:VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT bit and the
     ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bit set.
     In other words, mappable coherent memory can: always be attached to
     these objects.
@@ -8449,20 +8766,19 @@ endif::VK_KHR_maintenance4[]
     aspect corresponding to the image plane to query.
     This parameter is ignored unless
 ifdef::VK_EXT_image_drm_format_modifier[]
-    pname:pCreateInfo::pname:tiling is
+    pname:pCreateInfo->tiling is
     ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT, or
 endif::VK_EXT_image_drm_format_modifier[]
-    pname:pCreateInfo::pname:flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT
-    set.
+    pname:pCreateInfo->flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT set.
 
 .Valid Usage
 ****
   * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06416]]
-    The pname:pCreateInfo::pname:pNext chain must: not contain a
+    The pname:pCreateInfo->pNext chain must: not contain a
     slink:VkImageSwapchainCreateInfoKHR structure
 ifdef::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06776]]
-    The pname:pCreateInfo::pname:pNext chain must: not contain a
+    The pname:pCreateInfo->pNext chain must: not contain a
     slink:VkImageDrmFormatModifierExplicitCreateInfoEXT structure
 endif::VK_EXT_image_drm_format_modifier[]
 ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
@@ -8484,18 +8800,17 @@ ifdef::VK_VERSION_1_3,VK_KHR_maintenance4[]
 endif::VK_VERSION_1_3,VK_KHR_maintenance4[]
 endif::VK_QNX_external_memory_screen_buffer[]
   * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06417]]
-    If pname:pCreateInfo::pname:format specifies a _multi-planar_ format and
-    pname:pCreateInfo::pname:flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT
-    set then pname:planeAspect must: not be ename:VK_IMAGE_ASPECT_NONE_KHR
+    If pname:pCreateInfo->format specifies a _multi-planar_ format and
+    pname:pCreateInfo->flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT set then
+    pname:planeAspect must: not be ename:VK_IMAGE_ASPECT_NONE_KHR
   * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06419]]
-    If pname:pCreateInfo::pname:flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT
-    set and if the pname:pCreateInfo::pname:tiling is
-    ename:VK_IMAGE_TILING_LINEAR or ename:VK_IMAGE_TILING_OPTIMAL, then
-    pname:planeAspect must: be a single valid
-    <<formats-planes-image-aspect,multi-planar aspect mask>> bit
+    If pname:pCreateInfo->flags has ename:VK_IMAGE_CREATE_DISJOINT_BIT set
+    and if the pname:pCreateInfo->tiling is ename:VK_IMAGE_TILING_LINEAR or
+    ename:VK_IMAGE_TILING_OPTIMAL, then pname:planeAspect must: be a single
+    valid <<formats-planes-image-aspect,multi-planar aspect mask>> bit
 ifdef::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkDeviceImageMemoryRequirements-pCreateInfo-06420]]
-    If pname:pCreateInfo::pname:tiling is
+    If pname:pCreateInfo->tiling is
     ename:VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT, then pname:planeAspect
     must: be a single valid _memory plane_ for the image (that is,
     pname:aspectMask must: specify a plane index that is less than the
@@ -8730,12 +9045,28 @@ endif::VK_KHR_bind_memory2[]
 On some implementations, it may: be more efficient to batch memory bindings
 into a single command.
 
+ifdef::VK_KHR_maintenance6[]
+If the <<features-maintenance6, pname:maintenance6>> feature is enabled,
+this command must: attempt to perform all of the memory binding operations
+described by pname:pBindInfos, and must: not early exit on the first
+failure.
+endif::VK_KHR_maintenance6[]
+
+If any of the memory binding operations described by pname:pBindInfos fail,
+the elink:VkResult returned by this command must: be the return value of any
+one of the memory binding operations which did not return ename:VK_SUCCESS.
+
 [NOTE]
 .Note
 ====
-If fname:vkBindBufferMemory2 fails, and pname:bindInfoCount was greater than
-one, then the buffers referenced by pname:pBindInfos will be in an
-indeterminate state, and must not be used.
+If the fname:vkBindBufferMemory2 command failed,
+ifdef::VK_KHR_maintenance6[]
+slink:VkBindMemoryStatusKHR structures were not included in the pname:pNext
+chains of each element of pname:pBindInfos,
+endif::VK_KHR_maintenance6[]
+and pname:bindInfoCount was greater than one, then the buffers referenced by
+pname:pBindInfos will be in an indeterminate state, and must not be used.
+
 Applications should destroy these buffers.
 ====
 
@@ -8844,6 +9175,28 @@ In other words, by default each physical device attaches to instance zero.
 include::{generated}/validity/structs/VkBindBufferMemoryDeviceGroupInfo.adoc[]
 --
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
+
+ifdef::VK_KHR_maintenance6[]
+[open,refpage='VkBindMemoryStatusKHR',desc='Structure specifying where to return memory binding status',type='structs']
+--
+The sname:VkBindMemoryStatusKHR structure is defined as:
+
+include::{generated}/api/structs/VkBindMemoryStatusKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pResult is a pointer to a ename:VkResult value.
+
+If the pname:pNext chain of slink:VkBindBufferMemoryInfo or
+slink:VkBindImageMemoryInfo includes a sname:VkBindMemoryStatusKHR
+structure, then the sname:VkBindMemoryStatusKHR::pname:pResult will be
+populated with a value describing the result of the corresponding memory
+binding operation.
+
+include::{generated}/validity/structs/VkBindMemoryStatusKHR.adoc[]
+--
+endif::VK_KHR_maintenance6[]
 endif::VK_VERSION_1_1,VK_KHR_bind_memory2[]
 
 [open,refpage='vkBindImageMemory',desc='Bind device memory to an image object',type='protos']
@@ -8946,12 +9299,28 @@ endif::VK_KHR_bind_memory2[]
 On some implementations, it may: be more efficient to batch memory bindings
 into a single command.
 
+ifdef::VK_KHR_maintenance6[]
+If the <<features-maintenance6, pname:maintenance6>> feature is enabled,
+this command must: attempt to perform all of the memory binding operations
+described by pname:pBindInfos, and must: not early exit on the first
+failure.
+endif::VK_KHR_maintenance6[]
+
+If any of the memory binding operations described by pname:pBindInfos fail,
+the elink:VkResult returned by this command must: be the return value of any
+one of the memory binding operations which did not return ename:VK_SUCCESS.
+
 [NOTE]
 .Note
 ====
-If fname:vkBindImageMemory2 fails, and pname:bindInfoCount was greater than
-one, then the images referenced by pname:pBindInfos will be in an
-indeterminate state, and must not be used.
+If the fname:vkBindImageMemory2 command failed,
+ifdef::VK_KHR_maintenance6[]
+slink:VkBindMemoryStatusKHR structures were not included in the pname:pNext
+chains of each element of pname:pBindInfos,
+endif::VK_KHR_maintenance6[]
+and pname:bindInfoCount was greater than one, then the images referenced by
+pname:pBindInfos will be in an indeterminate state, and must not be used.
+
 Applications should destroy these images.
 ====
 
@@ -9504,9 +9873,9 @@ instance or API, applications must:
   . Ensure the release operation has completed using semaphores or fences.
   . Acquire exclusive ownership in the destination instance or API
 
-Unlike queue ownership transfers, the destination instance or API is not
-specified explicitly when releasing ownership, nor is the source instance or
-API specified when acquiring ownership.
+Unlike queue family ownership transfers, the destination instance or API is
+not specified explicitly when releasing ownership, nor is the source
+instance or API specified when acquiring ownership.
 Instead, the image or memory barrier's pname:dstQueueFamilyIndex or
 pname:srcQueueFamilyIndex parameters are set to the reserved queue family
 index ename:VK_QUEUE_FAMILY_EXTERNAL
@@ -9800,8 +10169,8 @@ To initialize a buffer collection on Fuchsia:
 
 [open,refpage='vkCreateBufferCollectionFUCHSIA',desc='Create a new buffer collection',type='protos']
 --
-To create an slink:VkBufferCollectionFUCHSIA for Vulkan to participate in
-the buffer collection:
+To create a slink:VkBufferCollectionFUCHSIA for Vulkan to participate in the
+buffer collection:
 
 include::{generated}/api/protos/vkCreateBufferCollectionFUCHSIA.adoc[]
 
@@ -9874,7 +10243,7 @@ include::{generated}/api/protos/vkSetBufferCollectionImageConstraintsFUCHSIA.ado
     slink:VkImageConstraintsInfoFUCHSIA structure
 
 fname:vkSetBufferCollectionImageConstraintsFUCHSIA may: fail if
-pname:pImageConstraintsInfo::pname:formatConstraintsCount is larger than the
+pname:pImageConstraintsInfo->formatConstraintsCount is larger than the
 implementation-defined limit.
 If that occurs, flink:vkSetBufferCollectionImageConstraintsFUCHSIA will
 return ename:VK_ERROR_INITIALIZATION_FAILED.
@@ -9926,38 +10295,38 @@ include::{generated}/api/structs/VkImageConstraintsInfoFUCHSIA.adoc[]
     in its
     slink:VkImageFormatConstraintsInfoFUCHSIA::pname:requiredFormatFeatures
   * [[VUID-VkImageConstraintsInfoFUCHSIA-pFormatConstraints-06396]]
-    If pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    If pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_SAMPLED_BIT, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain
+    pname:pFormatConstraints->requiredFormatFeatures must: contain
     ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT
   * [[VUID-VkImageConstraintsInfoFUCHSIA-pFormatConstraints-06397]]
-    If pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    If pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_STORAGE_BIT, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain
+    pname:pFormatConstraints->requiredFormatFeatures must: contain
     ename:VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT
   * [[VUID-VkImageConstraintsInfoFUCHSIA-pFormatConstraints-06398]]
-    If pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    If pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain
+    pname:pFormatConstraints->requiredFormatFeatures must: contain
     ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT
   * [[VUID-VkImageConstraintsInfoFUCHSIA-pFormatConstraints-06399]]
-    If pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    If pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain
+    pname:pFormatConstraints->requiredFormatFeatures must: contain
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
   * [[VUID-VkImageConstraintsInfoFUCHSIA-pFormatConstraints-06400]]
-    If pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    If pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain at
-    least one of ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT or
+    pname:pFormatConstraints->requiredFormatFeatures must: contain at least
+    one of ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT or
     ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
 ifdef::VK_KHR_fragment_shading_rate[]
   * [[VUID-VkImageConstraintsInfoFUCHSIA-attachmentFragmentShadingRate-06401]]
     If the <<features-attachmentFragmentShadingRate,
     pname:attachmentFragmentShadingRate>> feature is enabled, and
-    pname:pFormatConstraints::pname:imageCreateInfo::pname:usage contains
+    pname:pFormatConstraints->imageCreateInfo->usage contains
     ename:VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR, then
-    pname:pFormatConstraints::pname:requiredFormatFeatures must: contain
+    pname:pFormatConstraints->requiredFormatFeatures must: contain
     ename:VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR
 endif::VK_KHR_fragment_shading_rate[]
 ****

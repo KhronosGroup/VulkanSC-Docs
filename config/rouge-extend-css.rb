@@ -1,10 +1,10 @@
-# Copyright 2021-2023 The Khronos Group Inc.
+# Copyright 2021-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
 # Khronos overrides for Rouge 'github' theme CSS for accessibility.
 # See (note that this code is evolving, works as of asciidoctor 2.0.12):
-# https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/syntax_highlighter/rouge.rb
+# https://github.com/asciidoctor/asciidoctor/blob/main/lib/asciidoctor/syntax_highlighter/rouge.rb
 
 include ::Asciidoctor
 

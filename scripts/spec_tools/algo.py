@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Author(s):    Ryan Pavlik <ryan.pavlik@collabora.com>
+# Author(s):    Rylie Pavlik <rylie.pavlik@collabora.com>
 """RecursiveMemoize serves as a base class for a function modeled
 as a dictionary computed on-the-fly."""
 
@@ -83,7 +83,7 @@ def longest_common_prefix(strings):
     'abc'
 
     """
-    assert(len(strings) > 1)
+    assert len(strings) > 1
     a = min(strings)
     b = max(strings)
     prefix = []
@@ -127,7 +127,7 @@ def longest_common_token_prefix(strings, delimiter='_'):
     ''
 
     """
-    assert(len(strings) > 1)
+    assert len(strings) > 1
     a = min(strings).split(delimiter)
     b = max(strings).split(delimiter)
     prefix_tokens = []

@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -899,10 +899,11 @@ include::{generated}/api/enums/VkMemoryPropertyFlagBits.adoc[]
   * ename:VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT bit specifies that memory
     allocated with this type can: be mapped for host access using
     flink:vkMapMemory.
-  * ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bit specifies that the host
-    cache management commands flink:vkFlushMappedMemoryRanges and
-    flink:vkInvalidateMappedMemoryRanges are not needed to flush host writes
-    to the device or make device writes visible to the host, respectively.
+  * [[memory-coherent]] ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bit
+    specifies that the host cache management commands
+    flink:vkFlushMappedMemoryRanges and flink:vkInvalidateMappedMemoryRanges
+    are not needed to flush host writes to the device or make device writes
+    visible to the host, respectively.
   * ename:VK_MEMORY_PROPERTY_HOST_CACHED_BIT bit specifies that memory
     allocated with this type is cached on the host.
     Host memory accesses to uncached memory are slower than to cached
@@ -954,7 +955,7 @@ values are not reported correctly).
 However, device coherent accesses may be slower than equivalent accesses
 without device coherence, particularly if they are also device uncached.
 For device uncached memory in particular, repeated accesses to the same or
-neighbouring memory locations over a short time period (e.g. within a frame)
+neighboring memory locations over a short time period (e.g. within a frame)
 may be slower than it would be for the equivalent cached memory type.
 As such, it is generally inadvisable to use device coherent or device
 uncached memory except when really needed.
@@ -1030,6 +1031,7 @@ include::{generated}/api/handles/VkDeviceMemory.adoc[]
 :refpage: vkAllocateMemory
 :objectnameplural: device memory objects
 :objectnamecamelcase: deviceMemory
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To allocate memory objects, call:
@@ -2514,6 +2516,28 @@ to their payload is undefined:.
 As such, the application must: ensure that the imported memory range remains
 valid and accessible for the lifetime of the imported memory object.
 
+[[host-memory-import-non-visible-type]]
+Implementations may: support importing host pointers for memory types which
+are not host-visible.
+In this case, after a successful call to flink:vkAllocateMemory, the memory
+range imported from pname:pHostPointer must: not be accessed by the
+application until the slink:VkDeviceMemory has been destroyed.
+Memory contents for the host memory becomes undefined: on import, and is
+left undefined: after the slink:VkDeviceMemory has been destroyed.
+Applications must: also not access host memory which is mapped to the same
+physical memory as pname:pHostPointer, but mapped to a different host
+pointer while the slink:VkDeviceMemory handle is valid.
+Implementations running on general-purpose operating systems should: not
+support importing host pointers for memory types which are not host-visible.
+
+[NOTE]
+.Note
+====
+Using host pointers to back non-host visible allocations is a
+platform-specific use case, and applications should not attempt to do this
+unless instructed by the platform.
+====
+
 .Valid Usage
 ****
   * [[VUID-VkImportMemoryHostPointerInfoEXT-handleType-01747]]
@@ -2599,8 +2623,12 @@ include::{generated}/api/structs/VkMemoryHostPointerPropertiesEXT.adoc[]
   * pname:memoryTypeBits is a bitmask containing one bit set for every
     memory type which the specified host pointer can: be imported as.
 
-The value returned by pname:memoryTypeBits must: only include bits that
+The value returned by pname:memoryTypeBits should: only include bits that
 identify memory types which are host visible.
+Implementations may: include bits that identify memory types which are not
+host visible.
+Behavior for imported pointers of such types is defined by
+<<host-memory-import-non-visible-type,slink:VkImportMemoryHostPointerInfoEXT>>.
 
 include::{generated}/validity/structs/VkMemoryHostPointerPropertiesEXT.adoc[]
 --
@@ -3490,7 +3518,13 @@ include::{generated}/api/protos/vkMapMemory.adoc[]
   * pname:size is the size of the memory range to map, or
     ename:VK_WHOLE_SIZE to map from pname:offset to the end of the
     allocation.
+ifndef::VK_EXT_map_memory_placed[]
   * pname:flags is reserved for future use.
+endif::VK_EXT_map_memory_placed[]
+ifdef::VK_EXT_map_memory_placed[]
+  * pname:flags is a bitmask of elink:VkMemoryMapFlagBits specifying
+    additional parameters of the memory map operation.
+endif::VK_EXT_map_memory_placed[]
   * pname:ppData is a pointer to a code:void* variable in which a
     host-accessible pointer to the beginning of the mapped range is
     returned.
@@ -3576,17 +3610,39 @@ ifdef::VK_KHR_device_group[]
   * [[VUID-vkMapMemory-memory-00683]]
     pname:memory must: not have been allocated with multiple instances
 endif::VK_KHR_device_group[]
+ifdef::VK_EXT_map_memory_placed[]
+  * [[VUID-vkMapMemory-flags-09568]]
+    ename:VK_MEMORY_MAP_PLACED_BIT_EXT must: not be set in pname:flags
+endif::VK_EXT_map_memory_placed[]
 ****
 
 include::{generated}/validity/protos/vkMapMemory.adoc[]
 --
 
-[open,refpage='VkMemoryMapFlags',desc='Reserved for future use',type='flags']
+ifdef::VK_EXT_map_memory_placed[]
+[open,refpage='VkMemoryMapFlagBits',desc='Bitmask specifying additional parameters of a memory map',type='enums']
+--
+Bits which can: be set in flink:vkMapMemory::pname:flags and
+slink:VkMemoryMapInfoKHR::pname:flags, specifying additional properties of a
+memory map, are:
+
+include::{generated}/api/enums/VkMemoryMapFlagBits.adoc[]
+
+  * ename:VK_MEMORY_MAP_PLACED_BIT_EXT requests that the implementation
+    place the memory map at the virtual address specified by the client via
+    slink:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress, replacing any
+    existing mapping at that address.
+    This flag must: not be used with flink:vkMapMemory as there is no way to
+    specify the placement address.
+--
+endif::VK_EXT_map_memory_placed[]
+
+[open,refpage='VkMemoryMapFlags',desc='Bitmask of VkMemoryMapFlagBits',type='flags']
 --
 include::{generated}/api/flags/VkMemoryMapFlags.adoc[]
 
-tname:VkMemoryMapFlags is a bitmask type for setting a mask, but is
-currently reserved for future use.
+tname:VkMemoryMapFlags is a bitmask type for setting a mask of zero or more
+elink:VkMemoryMapFlagBits.
 --
 
 ifdef::VK_KHR_map_memory2[]
@@ -3622,7 +3678,8 @@ include::{generated}/api/structs/VkMemoryMapInfoKHR.adoc[]
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * pname:flags is reserved for future use.
+  * pname:flags is a bitmask of elink:VkMemoryMapFlagBits specifying
+    additional parameters of the memory map operation.
   * pname:memory is the slink:VkDeviceMemory object to be mapped.
   * pname:offset is a zero-based byte offset from the beginning of the
     memory object.
@@ -3649,11 +3706,106 @@ ifdef::VK_KHR_device_group[]
   * [[VUID-VkMemoryMapInfoKHR-memory-07963]]
     pname:memory must: not have been allocated with multiple instances
 endif::VK_KHR_device_group[]
+ifdef::VK_EXT_map_memory_placed[]
+  * [[VUID-VkMemoryMapInfoKHR-flags-09569]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags, the
+    <<features-memoryMapPlaced, pname:memoryMapPlaced>> feature must: be
+    enabled
+  * [[VUID-VkMemoryMapInfoKHR-flags-09570]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags, the
+    pname:pNext chain must: include a slink:VkMemoryMapPlacedInfoEXT
+    structure and sname:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress must:
+    not be `NULL`
+  * [[VUID-VkMemoryMapInfoKHR-flags-09571]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags and the
+    <<features-memoryMapRangePlaced, pname:memoryMapRangePlaced>> feature is
+    not enabled, pname:offset must: be zero
+  * [[VUID-VkMemoryMapInfoKHR-flags-09572]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags and the
+    <<features-memoryMapRangePlaced, pname:memoryMapRangePlaced>> feature is
+    not enabled, pname:size must: be ename:VK_WHOLE_SIZE or
+    sname:VkMemoryAllocateInfo::pname:allocationSize
+  * [[VUID-VkMemoryMapInfoKHR-flags-09573]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags and the
+    <<features-memoryMapRangePlaced, pname:memoryMapRangePlaced>> feature is
+    enabled, pname:offset must: be aligned to an integer multiple of
+    sname:VkPhysicalDeviceMapMemoryPlacedPropertiesEXT::pname:minPlacedMemoryMapAlignment
+  * [[VUID-VkMemoryMapInfoKHR-flags-09574]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags and
+    pname:size is not ename:VK_WHOLE_SIZE, pname:size must: be aligned to an
+    integer multiple of
+    sname:VkPhysicalDeviceMapMemoryPlacedPropertiesEXT::pname:minPlacedMemoryMapAlignment
+  * [[VUID-VkMemoryMapInfoKHR-flags-09651]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags and
+    pname:size is ename:VK_WHOLE_SIZE,
+    sname:VkMemoryAllocateInfo::pname:allocationSize must: be aligned to an
+    integer multiple of
+    sname:VkPhysicalDeviceMapMemoryPlacedPropertiesEXT::pname:minPlacedMemoryMapAlignment
+ifdef::VK_EXT_external_memory_host[]
+  * [[VUID-VkMemoryMapInfoKHR-flags-09575]]
+    If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in pname:flags, the memory
+    object must: not have been imported from a handle type of
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_ALLOCATION_BIT_EXT or
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_MAPPED_FOREIGN_MEMORY_BIT_EXT
+endif::VK_EXT_external_memory_host[]
+endif::VK_EXT_map_memory_placed[]
 ****
 
 include::{generated}/validity/structs/VkMemoryMapInfoKHR.adoc[]
 --
 endif::VK_KHR_map_memory2[]
+
+ifdef::VK_EXT_map_memory_placed[]
+[open,refpage='VkMemoryMapPlacedInfoEXT',desc='Structure containing memory map placement parameters',type='structs']
+--
+If ename:VK_MEMORY_MAP_PLACED_BIT_EXT is set in
+sname:VkMemoryMapInfoKHR::pname:flags and the pname:pNext chain of
+slink:VkMemoryMapInfoKHR includes a sname:VkMemoryMapPlacedInfoEXT
+structure, then that structure specifies the placement address of the memory
+map.
+The implementation will place the memory map at the specified address,
+replacing any existing maps in the specified memory range.
+Replacing memory maps in this way does not implicitly unmap Vulkan memory
+objects.
+Instead, the client must: ensure no other Vulkan memory objects are mapped
+anywhere in the specified virtual address range.
+If successful, pname:ppData will be set to the same value as
+sname:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress and
+fname:vkMapMemory2KHR will return ename:VK_SUCCESS.
+If it cannot place the map at the requested address for any reason, the
+memory object is left unmapped and fname:vkMapMemory2KHR will return
+ename:VK_ERROR_MEMORY_MAP_FAILED.
+
+The sname:VkMemoryMapPlacedInfoEXT structure is defined as:
+
+include::{generated}/api/structs/VkMemoryMapPlacedInfoEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pPlacedAddress is the virtual address at which to place the
+    address.
+    If sname:VkMemoryMapInfoKHR::pname:flags does not contain
+    ename:VK_MEMORY_MAP_PLACED_BIT_EXT, this value is ignored.
+
+.Valid Usage
+****
+  * [[VUID-VkMemoryMapPlacedInfoEXT-flags-09576]]
+    If sname:VkMemoryMapInfoKHR::pname:flags contains
+    ename:VK_MEMORY_MAP_PLACED_BIT_EXT, pname:pPlacedAddress must: not be
+    `NULL`
+  * [[VUID-VkMemoryMapPlacedInfoEXT-pPlacedAddress-09577]]
+    pname:pPlacedAddress must: be aligned to an integer multiple of
+    sname:VkPhysicalDeviceMapMemoryPlacedPropertiesEXT::pname:minPlacedMemoryMapAlignment
+  * [[VUID-VkMemoryMapPlacedInfoEXT-pPlacedAddress-09578]]
+    The address range specified by pname:pPlacedAddress and
+    sname:VkMemoryMapInfoKHR::pname:size must: not overlap any existing
+    Vulkan memory object mapping
+****
+
+include::{generated}/validity/structs/VkMemoryMapPlacedInfoEXT.adoc[]
+--
+endif::VK_EXT_map_memory_placed[]
 
 Two commands are provided to enable applications to work with non-coherent
 memory allocations: fname:vkFlushMappedMemoryRanges and
@@ -3889,24 +4041,62 @@ include::{generated}/api/structs/VkMemoryUnmapInfoKHR.adoc[]
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * pname:flags is reserved for future use.
+  * pname:flags is a bitmask of elink:VkMemoryUnmapFlagBitsKHR specifying
+    additional parameters of the memory map operation.
   * pname:memory is the slink:VkDeviceMemory object to be unmapped.
 
 .Valid Usage
 ****
   * [[VUID-VkMemoryUnmapInfoKHR-memory-07964]]
     pname:memory must: be currently host mapped
+ifdef::VK_EXT_map_memory_placed[]
+  * [[VUID-VkMemoryUnmapInfoKHR-flags-09579]]
+    If ename:VK_MEMORY_UNMAP_RESERVE_BIT_EXT is set in pname:flags, the
+    <<features-memoryUnmapReserve, pname:memoryUnmapReserve>> must: be
+    enabled
+ifdef::VK_EXT_external_memory_host[]
+  * [[VUID-VkMemoryUnmapInfoKHR-flags-09580]]
+    If ename:VK_MEMORY_UNMAP_RESERVE_BIT_EXT is set in pname:flags, the
+    memory object must: not have been imported from a handle type of
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_ALLOCATION_BIT_EXT or
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_MAPPED_FOREIGN_MEMORY_BIT_EXT
+endif::VK_EXT_external_memory_host[]
+endif::VK_EXT_map_memory_placed[]
 ****
 
 include::{generated}/validity/structs/VkMemoryUnmapInfoKHR.adoc[]
 --
 
-[open,refpage='VkMemoryUnmapFlagsKHR',desc='Reserved for future use',type='flags']
+ifdef::VK_EXT_map_memory_placed[]
+[open,refpage='VkMemoryUnmapFlagBitsKHR',desc='Bitmask specifying additional parameters of a memory unmap',type='enums']
+--
+Bits which can: be set in slink:VkMemoryUnmapInfoKHR::pname:flags,
+specifying additional properties of a memory unmap, are:
+
+include::{generated}/api/enums/VkMemoryUnmapFlagBitsKHR.adoc[]
+
+  * ename:VK_MEMORY_UNMAP_RESERVE_BIT_EXT requests that virtual address
+    range currently occupied by the memory map remain reserved after the
+    flink:vkUnmapMemory2KHR call completes.
+    Future system memory map operations or calls to flink:vkMapMemory or
+    flink:vkMapMemory2KHR will not return addresses in that range unless the
+    range has since been unreserved by the client or the mapping is
+    explicitly placed in that range by calling flink:vkMapMemory2KHR with
+    ename:VK_MEMORY_MAP_PLACED_BIT_EXT, or doing the system memory map
+    equivalent.
+    When ename:VK_MEMORY_UNMAP_RESERVE_BIT_EXT is set, the memory unmap
+    operation may: fail, in which case the memory object will remain host
+    mapped and flink:vkUnmapMemory2KHR will return
+    ename:VK_ERROR_MEMORY_MAP_FAILED.
+--
+endif::VK_EXT_map_memory_placed[]
+
+[open,refpage='VkMemoryUnmapFlagsKHR',desc='Bitmask of VkMemoryUnmapFlagBitsKHR',type='flags']
 --
 include::{generated}/api/flags/VkMemoryUnmapFlagsKHR.adoc[]
 
-tname:VkMemoryMapFlagsKHR is a bitmask type for setting a mask, but is
-currently reserved for future use.
+tname:VkMemoryUnmapFlagsKHR is a bitmask type for setting a mask of zero or
+more elink:VkMemoryUnmapFlagBitsKHR.
 --
 endif::VK_KHR_map_memory2[]
 
@@ -4326,7 +4516,7 @@ endif::VK_VERSION_1_2,VK_KHR_image_format_list[]
 
 
 [[memory-external-android-hardware-buffer-buffer-resources]]
-===== Android Hardware Buffer Buffer Resources
+===== Android Hardware Buffer Resources
 
 Android hardware buffers with a format of code:AHARDWAREBUFFER_FORMAT_BLOB
 and usage that includes code:AHARDWAREBUFFER_USAGE_GPU_DATA_BUFFER can: be

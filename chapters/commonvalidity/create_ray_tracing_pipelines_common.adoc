@@ -1,9 +1,12 @@
-// Copyright 2019-2023 The Khronos Group Inc.
+// Copyright 2019-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
 // Common Valid Usage
 // common to CreateRayTracingPipelines
+  * [[VUID-{refpage}-device-09677]]
+    pname:device must: support at least one queue family with the
+    ename:VK_QUEUE_COMPUTE_BIT capability
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-{refpage}-flags-03415]]
     If the pname:flags member of any element of pname:pCreateInfos contains

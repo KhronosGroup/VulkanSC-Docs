@@ -1,4 +1,4 @@
-// Copyright 2021-2023 The Khronos Group Inc.
+// Copyright 2021-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -29,7 +29,7 @@ It is intended primarily for use in system integration along with certain
 platform-specific priority enforcement rules.
 
 The driver implementation will attempt to skew hardware resource allocation
-in favour of the higher-priority task.
+in favor of the higher-priority task.
 Therefore, higher-priority work may retain similar latency and throughput
 characteristics even if the system is congested with lower priority work.
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -560,7 +560,7 @@ When this structure is included in the pname:pNext chain of
 slink:VkGraphicsPipelineCreateInfo, it defines parameters of the exclusive
 scissor test.
 If this structure is not included in the pname:pNext chain, it is equivalent
-to specifying this structure with a pname:exclusiveScissorCount of `0`.
+to specifying this structure with an pname:exclusiveScissorCount of `0`.
 
 .Valid Usage
 ****
@@ -765,6 +765,12 @@ For fragment shaders invoked by fragments, the following rules apply:
      storage resources).
   ** Any other <<fragops, fragment operation>> discards the fragment, and
      the shader does not write to any storage resources.
+  ** If a fragment shader statically computes the same values for different
+     framebuffer locations, and does not write to any storage resources,
+     multiple fragments may: be shaded by one fragment shader invocation.
+     This may: affect
+     ename:VK_QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT
+     results, but must: otherwise not be visible behavior to applications.
   * Otherwise, at least one fragment shader must: be executed.
   ** If <<primsrast-sampleshading,sample shading>> is enabled and multiple
      invocations per fragment are required:, additional invocations must: be
@@ -935,9 +941,8 @@ The samples which qualify for coherent tile image reads from an attachment
 A fragment shader can: declare code:NonCoherentColorAttachmentReadEXT,
 code:NonCoherentDepthAttachmentReadEXT, or
 code:NonCoherentStencilAttachmentReadEXT execution modes to enable
-non-coherent tile image reads which requires
-<<synchronization-pipeline-barriers-explicit-renderpass-tileimage, explicit
-tile image synchronization>> for the writes to an attachment to be made
+non-coherent tile image reads which require an explicit
+flink:vkCmdPipelineBarrier2 call for the writes to an attachment to be made
 visible via tile image reads.
 
 When
@@ -993,9 +998,9 @@ ifdef::VK_EXT_shader_stencil_export[]
 === Stencil Reference Replacement
 
 Writing to the
-<<interfaces-builtin-variables-fragdepth,code:FragStencilRefEXT>> built-in
-will replace the fragment's stencil reference value for each sample in the
-input code:SampleMask.
+<<interfaces-builtin-variables-fragstencilref,code:FragStencilRefEXT>>
+built-in will replace the fragment's stencil reference value for each sample
+in the input code:SampleMask.
 <<fragops-stencil, Stencil testing>> performed after the fragment shader for
 this fragment will use this new value as [eq]#s~r~#.
 endif::VK_EXT_shader_stencil_export[]
@@ -1080,11 +1085,11 @@ If no fragment shader is active, or if the active fragment shader does not
 include code:SampleMask in its interface, the coverage mask is not modified.
 
 Next, the fragment alpha value and coverage mask are modified based on the
-ifdef::VK_EXT_line_rasterization[]
+ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 line coverage factor if the pname:lineRasterizationMode member of the
 slink:VkPipelineRasterizationStateCreateInfo structure is
-ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_EXT, and the
-endif::VK_EXT_line_rasterization[]
+ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_KHR, and the
+endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 pname:alphaToCoverageEnable and pname:alphaToOneEnable members of the
 slink:VkPipelineMultisampleStateCreateInfo structure.
 
@@ -1177,14 +1182,14 @@ section).
 If that shader output has an integer or unsigned integer type, then these
 operations are skipped.
 
-ifdef::VK_EXT_line_rasterization[]
+ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 If the pname:lineRasterizationMode member of the
 slink:VkPipelineRasterizationStateCreateInfo structure is
-ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_EXT and the fragment
+ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_KHR and the fragment
 came from a line segment, then the alpha value is replaced by multiplying it
 by the coverage factor for the fragment computed during
 <<primsrast-lines-smooth,smooth line rasterization>>.
-endif::VK_EXT_line_rasterization[]
+endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 
 If pname:alphaToCoverageEnable is enabled, a temporary coverage mask is
 generated where each bit is determined by the fragment's alpha value, which

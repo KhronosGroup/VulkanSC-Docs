@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -21,6 +21,7 @@ include::{generated}/api/handles/VkSampler.adoc[]
 :refpage: vkCreateSampler
 :objectnameplural: samplers
 :objectnamecamelcase: sampler
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a sampler object, call:
@@ -39,6 +40,9 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
+  * [[VUID-vkCreateSampler-device-09668]]
+    pname:device must: support at least one queue family with one of the
+    ename:VK_QUEUE_COMPUTE_BIT or ename:VK_QUEUE_GRAPHICS_BIT capabilities
   * [[VUID-vkCreateSampler-maxSamplerAllocationCount-04110]]
     There must: be less than
     slink:VkPhysicalDeviceLimits::pname:maxSamplerAllocationCount
@@ -797,6 +801,7 @@ endif::VK_KHR_sampler_ycbcr_conversion[]
 :refpage: vkCreateSamplerYcbcrConversion
 :objectnameplural: sampler conversions
 :objectnamecamelcase: samplerYcbcrConversion
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a slink:VkSamplerYcbcrConversion, call:
@@ -1001,7 +1006,7 @@ ifdef::VK_QCOM_ycbcr_degamma[]
   * [[VUID-VkSamplerYcbcrConversionCreateInfo-pNext-09209]]
     If the pname:pNext chain includes a
     slink:VkSamplerYcbcrConversionYcbcrDegammaCreateInfoQCOM structure,
-    pname:format must: be a format with 8-bit R, G, and B components.
+    pname:format must: be a format with 8-bit R, G, and B components
 endif::VK_QCOM_ycbcr_degamma[]
 ****
 
@@ -1308,7 +1313,7 @@ include::{generated}/api/structs/VkSamplerBlockMatchWindowCreateInfoQCOM.adoc[]
 ****
   * [[VUID-VkSamplerBlockMatchWindowCreateInfoQCOM-WindowExtent-09210]]
     pname:WindowExtent must: not be larger than
-    slink:VkPhysicalDeviceImageProcessing2PropertiesQCOM::pname:maxBlockMatchWindow.
+    slink:VkPhysicalDeviceImageProcessing2PropertiesQCOM::pname:maxBlockMatchWindow
 ****
 
 include::{generated}/validity/structs/VkSamplerBlockMatchWindowCreateInfoQCOM.adoc[]

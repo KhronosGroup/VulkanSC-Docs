@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The Khronos Group Inc.
+// Copyright 2022-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -150,6 +150,11 @@ Extending `VkSubpassDescriptionFlagBits`,
 for the subpass.
 Extending `VkRenderingFlagBits`, `VK_RENDERING_ENABLE_LEGACY_DITHERING_BIT_EXT`
 does the same when using dynamic rendering.
+When used with dynamic rendering
+(`VK_RENDERING_ENABLE_LEGACY_DITHERING_BIT_EXT`), the graphics pipelines
+additionally need to be created with the
+`VK_PIPELINE_CREATE_2_ENABLE_LEGACY_DITHERING_BIT_EXT` flag (which requires
+`VK_KHR_maintenance5`).
 
 The Vulkan implementation is expected to apply dithering equivalently to the
 vendor's OpenGL driver.

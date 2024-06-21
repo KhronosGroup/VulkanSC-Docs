@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2020-2023 The Khronos Group Inc.
+# Copyright 2020-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -150,7 +150,7 @@ class SchemaOutputGenerator(OutputGenerator):
     def endFeature(self):
         if self.emit:
             if self.feature_not_empty:
-                if self.genOpts.conventions.writeFeature(self.featureExtraProtect, self.genOpts.filename):
+                if self.genOpts.conventions.writeFeature(self.featureName, self.featureExtraProtect, self.genOpts.filename):
 
                     for section in self.TYPE_SECTIONS:
                         contents = self.sections[section]

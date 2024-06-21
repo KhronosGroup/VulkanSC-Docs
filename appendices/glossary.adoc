@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -120,6 +120,17 @@ endif::VK_NV_ray_tracing,VK_KHR_acceleration_structure[]
 
 Back-Facing::
     See Facingness.
+
+ifdef::VK_KHR_video_queue[]
+Backward Prediction::
+    Sample prediction performed during video decode and encode operations
+    based on reference pictures that occur temporally (in display order)
+    after the current picture.
+
+Backward Reference::
+    A reference picture that occurs temporally (in display order) after the
+    current picture.
+endif::VK_KHR_video_queue[]
 
 Batch::
     A single structure submitted to a queue as part of a
@@ -634,11 +645,11 @@ Fence::
     Fences can: be waited on by the host.
     Represented by a slink:VkFence object.
 
-ifdef::VK_KHR_video_coding[]
+ifdef::VK_KHR_video_queue[]
 Field (Video)::
     Possibly discontinuous subregions of a frame.
     Frames may: consist of two fields, a top field and a bottom field.
-endif::VK_KHR_video_coding[]
+endif::VK_KHR_video_queue[]
 
 Flat Shading::
     A property of a vertex attribute that causes the value from a single
@@ -650,6 +661,17 @@ Format Features::
     A set of features from elink:VkFormatFeatureFlagBits that a
     elink:VkFormat is capable of using for various commands.
     The list is determined by factors such as elink:VkImageTiling.
+
+ifdef::VK_KHR_video_queue[]
+Forward Prediction::
+    Sample prediction performed during video decode and encode operations
+    based on reference pictures that occur temporally (in display order)
+    before the current picture.
+
+Forward Reference::
+    A reference picture that occurs temporally (in display order) before the
+    current picture.
+endif::VK_KHR_video_queue[]
 
 Fragment::
     A rectangular framebuffer region with associated data produced by
@@ -1007,7 +1029,7 @@ Invocation Group::
 
 ifdef::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
 Invocation Repack Instruction::
-    A ray tracing shader call <<ray-tracing-repack,instruction>> where the
+    A ray tracing <<ray-tracing-repack,instruction>> where the
     implementation may: change the set of invocations that are executing.
 endif::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
 
@@ -1329,14 +1351,31 @@ Pipeline Identifier::
 endif::VKSC_VERSION_1_0[]
 
 ifdef::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
+[[glossary-pipeline-trace-ray]]
 Pipeline Trace Ray Instruction::
     A ray tracing instruction which traces a ray into an acceleration
     structure when using ray tracing pipelines.
-    One of
-ifdef::VK_NV_ray_tracing[code:OpTraceNV,]
-ifdef::VK_NV_ray_tracing_motion_blur[code:OpTraceRayMotionNV, code:OpTraceMotionNV,]
-ifdef::VK_KHR_ray_tracing_pipeline[code:OpTraceRayKHR]
-    .
+    One of:
+
+ifdef::VK_NV_ray_tracing[]
+  * code:OpTraceNV
+endif::VK_NV_ray_tracing[]
+ifdef::VK_KHR_ray_tracing_pipeline[]
+  * code:OpTraceRayKHR
+endif::VK_KHR_ray_tracing_pipeline[]
+ifdef::VK_NV_ray_tracing_motion_blur[]
+  * code:OpTraceRayMotionNV
+ifdef::VK_NV_ray_tracing[]
+  * code:OpTraceMotionNV
+endif::VK_NV_ray_tracing[]
+endif::VK_NV_ray_tracing_motion_blur[]
+ifdef::VK_NV_ray_tracing_invocation_reorder[]
+  * code:OpHitObjectTraceRayNV
+ifdef::VK_NV_ray_tracing_motion_blur[]
+  * code:OpHitObjectTraceRayMotionNV
+endif::VK_NV_ray_tracing_motion_blur[]
+endif::VK_NV_ray_tracing_invocation_reorder[]
+
 endif::VK_KHR_ray_tracing_pipeline,VK_NV_ray_tracing[]
 
 pname:pNext Chain::
@@ -2077,6 +2116,9 @@ MV::
 
 NALU::
     Network Abstraction Layer Unit
+
+OBU::
+    Open Bitstream Unit
 
 PCM::
     Pulse-Code Modulation

@@ -1,4 +1,4 @@
-// Copyright 2014-2023 The Khronos Group Inc.
+// Copyright 2014-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -541,8 +541,9 @@ ifdef::VK_KHR_win32_surface+VK_EXT_full_screen_exclusive[]
     included in the pname:pNext chain
 endif::VK_KHR_win32_surface+VK_EXT_full_screen_exclusive[]
   * [[VUID-VkPhysicalDeviceSurfaceInfo2KHR-surface-07919]]
+    If surface is not VK_NULL_HANDLE,
 ifdef::VK_GOOGLE_surfaceless_query[]
-    If the `apiext:VK_GOOGLE_surfaceless_query` extension is not enabled,
+    and the `apiext:VK_GOOGLE_surfaceless_query` extension is not enabled,
 endif::VK_GOOGLE_surfaceless_query[]
     pname:surface must: be a valid slink:VkSurfaceKHR handle
 ****
@@ -875,7 +876,7 @@ use of this feature.
   * [[VUID-VkSurfacePresentModeEXT-presentMode-07780]]
     pname:presentMode must: be a value reported by
     flink:vkGetPhysicalDeviceSurfacePresentModesKHR for the specified
-    surface.
+    surface
 ****
 
 include::{generated}/validity/structs/VkSurfacePresentModeEXT.adoc[]
@@ -1691,7 +1692,7 @@ include::{generated}/api/protos/vkReleaseFullScreenExclusiveModeEXT.adoc[]
 ====
 Applications will not be able to present to pname:swapchain after this call
 until exclusive full-screen access is reacquired.
-This is usually useful to handle when an application is minimised or
+This is usually useful to handle when an application is minimized or
 otherwise intends to stop presenting for a time.
 ====
 
@@ -1705,6 +1706,8 @@ otherwise intends to stop presenting for a time.
     pname:fullScreenExclusive set to
     ename:VK_FULL_SCREEN_EXCLUSIVE_APPLICATION_CONTROLLED_EXT
 ****
+
+include::{generated}/validity/protos/vkReleaseFullScreenExclusiveModeEXT.adoc[]
 --
 endif::VK_EXT_full_screen_exclusive[]
 

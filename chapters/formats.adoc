@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -1289,10 +1289,13 @@ ifdef::VK_IMG_format_pvrtc[]
     nonlinear encoding applied to the RGB components.
 endif::VK_IMG_format_pvrtc[]
 ifdef::VK_NV_optical_flow[]
-  * ename:VK_FORMAT_R16G16_S10_5_NV specifies a two-component, fixed-point
-    format where most significant bit specifies the sign bit, next 10 bits
-    specify the integer value and last 5 bits represent the fractional
-    value.
+  * ename:VK_FORMAT_R16G16_SFIXED5_NV specifies a two-component, 16-bit
+    signed fixed-point format with linear encoding.
+    The components are signed two's-complement integers where the most
+    significant bit specifies the sign bit, the next 10 bits specify the
+    integer value, and the last 5 bits represent the fractional value.
+    The signed 16-bit values can: be converted to floats in the range
+    [eq]#[-1024,1023.96875]# by dividing the value by 32 [eq]#(2^5^)#.
 endif::VK_NV_optical_flow[]
 --
 
@@ -1381,6 +1384,9 @@ An X indicates a component that is unused, but may: be present for padding.
 | etext:UFLOAT   | OpTypeFloat   | floating-point   | The components are unsigned floating-point numbers (used by packed, shared exponent, and some compressed formats)
 | etext:SFLOAT   | OpTypeFloat   | floating-point   | The components are signed floating-point numbers
 | etext:SRGB     | OpTypeFloat   | floating-point   | The R, G, and B components are unsigned normalized values that represent values using sRGB nonlinear encoding, while the A component (if one exists) is a regular unsigned normalized value
+ifdef::VK_NV_optical_flow[]
+| etext:SFIXED5  | OpTypeInt     | scaled signed integer | The components are signed fractional integer values that get converted to floating-point in the range [eq]#[-1024,1023.96875]#
+endif::VK_NV_optical_flow[]
 4+| [eq]#n# is the number of bits in the component.
 |====
 
@@ -2773,6 +2779,8 @@ of the named formats, with more information in the table
 where the symbol appears
 ^|{sym3} | This feature must: be supported with some caveats or
 preconditions, with more information in the table where the symbol appears
+^|{sym4} | This feature must: be supported with some caveats or
+preconditions, with more information in the table where the symbol appears
 |====
 
 .Feature bits in pname:optimalTilingFeatures
@@ -3014,38 +3022,44 @@ pname:shaderStorageImageExtendedFormats>> feature.
 2+>| ename:VK_FORMAT_FEATURE_BLIT_SRC_BIT                      .3+^.^| {downarrow}
 1+>| ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT                 .2+^.^| {downarrow}
 s| Format
-| ename:VK_FORMAT_R16_UNORM                  |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16_SNORM                  |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16_USCALED                |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16_SSCALED                |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16_UINT                   | {sym1} | {sym1} |        | {sym3} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16_SINT                   | {sym1} | {sym1} |        | {sym3} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16_SFLOAT                 | {sym1} | {sym1} | {sym1} | {sym3} |   | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16G16_UNORM               |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16G16_SNORM               |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16G16_USCALED             |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16_SSCALED             |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16_UINT                | {sym1} | {sym1} |        | {sym3} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16G16_SINT                | {sym1} | {sym1} |        | {sym3} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16G16_SFLOAT              | {sym1} | {sym1} | {sym1} | {sym3} |   | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} |        |
-| ename:VK_FORMAT_R16G16B16_UNORM            |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_SNORM            |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_USCALED          |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_SSCALED          |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_UINT             |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_SINT             |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16_SFLOAT           |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16A16_UNORM         |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16G16B16A16_SNORM         |        |        |        | {sym3} |   |        |        |        |   | {sym1} |        |        |
-| ename:VK_FORMAT_R16G16B16A16_USCALED       |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16A16_SSCALED       |        |        |        |        |   |        |        |        |   |        |        |        |
-| ename:VK_FORMAT_R16G16B16A16_UINT          | {sym1} | {sym1} |        | {sym1} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} | {sym1} |
-| ename:VK_FORMAT_R16G16B16A16_SINT          | {sym1} | {sym1} |        | {sym1} |   | {sym1} | {sym1} |        |   | {sym1} | {sym1} | {sym1} |
-| ename:VK_FORMAT_R16G16B16A16_SFLOAT        | {sym1} | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} | {sym1} |
+| ename:VK_FORMAT_R16_UNORM                  |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16_SNORM                  |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16_USCALED                |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16_SSCALED                |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16_UINT                   | {sym1} | {sym1} |        | {sym3} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
+| ename:VK_FORMAT_R16_SINT                   | {sym1} | {sym1} |        | {sym3} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
+| ename:VK_FORMAT_R16_SFLOAT                 | {sym1} | {sym1} | {sym1} | {sym3} |        | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} |        |
+| ename:VK_FORMAT_R16G16_UNORM               |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16G16_SNORM               |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16G16_USCALED             |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16_SSCALED             |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16_UINT                | {sym1} | {sym1} |        | {sym3} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
+| ename:VK_FORMAT_R16G16_SINT                | {sym1} | {sym1} |        | {sym3} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} |        |
+| ename:VK_FORMAT_R16G16_SFLOAT              | {sym1} | {sym1} | {sym1} | {sym3} | {sym4} | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} | {sym4} | {sym4}
+| ename:VK_FORMAT_R16G16B16_UNORM            |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_SNORM            |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_USCALED          |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_SSCALED          |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_UINT             |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_SINT             |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16_SFLOAT           |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16A16_UNORM         |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16G16B16A16_SNORM         |        |        |        | {sym3} |        |        |        |        |   | {sym1} |        |        |
+| ename:VK_FORMAT_R16G16B16A16_USCALED       |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16A16_SSCALED       |        |        |        |        |        |        |        |        |   |        |        |        |
+| ename:VK_FORMAT_R16G16B16A16_UINT          | {sym1} | {sym1} |        | {sym1} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} | {sym1} |
+| ename:VK_FORMAT_R16G16B16A16_SINT          | {sym1} | {sym1} |        | {sym1} |        | {sym1} | {sym1} |        |   | {sym1} | {sym1} | {sym1} |
+| ename:VK_FORMAT_R16G16B16A16_SFLOAT        | {sym1} | {sym1} | {sym1} | {sym1} | {sym4} | {sym1} | {sym1} | {sym1} |   | {sym1} | {sym1} | {sym1} | {sym4}
 14+| Format features marked with {sym3} must: be supported for
 pname:optimalTilingFeatures if the sname:VkPhysicalDevice supports the
 <<features-shaderStorageImageExtendedFormats,
 pname:shaderStorageImageExtendedFormats>> feature.
+ifdef::VK_NV_shader_atomic_float16_vector[]
+14+| Format features marked with {sym4} must: be supported for
+pname:optimalTilingFeatures if the sname:VkPhysicalDevice supports
+the <<features-shaderFloat16VectorAtomics, pname:shaderFloat16VectorAtomics>>
+feature.
+endif::VK_NV_shader_atomic_float16_vector[]
 |====
 
 <<<
@@ -3595,6 +3609,28 @@ pname:shaderStorageImageWriteWithoutFormat>> must: support
 ename:VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT for that same
 format if Vulkan 1.3 or the `apiext:VK_KHR_format_feature_flags2` extension
 is supported.
+
+An implementation that does not support either of
+ename:VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT or
+ename:VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT for a format
+must: not report support for ename:VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT or
+ename:VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT for that format if it is
+not listed in the <<spirvenv-image-formats, SPIR-V and Vulkan Image Format
+Compatibility>> table.
+
+[NOTE]
+.Note
+====
+Some older implementations do not follow this restriction.
+They report support for formats as storage images even though they do not
+support access without the code:Format qualifier and there is no matching
+code:Format token.
+Such images cannot be either read from or written to.
+
+Drivers which pass Vulkan conformance test suite version 1.3.9.0, or any
+subsequent version will conform to the requirement above.
+====
+
 endif::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright 2022-2023 The Khronos Group Inc.
+# Copyright 2022-2024 The Khronos Group Inc.
 # Copyright 2003-2019 Paul McGuire
 # SPDX-License-Identifier: MIT
 
@@ -31,7 +31,8 @@
 #   - ',' as OR connector
 #   - parenthesization for grouping
 
-# Based on https://github.com/pyparsing/pyparsing/blob/master/examples/fourFn.py
+# Based on `examples/fourFn.py` from the
+# https://github.com/pyparsing/pyparsing/ repository.
 
 from pyparsing import (
     Literal,
@@ -83,7 +84,7 @@ def leafMarkupC(name):
 opMarkupAsciidocMap = { '+' : 'and', ',' : 'or' }
 
 def opMarkupAsciidoc(op):
-    """Markup a operator as an asciidoc spec markup equivalent
+    """Markup an operator as an asciidoc spec markup equivalent
 
        - op - operator ('+' or ',')"""
 
@@ -92,7 +93,7 @@ def opMarkupAsciidoc(op):
 opMarkupCMap = { '+' : '&&', ',' : '||' }
 
 def opMarkupC(op):
-    """Markup a operator as an C language equivalent
+    """Markup an operator as a C language equivalent
 
        - op - operator ('+' or ',')"""
 

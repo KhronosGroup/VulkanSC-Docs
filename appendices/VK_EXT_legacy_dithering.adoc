@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The Khronos Group Inc.
+// Copyright 2022-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -7,7 +7,7 @@ include::{generated}/meta/{refprefix}VK_EXT_legacy_dithering.adoc[]
 === Other Extension Metadata
 
 *Last Modified Date*::
-    2022-03-31
+    2024-02-22
 *Contributors*::
   - Shahbaz Youssefi, Google
   - Graeme Leese, Broadcom
@@ -27,6 +27,8 @@ include::{generated}/interfaces/VK_EXT_legacy_dithering.adoc[]
 
   * Revision 1, 2022-03-31 (Shahbaz Youssefi)
   ** Internal revisions
+  * Revision 2, 2024-02-22 (Shahbaz Youssefi)
+  ** Added pipeline create flag to support dynamic rendering
 
 === Issues
 

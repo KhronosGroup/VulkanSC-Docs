@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Author(s):    Ryan Pavlik <ryan.pavlik@collabora.com>
+# Author(s):    Rylie Pavlik <rylie.pavlik@collabora.com>
 #
 # Purpose:      This script checks some "business logic" in the XML registry.
 
@@ -35,11 +35,13 @@ EXTENSION_NAME_VERSION_EXCEPTIONS = (
     'VK_EXT_shader_image_atomic_int64',
     'VK_KHR_video_decode_h264',
     'VK_KHR_video_decode_h265',
-    'VK_EXT_video_encode_h264',
-    'VK_EXT_video_encode_h265',
+    'VK_KHR_video_decode_av1',
+    'VK_KHR_video_encode_h264',
+    'VK_KHR_video_encode_h265',
     'VK_KHR_external_fence_win32',
     'VK_KHR_external_memory_win32',
     'VK_KHR_external_semaphore_win32',
+    'VK_KHR_index_type_uint8',
     'VK_KHR_shader_atomic_int64',
     'VK_KHR_shader_float16_int8',
     'VK_KHR_spirv_1_4',
@@ -92,6 +94,7 @@ CHECK_MEMBER_PNEXT_OPTIONAL_EXCEPTIONS = (
 CHECK_ARRAY_ENUMERATION_RETURN_CODE_EXCEPTIONS = (
     'vkGetDeviceFaultInfoEXT',
     'vkEnumerateDeviceLayerProperties',
+    'vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI',
 )
 
 # Exceptions to unknown structure type constants.
@@ -117,14 +120,6 @@ def get_extension_commands(reg):
         for cmd in ext.findall('./require/command[@name]'):
             extension_cmds.add(cmd.get('name'))
     return extension_cmds
-
-
-def get_enum_value_names(reg, enum_type):
-    names = set()
-    result_elem = reg.groupdict[enum_type].elem
-    for val in result_elem.findall('./enum[@name]'):
-        names.add(val.get('name'))
-    return names
 
 
 # Regular expression matching an extension name ending in a (possible) version number
@@ -208,8 +203,6 @@ class Checker(XMLChecker):
         db = EntityDatabase(args)
 
         self.extension_cmds = get_extension_commands(db.registry)
-        self.return_codes = get_enum_value_names(db.registry, 'VkResult')
-        self.structure_types = get_enum_value_names(db.registry, TYPEENUM)
 
         # Dict of entity name to a list of messages to suppress. (Exclude any context data and "Warning:"/"Error:")
         # Keys are entity names, values are tuples or lists of message text to suppress.
@@ -292,10 +285,10 @@ class Checker(XMLChecker):
         codes = successcodes.union(errorcodes)
 
         # Check that all return codes are recognized.
-        unrecognized = codes - self.return_codes
-        if unrecognized:
+        unrecognized = [code for code in codes if not self.is_enum_value(code, 'VkResult')]
+        if len(unrecognized) > 0:
             self.record_error('Unrecognized return code(s):',
-                              unrecognized)
+                              ', '.join(unrecognized))
 
         elem = info.elem
         params = [(getElemName(elt), elt) for elt in elem.findall('param')]
@@ -325,6 +318,11 @@ class Checker(XMLChecker):
             if name in CHECK_ARRAY_ENUMERATION_RETURN_CODE_EXCEPTIONS:
                 self.record_warning('(Allowed exception)', message)
             else:
+                self.record_error(message)
+
+        for code in (('VK_ERROR_UNKNOWN', 'VK_ERROR_VALIDATION_FAILED', 'VK_ERROR_VALIDATION_FAILED_EXT')):
+            if code in errorcodes:
+                message = f'{code} is implicit and not allowed in errorcodes of {name}'
                 self.record_error(message)
 
     def check_param(self, param):
@@ -378,7 +376,7 @@ class Checker(XMLChecker):
         else:
             type_elt = type_elts[0]
             val = type_elt.get('values')
-            if val and val not in self.structure_types:
+            if val and not self.is_enum_value(val, TYPEENUM):
                 message = f'{self.entity} has unknown structure type constant {val}'
                 if val in CHECK_TYPE_STYPE_EXCEPTIONS:
                     self.record_warning('(Allowed exception)', message)
@@ -670,7 +668,8 @@ Other exceptions can be added to xml_consistency.py:EXTENSION_API_NAME_EXCEPTION
             if revisions:
                 ver_from_text = str(max(revisions))
                 if ver_from_xml != ver_from_text:
-                    self.record_error('Version enum mismatch: spec text indicates', ver_from_text,
+                    self.record_error('Version enum mismatch: spec text from', fn,
+                                      'indicates', ver_from_text,
                                       'but XML says', ver_from_xml)
             else:
                 if ver_from_xml == '1':

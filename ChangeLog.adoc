@@ -1,4 +1,4 @@
-Copyright 2016-2023 The Khronos Group Inc.
+Copyright 2016-2024 The Khronos Group Inc.
 SPDX-License-Identifier: CC-BY-4.0
 
 Update Log for the Vulkan-Docs repository on GitHub. Updates are in reverse
@@ -12,7 +12,653 @@ public pull requests that have been accepted.
 "`VU`" as used below is an abbreviation for "`valid usage statement`", which
 appears frequently in the change log.
 
------------------------------------------------------
+'''
+
+Change log for May 31, 2024 Vulkan 1.3.286 spec update:
+
+Public Issues
+
+  * Clarify dynamic state lifetime VU statements for pipelines and shader
+    objects (public issue 2276).
+  * Add the `depends` attribute to XML feature tags, deprecating the
+    `number` attribute, which will eventually be retired (public issue
+    2327).
+  * Add a `type="constants"` attribute to `enums` XML tags so all of them
+    have a `type` attribute (public issue 2359).
+  * Clarify behavior of VK_PRESENT_MODE_FIFO_RELAXED_KHR in the "`Display
+    Timing Queries`" portion of the VK_GOOGLE_display_timing extension
+    (public pull request 2363).
+
+Internal Issues
+
+  * Clarify that host-image-copy functions work on the host for
+    vkCopyMemoryToImageEXT, vkCopyImageToMemoryEXT, and
+    vkCopyImageToImageEXT (internal issue 3857).
+  * Clarify that stage masks are ignored for acquire/release in sync2
+    vkCmdPipelineBarrier2 and <<synchronization-queue-transfers-acquire>>
+    (internal issue 3865).
+  * Explain why mapping state is duplicated in the
+    VK_KHR_dynamic_rendering_local_read proposal document (internal issue
+    3881).
+  * Add description of VK_ERROR_NOT_PERMITTED_KHR to the
+    <<fundamentals-errorcodes, Error codes>> section (internal issue 3888).
+  * Remove redundant near-duplicate markup for the "`Precision of core
+    SPIR-V Instructions`" table (internal MR 6645).
+  * Remove UnpackDouble2x32 from the list of instructions affected by
+    DenormFlushToZero in the <<spirvenv-precision-operation, Precision and
+    Operation of SPIR-V Instructions>> section (internal MR 6648).
+  * Add `returnedonly="true"` attributes to VkSurface*Capabilities*
+    structures (internal MR 6657).
+  * Add a note about an AV1 decode reference info type bug in the
+    <<decode-av1-reference-info, Std Reference Information>> section
+    (internal MR 6662).
+  * Fix incorrect use of "`forward prediction`" vs. "`backward prediction`"
+    in the video extensions and glossary (internal MR 6663).
+  * Do not print checker script warning headers when no warnings are printed
+    (internal MR 6670).
+  * Add VU statements tying features to queue types (internal MR 6672).
+  * Fix VkGraphicsPipelineCreateInfo VU 06601 to correspond to the description
+    of pRasterizationState when EDS3 is enabled
+    (internal MR 6674).
+
+New Extensions
+
+  * VK_EXT_shader_replicated_composites
+
+'''
+
+Change log for May 10, 2024 Vulkan 1.3.285 spec update:
+
+Public Issues
+
+  * Update VkMemoryMapInfoKHR VUs to not require VK_WHOLE_SIZE with
+    VK_MEMORY_MAP_PLACED_BIT (public issue 2350).
+  * Add a <<fundamentals-strings, String Representation>> section and
+    clarify that fixed-length string buffers in API structures always
+    include the null terminator (public issue 2351).
+  * Update refpage short descriptions of VkAttachmentLoad/StoreOp to be
+    consistent with spec language (public issue 2353).
+  * Clarify that the KHR and EXT load_store_op_none extensions were not
+    promoted to Vulkan 1.3 (public PR 2357).
+
+Internal Issues
+
+  * Add a VkGraphicsPipelineCreateInfo VU banning "`read-only`" input
+    attachments without VkRenderingInputAttachmentIndexInfoKHR (internal
+    issue 3862).
+  * Add explicit reference to RayQueryPositionFetchKHR SPIR-V capability in
+    the VK_KHR_ray_tracing_position_fetch extension appendix and XML
+    spirvcapability tags (internal MR 6617).
+  * Remove MaximallyReconvergesKHR capability (which is not a capability,
+    but an execution mode) from XML (internal MR 6618).
+  * Add alias and enum value-> type maps in `reg.py` (internal MR 6620).
+  * Add missing shader object VU for vkCmdDispatchBase (internal MR 6623).
+  * Make build tests less sensitive to asciidoctor versions and CSS changes
+    by just comparing HTML body content (internal MR 6637).
+  * Do not allow overlapping builtin decorations for an entry point in the
+    <<interfaces-builtin-variables, Built-In Variables>> section, and add
+    some related <<spirvenv-module-validation-standalone, Standalone SPIR-V
+    Validation>> VUs (KhronosGroup/SPIRV-Cross issue 2313).
+
+New Extensions
+
+  * VK_MESA_image_alignment_control
+
+'''
+
+Change log for May 5, 2024 Vulkan 1.3.284 spec update:
+
+Public Issues
+
+  * Refactor "`proposals`" into a separate Antora component "`features`" and
+    refer to published proposals more consistently as "`feature
+    descriptions`" (public PR 2361).
+
+Internal Issues
+
+  * Partial synchronization with OpenXR scripts (internal MR 6419).
+  * Refactor extensionmetadocgenerator.py to simplify adding new sections
+    (internal MR 6624).
+  * Restore structextends="VkPhysicalDeviceProperties2" back for
+    VkPhysicalDeviceLegacyVertexAttributesPropertiesEXT (internal MR 6631).
+
+New Extensions
+
+  * VK_EXT_legacy_vertex_attributes
+
+'''
+
+Change log for April 19, 2024 Vulkan 1.3.283 spec update:
+
+Public Issues
+
+  * Add a NOTE to the <<synchronization-queue-transfers-acquire>> section
+    explaining how release barrier should be used (public issue 2319).
+  * Add VkGraphicsPipelineCreateInfo VU to fix partial dynamic state for
+    VK_EXT_conservative_rasterization (public issue 2344).
+  * Update Github Actions from @v3 to @v4 (public PR 2352).
+
+Internal Issues
+
+  * Limit protected VkBuffer creation to Vulkan 1.0 usages in
+    VkBufferCreateInfo VUs and <<spirvenv-module-validation-runtime, Runtime
+    SPIR-V Validation>> (internal issue 3596).
+  * Clarify meaning of
+    VkAccelerationStructureGeometryTrianglesDataKHR::maxVertex (internal
+    issue 3796).
+  * Require InputAttachmentIndx for arrayed SubpassData variables in
+    <<spirvenv-module-validation-runtime, Runtime SPIR-V Validation>>
+    (internal issue 3837).
+  * Allow external host memory to <<host-memory-import-non-visible-type,
+    back non-host visible types>> (internal issue 3841).
+  * Add pipeline create flag to VK_EXT_legacy_dithering to enable use with
+    dynamic rendering (internal MR 6491).
+  * Add missing vkCmdBeginRenderPass VU for VK_EXT_nested_command_buffer
+    (internal MR 6595).
+  * Remove redundant common draw vertex binding VU 04912 (internal MR 6604).
+
+'''
+
+Change log for April 13, 2024 Vulkan 1.3.282 spec update:
+
+Public Issues
+
+  * Fix typo and move vkCmdCopyAccelerationStructureNV VU 07792 from the
+    common copy acceleration structures VUs (based on issues from public
+    pull request 2144).
+  * Relax video format image usage flags requirement in the
+    <<resources-image-creation-limits, Image Creation Limits>> section when
+    VK_IMAGE_CREATE_EXTENDED_USAGE_BIT is specified (public issue 2329).
+  * Resolve some duplicate consecutive word typos (public PR 2333) and add a
+    CI / `allchecks` built target to detect them in the future (public issue
+    2338).
+  * Adjust proposal links to point to the docs site from the Antora build
+    (Vulkan-Site issue 65).
+  * Minor fixes to proposal markup and navigation for the Antora build.
+
+Internal Issues
+
+  * Add unnormalizedCoordinates draw-time ImageView VUs (internal issue
+    3632).
+  * Alias VK_FORMAT_R16G16_S10_5_NV to the more informative
+    VK_FORMAT_R16G16_SFIXED5_NV, and add a `SFIXED5` `numericFormat` XML
+    attribute to describe the component format (internal issue 3802).
+  * Add <<spirvenv-module-validation-standalone, Standalone SPIR-V
+    Validation>> VU to ban use of SPIR-V dimension `Rect` (internal issue
+    3812).
+  * Clarify in the <<queries-pipestats, Pipeline Statistics Queries>>
+    section that queries are undefined for stages not present in pipelines
+    (internal issue 3816).
+  * Add VkGraphicsPipelineCreateInfo and vkCreateShadersEXT VUs for
+    DrawIndex BuiltIn decorations with Task and Mesh shader stages (internal
+    issue 3833).
+  * Add CI check to prevent VK_ERROR_UNKNOWN and VK_ERROR_VALIDATION_FAILED
+    in XML `errorcodes` attributes (internal issue 3836).
+  * Add the robustBufferAccess feature to common draw vertex binding VU
+    02721 (internal issue 3838).
+  * Enforce American English spelling conventions in CI (as required by the
+    style guide) using the codespell British->American English dictionary,
+    fix inconsistencies that discovered, and update some external repository
+    deep links to include their updated default branch name (internal issue
+    3848).
+  * Add missing VU for using HOST_BIT with vkCmdPipelineBarrier (internal MR
+    6217).
+  * Clarify descriptor set layout support in vkCreateDescriptorSetLayout VU
+    09582 (internal MR 6567).
+  * Add `%unbreakable` asciidoc option to generated API interface blocks,
+    preventing long structure and enumerant definitions from being split
+    across PDF page boundaries (internal MR 6571).
+  * Improve error message from xml_consistency.py (internal MR 6572).
+  * Fixes to sampleShadingEnable for VkGraphicsPipelineCreateInfo VU 06637
+    and VkGraphicsPipelineCreateInfo VU 09567 (internal MR 6575).
+  * Clarify that subpassLoad does not take a "`layer`" argument in
+    <<spirvenv-module-validation-standalone, Standalone SPIR-V Validation>>
+    VU 04660 (internal MR 6581).
+  * Update VK_EXT_metal_objects by adding an `__unsafe_unretained ownership`
+    qualifier to all Metal object declarations, to support Automatic
+    Reference Counting (ARC) (internal MR 6582).
+  * Add a NOTE to the <<textures-operation-validation,
+    Instruction/Sampler/Image View Validation>> section about conditions
+    requiring a CTS waiver on some implementations (internal MR 6589).
+  * Add a common draw vertex binding VU for primitiveRestartEnable list
+    topology, corresponding to VkPipelinInputAssemblyStateCreateInfo VU
+    06252 (public Vulkan-ValidationLayers issue 4413).
+
+'''
+
+Change log for March 22, 2024 Vulkan 1.3.281 spec update:
+
+Public Issues
+
+  * Add matching stride VUs for MultiDraw (public issue 2323).
+  * Always generate a failure code section, even for commands with no
+    errorcodes specified in the XML (public PR 2325).
+
+
+Internal Issues
+
+  * Correct issues describing NT handle usage in the
+    VK_KHR_external_memory_win32 and VK_KHR_external_semaphore_win32
+    extension appendices (internal issue 1291).
+  * Fix refpage layout for Vk*Feature* structures so member descriptions
+    appear in the right section (internal issue 3314).
+  * Add vkCmdBeginTransformFeedbackEXT VU statement for max counter buffers
+    (internal issue 3654).
+  * Clarify packing of data returned by vkGetRayTracingShaderGroupHandles
+    (internal issue 3791).
+  * Fix `depends` attribute for many promoted extensions (internal issue
+    3810).
+  * Clarify OpKill behavior with shader termination (internal issue 3815).
+  * Require customBorderColors feature support if the
+    VK_EXT_custom_border_color extension is supported (internal issue 3819).
+  * Remove explicit VK_ERROR_UNKNOWN errorcodes from XML and add a NOTE not
+    to do this in the registry schema document (internal issue 3824).
+  * Clarify AV1 loop restoration size values in the
+    <<decode-av1-picture-info, Std Picture Information>> description
+    (internal MR 6499).
+  * Fix VkGraphicsPipelineCreateInfo VU 07609 (internal MR 6535).
+  * Add helper script to run the Khronos Docker image used to build
+    specifications using podman, instead of docker (internal MR 6538).
+  * Mark recently ratified EXT extensions in XML (internal MR 6548).
+  * Relocate a NOTE in the "`WSI Swapchain`" section following the normative
+    language it refers to (internal MR 6549).
+  * Clarify and fix sparse memory bind size requirements in the
+    <<sparsememory-memory-requirements, Sparse Resource Memory
+    Requirements>>, <<sparsememory-memory-partially-resident, Partially
+    Resident Images>>, and VkSparseMemoryBind language (internal MR 6555).
+
+'''
+
+Change log for March 8, 2024 Vulkan 1.3.280 spec update:
+
+Public Issues
+
+  * Use full "`queue family ownership transfer`" terminology consistently
+    (public PR 2320).
+
+Internal Issues
+
+  * Add a NOTE to the <<pipelines-dynamic-state, Dynamic State>> section
+    warning of setting dynamic state on a static pipeline in older drivers
+    (internal issue 3675).
+  * Fix VkGraphicsPipelineCreateInfo VU 09037 related to pColorBlendState
+    with dynamic rendering (internal issue 3748).
+  * Add additional vkCmdBeginRendering and common draw dispatch VUs for
+    image layouts (internal issue 3758).
+  * Add missing common draw shader compatibility VUs for
+    VK_KHR_dynamic_rendering_local_read (internal issue 3787).
+  * Update sampling restrictions for min/max filtering in common draw
+    dispatch VUs (internal issue 3800).
+  * Add VkGraphicsPipelineCreateInfo VU requiring stageCount to be zero when
+    not needed (internal issue 3804).
+  * Clarify submission order for multiple subpasses in the
+    <<synchronization-implicit, Implicit Synchronization Guarantees>>
+    section (internal issue 3811).
+  * Fix miscellaneous minor language and example code issues in the video
+    extension proposal and specification language (internal MR 6492).
+  * Properly define <<fundamentals-queueoperation-command-types, terms for
+    command types>> in the fundamentals chapter (internal MR 6508).
+  * Add missing VUs for subresource aspectMask to common image layout
+    transition, VkImageViewCreateInfo, and VkSparseImageMemoryBindInfo
+    (internal MR 6522).
+  * fix shader object interaction with dynamic blend states in the
+    <<shaders-objects-state]] Setting State>> section and common draw VUs
+    (internal MR 6523).
+
+New Extensions
+
+  * VK_NV_ray_tracing_validation
+
+'''
+
+Change log for March 1, 2024 Vulkan 1.3.279 spec update:
+
+Public Issues
+
+  * Add a NOTE to the VK_IMG_format_pvrtc extension appendix specifying that
+    PVRTC1 images must have power of two dimensions, and a corresponding VU
+    to VkImageCreateInfo (public issue 1991).
+  * Remove BETA ifdefs from video enums (public issue 2314).
+
+Internal Issues
+
+  * Clarify using multiple dynamic state to set vertex stride in the
+    <<fxvertex-input-address-calculation, Vertex Input Address Calculation>>
+    section (internal issue 3381).
+  * Specify that reinterpreting images with unused format bits returns
+    undefined values in the <<textures-operation-validation,
+    Instruction/Sampler/Image View Validation>> and
+    <<textures-output-format-conversion, Texel Output Format Conversion>>
+    sections (internal issue 3591).
+  * Remove redundant VkGraphicsPipelineCreateInfo multiView VUs (internal
+    issue 3662).
+  * Ensure that created descriptor set layouts are supported in
+    vkCreateDescriptorSetLayout (internal issue 3676).
+  * Clarify vkGetRenderingAreaGranularityKHR recommendations for optimal
+    renderArea (internal issue 3702).
+  * Fix link typo in vkRenderingFragmentDensityMapAttachmentInfoEXT
+    multiview VU 07908 (internal issue 3714).
+  * Tighten <<formats-without-shader-storage-format, Formats Without Shader
+    Storage Format>> language regarding storage format support (internal
+    issue 3777).
+  * Clarify that VkPhysicalDeviceDriverProperties::conformanceVersion
+    identifies the most recent version of CTS successfully passed (as
+    opposed to requiring the driver to have passed a one-month review period
+    and have been officially labeled conformant by the Vulkan working
+    group) (internal issue 3780).
+  * Provide more detailed description for VK_FORMAT_R16G16_S10_5_NV
+    (internal issue 3788).
+  * Fix swapped FeatureEnabled indices in the <<decode-av1-picture-info, Std
+    Picture Information>> section (internal issue 3793).
+  * Improve proposal template and style guide to clarify that the
+    specification custom asciidoctor macros are not available in proposal
+    documents (internal issue 3808).
+  * Improvements and fixes for VK_NV_device_generated_commands_compute
+    (internal MR 6410).
+  * Fix parameter name typo in vkCmdControlVideoCodingKHR VU 08243 (internal
+    MR 6426).
+  * Clarify the default values of render pass mappings for
+    vkCmdSetRenderingAttachmentLocationsKHR and
+    VkRenderingInputAttachmentIndexInfoKHR (internal MR 6469).
+  * Fix param name typo in VkRenderingFragmentDensityMapAttachmentInfoEXT VU
+    06157 (internal MR 6483).
+  * Fix VkMutableDescriptorTypeCreateInfoEXT ->
+    VkMutableDescriptorTypeListEXT typo in the <<descriptorsets-mutable,
+    Mutable>> introduction (internal MR 6484).
+  * Fix VkGraphicsPipelineCreateInfo VU 08899 to refer to vertex input,
+    rather than pre-rasterization state (internal MR 6501).
+  * Add missing `type` attribute to some AV1 `<enum>` tags in `video.xml`
+    (internal MR 6506).
+  * Fix styleguide example markup that did not escape ifdef and endif macros
+    (internal MR 6506).
+  * Add a missing common pipeline barrier VU, and move the "`Explicit Render
+    Pass Tile Image Access Synchronization`" section to the
+    VK_EXT_shader_tile_image proposal document (internal MR 6510).
+
+New Extensions
+
+  * VK_NV_raw_access_chains
+
+'''
+
+Change log for February 16, 2024 Vulkan 1.3.278 spec update:
+
+Public Issues
+
+  * Restore orphaned vkQueuePresentKHR text to proper locations (public
+    issue 2008).
+  * Make ename:VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT into a typo alias of
+    ename:VK_INCOMPATIBLE_SHADER_BINARY_EXT, since this is actually a
+    success code, not an error code (public issue 2295).
+
+Internal Issues
+
+  * Remove VK_INCOMPLETE success code in
+    vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI, and tag
+    pMaxWorkgroupSize as a pointer to a single returned structure, not an
+    array (internal issue 3715).
+  * Add missing `len` XML attributes for structure <member> tags which are
+    static arrays, but may not use the entire array (internal issue 3743).
+  * Fix VkPhysicalDeviceSurfaceInfo2KHR::surface VU 07919 and set
+    `noautovalidity` on corresponding XML member (internal MR 6429).
+  * Move sections in generated extension appendices down one heading level
+    in spec body (internal MR 6436).
+  * Remove `returnedonly` XML attribute from VkPhysicalDeviceSurfaceInfo2KHR
+    (internal MR 6436).
+  * Add `returnedonly` XML attribute to VkLatencyTimingsFrameReportNV
+    (internal MR 6463) and slink:VkPerformanceValueINTEL (internal MR 6461).
+  * Fix typo in vkCopyAccelerationStructureKHR VU 03728 (internal MR 6457).
+  * Remove invalid subpassLoadMS operation from description of
+    vkCmdSubpassShadingHUAWEI (internal MR 6454).
+  * Remove "`equal to`" clause from VU 09515 (internal MR 6458).
+  * Rearrange some function markup and add missing parameter descriptions
+    for vkCmdSetPerformanceStreamMarkerINTEL (internal issue 3785).
+  * Remove non-sensical VkGraphicsPipelineCreateInfo VUs 07717 and 07719
+    (internal MR 6468).
+  * Fix various 'a'/'an' typos (internal MR 6470).
+
+New Extensions
+
+  * VK_EXT_map_memory_placed
+  * VK_NV_shader_atomic_float16_vector
+
+'''
+
+Change log for February 1, 2024 Vulkan 1.3.277 spec update:
+
+Internal Issues
+
+  * Add bits to VkSubgroupFeatureFlagBits for VK_KHR_shader_subgroup_rotate
+    (internal issue 3773).
+  * Add missing `promotedto` XML attribute to VK_EXT_line_rasterization
+    (internal issue 3772).
+  * Fix VU missing shaderTileImageStencilReadAccess (internal issue 3778).
+  * Revert add VUs for VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT
+    (internal MR 6402).
+  * Add missing VkGraphicsPipelinCreateInfo multisample state VU (internal
+    MR 6408).
+  * Add VU for null pGeometries and ppGeometries (internal MR 6411).
+  * Fix typo in vkCmdWriteAccelerationStructuresPropertiesKHR VU (internal
+    MR 6417).
+  * Fix typos in some credits (internal MR 6423).
+  * Fix missing SPIR-V interface summary in some extension appendices
+    (internal MR 6425).
+  * Update VK_FORMAT_UNDEFINED for VK_ANDROID_external_format_resolve
+    (internal MR 6428)
+  * Fix vkGetDescriptorEXT VU for null pCombinedImageSampler (internal MR
+    6431).
+  * Remove redundant vkGetDescriptorEXT VU (internal MR 6434).
+
+New Extensions
+
+  * VK_KHR_video_decode_av1
+
+'''
+
+Change log for January 25, 2024 Vulkan 1.3.276 spec update:
+
+Github Issues
+
+  * Add missing VUs to structures taking elink:VkFormat parameters where
+    formats cannot be ename:VK_FORMAT_UNDEFINED (public issue 2165).
+  * Add EPUB generation target to the Makefile. NOTE: the `epub` target is
+    not supported by Khronos, but provided in case it is of use to people
+    building their own specification outputs. Please see
+    https://github.com/KhronosGroup/Vulkan-Docs/pull/2286 for more about
+    this (public PR 2286).
+
+Internal Issues
+
+  * Fix VU 06604 to allow omitting fragment shaders when creating a graphics
+    pipeline library (internal issue 3178).
+  * Clarify pname:maxCombinedClipAndCullDistances and related VUs (internal
+    issue 3325).
+  * Refactor apiext:VK_EXT_extended_dynamic_state3 and
+    apiext:VK_EXT_shader_object XML to include extension dependencies
+    (internal issue 3360).
+  * Add <<spirvenv-module-validation-standalone, Standalone SPIR-V
+    Validation>> VU banning code:PhysicalStorageBuffer pointers in shader
+    interfaces (internal issue 3677).
+  * Clarified image requirement for slink:VkSparseImageFormatProperties
+    (internal issue 3686).
+  * Add slink:VkQueryPoolCreateInfo VU requiring pname:pipelineStatistics
+    not be zero for that query type (internal issue 3722).
+  * Add slink:VkWriteDescriptorSet and flink:vkGetDescriptorEXT VUs banning
+    dlink:VK_NULL_HANDLE YCbCr descriptors (internal issue 3727).
+  * Clarify acceleration structure binding requirements in a NOTE for
+    flink:vkCreateAccelerationStructureKHR and new VUs for
+    flink:vkGetAccelerationStructureDeviceAddressKHR (internal issue 3735).
+  * Add `optional` attribute to shader parameter of flink:vkDestroyShaderEXT
+    (internal issue 3754).
+  * Add flink:vkSetEvent VU for pending command buffers (internal MR 6326).
+  * Allow pname:pMessage to be `NULL` in
+    slink:VkDebugUtilsMessengerCallbackDataEXT (internal MR 6331).
+  * Fix link to the H.265 specification (internal MR 6334).
+  * Remove redundant slink:VkDeferredOperationKHR check formerly in VUID
+    03677 (internal MR 6374).
+  * Add VU requiring pname:commandBuffer to not be protected for
+    flink:vkCmdBuildAccelerationStructuresKHR (internal MR 6375).
+  * Update `genvk.py` to not load generators when they are not available, as
+    may be the case in VulkanSC-Headers or downstream repositories (internal
+    MR 6384).
+  * Add `returnedonly` attributes to some Properties structs missing them
+    (internal MR 6392).
+  * Remove redundant slink:VkDebugUtilsMessengerCreateInfoEXT VU 01914
+    (internal MR 6404).
+  * Clarify the conditions under which <<shaders-helper-invocations, shader
+    helper invocations>> may become inactive (internal MR 6405).
+  * Fix typo in
+    slink:VkPipelineMultisampleStateCreateInfo::pname:sampleShadingEnable
+    member name (internal MR 6407).
+
+New Extensions
+
+  * Roadmap 2024 Extensions
+  ** VK_KHR_dynamic_rendering_local_read
+  ** VK_KHR_index_type_uint8 (promoted from EXT)
+  ** VK_KHR_line_rasterization (promoted from EXT)
+  ** VK_KHR_load_store_op_none (promoted from EXT)
+  ** VK_KHR_shader_expect_assume
+  ** VK_KHR_shader_float_controls2
+  ** VK_KHR_shader_maximal_reconvergence
+  ** VK_KHR_shader_quad_control
+  ** VK_KHR_shader_subgroup_rotate
+
+'''
+
+Change log for January 5, 2024 Vulkan 1.3.275 spec update:
+
+Github Issues
+
+  * Update `VK_EXT_image_compression_control` support query example (public
+    PR 2285).
+  * Fix markup issue in extension refpages (public issue 2288).
+
+Internal Issues
+
+  * Add requirements for WIN32 multithreading behavior and HWND handling to
+    flink:vkCreateWin32SurfaceKHR (internal issue 3402).
+  * Link to the appropriate etext:Vk*FlagBits type to improve "`must: be a
+    bit value`" terminology (internal issue 3728).
+  * Editorial and XML dependency updates for
+    apiext:VK_QCOM_render_pass_transform and
+    apiext:VK_QCOM_rotated_copy_commands (internal MR 6353).
+  * Add missing links to <<resources-image-views-identity-mappings,identity
+    swizzle>> in a few places where the term is used (internal MR 6354).
+  * Remove unreachable VU 07008 in flink:vkCmdEndQuery (internal MR 6356).
+  * Fix XML dependencies for apiext:VK_KHR_maintenance6 (internal MR 6361).
+  * Set XML `noautovalidity` attribute on all pipeline create flags
+    (internal MR 6364).
+  * Remove duplicate flink:vkCmdBindDescriptorSets VUID 06754 (internal MR
+    6364).
+  * Remove shader object VU 08401 which was inconsistent with specification
+    language (internal MR 6368).
+  * Editorial fix to use 'must:' normative term in VUs (internal MR 6370).
+  * Update buffer usage flag VUs to factor out common VUs to a new
+    commonvalidity file, and fix typo in
+    slink:VkDescriptorBufferBindingInfoEXT (internal MR 6371).
+  * Add flink:vkGetPrivateData VU requiring pname:objectHandle to be valid
+    (internal MR 6373).
+  * Remove redundant VkGraphicsPipelineCreateInfo VU 06680 and re-word VU
+    06679 to combine them (internal MR 6376).
+  * Fix field name typos for flink:vkGetDescriptorEXT VUs (internal MR
+    6378).
+  * Set `noautovalidity` XML attribute on some slink:VkCudaLaunchInfoNV
+    parameters (internal MR 6382).
+
+
+'''
+
+Change log for December 19, 2023 Vulkan 1.3.274 spec update:
+
+Github Issues
+
+  * Remove incorrect `optional` attribute on
+    slink:VkCudaLaunchInfoNV::pParams and pname:pExtras (public PR 2263).
+  * Require identity swizzle for attachments in slink:VkRenderingInfo
+    dynamic rendering VUs (public issue 2275).
+  * Make slink:VkRenderPassStripeBeginInfoARM::pname:pStripeInfos `const`
+    (public PR 2279).
+
+Internal Issues
+
+  * Add a <<introduction-ratified, Ratification>> section to the
+    introduction, to define "`ratified`" (as used in the extension appendix
+    metadata) in terms useful for developers (internal issues 3472, 3709).
+  * Allow fragment shader invocations to be merged for flat shaded
+    primitives in the <<fragops-shader, Fragment Shading>> section (internal
+    issue 3563).
+  * Add alignment VUs to flink:vkCmdDrawIndirectByteCountEXT (internal issue
+    3674).
+  * Fix etext:VK_*_CREATE_PROTECTED_BIT memory requirements reporting in the
+    <<resources-association, Resource Memory Association>> section (internal
+    issue 3694).
+  * Update common pipeline create info VUs for create flags (internal issue
+    3703).
+  * Fix slink:VkRenderingInfo dynamic rendering VUs for
+    slink:VkRenderingAttachmentInfo::pname:resolveImageView structures
+    (internal issue 3711).
+  * Minor changes to slink:VkGraphicsPipelinCreateInfo VUs to consistently
+    allow pname:pMultisampleState to be optional (internal MR 6312).
+  * Update flink:vkGetDescriptorEXT VUs for YCbCr
+    ename:VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER (internal MR 6318).
+  * Specify alignment requirement VUs for slink:VkSparseMemoryBind
+    pname:resourceOffset and pname:memoryOffset values (internal MR 6323).
+  * Clarify slink:VkDescriptorSetLayoutBinding::pname:stageFlags VU
+    (internal MR 6333).
+  * Fix some slink:VkGraphicsPipelineCreateInfo VUs to read properly without
+    some related extensions enabled in the build (internal MR 6335).
+  * Fix code:OutputTriangles -> code:OutputTrianglesNV in the description of
+    code:PrimitiveIndicesNV (internal MR 6338).
+  * Add capture replay VUs to slink:VkAccelerationStructureCreateInfoKHR to
+    ensure that the acceleration structure and buffer are identical and have
+    the same addresses (internal MR 6351).
+
+New Extensions
+
+  * VK_KHR_maintenance6
+  * Video Encode Extensions
+  ** VK_KHR_video_encode_queue (was provisional KHR)
+  ** VK_KHR_video_encode_h264 (promoted from provisional EXT)
+  ** VK_KHR_video_encode_h265 (promoted from provisional EXT)
+  ** VK_KHR_video_maintenance1
+  * VK_NV_per_stage_descriptor_set
+
+'''
+
+Change log for December 8, 2023 Vulkan 1.3.273 spec update:
+
+Github Issues
+
+  * Add missing `bitwidth` attribute for
+    elink:VkPhysicalDeviceSchedulingControlsFlagBitsARM (public issue 2277).
+
+Internal Issues
+
+  * Use the new <<glossary-pipeline-trace-ray, pipeline trace ray>> term to
+    refer to trace ray instructions, instead of the too-specific
+    code:OpTraceRayKHR (internal issue 3284).
+  * Improve description of <<pipelines-multiple, multiple pipeline
+    creation>>, refer to it from each ftext:vkCreate*Pipelines command, and
+    add style guide language to follow this pattern for future multiple
+    creation commands (internal issue 3707).
+  * Add common blit image and copy image VU that copying an image with the
+    same subresource must: be ename:VK_IMAGE_LAYOUT_GENERAL or
+    ename:VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR (internal MR 6143).
+  * Markup improvements and correct use of normative must: for
+    flink:vkGetPhysicalDeviceOpticalFlowImageFormatsNV (internal MR 6315).
+  * Refer to "`shader calls`" in the <<memory-model, Memory Model>> chapter
+    refers to them as such, rather than "`invocation repacks`" (internal MR
+    6316).
+  * Make some flink:vkAcquireImageANDROID parameters `optional` in XML
+    (internal MR 6325).
+
+New Extensions
+
+  * apiext:VK_KHR_calibrated_timestamps
+  * apiext:VK_KHR_vertex_attribute_divisor
+
+'''
 
 Change log for December 1, 2023 Vulkan 1.3.272 spec update:
 
@@ -39,7 +685,7 @@ New Extensions
   * apiext:VK_EXT_layer_settings
   * apiext:VK_ARM_render_pass_striped
 
------------------------------------------------------
+'''
 
 Change log for November 17, 2023 Vulkan 1.3.271 spec update:
 
@@ -80,7 +726,7 @@ Internal Issues
     XML (internal MR 6297).
 
 
------------------------------------------------------
+'''
 
 Change log for November 9, 2023 Vulkan 1.3.270 spec update:
 
@@ -144,7 +790,7 @@ New Extensions
 
   * apiext:VK_IMG_relaxed_line_rasterization
 
------------------------------------------------------
+'''
 
 Change log for October 20, 2023 Vulkan 1.3.269 spec update:
 
@@ -183,7 +829,7 @@ New Extensions
   * apiext:VK_ARM_scheduling_controls
   * apiext:VK_NV_cuda_kernel_launch
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2023 Vulkan 1.3.268 spec update:
 
@@ -214,7 +860,7 @@ Internal Issues
   * Use title case consistently for chapter and section titles, and add it
     to the style guide (internal MR 6201).
 
------------------------------------------------------
+'''
 
 Change log for October 6, 2023 Vulkan 1.3.267 spec update:
 
@@ -255,7 +901,7 @@ New Extensions
   * apiext:VK_NV_extended_sparse_address_space
 
 
------------------------------------------------------
+'''
 
 Change log for September 29, 2023 Vulkan 1.3.266 spec update:
 
@@ -281,7 +927,7 @@ New Extensions
   * apiext:VK_ANDROID_external_format_resolve
   * apiext:VK_NV_low_latency2
 
------------------------------------------------------
+'''
 
 Change log for September 22, 2023 Vulkan 1.3.265 spec update:
 
@@ -319,7 +965,7 @@ Internal Issues
     slink:VkDeviceImageMemoryRequirements VUIDs (internal MR 6124).
 
 
------------------------------------------------------
+'''
 
 Change log for September 8, 2023 Vulkan 1.3.264 spec update:
 
@@ -345,7 +991,7 @@ New Extensions
   * apiext:VK_EXT_frame_boundary
   * apiext:VK_MSFT_layered_driver
 
------------------------------------------------------
+'''
 
 Change log for September 2, 2023 Vulkan 1.3.263 spec update:
 
@@ -355,7 +1001,7 @@ Github Issues
     specifications (public issue 2193).
   * Explicitly state that VkDeviceOrHostAddressConstKHR is also ignored
     (public PR 2205).
-  * Fix parameter typo "`cordinates`" and correct markup (public PR 2206).
+  * Fix parameter typo "`coordinates`" and correct markup (public PR 2206).
   * Cleanup slink:VkGraphicspipelineCreateInfo VUs for code:PointSize in the
     context of apiext:VK_KHR_maintenance5 (public Vulkan-ValidationLayers
     issue 6382).
@@ -390,7 +1036,7 @@ New Extensions
 
   * apiext:VK_NV_descriptor_pool_overallocation
 
------------------------------------------------------
+'''
 
 Change log for August 25, 2023 Vulkan 1.3.262 spec update:
 
@@ -446,7 +1092,7 @@ New Extensions
   * apiext:VK_QCOM_image_processing2
   * apiext:VK_QCOM_ycbcr_degamma
 
------------------------------------------------------
+'''
 
 Change log for August 4, 2023 Vulkan 1.3.261 spec update:
 
@@ -496,7 +1142,7 @@ Internal Issues
     requirement for apiext:VK_KHR_cooperative_matrix (internal merge request
     6051).
 
------------------------------------------------------
+'''
 
 Change log for July 28, 2023 Vulkan 1.3.260 spec update:
 
@@ -525,7 +1171,7 @@ New Extensions
   * apiext:VK_KHR_maintenance5
   * apiext:VK_AMDX_shader_enqueue
 
------------------------------------------------------
+'''
 
 Change log for July 21, 2023 Vulkan 1.3.259 spec update:
 
@@ -540,7 +1186,7 @@ Internal Issues
   * Add a CI check for undefined attributes in the spec build (internal
     issue 3567).
 
------------------------------------------------------
+'''
 
 Change log for July 21, 2023 Vulkan 1.3.258 spec update:
 
@@ -597,7 +1243,7 @@ New Extensions
   * apiext:VK_EXT_host_image_copy
   * apiext:VK_NV_device_generated_commands_compute
 
------------------------------------------------------
+'''
 
 Change log for July 7, 2023 Vulkan 1.3.257 spec update:
 
@@ -654,7 +1300,7 @@ Internal Issues
   * Add more CI checks for preferred orthography and fix problems identified
     by them (internal merge request 5991).
 
------------------------------------------------------
+'''
 
 Change log for June 30, 2023 Vulkan 1.3.256 spec update:
 
@@ -694,7 +1340,7 @@ Internal Issues
   * Update registry schema document with a current example of `externsync`
     for arrays (internal merge request 5975).
 
------------------------------------------------------
+'''
 
 Change log for June 23, 2023 Vulkan 1.3.255 spec update:
 
@@ -724,7 +1370,7 @@ New Extensions
 
   * apiext:VK_KHR_cooperative_matrix
 
------------------------------------------------------
+'''
 
 Change log for June 16, 2023 Vulkan 1.3.254 spec update:
 
@@ -752,7 +1398,7 @@ New Extensions
   * apiext:VK_EXT_depth_bias_control
   * apiext:VK_QNX_external_memory_screen_buffer
 
------------------------------------------------------
+'''
 
 Change log for June 9, 2023 Vulkan 1.3.253 spec update:
 
@@ -784,7 +1430,7 @@ Internal Issues
     GLSL.std.450 Instructions>> table (internal merge request 5923).
 
 
------------------------------------------------------
+'''
 
 Change log for June 1, 2023 Vulkan 1.3.252 spec update:
 
@@ -807,7 +1453,7 @@ New Extensions
 
   * apiext:VK_EXT_external_memory_acquire_unmodified
 
------------------------------------------------------
+'''
 
 Change log for May 28, 2023 Vulkan 1.3.251 spec update:
 
@@ -860,7 +1506,7 @@ New Extensions
 
   * apiext:VK_EXT_dynamic_rendering_unused_attachments
 
------------------------------------------------------
+'''
 
 Change log for May 4, 2023 Vulkan 1.3.250 spec update:
 
@@ -899,7 +1545,7 @@ New Extensions
   * apiext:VK_EXT_attachment_feedback_loop_dynamic_state
 
 
------------------------------------------------------
+'''
 
 Change log for April 27, 2023 Vulkan 1.3.249 spec update:
 
@@ -940,7 +1586,7 @@ New Extensions
 
   * apiext:VK_KHR_ray_tracing_position_fetch
 
------------------------------------------------------
+'''
 
 Change log for April 20, 2023 Vulkan 1.3.248 spec update:
 
@@ -988,7 +1634,7 @@ Internal Issues
     to require decorations to match between shader stages (internal MR
     5861).
 
------------------------------------------------------
+'''
 
 Change log for April 12, 2023 Vulkan 1.3.247 spec update:
 
@@ -1045,7 +1691,7 @@ Internal Issues
     <<tessellation, Tessellator>> section to refer to the control stage, not
     the evaluation stage (internal MR 5846).
 
------------------------------------------------------
+'''
 
 Change log for March 31, 2023 Vulkan 1.3.246 spec update:
 
@@ -1088,7 +1734,7 @@ New Extensions:
   * apiext:VK_EXT_shader_object
   * apiext:VK_EXT_shader_tile_image
 
------------------------------------------------------
+'''
 
 Change log for March 24, 2023 Vulkan 1.3.245 spec update:
 
@@ -1134,7 +1780,7 @@ New Extensions:
 
   * apiext:VK_NV_displacement_micromap
 
------------------------------------------------------
+'''
 
 Change log for March 17, 2023 Vulkan 1.3.244 spec update:
 
@@ -1161,7 +1807,7 @@ New Extensions:
 
   * apiext:VK_KHR_map_memory2
 
------------------------------------------------------
+'''
 
 Change log for March 12, 2023 Vulkan 1.3.243 spec update:
 
@@ -1249,7 +1895,7 @@ Internal Issues
   * Refactor single-sampled requirement of copy commands into common VU
     statements (internal merge request 5776).
 
------------------------------------------------------
+'''
 
 Change log for February 26, 2023 Vulkan 1.3.242 spec update:
 
@@ -1287,7 +1933,7 @@ New Extensions:
 
   * apiext:VK_NV_low_latency
 
------------------------------------------------------
+'''
 
 Change log for February 16, 2023 Vulkan 1.3.241 spec update:
 
@@ -1401,7 +2047,7 @@ New Extensions:
   * apiext:VK_ARM_shader_core_properties
   * apiext:VK_QCOM_multiview_per_view_render_areas
 
------------------------------------------------------
+'''
 
 Change log for January 26, 2023 Vulkan 1.3.240 spec update:
 
@@ -1429,7 +2075,7 @@ New Extensions:
 
   * apiext:VK_EXT_pipeline_library_group_handles
 
------------------------------------------------------
+'''
 
 Change log for January 19, 2023 Vulkan 1.3.239 spec update:
 
@@ -1508,7 +2154,7 @@ New Extensions:
 
   * apiext:VK_HUAWEI_cluster_culling_shader
 
------------------------------------------------------
+'''
 
 Change log for December 19, 2022 Vulkan 1.3.238 spec update:
 
@@ -1547,7 +2193,7 @@ New Extensions:
   ** apiext:VK_KHR_video_decode_h264 (promoted from EXT)
   ** apiext:VK_KHR_video_decode_h265 (promoted from EXT)
 
------------------------------------------------------
+'''
 
 Change log for December 8, 2022 Vulkan 1.3.237 spec update:
 
@@ -1579,7 +2225,7 @@ New Extensions:
   * apiext:VK_EXT_surface_maintenance1
   * apiext:VK_EXT_swapchain_maintenance1
 
------------------------------------------------------
+'''
 
 Change log for December 1, 2022 Vulkan 1.3.236 spec update:
 
@@ -1665,7 +2311,7 @@ New Extensions:
   * apiext:VK_LUNARG_direct_driver_loading
   * apiext:VK_QCOM_multiview_per_view_viewports
 
------------------------------------------------------
+'''
 
 Change log for November 17, 2022 Vulkan 1.3.235 spec update:
 
@@ -1687,7 +2333,7 @@ New Extensions:
 
   * apiext:VK_EXT_descriptor_buffer
 
------------------------------------------------------
+'''
 
 Change log for November 10, 2022 Vulkan 1.3.234 spec update:
 
@@ -1735,7 +2381,7 @@ Internal Issues:
   * Use consistent wording for "`_handle_ is not dlink:VK_NULL_HANDLE`" and
     update style guide accordingly.
 
------------------------------------------------------
+'''
 
 Change log for November 3, 2022 Vulkan 1.3.233 spec update:
 
@@ -1780,7 +2426,7 @@ New Extensions:
   * apiext:VK_NV_ray_tracing_invocation_reorder
   * apiext:VK_NV_copy_memory_indirect
 
------------------------------------------------------
+'''
 
 Change log for October 27, 2022 Vulkan 1.3.232 spec update:
 
@@ -1793,7 +2439,7 @@ Internal Issues:
 
   * Force applications to specify ename:VK_FORMAT_UNDEFINED for an unused
     attachment in both slink:VkPipelineRenderingCreateInfoKHR and
-    slink:VkCommandBufferInheritanceRenderingInfoKHR. The previous behaviour
+    slink:VkCommandBufferInheritanceRenderingInfoKHR. The previous behavior
     of allowing unused attachments to have any format is not supported on
     some conformant implementations that have shipped and cannot be updated.
     This functionality is intended to be restored via a new extension in the
@@ -1828,7 +2474,7 @@ Internal Issues:
     compatibility break (internal merge request 5512).
 
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2022 Vulkan 1.3.231 spec update:
 
@@ -1891,7 +2537,7 @@ New Extensions:
 
   * apiext:VK_ARM_shader_core_builtins
 
------------------------------------------------------
+'''
 
 Change log for September 29, 2022 Vulkan 1.3.230 spec update:
 
@@ -1927,7 +2573,7 @@ New Extensions:
   * apiext:VK_NV_optical_flow
   * apiext:VK_NV_present_barrier
 
------------------------------------------------------
+'''
 
 Change log for September 22, 2022 Vulkan 1.3.229 spec update:
 
@@ -1969,7 +2615,7 @@ Internal Issues:
   ** Add previously missing definitions and fix incorrect definitions in the
      Video Std headers.
 
------------------------------------------------------
+'''
 
 Change log for September 15, 2022 Vulkan 1.3.228 spec update:
 
@@ -2034,7 +2680,7 @@ New Extensions:
 
   * apiext:VK_EXT_mutable_descriptor_type (promoted from `VALVE`).
 
------------------------------------------------------
+'''
 
 Change log for September 8, 2022 Vulkan 1.3.227 spec update:
 
@@ -2114,7 +2760,7 @@ New Extensions:
 
   * apiext:VK_EXT_legacy_dithering (internal merge request 5042).
 
------------------------------------------------------
+'''
 
 Change log for September 1, 2022 Vulkan 1.3.226 spec update:
 
@@ -2178,7 +2824,7 @@ New Extensions
   * apiext:VK_EXT_depth_clamp_01
   * apiext:VK_EXT_mesh_shader
 
------------------------------------------------------
+'''
 
 Change log for August 18, 2022 Vulkan 1.3.225 spec update:
 
@@ -2228,7 +2874,7 @@ New Extensions:
 
   * apiext:VK_EXT_rasterization_order_attachment_access
 
------------------------------------------------------
+'''
 
 Change log for August 4, 2022 Vulkan 1.3.224 spec update:
 
@@ -2267,7 +2913,7 @@ New Extensions
   * apiext:VK_SEC_amigo_profiling - internal extension used within ANGLE, no
     actual spec language exists yet (internal merge request 5332).
 
------------------------------------------------------
+'''
 
 Change log for July 28, 2022 Vulkan 1.3.223 spec update:
 
@@ -2316,7 +2962,7 @@ Internal Issues:
     (https://github.com/KhronosGroup/Vulkan-Profiles/issues/226).
 
 
------------------------------------------------------
+'''
 
 Change log for July 21, 2022 Vulkan 1.3.222 spec update:
 
@@ -2357,7 +3003,7 @@ New Extensions:
   * `apiext:VK_QCOM_image_processing`
   * `apiext:VK_QCOM_tile_properties`
 
------------------------------------------------------
+'''
 
 Change log for July 14, 2022 Vulkan 1.3.221 spec update:
 
@@ -2403,7 +3049,7 @@ New Extensions:
 
   * apiext:VK_EXT_pipeline_robustness
 
------------------------------------------------------
+'''
 
 Change log for July 7, 2022 Vulkan 1.3.220 spec update:
 
@@ -2461,7 +3107,7 @@ Internal Issues:
     <<interfaces-iointerfaces-matching, Interface Matching>> rules (internal
     issue 3053).
 
------------------------------------------------------
+'''
 
 Change log for June 30, 2022 Vulkan 1.3.219 spec update:
 
@@ -2517,7 +3163,7 @@ New Extensions:
   * apiext:VK_EXT_multisampled_render_to_single_sampled
   * apiext:VK_EXT_shader_module_identifier
 
------------------------------------------------------
+'''
 
 Change log for June 16, 2022 Vulkan 1.3.218 spec update:
 
@@ -2570,7 +3216,7 @@ Internal Issues:
     (internal merge request 5242).
 
 
------------------------------------------------------
+'''
 
 Change log for June 9, 2022 Vulkan 1.3.217 spec update:
 
@@ -2628,7 +3274,7 @@ New Extensions:
   * apiext:VK_EXT_metal_objects
   * apiext:VK_EXT_non_seamless_cube_map
 
------------------------------------------------------
+'''
 
 Change log for June 2, 2022 Vulkan 1.3.216 spec update:
 
@@ -2665,7 +3311,7 @@ Internal Issues:
     merge request 5170).
 
 
------------------------------------------------------
+'''
 
 Change log for May 24, 2022 Vulkan 1.3.215 spec update:
 
@@ -2706,7 +3352,7 @@ New Extensions:
 
   * apiext:VK_KHR_fragment_shader_barycentric
 
------------------------------------------------------
+'''
 
 Change log for May 17, 2022 Vulkan 1.3.214 spec update:
 
@@ -2771,7 +3417,7 @@ New Extensions:
 
   * apiext:VK_AMD_shader_early_and_late_fragment_tests
 
------------------------------------------------------
+'''
 
 Change log for May 10, 2022 Vulkan 1.3.213 spec update:
 
@@ -2803,7 +3449,7 @@ New Extensions:
   * apiext:VK_EXT_subpass_merge_feedback
   * apiext:VK_KHR_ray_tracing_maintenance1
 
------------------------------------------------------
+'''
 
 Change log for April 21, 2022 Vulkan 1.3.212 spec update:
 
@@ -2833,7 +3479,7 @@ Internal Issues:
     issue 2762).
   * Minor editorial fixes for the <<memory, Memory Allocation>> chapter.
 
------------------------------------------------------
+'''
 
 Change log for April 5, 2022 Vulkan 1.3.211 spec update:
 
@@ -2900,7 +3546,7 @@ New Extensions:
   * apiext:VK_EXT_image_2d_view_of_3d
 
 
------------------------------------------------------
+'''
 
 Change log for March 29, 2022 Vulkan 1.3.210 spec update:
 
@@ -2941,7 +3587,7 @@ New Extensions:
   * apiext:VK_EXT_graphics_pipeline_library
   * apiext:VK_EXT_primitives_generated_query
 
------------------------------------------------------
+'''
 
 Change log for March 23, 2022 Vulkan 1.3.209 spec update:
 
@@ -2990,7 +3636,7 @@ Internal Issues:
     the common validity statements for drawing commands (internal merge
     request 5103).
 
------------------------------------------------------
+'''
 
 Change log for March 15, 2022 Vulkan 1.3.208 spec update:
 
@@ -3011,7 +3657,7 @@ New Extensions:
 
   * apiext:VK_KHR_portability_enumeration
 
------------------------------------------------------
+'''
 
 Change log for March 8, 2022 Vulkan 1.3.207 spec update:
 
@@ -3086,7 +3732,7 @@ New Extensions:
 
   * apiext:VK_VALVE_descriptor_set_host_mapping
 
------------------------------------------------------
+'''
 
 Change log for February 17, 2022 Vulkan 1.3.206 spec update:
 
@@ -3149,7 +3795,7 @@ Internal Issues:
     <<textures-output-format-conversion, Texel Output Format Conversion>>
     section (internal merge request 5053).
 
------------------------------------------------------
+'''
 
 Change log for February 4, 2022 Vulkan 1.3.205 spec update:
 
@@ -3244,7 +3890,7 @@ Internal Issues:
   * Clarify that state is not inherited from static to dynamic pipelines in
     the <<pipelines-dynamic-state, Dynamic State>> section.
 
------------------------------------------------------
+'''
 
 Change log for January 25, 2022 Vulkan 1.3.204 spec update:
 
@@ -3273,7 +3919,7 @@ New Features:
   * <<roadmap-2022, `VK_KHR_roadmap_2022`>> ("`Roadmap 2022`") profile
     (internal merge request 4797).
 
------------------------------------------------------
+'''
 
 Change log for December 20, 2021 Vulkan 1.2.203 spec update:
 
@@ -3340,7 +3986,7 @@ New Extensions:
   * apiext:VK_NV_linear_color_attachment (internal merge request 4956).
   * apiext:VK_QCOM_fragment_density_map_offset (internal merge request 4824).
 
------------------------------------------------------
+'''
 
 Change log for December 7, 2021 Vulkan 1.2.202 spec update:
 
@@ -3387,7 +4033,7 @@ Internal Issues:
     extension registry URL from the Makefile into that file. Use `https:`
     prefixes on URLs instead of `http:` where possible.
 
------------------------------------------------------
+'''
 
 Change log for November 30, 2021 Vulkan 1.2.201 spec update:
 
@@ -3431,7 +4077,7 @@ Internal Issues:
     merge request 4953).
 
 
------------------------------------------------------
+'''
 
 Change log for November 23, 2021 Vulkan 1.2.200 spec update:
 
@@ -3487,7 +4133,7 @@ New Extensions:
     request 3856).
   * apiext:VK_EXT_depth_clip_control (public issues 986 and 1054).
 
------------------------------------------------------
+'''
 
 Change log for November 16, 2021 Vulkan 1.2.199 spec update:
 
@@ -3516,7 +4162,7 @@ Internal Issues:
     VU 06271 (internal issue 2917).
   * Use etext:VK_VERSION_m_n instead of etext:VK_API_VERSION_m_n in
     `<spirvcapability>` and `<spirvextension>` XML tags for consistency with
-    other version / extension reqiurements. Note that there is a possibility
+    other version / extension requirements. Note that there is a possibility
     of this change affecting downstream consumers of the XML (internal issue
     2896).
   * Add refpage cross-reference from slink:VkSwapchainKHR to
@@ -3537,7 +4183,7 @@ New Extensions:
 
   * apiext:VK_EXT_image_view_min_lod (internal merge request 4701).
 
------------------------------------------------------
+'''
 
 Change log for November 9, 2021 Vulkan 1.2.198 spec update:
 
@@ -3580,7 +4226,7 @@ Internal Issues:
     slink:VkAndroidHardwareBufferFormatProperties2ANDROID.
   * Minor editorial markup fixes.
 
------------------------------------------------------
+'''
 
 Change log for November 2, 2021 Vulkan 1.2.197 spec update:
 
@@ -3634,7 +4280,7 @@ New Extensions
 
   * `<<VK_KHR_dynamic_rendering>>`
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2021 Vulkan 1.2.196 spec update:
 
@@ -3669,7 +4315,7 @@ New Extensions
   * `<<VK_EXT_border_color_swizzle>>`
   * `<<VK_EXT_video_encode_h265>>` *provisional* H.265 video encode codec extension
 
------------------------------------------------------
+'''
 
 Change log for October 5, 2021 Vulkan 1.2.195 spec update:
 
@@ -3710,7 +4356,7 @@ New Extensions
   * `<<VK_KHR_maintenance4>>`
   * `<<VK_EXT_rgba10x6_formats>>`
 
------------------------------------------------------
+'''
 
 Change log for September 28, 2021 Vulkan 1.2.194 spec update:
 
@@ -3738,7 +4384,7 @@ New Extensions
 
   * `<<VK_FUCHSIA_buffer_collection>>`
 
------------------------------------------------------
+'''
 
 Change log for September 21, 2021 Vulkan 1.2.193 spec update:
 
@@ -3782,7 +4428,7 @@ Internal Issues:
   * Miscellaneous minor formatting and style fixes (internal merge requests
     4832, 4838).
 
------------------------------------------------------
+'''
 
 Change log for September 14, 2021 Vulkan 1.2.192 spec update:
 
@@ -3856,7 +4502,7 @@ Internal Issues:
     compressed formats (internal merge request 4812).
 
 
------------------------------------------------------
+'''
 
 Change log for September 7, 2021 Vulkan 1.2.191 spec update:
 
@@ -3878,7 +4524,7 @@ New Extensions:
 
   * `<<VK_EXT_pageable_device_local_memory>>`
 
------------------------------------------------------
+'''
 
 Change log for August 29, 2021 Vulkan 1.2.190 spec update:
 
@@ -3921,7 +4567,7 @@ New Extensions:
   * `<<VK_KHR_shader_integer_dot_product>>`
   * `<<VK_EXT_primitive_topology_list_restart>>`
 
------------------------------------------------------
+'''
 
 Change log for August 17, 2021 Vulkan 1.2.189 spec update:
 
@@ -3967,7 +4613,7 @@ Internal Issues:
   * Support `optional` attribute in the valid usage statement generator for
     union types (internal merge request 4772).
 
------------------------------------------------------
+'''
 
 Change log for August 10, 2021 Vulkan 1.2.188 spec update:
 
@@ -4008,7 +4654,7 @@ New Extensions:
 
   * `<<VK_EXT_load_store_op_none>>`
 
------------------------------------------------------
+'''
 
 Change log for August 3, 2021 Vulkan 1.2.187 spec update:
 
@@ -4067,7 +4713,7 @@ Internal Issues:
     slink:VkFramebufferAttachmentImageInfo (internal merge request 4744).
 
 
------------------------------------------------------
+'''
 
 Change log for July 27, 2021 Vulkan 1.2.186 spec update:
 
@@ -4110,7 +4756,7 @@ Internal Issues:
     <<spirvenv-module-validation-runtime, Runtime SPIR-V Validation>>
     section (internal merge request 4693)
 
------------------------------------------------------
+'''
 
 Change log for July 20, 2021 Vulkan 1.2.185 spec update:
 
@@ -4188,7 +4834,7 @@ Miscellany:
 
   * Happy Lunar Landing Day!
 
------------------------------------------------------
+'''
 
 Change log for July 5, 2021 Vulkan 1.2.184 spec update:
 
@@ -4204,7 +4850,7 @@ GitHub Issues:
     flink:vkGetSubpassShadingMaxWorkgroupSizeHUAWEI to
     flink:vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI and give it a
     dispatchable slink:VkDevice parameter (public issue 1564).
-  * Fix labelling of "`Resource`" reference block in pipeline block
+  * Fix labeling of "`Resource`" reference block in pipeline block
     diagrams (public issue 1582).
 
 Internal Issues:
@@ -4225,7 +4871,7 @@ New Extensions:
 
   * `<<VK_NV_extermal_memory_rdma>>`
 
------------------------------------------------------
+'''
 
 Change log for June 28, 2021 Vulkan 1.2.183 spec update:
 
@@ -4303,7 +4949,7 @@ Internal Issues:
   * Fix markup typo for `<<VK_NV_fragment_shader_barycentric>>` ifdef
     (internal merge request 4663).
 
------------------------------------------------------
+'''
 
 Change log for June 21, 2021 Vulkan 1.2.182 spec update:
 
@@ -4331,7 +4977,7 @@ New Extensions:
   * `<<VK_HUAWEI_subpass_shading>>`
   * `<<VK_NV_ray_tracing_motion_blur>>`
 
------------------------------------------------------
+'''
 
 Change log for June 14, 2021 Vulkan 1.2.181 spec update:
 
@@ -4386,7 +5032,7 @@ Internal Issues:
     intended purpose, although it also make these images in the HTML output
     show the same artifacts as the PDF output.
 
------------------------------------------------------
+'''
 
 Change log for June 7, 2021 Vulkan 1.2.180 spec update:
 
@@ -4453,7 +5099,7 @@ New Extensions:
   * `<<VK_KHR_shader_subgroup_uniform_control_flow>>`
   * `<<VK_EXT_global_priority_query>>`
 
------------------------------------------------------
+'''
 
 Change log for May 24, 2021 Vulkan 1.2.179 spec update:
 
@@ -4550,7 +5196,7 @@ Internal Issues:
     the <<spirvenv-module-validation-standalone, Standalone SPIR-V
     Validation>> section (internal merge request 4584).
 
------------------------------------------------------
+'''
 
 Change log for May 10, 2021 Vulkan 1.2.178 spec update:
 
@@ -4616,7 +5262,7 @@ New Extensions:
   * `<<VK_NVX_binary_import>>` (only appendix and XML - no spec language
     yet).
 
------------------------------------------------------
+'''
 
 Change log for April 26, 2021 Vulkan 1.2.177 spec update:
 
@@ -4658,7 +5304,7 @@ New Extensions:
 
   * `<<VK_EXT_provoking_vertex>>`
 
------------------------------------------------------
+'''
 
 Change log for April 19, 2021 Vulkan 1.2.176 spec update:
 
@@ -4688,7 +5334,7 @@ New Extensions:
 
   * `<<VK_EXT_extended_dynamic_state2>>`
 
------------------------------------------------------
+'''
 
 Change log for April 13, 2021 Vulkan 1.2.175 spec update:
 
@@ -4775,7 +5421,7 @@ New Extensions:
   ** `<<VK_EXT_video_decode_h265>>`
   ** `<<VK_EXT_video_encode_h264>>`
 
------------------------------------------------------
+'''
 
 Change log for March 29, 2021 Vulkan 1.2.174 spec update:
 
@@ -4817,7 +5463,7 @@ Internal Issues:
     <<copies-buffers-images-addressing, Buffer and Image Addressing>>
     section (internal merge request 4439).
 
------------------------------------------------------
+'''
 
 Change log for March 21, 2021 Vulkan 1.2.173 spec update:
 
@@ -4876,7 +5522,7 @@ New Extensions:
   * `<<VK_FUCHSIA_external_memory>>`
   * `<<VK_FUCHSIA_external_semaphore>>`
 
------------------------------------------------------
+'''
 
 Change log for March 8, 2021 Vulkan 1.2.172 spec update:
 
@@ -4914,7 +5560,7 @@ Internal Issues:
   * Fix typo in the mandatory features section related to
     `<<VK_KHR_ray_tracing_pipeline>>` (internal merge request 4406).
 
------------------------------------------------------
+'''
 
 Change log for March 1, 2021 Vulkan 1.2.171 spec update:
 
@@ -4924,7 +5570,7 @@ GitHub Issues:
 
   * Use `strictly increasing` rather than `monotonically increasing` in the
     definition of <<glossary, timeline semaphores>> (public issue 1424).
-  * Add missing raytracing pipeline creation information from
+  * Add missing ray tracing pipeline creation information from
     `<<VK_KHR_pipeline_executable_properties>>` to
     flink:vkGetPipelineExecutableStatisticsKHR and
     flink:vkGetPipelineExecutableInternalRepresentationsKHR valid usage
@@ -4994,7 +5640,7 @@ New Extensions
 
   * `<<VK_QNX_screen_surface>>` (public pull request 1449).
 
------------------------------------------------------
+'''
 
 Change log for February 15, 2021 Vulkan 1.2.170 spec update:
 
@@ -5010,7 +5656,7 @@ New Extensions:
 
   * `<<VK_KHR_synchronization2>>`
 
------------------------------------------------------
+'''
 
 Change log for February 2, 2021 Vulkan 1.2.169 spec update:
 
@@ -5058,7 +5704,7 @@ Internal Issues:
     request 4365).
 
 
------------------------------------------------------
+'''
 
 Change log for January 25, 2021 Vulkan 1.2.168 spec update:
 
@@ -5084,7 +5730,7 @@ New Extensions:
   * `<<VK_KHR_workgroup_memory_explicit_layout>>`
   * `<<VK_KHR_zero_initialize_workgroup_memory>>`
 
------------------------------------------------------
+'''
 
 Change log for January 19, 2021 Vulkan 1.2.167 spec update:
 
@@ -5170,7 +5816,7 @@ Internal Issues:
     <<ray-traversal-culling-primitive, Ray Primitive Culling>> section
     (internal merge request 4315).
 
------------------------------------------------------
+'''
 
 Change log for January 4, 2021 Vulkan 1.2.166 spec update:
 
@@ -5223,7 +5869,7 @@ Internal Issues:
     <<interfaces-iointerfaces-limits, Shader Input and Output Locations>>
     table (internal merge request 3428).
 
------------------------------------------------------
+'''
 
 Change log for December 14, 2020 Vulkan 1.2.165 spec update:
 
@@ -5281,7 +5927,7 @@ Internal Issues:
     support for some math characters not found in the default theme
     (internal merge request 4287).
 
------------------------------------------------------
+'''
 
 Change log for December 7, 2020 Vulkan 1.2.164 spec update:
 
@@ -5325,7 +5971,7 @@ New Extensions:
   * `<<VK_NV_acquire_winrt_display>>`
   * `<<VK_VALVE_mutable_descriptor_type>>`
 
------------------------------------------------------
+'''
 
 Change log for November 30, 2020 Vulkan 1.2.163 spec update:
 
@@ -5355,7 +6001,7 @@ Internal Issues:
     (internal merge request 4225).
 
 
------------------------------------------------------
+'''
 
 Change log for November 23, 2020 Vulkan 1.2.162 spec update:
 
@@ -5388,7 +6034,7 @@ New Extensions:
   ** `<<VK_KHR_pipeline_library>>`
   ** `<<VK_KHR_deferred_host_operations>>`
 
------------------------------------------------------
+'''
 
 Change log for November 16, 2020 Vulkan 1.2.161 spec update:
 
@@ -5426,7 +6072,7 @@ Internal Issues:
     `<<VK_KHR_fragment_shading_rate>>` extension (internal merge request
     4207).
 
------------------------------------------------------
+'''
 
 Change log for November 9, 2020 Vulkan 1.2.160 spec update:
 
@@ -5467,7 +6113,7 @@ New Extensions:
 
   * `<<VK_NV_fragment_shading_rate_enums>>`
 
------------------------------------------------------
+'''
 
 Change log for November 1, 2020 Vulkan 1.2.159 spec update:
 
@@ -5528,7 +6174,7 @@ New Extensions:
 
   * `<<VK_QCOM_rotated_copy_commands>>` (internal merge request 4132).
 
------------------------------------------------------
+'''
 
 Change log for October 19, 2020 Vulkan 1.2.158 spec update:
 
@@ -5557,7 +6203,7 @@ New Extensions:
   * `<<VK_KHR_fragment_shading_rate>>`
   * `<<VK_KHR_shader_terminate_invocation>>`
 
------------------------------------------------------
+'''
 
 Change log for October 12, 2020 Vulkan 1.2.157 spec update:
 
@@ -5588,7 +6234,7 @@ Internal Issues:
     between flink:vkCmdResetEvent and flink:vkCmdWaitEvents
     (internal merge request 4152).
 
------------------------------------------------------
+'''
 
 Change log for October 5, 2020 Vulkan 1.2.156 spec update:
 
@@ -5606,7 +6252,7 @@ New Extensions:
 
   * `<<VK_EXT_device_memory_report>>`
 
------------------------------------------------------
+'''
 
 Change log for September 28, 2020 Vulkan 1.2.155 spec update:
 
@@ -5616,7 +6262,7 @@ New Extensions:
 
   * `<<VK_EXT_shader_image_atomic_int64>>`
 
------------------------------------------------------
+'''
 
 Change log for September 7, 2020 Vulkan 1.2.153 spec update:
 
@@ -5624,10 +6270,11 @@ Change log for September 7, 2020 Vulkan 1.2.153 spec update:
 
 GitHub Issues:
 
-  * Specification default branch for updates and PRs is now `main` instead
-    of `master`. `master` branch still exists, but is frozen at the 1.2.152
-    level. If you are pulling content from this repository, please switch
-    from `master` to `main` branch (internal issue 1351).
+  * Specification default branch for updates and PRs is now `main`.
+    The old default branch still exists, but is frozen at the 1.2.152
+    level.
+    If you are pulling content from this repository, please switch to `main`
+    branch (internal issue 1351).
   * Fix slink:VkSubpassDependency2 link from slink:VkRenderPassCreateInfo2
     (public issue 1358).
 
@@ -5654,7 +6301,7 @@ Internal Issues:
     into the "`Interactions and External Dependencies`" sections (internal
     merge request 3969).
 
------------------------------------------------------
+'''
 
 Change log for August 26, 2020 Vulkan 1.2.152 spec update:
 
@@ -5727,7 +6374,7 @@ Internal Issues:
     description of the <<limits-framebufferColorSampleCounts>> feature if
     Vulkan 1.2 is supported (internal merge request 4088).
 
------------------------------------------------------
+'''
 
 Change log for August 17, 2020 Vulkan 1.2.151 spec update:
 
@@ -5764,7 +6411,7 @@ Internal Issues:
     renaming of "`subgroups`" to "`groups`" previously done for
     slink:VkPhysicalDeviceSubgroupProperties (internal merge request 4050).
 
------------------------------------------------------
+'''
 
 Change log for August 10, 2020 Vulkan 1.2.150 spec update:
 
@@ -5773,7 +6420,7 @@ Change log for August 10, 2020 Vulkan 1.2.150 spec update:
 GitHub Issues:
 
   * Remove ename:VK_ERROR_TOO_MANY_OBJECTS as a required error code for
-    flink:vkAllocateMemory and and flink:vkCreateSampler, and note that
+    flink:vkAllocateMemory and flink:vkCreateSampler, and note that
     while it may still occur as a historical artifact, exceeding
     implementation limits will result in undefined behavior (public issue
     1295).
@@ -5803,7 +6450,7 @@ Internal Issues:
     `<<VK_EXT_validation_features>>` to enable synchronization validation
     (internal merge request 4037).
 
------------------------------------------------------
+'''
 
 Change log for August 3, 2020 Vulkan 1.2.149 spec update:
 
@@ -5839,7 +6486,7 @@ New Extensions:
 
   * `<<VK_EXT_4444_formats>>`
 
------------------------------------------------------
+'''
 
 Change log for July 19, 2020 Vulkan 1.2.148 spec update:
 
@@ -5869,7 +6516,7 @@ Internal Issues:
     2124).
   * Do not allow flink:vkWaitForFences or flink:vkWaitSemaphores to return
     timeouts before the period has expired, even though this is valid in
-    some other synchronisation APIs (internal issue 2146).
+    some other synchronization APIs (internal issue 2146).
   * Add elink:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D11_FENCE_BIT as an alias
     of elink:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT for clarity
     when interacting with D3D11 fences (internal issue 2175).
@@ -5898,7 +6545,7 @@ New Extensions:
   * `<<VK_EXT_image_robustness>>`
   * `<<VK_EXT_shader_atomic_float>>`
 
------------------------------------------------------
+'''
 
 Change log for July 13, 2020 Vulkan 1.2.147 spec update:
 
@@ -5954,7 +6601,7 @@ Internal Issues:
     <<limits-required, Required Limits>> must be at least the corresponding
     non- ptext:UpdateAfterBind limits (internal merge request 3992).
 
------------------------------------------------------
+'''
 
 Change log for July 3, 2020 Vulkan 1.2.146 spec update:
 
@@ -6009,7 +6656,7 @@ New Extensions:
   * `<<VK_EXT_directfb_surface>>` (public pull requests 1292, 1294).
   * `<<VK_EXT_fragment_density_map2>>` (internal merge request 3914).
 
------------------------------------------------------
+'''
 
 Change log for June 20, 2020 Vulkan 1.2.145 spec update:
 
@@ -6074,7 +6721,7 @@ New Extensions:
 
   * `<<VK_EXT_extended_dynamic_state>>`
 
------------------------------------------------------
+'''
 
 Change log for June 8, 2020 Vulkan 1.2.144 spec update:
 
@@ -6127,7 +6774,7 @@ Internal Issues:
     flink:vkCreateSampler for allocation limits of slink:VkDeviceMemory and
     elink:VkSamplers, respectively (internal merge request 3923).
 
------------------------------------------------------
+'''
 
 Change log for June 8, 2020 Vulkan 1.2.143 spec update:
 
@@ -6187,7 +6834,7 @@ Internal Issues:
     feature be enabled when using etext:VK_BORDER_COLOR_* in
     slink:VkSamplerCreateInfo (internal merge request 3884).
 
------------------------------------------------------
+'''
 
 Change log for June 1, 2020 Vulkan 1.2.142 spec update:
 
@@ -6235,8 +6882,8 @@ Internal Issues:
     pname:instance (internal issue 2057).
   * Modify the valid usage statement ID assignment script to track a range
     of unused IDs for each extension branch under development, instead of
-    only allowing VUID assignment in `master` and `devel` branches (internal
-    issue 2100).
+    only allowing VUID assignment in the default and `devel` branches
+    (internal issue 2100).
   * Add `selector` and `selection` attributes for unions in XML, to enable
     automatic generation of validation code (internal issue 2140).
   * Fix validity generator for stext:Vk*Flags types that are aliases,
@@ -6279,7 +6926,7 @@ Internal Issues:
     valid usage statements, for future-proofing (internal merge requests
     3864, 3865, 3866, 3867, 3868).
 
------------------------------------------------------
+'''
 
 Change log for May 15, 2020 Vulkan 1.2.141 spec update:
 
@@ -6319,7 +6966,7 @@ Internal Issues:
   * Add "`runtime`" to style guide and use that spelling consistently
     (internal merge request 3843).
 
------------------------------------------------------
+'''
 
 Change log for May 3, 2020 Vulkan 1.2.140 spec update:
 
@@ -6414,7 +7061,7 @@ New Extensions:
   * `<<VK_EXT_private_data>>`
   * `<<VK_EXT_custom_border_color>>`
 
------------------------------------------------------
+'''
 
 Change log for April 26, 2020 Vulkan 1.2.139 spec update:
 
@@ -6460,7 +7107,7 @@ New Extensions:
   * `<<VK_EXT_robustness2>>`
   * `<<VK_QCOM_render_pass_shader_resolve>>`
 
------------------------------------------------------
+'''
 
 Change log for April 16, 2020 Vulkan 1.2.138 spec update:
 
@@ -6518,7 +7165,7 @@ Internal Issues:
     `<<VK_ANDROID_external_memory_android_hardware_buffer>>` (internal merge
     request 3751).
 
------------------------------------------------------
+'''
 
 Change log for April 06, 2020 Vulkan 1.2.137 spec update:
 
@@ -6643,7 +7290,7 @@ New Extensions:
 
   * `<<VK_QCOM_render_pass_store_ops>>`
 
------------------------------------------------------
+'''
 
 Change log for March 24, 2020 Vulkan 1.2.136 spec update:
 
@@ -6695,7 +7342,7 @@ Internal Issues:
     `successcodes` attributes of appropriate commands in `vk.xml` (internal
     merge request 3687).
 
------------------------------------------------------
+'''
 
 Change log for March 17, 2020 Vulkan 1.2.135 spec update:
 
@@ -6776,7 +7423,7 @@ New Extensions
     `VK_NVX_device_generated_commands`, which was an experimental vendor
     extension and has been removed from the Specification and `vk.xml`).
 
------------------------------------------------------
+'''
 
 Change log for March 6, 2020 Vulkan 1.2.134 spec update:
 
@@ -6853,7 +7500,7 @@ New Extensions
 
   * `<<VK_QCOM_render_pass_transform>>`
 
------------------------------------------------------
+'''
 
 Change log for February 15, 2020 Vulkan 1.2.133 spec update:
 
@@ -6925,7 +7572,7 @@ New Extensions
 
   * `<<VK_KHR_shader_non_semantic_info>>`
 
------------------------------------------------------
+'''
 
 Change log for January 20, 2020 Vulkan 1.2.132 spec update:
 
@@ -6984,7 +7631,7 @@ Internal Issues:
     flink:vkBindImageMemory2, where it can be determined (internal merge
     request 3548).
 
------------------------------------------------------
+'''
 
 Change log for January 15, 2020 Vulkan 1.2.131 spec update:
 
@@ -7045,7 +7692,7 @@ Internal Issues:
   * Changes to script tools to stay relatively aligned with OpenXR scripts
     (internal merge request 3530).
 
------------------------------------------------------
+'''
 
 Change log for December 9, 2019 Vulkan 1.1.130 spec update:
 
@@ -7102,7 +7749,7 @@ New Extensions
 
   * `<<VK_EXT_tooling_info>>`
 
------------------------------------------------------
+'''
 
 Change log for November 25, 2019 Vulkan 1.1.129 spec update:
 
@@ -7129,7 +7776,7 @@ New Extensions
 
   * `<<VK_KHR_buffer_device_address>>`
 
------------------------------------------------------
+'''
 
 Change log for November 18, 2019 Vulkan 1.1.128 spec update:
 
@@ -7193,7 +7840,7 @@ New Extensions
 
   * `<<VK_KHR_performance_query>>`
 
------------------------------------------------------
+'''
 
 Change log for November 4, 2019 Vulkan 1.1.127 spec update:
 
@@ -7231,7 +7878,7 @@ New Extensions
 
   * `<<VK_KHR_separate_depth_stencil_layouts>>`
 
------------------------------------------------------
+'''
 
 Change log for October 21, 2019 Vulkan 1.1.126 spec update:
 
@@ -7277,7 +7924,7 @@ Internal Issues:
     host memory allocation and dedicated allocation (internal merge request
     3375).
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2019 Vulkan 1.1.125 spec update:
 
@@ -7315,7 +7962,7 @@ New Extensions
 
   * `<<VK_KHR_spirv_1_4>>`
 
------------------------------------------------------
+'''
 
 Change log for October 6, 2019 Vulkan 1.1.124 spec update:
 
@@ -7346,7 +7993,7 @@ New Extensions
   * `<<VK_KHR_shader_clock>>`
   * `<<VK_KHR_timeline_semaphore>>`
 
------------------------------------------------------
+'''
 
 Change log for September 15, 2019 Vulkan 1.1.123 spec update:
 
@@ -7400,7 +8047,7 @@ New Extensions
   * `<<VK_KHR_shader_subgroup_extended_types>>`
   * `<<VK_GOOGLE_user_type>>`
 
------------------------------------------------------
+'''
 
 Change log for September 8, 2019 Vulkan 1.1.122 spec update:
 
@@ -7446,7 +8093,7 @@ New Extensions
 
   * `<<VK_IMG_format_pvrtc>>` (public issue 512).
 
------------------------------------------------------
+'''
 
 Change log for August 25, 2019 Vulkan 1.1.121 spec update:
 
@@ -7499,7 +8146,7 @@ New Extensions
 
   * `<<VK_AMD_device_coherent_memory>>`
 
------------------------------------------------------
+'''
 
 Change log for August 17, 2019 Vulkan 1.1.120 spec update:
 
@@ -7546,7 +8193,7 @@ Internal Issues:
     check_spec_links.py tests from .gitlab-ci.yml and 'allchecks' target
     (internal merge request 3315).
 
------------------------------------------------------
+'''
 
 Change log for August 11, 2019 Vulkan 1.1.119 spec update:
 
@@ -7558,7 +8205,7 @@ New Extensions:
 
   * `<<VK_KHR_pipeline_executable_properties>>`
 
------------------------------------------------------
+'''
 
 Change log for August 11, 2019 Vulkan 1.1.118 spec update:
 
@@ -7613,7 +8260,7 @@ New Extensions:
   * `<<VK_AMD_shader_core_properties2>>`
   * `<<VK_AMD_pipeline_compiler_control>>`
 
------------------------------------------------------
+'''
 
 Change log for July 28, 2019 Vulkan 1.1.117 spec update:
 
@@ -7656,7 +8303,7 @@ New Extensions:
   * `<<VK_EXT_texture_compression_astc_hdr>>`
   * `<<VK_EXT_index_type_uint8>>`
 
------------------------------------------------------
+'''
 
 Change log for July 20, 2019 Vulkan 1.1.116 spec update:
 
@@ -7700,7 +8347,7 @@ New Extensions:
 
   * `<<VK_EXT_subgroup_size_control>>`
 
------------------------------------------------------
+'''
 
 Change log for July 14, 2019 Vulkan 1.1.115 spec update:
 
@@ -7752,7 +8399,7 @@ Internal Issues:
     retaining aliases of the old structure name and structure type enum for
     backwards compatibility.
 
------------------------------------------------------
+'''
 
 Change log for July 7, 2019 Vulkan 1.1.114 spec update:
 
@@ -7768,7 +8415,7 @@ New Extensions:
 
   * `<<VK_KHR_imageless_framebuffer>>`
 
------------------------------------------------------
+'''
 
 Change log for June 30, 2019 Vulkan 1.1.113 spec update:
 
@@ -7798,7 +8445,7 @@ New Extensions:
   * `<<VK_EXT_texel_buffer_alignment>>`
   * `<<VK_EXT_shader_demote_to_helper_invocation>>`
 
------------------------------------------------------
+'''
 
 Change log for June 23, 2019 Vulkan 1.1.112 spec update:
 
@@ -7837,7 +8484,7 @@ Internal Issues:
     <<spirvenv-precision-operation, Precision and Operation of SPIR-V
     Instructions>> appendix.
 
------------------------------------------------------
+'''
 
 Change log for June 10, 2019 Vulkan 1.1.111 spec update:
 
@@ -7889,7 +8536,7 @@ Internal Issues:
     filters, immediately following the <<formats-mandatory-features-astc,
     Mandatory ASTC LDR format support>> table (internal merge request 3194).
 
------------------------------------------------------
+'''
 
 Change log for June 2, 2019 Vulkan 1.1.110 spec update:
 
@@ -7905,7 +8552,7 @@ New Extensions:
   * `<<VK_EXT_fragment_shader_interlock>>`
   * `<<VK_NV_shader_sm_builtins>>`
 
------------------------------------------------------
+'''
 
 Change log for May 24, 2019 Vulkan 1.1.109 spec update:
 
@@ -7954,7 +8601,7 @@ New Extensions:
   * `<<VK_INTEL_performance_query>>`
   * `<<VK_INTEL_shader_integer_functions2>>`
 
------------------------------------------------------
+'''
 
 Change log for May 13, 2019 Vulkan 1.1.108 spec update:
 
@@ -8000,7 +8647,7 @@ New Extensions:
   * `<<VK_NV_framebuffer_mixed_samples_coverage_reduction_mode>>`
   * `<<VK_KHR_uniform_buffer_standard_layout>>`
 
------------------------------------------------------
+'''
 
 Change log for April 16, 2019 Vulkan 1.1.107 spec update:
 
@@ -8053,7 +8700,7 @@ New Extensions:
 
   * `<<VK_EXT_headless_surface>>`
 
------------------------------------------------------
+'''
 
 Change log for April 7, 2019 Vulkan 1.1.106 spec update:
 
@@ -8111,7 +8758,7 @@ Internal Issues:
   * Fix minor markup and spelling issues in the `VK_NV_ray_tracing`
     extension.
 
------------------------------------------------------
+'''
 
 Change log for March 19, 2019 Vulkan 1.1.105 spec update (GDC edition):
 
@@ -8128,7 +8775,7 @@ New Extensions:
   ** `VK_GGP_frame_token`
   ** `VK_GGP_stream_descriptor_surface`
 
------------------------------------------------------
+'''
 
 Change log for March 18, 2019 Vulkan 1.1.104 spec update:
 
@@ -8153,7 +8800,7 @@ Internal Issues:
     the headers for use by the hpp-generate / hpp-compile CI stages. Targets
     to generate the headers will not be removed, but keeping these generated
     files in the repository increased the frequency of conflicts between
-    branches when merging to master (internal issue 745).
+    branches when merging to the default branch (internal issue 745).
   * Reword "`undefined: behavior if *action*" to "`must: not do *action*`"
     in the places the old terminology was used, and add a new
     <<writing-undefined, Describing Undefined Behavior>> section of the
@@ -8175,7 +8822,7 @@ New Extensions:
   * `VK_EXT_pipeline_creation_feedback` (internal issue 1560)
   * `VK_KHR_surface_protected_capabilities` (internal issue 1520)
 
------------------------------------------------------
+'''
 
 Change log for March 11, 2019 Vulkan 1.1.103 spec update:
 
@@ -8204,7 +8851,7 @@ Internal Issues:
   * Remove duplicate valid usage statement from flink:vkAcquireNextImageKHR
     (internal merge request 3062).
 
------------------------------------------------------
+'''
 
 Change log for March 3, 2019 Vulkan 1.1.102 spec update:
 
@@ -8252,7 +8899,7 @@ New Extensions:
   * `VK_EXT_ycbcr_image_arrays` (internal issue 1361).
   * `VK_NVX_image_view_handle`
 
------------------------------------------------------
+'''
 
 Change log for February 17, 2019 Vulkan 1.1.101 spec update:
 
@@ -8308,7 +8955,7 @@ New Extensions:
   * `VK_NV_cooperative_matrix`
   * `VK_EXT_depth_clip_enable` (internal issue 1485).
 
------------------------------------------------------
+'''
 
 Change log for February 10, 2019 Vulkan 1.1.100 spec update:
 
@@ -8343,7 +8990,7 @@ Internal Issues:
     number is the correctly rounded result, so it should be allowed.
   * Require descriptor types to match in slink:VkCopyDescriptorSet.
 
------------------------------------------------------
+'''
 
 Change log for February 3, 2019 Vulkan 1.1.99 spec update:
 
@@ -8391,7 +9038,7 @@ New Extensions:
   * `VK_EXT_filter_cubic`
   * `VK_NV_dedicated_allocation_image_aliasing`
 
------------------------------------------------------
+'''
 
 Change log for January 13, 2019 Vulkan 1.1.98 spec update:
 
@@ -8446,7 +9093,7 @@ Internal Issues:
   * Update check_spec_links script, including validation for reference page
     open blocks. Fix errors identified by the script.
 
------------------------------------------------------
+'''
 
 Change log for January 05, 2019 Vulkan 1.1.97 spec update:
 
@@ -8487,7 +9134,7 @@ New Extensions:
   * `VK_EXT_memory_priority`
   * `VK_EXT_validation_features`
 
------------------------------------------------------
+'''
 
 Change log for December 16, 2018 Vulkan 1.1.96 spec update:
 
@@ -8506,7 +9153,7 @@ Internal Issues:
   * Clarify the behavior of command aliases described in the <<versions,
     Core Revisions>> and <<initialization-functionpointers, Command Function
     Pointers>> sections and the registry schema document with respect to
-    whether they are or are not the same entry point, and what the behaviour
+    whether they are or are not the same entry point, and what the behavior
     of the ftext:vkGet*ProcAddr commands is for each alias (internal issue
     1462).
   * Update slink:VkPipelineShaderStageCreateInfo valid usage statements for
@@ -8544,7 +9191,7 @@ Internal Issues:
   * Remove some nautovalidity="true" in `vk.xml` for NV extensions where
     it is clearly wrong (internal MR 2970).
 
------------------------------------------------------
+'''
 
 Change log for December 3, 2018 Vulkan 1.1.95 spec update:
 
@@ -8587,7 +9234,7 @@ New Extensions:
   * `VK_KHR_shader_float16_int8`
   * `VK_KHR_shader_float_controls`
 
------------------------------------------------------
+'''
 
 Change log for November 25, 2018 Vulkan 1.1.94 spec update:
 
@@ -8625,7 +9272,7 @@ New Extensions:
   * `VK_KHR_swapchain_mutable_format`
   * `VK_EXT_fragment_density_map`
 
------------------------------------------------------
+'''
 
 Change log for November 18, 2018 Vulkan 1.1.93 spec update:
 
@@ -8677,7 +9324,7 @@ New Extensions:
   * `VK_EXT_scalar_block_layout`
   * `VK_EXT_separate_stencil_usage`
 
------------------------------------------------------
+'''
 
 Change log for November 12, 2018 Vulkan 1.1.92 spec update:
 
@@ -8718,7 +9365,7 @@ Internal Issues:
     markup problems identified by checkLinks.py, so that we can rely on the
     checklinks script as part of Gitlab CI.
 
------------------------------------------------------
+'''
 
 Change log for November 4, 2018 Vulkan 1.1.91 spec update:
 
@@ -8763,7 +9410,7 @@ New Extensions:
   * `VK_AMD_memory_overallocation_behavior`
   * `VK_NV_ray_tracing`, replacing `VK_NVX_raytracing`
 
------------------------------------------------------
+'''
 
 Change log for October 28, 2018 Vulkan 1.1.90 spec update:
 
@@ -8808,7 +9455,7 @@ Internal Issues:
   * Minor editorial changes to the <<memory-model, memory model>> appendix
     based on external feedback.
 
------------------------------------------------------
+'''
 
 Change log for October 21, 2018 Vulkan 1.1.89 spec update:
 
@@ -8846,7 +9493,7 @@ Internal Issues:
     validextensionstructs in the XML processing scripts, so downstream code
     generators don't emit them.
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2018 Vulkan 1.1.88 spec update:
 
@@ -8892,7 +9539,7 @@ New Extensions:
   * `VK_GOOGLE_decorate_string`, exposing support for
     `SPV_GOOGLE_decorate_string`.
 
------------------------------------------------------
+'''
 
 Change log for October 7, 2018 Vulkan 1.1.87 spec update:
 
@@ -8951,7 +9598,7 @@ New Extensions:
 
   * `<<VK_FUCHSIA_imagepipe_surface>>`
 
------------------------------------------------------
+'''
 
 Change log for September 29, 2018 Vulkan 1.1.86 spec update:
 
@@ -8980,7 +9627,7 @@ New Extensions:
     enabled, and become part of the spec, only when the authors decide it is
     ready.
 
------------------------------------------------------
+'''
 
 Change log for September 19, 2018 Vulkan 1.1.85 spec update:
 
@@ -9030,7 +9677,7 @@ New Extensions:
   * `VK_NV_shading_rate_image`
   * `VK_NVX_raytracing`
 
------------------------------------------------------
+'''
 
 Change log for September 8, 2018 Vulkan 1.1.84 spec update:
 
@@ -9075,7 +9722,7 @@ New Extensions:
   * `VK_EXT_astc_decode_mode`
   * `VK_EXT_inline_uniform_block`
 
------------------------------------------------------
+'''
 
 Change log for August 13, 2018 Vulkan 1.1.83 spec update:
 
@@ -9126,7 +9773,7 @@ Other Issues:
     Variables>> section.
   * Add missing ChangeLog entries for the previous three spec updates.
 
------------------------------------------------------
+'''
 
 Change log for July 30, 2018 Vulkan 1.1.82 spec update:
 
@@ -9164,7 +9811,7 @@ New Extensions:
 
   * `VK_NV_device_diagnostic_checkpoints`
 
------------------------------------------------------
+'''
 
 Change log for July 23, 2018 Vulkan 1.1.81 spec update:
 
@@ -9202,7 +9849,7 @@ Internal Issues:
     between pname:firstInstance and pname:divisor matches the OpenGL
     convention (internal issue 1333).
 
------------------------------------------------------
+'''
 
 Change log for July 7, 2018 Vulkan 1.1.80 spec update:
 
@@ -9228,7 +9875,7 @@ New Extensions:
   * `VK_KHR_create_renderpass2` (public issue 736)
   * `VK_KHR_8bit_storage` (public issue 737)
 
------------------------------------------------------
+'''
 
 Change log for July 1, 2018 Vulkan 1.1.79 spec update:
 
@@ -9272,7 +9919,7 @@ Internal Issues:
   * Add code:Float16 to the <<spirvenv-capabilities-table, List of optional
     SPIR-V capabilities>> for the `VK_AMD_gpu_shader_half_float` extension.
 
------------------------------------------------------
+'''
 
 Change log for June 18, 2018 Vulkan 1.1.78 spec update:
 
@@ -9310,7 +9957,7 @@ Other Issues:
     statements for slink:VkImageFormatListCreateInfoKHR (internal pull
     request 2711).
 
------------------------------------------------------
+'''
 
 Change log for June 10, 2018 Vulkan 1.1.77 spec update:
 
@@ -9353,7 +10000,7 @@ Other Issues:
     <<vulkan-styleguide, link to that document>>, and use the full name
     in the registry index page.
 
------------------------------------------------------
+'''
 
 Change log for May 25, 2018 Vulkan 1.1.76 spec update:
 
@@ -9383,7 +10030,7 @@ New Extensions:
   * `VK_KHR_get_display_properties2`
   * `VK_KHR_draw_indirect_count`
 
------------------------------------------------------
+'''
 
 Change log for May 16, 2018 Vulkan 1.1.75 spec update:
 
@@ -9464,7 +10111,7 @@ Other Issues:
     Interface>> section to the <<spirvenv-module-validation, Validation
     Rules within a Module>> section of the SPIR-V appendix.
 
------------------------------------------------------
+'''
 
 Change log for April 21, 2018 Vulkan 1.1.74 spec update:
 
@@ -9493,7 +10140,7 @@ Other Issues:
 
   * Fix typo in <<NV_geometry_shader_passthrough>> issues list.
 
------------------------------------------------------
+'''
 
 Change log for April 15, 2018 Vulkan 1.1.73 spec update:
 
@@ -9509,7 +10156,7 @@ GitHub Issues:
     that had previously been removed at the time that
     ename:VK_IMAGE_CREATE_EXTENDED_USAGE_BIT was introduced. These
     statements had incorrectly been restored due to an glitch while merging
-    from the old `1.0` branch to the current `master` branch (public issue
+    from the old `1.0` branch to the current default branch (public issue
     683).
 
 Internal Issues:
@@ -9551,7 +10198,7 @@ Other Issues:
     "`non-sparse resources must be bound to memory before being recorded to
     command`".
 
------------------------------------------------------
+'''
 
 Change log for April 5, 2018 Vulkan 1.1.72 spec update:
 
@@ -9612,7 +10259,7 @@ New Extensions:
   * `VK_EXT_descriptor_indexing`
   * `VK_NV_shader_subgroup_partitioned`
 
------------------------------------------------------
+'''
 
 Change log for March 16, 2018 Vulkan 1.1.71 spec update:
 
@@ -9702,7 +10349,7 @@ New Extensions:
 
   * `VK_ANDROID_external_memory_android_hardware_buffer`
 
------------------------------------------------------
+'''
 
 Change log for March 7, 2018 Vulkan 1.1.70 spec update:
 
@@ -9716,10 +10363,10 @@ Change log for March 7, 2018 Vulkan 1.1.70 spec update:
     out with those build targets. However, we will soon generate all three
     types of documents as part of the regular spec update cycle.
 
-    NOTE: The GitHub KhronosGroup/Vulkan-Docs repository now maintains the
-    current specification in the `master` branch. The `1.0` branch is out of
-    date and will not be maintained, since we will be generating both 1.1
-    and 1.0 specifications from the `master` branch in the future.
+    NOTE: The GitHub KhronosGroup/Vulkan-Docs repository default branch has
+    been changed. The old default `1.0` branch is out of date and will not
+    be maintained, since we will be generating both 1.1 and 1.0
+    specifications from the default branch in the future.
 
 GitHub Issues:
 
@@ -9866,7 +10513,7 @@ New Extensions:
 
   * `VK_EXT_vertex_attrib_divisor`
 
------------------------------------------------------
+'''
 
 Change log for February 19, 2018 Vulkan 1.0.69 spec update:
 
@@ -9946,7 +10593,7 @@ New Extensions:
 
   * `VK_AMD_buffer_marker`
 
------------------------------------------------------
+'''
 
 Change log for January 15, 2018 Vulkan 1.0.68 spec update:
 
@@ -9996,7 +10643,7 @@ Other Issues:
     etext:Vk*FlagBits value if one is defined, or after the first structure
     that includes them if not.
 
------------------------------------------------------
+'''
 
 Change log for January 5, 2018 Vulkan 1.0.67 spec update:
 
@@ -10063,7 +10710,7 @@ New Extensions:
 
   * `VK_EXT_conservative_rasterization`
 
------------------------------------------------------
+'''
 
 Change log for November 27, 2017 Vulkan 1.0.66 spec update:
 
@@ -10117,7 +10764,7 @@ New Extensions:
   * `VK_EXT_external_memory_dma_buf`
   * `VK_EXT_queue_family_foreign`
 
------------------------------------------------------
+'''
 
 Change log for October 27, 2017 Vulkan 1.0.65 spec update:
 
@@ -10178,7 +10825,7 @@ Internal Issues:
     slink:VkPhysicalDeviceFeatures and flink:vkCmdBindVertexBuffers.txt
     sections (internal issue 842).
 
------------------------------------------------------
+'''
 
 Change log for October 20, 2017 Vulkan 1.0.64 spec update:
 
@@ -10228,7 +10875,7 @@ New Extensions:
 
   * `VK_AMD_shader_info`
 
------------------------------------------------------
+'''
 
 Change log for October 13, 2017 Vulkan 1.0.63 spec update:
 
@@ -10280,7 +10927,7 @@ New Extensions:
 
   * `VK_EXT_global_priority`
 
------------------------------------------------------
+'''
 
 Change log for October 6, 2017 Vulkan 1.0.62 spec update:
 
@@ -10343,7 +10990,7 @@ New Extensions:
     (note, this extension is not yet enabled).
   * `VK_AMD_shader_image_load_store_lod`
 
------------------------------------------------------
+'''
 
 Change log for September 15, 2017 Vulkan 1.0.61 spec update:
 
@@ -10407,7 +11054,7 @@ New Extensions:
   * `VK_KHR_maintenance2`
   * `VK_KHR_sampler_ycbcr_conversion`
 
------------------------------------------------------
+'''
 
 Change log for September 5, 2017 Vulkan 1.0.60 spec update:
 
@@ -10465,7 +11112,7 @@ New Extensions:
   * `VK_EXT_sample_locations`
   * `VK_EXT_validation_cache`
 
------------------------------------------------------
+'''
 
 Change log for August 19, 2017 Vulkan 1.0.59 spec update:
 
@@ -10502,7 +11149,7 @@ New Extensions:
 
   * `VK_EXT_shader_stencil_export`
 
------------------------------------------------------
+'''
 
 Change log for August 14, 2017 Vulkan 1.0.58 spec update:
 
@@ -10554,7 +11201,7 @@ New Extensions:
 
   * `VK_EXT_shader_viewport_index_layer`
 
------------------------------------------------------
+'''
 
 Change log for August 1, 2017 Vulkan 1.0.57 spec update:
 
@@ -10588,7 +11235,7 @@ New Extensions:
   * `VK_EXT_post_depth_coverage`
   * `VK_KHR_relaxed_block_layout`
 
------------------------------------------------------
+'''
 
 Change log for July 21, 2017 Vulkan 1.0.56 spec update:
 
@@ -10621,7 +11268,7 @@ New Extensions:
 
   * `VK_EXT_depth_range_unrestricted`
 
------------------------------------------------------
+'''
 
 Change log for July 15, 2017 Vulkan 1.0.55 spec update:
 
@@ -10679,7 +11326,7 @@ Other Commits:
     until we're certain this doesn't cause problems with known consumers of
     +vk.xml+.
 
------------------------------------------------------
+'''
 
 Change log for July 13, 2017 Vulkan 1.0.54 spec update:
 
@@ -10725,7 +11372,7 @@ Extensions Promoted From KHX To KHR Status:
   * `VK_KHR_external_semaphore_win32`
   * `VK_KHR_win32_keyed_mutex`
 
------------------------------------------------------
+'''
 
 Change log for June 24, 2017 Vulkan 1.0.53 spec update:
 
@@ -10768,7 +11415,7 @@ New Extensions:
   * `VK_EXT_sampler_filter_minmax`
   * `VK_NV_framebuffer_mixed_samples`
 
------------------------------------------------------
+'''
 
 Change log for June 13, 2017 Vulkan 1.0.52 spec update:
 
@@ -10807,7 +11454,7 @@ New Extensions:
   * `VK_NV_fill_rectangle`
   * `VK_NV_fragment_coverage_to_color`
 
------------------------------------------------------
+'''
 
 Change log for June 4, 2017 Vulkan 1.0.51 spec update:
 
@@ -10850,7 +11497,7 @@ Internal Issues:
   * Fix enum naming and clarify behavior for
     `VK_NVX_device_generated_commands` extension.
 
------------------------------------------------------
+'''
 
 Change log for May 20, 2017 Vulkan 1.0.50 spec update:
 
@@ -10896,7 +11543,7 @@ New Extensions:
 
   * `VK_AMD_texture_gather_bias_lod`
 
------------------------------------------------------
+'''
 
 Change log for May 12, 2017 Vulkan 1.0.49 spec update:
 
@@ -10965,7 +11612,7 @@ New Extensions:
   * `VK_KHR_get_surface_capabilities2`
   * `VK_KHR_shared_presentable_image`
 
------------------------------------------------------
+'''
 
 Change log for April 15, 2017 Vulkan 1.0.48 spec update:
 
@@ -10978,7 +11625,7 @@ Internal Issues:
   * Correct swapped ifdef/ifndef blocks for `VK_KHR_maintenance1` extension
     (internal issue 776).
 
------------------------------------------------------
+'''
 
 Change log for April 8, 2017 Vulkan 1.0.47 spec update:
 
@@ -11019,7 +11666,7 @@ Internal Issues:
   * Re-remove KHX variants of KHR structure types after promotion (internal
     issue 762).
 
------------------------------------------------------
+'''
 
 Change log for March 31, 2017 Vulkan 1.0.46 spec update:
 
@@ -11062,7 +11709,7 @@ New Extensions:
 
   * `VK_KHR_incremental_present`
 
------------------------------------------------------
+'''
 
 Change log for March 24, 2017 Vulkan 1.0.45 spec update:
 
@@ -11097,7 +11744,7 @@ Internal Issues:
   * Define the glossary term "ptext:pNext chain", and use it consistently in
     the spec (internal issue 744).
 
------------------------------------------------------
+'''
 
 Change log for March 17, 2017 Vulkan 1.0.44 spec update:
 
@@ -11165,7 +11812,7 @@ Internal Issues:
     chain for VkPresentInfoKHR, fixing implicit valid usage statements for
     those structures (internal issue 740).
 
------------------------------------------------------
+'''
 
 Change log for March 10, 2017 Vulkan 1.0.43 spec update:
 
@@ -11212,7 +11859,7 @@ New Extensions:
   * `VK_EXT_hdr_metadata`
   * `VK_GOOGLE_display_timing`
 
------------------------------------------------------
+'''
 
 Change log for February 27, 2017 Vulkan 1.0.42 spec update:
 
@@ -11268,7 +11915,7 @@ New Extensions:
   ** GL_EXT_device_group
   ** GL_EXT_multiview
 
------------------------------------------------------
+'''
 
 Change log for February 17, 2017 Vulkan 1.0.41 spec update:
 
@@ -11310,7 +11957,7 @@ Other Issues:
     number is treated as a patch number, so that changes to published
     extensions should only include bug fixes and spec clarifications.
 
------------------------------------------------------
+'''
 
 Change log for February 10, 2017 Vulkan 1.0.40 spec update:
 
@@ -11396,7 +12043,7 @@ Other Issues:
     to be below the flink:VkPhysicalDeviceSparseImageFormatInfo2KHR
     structure.
 
------------------------------------------------------
+'''
 
 Change log for January 23, 2017 Vulkan 1.0.39 spec update:
 
@@ -11457,7 +12104,7 @@ Other Issues:
   * Add the +<<VK_EXT_swapchain_colorspace>>+ extension defining common
     color spaces.
 
------------------------------------------------------
+'''
 
 Change log for December 16, 2016 Vulkan 1.0.38 spec update:
 
@@ -11484,7 +12131,7 @@ Other Issues:
   * Vulkan is now a registered trademark symbol, and this is reflected in
     documents and copyright statements.
 
------------------------------------------------------
+'''
 
 Change log for December 10, 2016 Vulkan 1.0.37 spec update:
 
@@ -11515,7 +12162,7 @@ Internal Issues:
     ename:VK_SUCCESS for the requested image configuration (internal issue
     598).
 
------------------------------------------------------
+'''
 
 Change log for December 1, 2016 Vulkan 1.0.36 spec update:
 
@@ -11561,7 +12208,7 @@ Other Issues:
     slink:VkPushConstantRange::pname:offset be a multiple of 4, as stated in
     the spec language.
 
------------------------------------------------------
+'''
 
 Change log for November 25, 2016 Vulkan 1.0.35 spec update:
 
@@ -11601,7 +12248,7 @@ Internal Issues:
     logic error in reflib.py which could cause a fatal error for
     malstructured asciidoc (internal issues 578, 586).
 
------------------------------------------------------
+'''
 
 Change log for November 18, 2016 Vulkan 1.0.34 spec update:
 
@@ -11624,7 +12271,7 @@ Internal Issues:
   * Shorten the table of contents in the single-page ref page HTML output.
     Still working on the PDF (internal issue 536).
 
------------------------------------------------------
+'''
 
 Change log for November 11, 2016 Vulkan 1.0.33 spec update:
 
@@ -11665,7 +12312,7 @@ Other Issues:
     included in your project, and is expected to be packaged in the Vulkan
     SDK provided by LunarG in the future.
 
------------------------------------------------------
+'''
 
 Change log for October 25, 2016 Vulkan 1.0.32 spec update:
 
@@ -11702,7 +12349,7 @@ Internal Issues:
     validity. Doesn't affect output, other than some statements
     appearing in another block now (internal issue 513).
 
------------------------------------------------------
+'''
 
 Change log for October 14, 2016 Vulkan 1.0.31 spec update:
 
@@ -11741,7 +12388,7 @@ Internal Issues:
     glossary entry pointing to the SPIR-V Specification's definition of the
     term (internal issue 531).
 
------------------------------------------------------
+'''
 
 Change log for October 7, 2016 Vulkan 1.0.30 spec update:
 
@@ -11770,7 +12417,7 @@ Internal Issues:
     language to allow multisampled depth-stencil images (internal issue
     521).
 
------------------------------------------------------
+'''
 
 Change log for September 30, 2016 Vulkan 1.0.29 spec update:
 
@@ -11823,7 +12470,7 @@ Other Issues:
   * Use the terms ``allocation scope'' and ``extension scope'' instead of
     just ``scope'', and add them to the glossary.
 
------------------------------------------------------
+'''
 
 Change log for September 23, 2016 Vulkan 1.0.28 spec update:
 
@@ -11882,7 +12529,7 @@ Other Issues:
     effect on the spec outputs, but considerable changes on the asciidoc
     source (internal issue 367).
 
------------------------------------------------------
+'''
 
 Change log for September 16, 2016 Vulkan 1.0.27 spec update:
 
@@ -11920,12 +12567,12 @@ Other Issues:
 
   * Expand style guide and make it more self-consistent.
   * Use ISO 8601 date format everywhere.
-  * Emphasise the correct way of using
+  * Emphasize the correct way of using
     slink:VkSurfaceCapabilitiesKHR::pname:maxImageCount.
   * Added +VK_EXT_validation_flags+ extension for validation flag mechanism.
   * Fix an <<credits,author credit>> to include their current employer.
 
------------------------------------------------------
+'''
 
 Change log for September 6, 2016 Vulkan 1.0.26 spec update:
 
@@ -11993,7 +12640,7 @@ Other Issues:
     25)
   * Cleanup reference page builds so only core pages are built for releases.
 
------------------------------------------------------
+'''
 
 Change log for August 26, 2016 Vulkan 1.0.25 spec update:
 
@@ -12046,7 +12693,7 @@ Internal Issues:
   * Implement the single-branch model as described above (internal issue
     461).
 
------------------------------------------------------
+'''
 
 Change log for August 12, 2016 Vulkan 1.0.24 spec update:
 
@@ -12084,7 +12731,7 @@ Internal Issues:
     rather than created. Also clarify when the recording state of a
     command buffer is relevant (internal issue 434).
 
------------------------------------------------------
+'''
 
 Change log for August 5, 2016 Vulkan 1.0.23 spec update:
 
@@ -12141,7 +12788,7 @@ Other Commits:
     sname:VkPipelineInputAssemblyStateCreateInfo are described to match
     their order in the structures.
 
------------------------------------------------------
+'''
 
 Change log for July 22, 2016 Vulkan 1.0.22 spec update:
 
@@ -12216,7 +12863,7 @@ Other Commits:
     genvk.py, and express better dependencies between XML, scripts, and
     generated files.
 
------------------------------------------------------
+'''
 
 Change log for July 15, 2016 Vulkan 1.0.21 spec update:
 
@@ -12276,7 +12923,7 @@ Other Commits:
   * Update vk_platform.h to handle 32-bit ARMv8 binaries.
   * Various minor cleanups to the Makefile and build process.
 
------------------------------------------------------
+'''
 
 Change log for July 8, 2016 Vulkan 1.0.20 spec update:
 
@@ -12299,7 +12946,7 @@ GitHub Issues:
     instead concentrate on the specification source from which the ref pages
     are being extracted (public issues 44, 55, 160; internal issue 389).
 
------------------------------------------------------
+'''
 
 Change log for July 1, 2016 Vulkan 1.0.19 spec update:
 
@@ -12354,7 +13001,7 @@ Other Commits:
   * Fix "corresponds" typo in member definitions for
     slink:VkSubpassDescription.
 
------------------------------------------------------
+'''
 
 Change log for June 24, 2016 Vulkan 1.0.18 spec update:
 
@@ -12429,7 +13076,7 @@ Other Commits:
     M, N, and I, describing set, binding, and index, consistently
     throughout the example code.
 
------------------------------------------------------
+'''
 
 Change log for June 17, 2016 Vulkan 1.0.17 spec update:
 
@@ -12471,7 +13118,7 @@ Other Commits:
   * Added missing ename:VK_ERROR_DEVICE_LOST error to
     flink:vkQueueBindSparse.
 
------------------------------------------------------
+'''
 
 Change log for June 10, 2016 Vulkan 1.0.16 spec update:
 
@@ -12528,7 +13175,7 @@ Other Commits:
     header / validation layer / include autogeneration from XML,
     reducing platform dependencies.
 
------------------------------------------------------
+'''
 
 Change log for May 27, 2016 Vulkan 1.0.15 spec update:
 
@@ -12556,7 +13203,7 @@ Internal Issues:
     Implementation Guidelines>> to refer to the correct feature names
     (internal issue 305).
 
------------------------------------------------------
+'''
 
 Change log for May 20, 2016 Vulkan 1.0.14 spec update:
 
@@ -12587,7 +13234,7 @@ Other Commits:
     <<interfaces-builtin-variables,Built-in Variables>> section such
     that they match the SPIR-V specification.
 
------------------------------------------------------
+'''
 
 Change log for May 13, 2016 Vulkan 1.0.13 spec update:
 
@@ -12605,8 +13252,7 @@ GitHub Issues:
   * Replaced {apiname} with ``Vulkan'' in XML validity statements (public
     issue 199).
   * Fix dead links for WSI handle types (public issue 200).
-  * Use "signaled" instead of "signalled" spelling everywhere (public issue
-    201).
+  * Use "signaled" spelling everywhere (public issue 201).
   * Move readme.pdf target directory for XML schema documentation into the
     target generation directory, instead of leaving it checked into the spec
     source tree (public issue 203).
@@ -12642,7 +13288,7 @@ Internal Issues:
     the result pointer may be modified for specific commands, even if a
     runtime error is returned (internal issue 324).
 
------------------------------------------------------
+'''
 
 Change log for April 29, 2016 Vulkan 1.0.12 spec update:
 
@@ -12697,7 +13343,7 @@ Other Commits:
     committed to that name.
   * Add the VK_AMD_rasterization_order extension to vk.xml.
 
------------------------------------------------------
+'''
 
 Change log for April 22, 2016 Vulkan 1.0.11 spec update:
 
@@ -12758,7 +13404,7 @@ Other Commits:
     on relevant script/XML/header files. This does not affect the
     specification source copyright.
 
------------------------------------------------------
+'''
 
 Change log for April 15, 2016 Vulkan 1.0.10 spec update:
 
@@ -12804,7 +13450,7 @@ Internal Issues:
   * Fix typo in the definition of point sampling for
     elink:VkCullModeFlagBits (internal issue 268).
 
------------------------------------------------------
+'''
 
 Change log for April 8, 2016 Vulkan 1.0.9 spec update:
 
@@ -12842,7 +13488,7 @@ Internal Issues:
     to state that user-defined variable interface must match too (internal
     issue 250).
 
------------------------------------------------------
+'''
 
 Change log for April 1, 2016 Vulkan 1.0.8 spec update:
 
@@ -12897,7 +13543,7 @@ Other Commits:
     array queries when the passed array is too short, in the
     VK_KHR_display, VK_KHR_swapchain, and VK_KHR_surface extensions.
 
------------------------------------------------------
+'''
 
 Change log for March 25, 2016 Vulkan 1.0.7 spec update:
 
@@ -12967,7 +13613,7 @@ Other Commits:
   * Fix ref page build to generate .3 targets in the right output
     directory.
 
------------------------------------------------------
+'''
 
 Change log for March 10, 2016 Vulkan 1.0.6 spec update:
 
@@ -13069,7 +13715,7 @@ Other Commits:
   * Update GL_KHR_vulkan_glsl so push_constants do not have descriptor
     sets.
 
------------------------------------------------------
+'''
 
 Change log for March 4, 2016 Vulkan 1.0.5 spec update:
 
@@ -13158,7 +13804,7 @@ Other Commits:
     specialization array constant semantics.
   * Corrected/updated Data Format Specification date.
 
------------------------------------------------------
+'''
 
 Change log for February 25, 2015 Vulkan 1.0.4 spec update:
 
@@ -13215,7 +13861,8 @@ Change log for February 25, 2015 Vulkan 1.0.4 spec update:
     base offset within the index buffer.
   * Fix error in the description of flink:vkCmdNextSubpass.
 
------------------------------------------------------
+'''
 
 February 16, 2016 - Vulkan 1.0 initial public release
+
 

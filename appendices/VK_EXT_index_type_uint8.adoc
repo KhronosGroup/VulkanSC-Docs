@@ -1,4 +1,4 @@
-// Copyright 2019-2023 The Khronos Group Inc.
+// Copyright 2019-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -17,6 +17,13 @@ include::{generated}/meta/{refprefix}VK_EXT_index_type_uint8.adoc[]
 
 This extension allows code:uint8_t indices to be used with
 flink:vkCmdBindIndexBuffer.
+
+=== Promotion to `VK_KHR_index_type_uint8`
+
+All functionality in this extension is included in
+`apiext:VK_KHR_index_type_uint8`, with the suffix changed to KHR.
+The original enum names are still available as aliases of the KHR
+functionality.
 
 include::{generated}/interfaces/VK_EXT_index_type_uint8.adoc[]
 

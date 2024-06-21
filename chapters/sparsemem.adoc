@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -922,8 +922,9 @@ or more elink:VkSparseImageFormatFlagBits.
 --
 fname:vkGetPhysicalDeviceSparseImageFormatProperties returns an array of
 slink:VkSparseImageFormatProperties.
-Each element will describe properties for one set of image aspects that are
-bound simultaneously in the image.
+Each element describes properties for one set of image aspects that are
+bound simultaneously for a sname:VkImage created with the provided image
+creation parameters.
 This is usually one element for each aspect in the image, but for
 interleaved depth/stencil images there is only one element describing the
 combined aspects.
@@ -969,12 +970,10 @@ ename:VK_IMAGE_ASPECT_STENCIL_BIT.
 .Valid Usage
 ****
   * [[VUID-vkGetPhysicalDeviceSparseImageFormatProperties-samples-01094]]
-    pname:samples must: be a bit value that is set in
-    sname:VkImageFormatProperties::pname:sampleCounts returned by
+    pname:samples must: be a valid elink:VkSampleCountFlagBits value that is
+    set in sname:VkImageFormatProperties::pname:sampleCounts returned by
     fname:vkGetPhysicalDeviceImageFormatProperties with pname:format,
     pname:type, pname:tiling, and pname:usage equal to those in this command
-    and pname:flags equal to the value that is set in
-    slink:VkImageCreateInfo::pname:flags when the image is created
 ****
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceSparseImageFormatProperties.adoc[]
@@ -985,8 +984,9 @@ ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 --
 fname:vkGetPhysicalDeviceSparseImageFormatProperties2 returns an array of
 slink:VkSparseImageFormatProperties2.
-Each element will describe properties for one set of image aspects that are
-bound simultaneously in the image.
+Each element describes properties for one set of image aspects that are
+bound simultaneously for a sname:VkImage created with the provided image
+creation parameters.
 This is usually one element for each aspect in the image, but for
 interleaved depth/stencil images there is only one element describing the
 combined aspects.
@@ -1044,12 +1044,10 @@ endif::VK_KHR_get_physical_device_properties2[]
 .Valid Usage
 ****
   * [[VUID-VkPhysicalDeviceSparseImageFormatInfo2-samples-01095]]
-    pname:samples must: be a bit value that is set in
-    sname:VkImageFormatProperties::pname:sampleCounts returned by
+    pname:samples must: be a valid elink:VkSampleCountFlagBits value that is
+    set in sname:VkImageFormatProperties::pname:sampleCounts returned by
     fname:vkGetPhysicalDeviceImageFormatProperties with pname:format,
     pname:type, pname:tiling, and pname:usage equal to those in this command
-    and pname:flags equal to the value that is set in
-    slink:VkImageCreateInfo::pname:flags when the image is created
 ****
 
 include::{generated}/validity/structs/VkPhysicalDeviceSparseImageFormatInfo2.adoc[]
@@ -1120,7 +1118,7 @@ objects and sname:VkImage objects.
 Buffers (both fully and partially resident) and fully-resident images can:
 be bound to memory using only the data from sname:VkMemoryRequirements.
 For all sparse resources the sname:VkMemoryRequirements::pname:alignment
-member specifies both the bindable sparse block size in bytes and required:
+member specifies both the binding granularity in bytes and the required:
 alignment of sname:VkDeviceMemory.
 
 
@@ -1129,8 +1127,8 @@ alignment of sname:VkDeviceMemory.
 
 Partially resident images have a different method for binding memory.
 As with buffers and fully resident images, the
-sname:VkMemoryRequirements::pname:alignment field specifies the bindable
-sparse block size in bytes for the image.
+sname:VkMemoryRequirements::pname:alignment field specifies the binding
+granularity in bytes for the image.
 
 Requesting sparse memory requirements for sname:VkImage objects using
 fname:vkGetImageSparseMemoryRequirements will return an array of one or more
@@ -1448,6 +1446,17 @@ the binding range must: be within the range
     If pname:memory is not dlink:VK_NULL_HANDLE, pname:memory and
     pname:memoryOffset must: match the memory requirements of the resource,
     as described in section <<resources-association>>
+  * [[VUID-VkSparseMemoryBind-resourceOffset-09491]]
+    If the resource being bound is a sname:VkBuffer, pname:resourceOffset,
+    pname:memoryOffset and pname:size must: be an integer multiple of the
+    pname:alignment of the slink:VkMemoryRequirements structure returned
+    from a call to flink:vkGetBufferMemoryRequirements with the buffer
+    resource
+  * [[VUID-VkSparseMemoryBind-resourceOffset-09492]]
+    If the resource being bound is a sname:VkImage, pname:resourceOffset and
+    pname:memoryOffset must: be an integer multiple of the pname:alignment
+    of the slink:VkMemoryRequirements structure returned from a call to
+    flink:vkGetImageMemoryRequirements with the image resource
   * [[VUID-VkSparseMemoryBind-memory-01097]]
     If pname:memory is not dlink:VK_NULL_HANDLE, pname:memory must: not have
     been created with a memory type that reports
@@ -1610,6 +1619,10 @@ include::{generated}/api/structs/VkSparseImageMemoryBindInfo.adoc[]
     The pname:subresource.arrayLayer member of each element of pname:pBinds
     must: be less than the pname:arrayLayers specified in
     slink:VkImageCreateInfo when pname:image was created
+  * [[VUID-VkSparseImageMemoryBindInfo-subresource-01106]]
+    The pname:subresource.aspectMask member of each element of pname:pBinds
+    must: be valid for the pname:format specified in slink:VkImageCreateInfo
+    when pname:image was created
   * [[VUID-VkSparseImageMemoryBindInfo-image-02901]]
     pname:image must: have been created with
     ename:VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT set
@@ -1654,9 +1667,6 @@ include::{generated}/api/structs/VkSparseImageMemoryBind.adoc[]
     pname:memory and pname:memoryOffset must: match the memory requirements
     of the calling command's pname:image, as described in section
     <<resources-association>>
-  * [[VUID-VkSparseImageMemoryBind-subresource-01106]]
-    pname:subresource must: be a valid image subresource for pname:image
-    (see <<resources-image-views>>)
   * [[VUID-VkSparseImageMemoryBind-offset-01107]]
     pname:offset.x must: be a multiple of the sparse image block width
     (sname:VkSparseImageFormatProperties::pname:imageGranularity.width) of

@@ -1,4 +1,4 @@
-# Copyright 2018-2023 The Khronos Group Inc.
+# Copyright 2018-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -148,7 +148,7 @@ vk-generate:
 # Regenerate Rust bindings (Ash crate)
 # Commented out for Vulkan SC, for now
 #ash-generate:
-#  image: khronosgroup/docker-images@sha256:9e0beda7d46d7a2f72526bac80b4ccb7a860486b09f00d513e24c6676fdd8de1
+#  image: khronosgroup/docker-images@sha256:cf554c9cf5d0322e022f0be32efad9bff44ada4b32653bfdc8033cba22972fa2
 #  stage: build
 #  needs:
 #    - spec-generate # For the full include/ directory
@@ -199,7 +199,7 @@ cts-framework-tests:
     # Link the spec project into CTS hierarchy, instead of cloning it
     - mkdir external/vulkan-docs
     - ln -s `cd .. ; pwd` external/vulkan-docs/src
-    # Run the Vulkan-specific tests (from scripts/check_build_sanity.py)
+    # Run the Vulkan-specific tests (from scripts/check_build_sanity.py) # codespell:allow sanity
     - python3 external/vulkancts/scripts/gen_framework.py
     - python3 external/vulkancts/scripts/gen_framework_c.py
     - python3 external/vulkancts/scripts/gen_framework.py --api SC
@@ -236,7 +236,7 @@ h-compile:
 # Build-test Rust bindings (Ash crate)
 # Commented out for Vulkan SC, for now
 #ash-compile:
-#  image: khronosgroup/docker-images@sha256:9e0beda7d46d7a2f72526bac80b4ccb7a860486b09f00d513e24c6676fdd8de1
+#  image: khronosgroup/docker-images@sha256:cf554c9cf5d0322e022f0be32efad9bff44ada4b32653bfdc8033cba22972fa2
 #  stage: test
 #  needs:
 #    - ash-generate

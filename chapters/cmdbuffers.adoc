@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -163,6 +163,7 @@ include::{generated}/api/handles/VkCommandPool.adoc[]
 :refpage: vkCreateCommandPool
 :objectnameplural: command pools
 :objectnamecamelcase: commandPool
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a command pool, call:
@@ -690,6 +691,12 @@ allocated from pname:commandPool again.
 
 .Valid Usage
 ****
+  * [[VUID-VkCommandBufferAllocateInfo-level-09660]]
+    If pname:level is not ename:VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+    pname:commandPool must: have been allocated with a `queueFamilyIndex`
+    identifying a queue family that supports one of the
+    ename:VK_QUEUE_TRANSFER_BIT, ename:VK_QUEUE_COMPUTE_BIT, or
+    ename:VK_QUEUE_GRAPHICS_BIT capabilities
   * [[VUID-VkCommandBufferAllocateInfo-commandPool-05006]]
     The number of command buffers currently allocated from pname:commandPool
     plus pname:commandBufferCount must: be less than or equal to the value
@@ -1742,7 +1749,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
   * [[VUID-vkQueueSubmit2-commandBuffer-03867]]
     If a command recorded into the pname:commandBuffer member of any element
     of the pname:pCommandBufferInfos member of any element of pname:pSubmits
-    referenced an slink:VkEvent, that event must: not be referenced by a
+    referenced a slink:VkEvent, that event must: not be referenced by a
     command that has been submitted to another queue and is still in the
     _pending state_
   * [[VUID-vkQueueSubmit2-semaphore-03868]]
@@ -1807,12 +1814,13 @@ endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
     If a command recorded into the pname:commandBuffer member of any element
     of the pname:pCommandBufferInfos member of any element of pname:pSubmits
     includes a <<synchronization-queue-transfers-acquire, Queue Family
-    Transfer Acquire Operation>>, there must: exist a previously submitted
-    <<synchronization-queue-transfers-release, Queue Family Transfer Release
-    Operation>> on a queue in the queue family identified by the acquire
-    operation, with parameters matching the acquire operation as defined in
-    the definition of such <<synchronization-queue-transfers-acquire,
-    acquire operations>>, and which happens before the acquire operation
+    Ownership Transfer Acquire Operation>>, there must: exist a previously
+    submitted <<synchronization-queue-transfers-release, Queue Family
+    Ownership Transfer Release Operation>> on a queue in the queue family
+    identified by the acquire operation, with parameters matching the
+    acquire operation as defined in the definition of such
+    <<synchronization-queue-transfers-acquire, acquire operations>>, and
+    which happens before the acquire operation
 ifdef::VK_KHR_performance_query[]
   * [[VUID-vkQueueSubmit2-commandBuffer-03880]]
     If a command recorded into the pname:commandBuffer member of any element
@@ -2264,13 +2272,14 @@ endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
     was created for the same queue family pname:queue belongs to
   * [[VUID-vkQueueSubmit-pSubmits-02207]]
     If any element of pname:pSubmits->pCommandBuffers includes a
-    <<synchronization-queue-transfers-acquire, Queue Family Transfer Acquire
-    Operation>>, there must: exist a previously submitted
-    <<synchronization-queue-transfers-release, Queue Family Transfer Release
-    Operation>> on a queue in the queue family identified by the acquire
-    operation, with parameters matching the acquire operation as defined in
-    the definition of such <<synchronization-queue-transfers-acquire,
-    acquire operations>>, and which happens-before the acquire operation
+    <<synchronization-queue-transfers-acquire, Queue Family Ownership
+    Transfer Acquire Operation>>, there must: exist a previously submitted
+    <<synchronization-queue-transfers-release, Queue Family Ownership
+    Transfer Release Operation>> on a queue in the queue family identified
+    by the acquire operation, with parameters matching the acquire operation
+    as defined in the definition of such
+    <<synchronization-queue-transfers-acquire, acquire operations>>, and
+    which happens-before the acquire operation
 ifdef::VK_KHR_performance_query[]
   * [[VUID-vkQueueSubmit-pCommandBuffers-03220]]
     If a command recorded into any element of pname:pCommandBuffers was a
@@ -2293,7 +2302,7 @@ ifdef::VK_VERSION_1_1[]
   * [[VUID-vkQueueSubmit-queue-06448]]
     If pname:queue was not created with
     ename:VK_DEVICE_QUEUE_CREATE_PROTECTED_BIT, there must: be no element of
-    pname:pSubmits that includes an slink:VkProtectedSubmitInfo structure in
+    pname:pSubmits that includes a slink:VkProtectedSubmitInfo structure in
     its pname:pNext chain with pname:protectedSubmit equal to ename:VK_TRUE
 endif::VK_VERSION_1_1[]
 ****
@@ -3200,7 +3209,7 @@ ifdef::VK_ANDROID_external_format_resolve[]
     ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_ANDROID, the
     pname:pNext chain of slink:VkCommandBufferInheritanceInfo used to create
     each element of pname:pCommandBuffers must: include a
-    slink:VkExternalFormatANDROID structure with a pname:externalFormat
+    slink:VkExternalFormatANDROID structure with an pname:externalFormat
     matching that used to create the resolve attachment in the render pass
   * [[VUID-vkCmdExecuteCommands-pNext-09300]]
     If fname:vkCmdExecuteCommands is being called within a render pass
@@ -3239,6 +3248,22 @@ ifdef::VK_EXT_nested_command_buffer[]
     element of pname:pCommandBuffers must: not have been recorded with
     ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
 endif::VK_EXT_nested_command_buffer[]
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+ifdef::VK_KHR_dynamic_rendering_local_read[]
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-09504]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance begun with flink:vkCmdBeginRendering, the color attachment
+    mapping state specified by slink:VkRenderingAttachmentLocationInfoKHR in
+    the inheritance info of each element of pname:pCommandBuffers and in the
+    current state of pname:commandBuffer must: match
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-09505]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance begun with flink:vkCmdBeginRendering, the input attachment
+    mapping state specified by slink:VkRenderingInputAttachmentIndexInfoKHR
+    in the inheritance info of each element of pname:pCommandBuffers and in
+    the current state of pname:commandBuffer must: match
+endif::VK_KHR_dynamic_rendering_local_read[]
+endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
 ****
 
 include::{generated}/validity/protos/vkCmdExecuteCommands.adoc[]

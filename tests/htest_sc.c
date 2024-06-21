@@ -1,6 +1,6 @@
 //% gcc -c -Wall -I. -I../include htest.c
 
-// Copyright 2019-2023 The Khronos Group Inc.
+// Copyright 2019-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -42,7 +42,7 @@
 #include <vulkan/vulkan_sc.h>
 #endif
 
-// Sanity check with a type or function from each platform header in turn
+// Check with a type or function from each platform header in turn
 // (uncomment type below if a platform extension is enabled for 'vulkansc')
 
 //VkAndroidSurfaceCreateFlagsKHR          android_flags;

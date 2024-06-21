@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -186,6 +186,10 @@ include::{chapters}/commonvalidity/draw_dispatch_nonindirect_common.adoc[]
     If any of pname:baseGroupX, pname:baseGroupY, or pname:baseGroupZ are
     not zero, then the bound compute pipeline must: have been created with
     the ename:VK_PIPELINE_CREATE_DISPATCH_BASE flag
+ifdef::VK_EXT_shader_object[]
+    or the bound compute shader object must: have been created with the
+    ename:VK_SHADER_CREATE_DISPATCH_BASE_BIT_EXT flag
+endif::VK_EXT_shader_object[]
 ****
 
 include::{generated}/validity/protos/vkCmdDispatchBase.adoc[]
@@ -200,8 +204,7 @@ ifdef::VK_HUAWEI_subpass_shading[]
 A subpass shading dispatches a compute pipeline work with the work dimension
 of render area of the calling subpass and work groups are partitioned by
 specified work group size.
-Subpass operations like subpassLoad and subpassLoadMS are allowed to be
-used.
+Subpass operations like code:subpassLoad are allowed to be used.
 
 To record a subpass shading, call:
 

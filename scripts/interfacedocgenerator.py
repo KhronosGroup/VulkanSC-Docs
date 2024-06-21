@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2023 The Khronos Group Inc.
+# Copyright 2013-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -16,7 +16,7 @@ def interfaceDocSortKey(item):
 
 class InterfaceDocGenerator(OutputGenerator):
     """InterfaceDocGenerator - subclass of OutputGenerator.
-    Generates AsciiDoc includes of the interfaces added by a an API version
+    Generates AsciiDoc includes of the interfaces added by an API version
     or extension."""
 
     def __init__(self, *args, **kwargs):

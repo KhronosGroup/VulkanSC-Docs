@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -66,6 +66,7 @@ include::{generated}/api/handles/VkQueryPool.adoc[]
 :refpage: vkCreateQueryPool
 :objectnameplural: query pools
 :objectnamecamelcase: queryPool
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a query pool, call:
@@ -83,12 +84,21 @@ include::{generated}/api/protos/vkCreateQueryPool.adoc[]
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
-ifdef::VKSC_VERSION_1_0[]
 .Valid Usage
 ****
+  * [[VUID-vkCreateQueryPool-device-09663]]
+    pname:device must: support at least one queue family with one of the
+ifdef::VK_KHR_video_encode_queue[]
+    ename:VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_VIDEO_DECODE_BIT_KHR,
+endif::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_COMPUTE_BIT, or ename:VK_QUEUE_GRAPHICS_BIT capabilities
+ifdef::VKSC_VERSION_1_0[]
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
-****
 endif::VKSC_VERSION_1_0[]
+****
 
 include::{generated}/validity/protos/vkCreateQueryPool.adoc[]
 --
@@ -137,6 +147,9 @@ endif::VK_EXT_mesh_shader[]
     If pname:queryType is ename:VK_QUERY_TYPE_PIPELINE_STATISTICS,
     pname:pipelineStatistics must: be a valid combination of
     elink:VkQueryPipelineStatisticFlagBits values
+  * [[VUID-VkQueryPoolCreateInfo-queryType-09534]]
+    If pname:queryType is ename:VK_QUERY_TYPE_PIPELINE_STATISTICS,
+    pname:pipelineStatistics must: not be zero
 ifdef::VK_KHR_performance_query[]
   * [[VUID-VkQueryPoolCreateInfo-queryType-03222]]
     If pname:queryType is ename:VK_QUERY_TYPE_PERFORMANCE_QUERY_KHR, the
@@ -1108,6 +1121,11 @@ unsuccessfully.
 
 elink:VkQueryResultStatusKHR defines specific meaning for values returned
 here, though implementations are free to return other values.
+
+If the status value written is negative, indicating that the operations
+within the query completed unsuccessfully, then all other results written by
+this command are undefined: unless otherwise specified for any of the
+results of the used query type.
 endif::VK_KHR_video_queue[]
 
 [NOTE]
@@ -1235,7 +1253,7 @@ endif::VK_KHR_performance_query[]
     must: be large enough to contain the unsigned integer representing
     availability
 ifdef::VK_KHR_video_queue[or status]
-    in addition to the query result.
+    in addition to the query result
 ifdef::VK_KHR_performance_query[]
   * [[VUID-vkGetQueryPoolResults-queryType-03229]]
     If the pname:queryType used to create pname:queryPool was
@@ -1301,11 +1319,11 @@ Specific status codes that can: be returned from a query are:
 
 include::{generated}/api/enums/VkQueryResultStatusKHR.adoc[]
 
-  * ename:VK_QUERY_RESULT_STATUS_NOT_READY_KHR specifies that the query
+  * ename:VK_QUERY_RESULT_STATUS_NOT_READY_KHR indicates that the query
     result is not yet available.
-  * ename:VK_QUERY_RESULT_STATUS_ERROR_KHR specifies that operations did not
+  * ename:VK_QUERY_RESULT_STATUS_ERROR_KHR indicates that operations did not
     complete successfully.
-  * ename:VK_QUERY_RESULT_STATUS_COMPLETE_KHR specifies that operations
+  * ename:VK_QUERY_RESULT_STATUS_COMPLETE_KHR indicates that operations
     completed successfully and the query result is available.
 ifdef::VK_KHR_video_encode_queue[]
   * ename:VK_QUERY_RESULT_STATUS_INSUFFICIENT_BITSTREAM_BUFFER_RANGE_KHR
@@ -1370,6 +1388,11 @@ unsuccessfully.
 
 elink:VkQueryResultStatusKHR defines specific meaning for values returned
 here, though implementations are free to return other values.
+
+If the status value written is negative, indicating that the operations
+within the query completed unsuccessfully, then all other results written by
+this command are undefined: unless otherwise specified for any of the
+results of the used query type.
 endif::VK_KHR_video_queue[]
 
 Results for any available query written by this command are final and
@@ -1561,8 +1584,10 @@ While the query is active, the pipeline type determines which set of
 statistics are available, but these must: be configured on the query pool
 when it is created.
 If a statistic counter is issued on a command buffer that does not support
-the corresponding operation, the value of that counter is undefined: after
-the query has been made available.
+the corresponding operation, or the counter corresponds to a shading stage
+which is missing from any of the pipelines used while the query is active,
+the value of that counter is undefined: after the query has been made
+available.
 At least one statistic counter relevant to the operations supported on the
 recording command buffer must: be enabled.
 
@@ -1783,15 +1808,21 @@ Any timestamp write that <<synchronization-dependencies-execution,
 happens-after>> another timestamp write in the same submission must: not
 have a lower value unless its value overflows the maximum supported integer
 bit width of the query.
-ifdef::VK_EXT_calibrated_timestamps[]
-If `apiext:VK_EXT_calibrated_timestamps` is enabled, this extends to
-timestamp writes across all submissions on the same logical device: any
-timestamp write that <<synchronization-dependencies-execution,
-happens-after>> another must: not have a lower value unless its value
-overflows the maximum supported integer bit width of the query.
+ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
+If
+ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
+ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
+is enabled, this extends to timestamp writes across all submissions on the
+same logical device: any timestamp write that
+<<synchronization-dependencies-execution, happens-after>> another must: not
+have a lower value unless its value overflows the maximum supported integer
+bit width of the query.
 Timestamps written by this command must: be in the
-ename:VK_TIME_DOMAIN_DEVICE_EXT <<VkTimeDomainEXT, time domain>>.
-endif::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_KHR]
+ifndef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_EXT]
+<<VkTimeDomainKHR, time domain>>.
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 If an overflow occurs, the timestamp value must: wrap back to zero.
 
 [NOTE]
@@ -1802,13 +1833,16 @@ are guaranteed to not decrease.
 For example, subtracting an older timestamp from a newer one to determine
 the execution time of a sequence of commands is only a reliable measurement
 if the two timestamp writes were performed in the same
-ifdef::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 submission, or if the writes were performed on the same logical device and
-`apiext:VK_EXT_calibrated_timestamps` is enabled.
-endif::VK_EXT_calibrated_timestamps[]
-ifndef::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
+ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
+is enabled.
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
+ifndef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 submission.
-endif::VK_EXT_calibrated_timestamps[]
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 ====
 
 ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
@@ -1914,15 +1948,21 @@ Any timestamp write that <<synchronization-dependencies-execution,
 happens-after>> another timestamp write in the same submission must: not
 have a lower value unless its value overflows the maximum supported integer
 bit width of the query.
-ifdef::VK_EXT_calibrated_timestamps[]
-If `apiext:VK_EXT_calibrated_timestamps` is enabled, this extends to
-timestamp writes across all submissions on the same logical device: any
-timestamp write that <<synchronization-dependencies-execution,
-happens-after>> another must: not have a lower value unless its value
-overflows the maximum supported integer bit width of the query.
+ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
+If
+ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
+ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
+is enabled, this extends to timestamp writes across all submissions on the
+same logical device: any timestamp write that
+<<synchronization-dependencies-execution, happens-after>> another must: not
+have a lower value unless its value overflows the maximum supported integer
+bit width of the query.
 Timestamps written by this command must: be in the
-ename:VK_TIME_DOMAIN_DEVICE_EXT <<VkTimeDomainEXT, time domain>>.
-endif::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_KHR]
+ifndef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_EXT]
+<<VkTimeDomainKHR, time domain>>.
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 If an overflow occurs, the timestamp value must: wrap back to zero.
 
 [NOTE]
@@ -1933,13 +1973,16 @@ are guaranteed to not decrease.
 For example, subtracting an older timestamp from a newer one to determine
 the execution time of a sequence of commands is only a reliable measurement
 if the two timestamp writes were performed in the same
-ifdef::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 submission, or if the writes were performed on the same logical device and
-`apiext:VK_EXT_calibrated_timestamps` is enabled.
-endif::VK_EXT_calibrated_timestamps[]
-ifndef::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
+ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
+is enabled.
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
+ifndef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 submission.
-endif::VK_EXT_calibrated_timestamps[]
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 ====
 
 
@@ -2164,6 +2207,12 @@ include::{generated}/api/enums/VkVideoEncodeFeedbackFlagBitsKHR.adoc[]
     buffer specified in slink:VkVideoEncodeInfoKHR::pname:dstBuffer relative
     to the offset specified in
     slink:VkVideoEncodeInfoKHR::pname:dstBufferOffset.
+    For the first video encode operation issued by any
+    <<video-encode-commands,video encode command>>, this value will always
+    be zero, meaning that bitstream data is always written to the buffer
+    specified in slink:VkVideoEncodeInfoKHR::pname:dstBuffer starting from
+    the offset specified in
+    slink:VkVideoEncodeInfoKHR::pname:dstBufferOffset.
   * ename:VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_BYTES_WRITTEN_BIT_KHR specifies
     that queries managed by the pool will capture the number of bytes
     written by the video encode operation to the bitstream buffer specified
@@ -2171,14 +2220,27 @@ include::{generated}/api/enums/VkVideoEncodeFeedbackFlagBitsKHR.adoc[]
   * ename:VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_HAS_OVERRIDES_BIT_KHR specifies
     that queries managed by the pool will capture a boolean value indicating
     that the data written to the bitstream buffer specified in
-    slink:VkVideoEncodeInfoKHR::pname:dstBuffer contains overridden
-    parameters.
+    slink:VkVideoEncodeInfoKHR::pname:dstBuffer contains
+    <<encode-overrides,overridden parameters>>.
 
 When retrieving the results of video encode feedback queries, the values
 corresponding to each enabled video encode feedback are written in the order
 of the bits defined above, followed by an optional value indicating
 availability or result status if ename:VK_QUERY_RESULT_WITH_AVAILABILITY_BIT
 or ename:VK_QUERY_RESULT_WITH_STATUS_BIT_KHR is specified, respectively.
+
+If the result status of a video encode feedback query is negative, then the
+results of all enabled video encode feedback values will be undefined:.
+
+[NOTE]
+.Note
+====
+Thus it is recommended that applications always specify
+ename:VK_QUERY_RESULT_WITH_STATUS_BIT_KHR when retrieving the results of
+video encode feedback queries and ignore such undefined: video encode
+feedback values for any <<encode-unsuccessful,unsuccessfully>> completed
+video encode operations.
+====
 --
 
 [open,refpage='VkVideoEncodeFeedbackFlagsKHR',desc='Bitmask of VkVideoEncodeFeedbackFlagBitsKHR',type='flags']

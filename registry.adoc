@@ -1,5 +1,4 @@
-// Copyright 2013-2023 The Khronos Group Inc.
-//
+// Copyright 2013-2024 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 // Core versions and extensions to enable
@@ -232,7 +231,7 @@ the API profile requested.
 == API Names
 
 Specific API versions features and extensions can be tagged as belonging to
-to classes of features with the use of _API names_.
+classes of features with the use of _API names_.
 This is intended to allow multiple closely-related API specifications in the
 same family - such as desktop and mobile specifications - to share the same
 XML.
@@ -558,14 +557,23 @@ The tag:member tag defines the type and name of a structure or union member.
   * attr:values - only valid on the `sType` member of a struct.
     This is a comma-separated list of enumerant values that are valid for
     the structure type; usually there is only a single value.
-  * attr:len - if the member is an array, len may be one or more of the
-    following things, separated by commas (one for each array indirection):
-    another member of that struct; `"null-terminated"` for a string; `"1"`
-    to indicate it is just a pointer (used for nested pointers); or an
-    equation in math markup for incorporation in the specification (a LaTeX
-    math expression delimited by `latexmath:[` and `]`.
-    The only variables in the equation should be the names of members of the
-    structure.
+  * attr:len - valid length of the data described by the member.
+    If the member is a static array, attr:len must be less than or equal
+    to the size of the array; if not present for a static array, all
+    elements of the array are considered valid.
+    If the member is a pointer, attr:len is the length of the pointed-to
+    data.
+    attr:len must contain one or more expressions defining length (one for
+    each array indirection), separated by commas.
+    Each expression may be one of:
+  ** the name of another member of this struct
+  ** `"null-terminated"`, indicating a pointer to a null-terminated UTF-8
+     string
+  ** `"1"` to indicate it is just a pointer (used for nested pointers)
+  ** an equation in math markup for incorporation in the specification (a
+     LaTeX math expression delimited by `latexmath:[` and `]`.
+     The only variables in the equation should be the names of members of
+     the structure.
   * attr:altlen - if the attr:len attribute is specified, and contains a
     `latexmath:` equation, this attribute should be specified with an
     equivalent equation using only C builtin operators, C math library
@@ -797,9 +805,9 @@ was based on.
     group.
     If present, this attribute should match the attr:name attribute of a
     corresponding tag:type tag.
-  * attr:type - optional.
+  * attr:type - required.
     String describing the data type of the values of this group of enums.
-    At present the only accepted categories are `enum` and `bitmask`, as
+    The accepted categories are `bitmask`, `constants`, and `enum`, as
     described below.
   * attr:comment - optional.
     Arbitrary string (unused).
@@ -840,7 +848,7 @@ this results in
 [[tag-enum]]
 = Enumerants (tag:enum Tag)
 
-Each tag:enum tag defines a single Vulkan (or other API) token.
+Each tag:enum tag defines a single API token.
 
 == Attributes of tag:enum Tags
 
@@ -895,7 +903,7 @@ Each tag:enum tag defines a single Vulkan (or other API) token.
 [NOTE]
 .Note
 ====
-Using attr:alias on a tag:enum means you want the attr:name defined by the
+Using attr:alias on an tag:enum means you want the attr:name defined by the
 tag to be treated as an alias of the token name in the attr:alias attribute
 value.
 For example, the following tag defines `VK_ALIAS` as an alias of `VK_VALUE`:
@@ -1014,6 +1022,15 @@ In this case the allowed attributes include:
   * attr:errorcodes - optional.
     A string describing possible error return codes from the command, as a
     comma-separated list of Vulkan result code names.
++
+--
+[NOTE]
+.Note
+====
+attr:errorcodes should never include `VK_ERROR_UNKNOWN` or
+`VK_ERROR_VALIDATION_FAILED`.
+====
+--
   * attr:renderpass - optional.
     A string identifying whether the command can be issued only inside a
     render pass (`"inside"`), only outside a render pass (`"outside"`), or
@@ -1139,14 +1156,23 @@ and union members.
     This definition is only used if the requested API name matches the
     attribute.
     May be used to address subtle incompatibilities.
-  * attr:len - if the param is an array, len may be one or more of the
-    following things, separated by commas (one for each array indirection):
-    another param of that command; `"null-terminated"` for a string; `"1"`
-    to indicate it is just a pointer (used for nested pointers); or an
-    equation in math markup for incorporation in the specification (a LaTeX
-    math expression delimited by `latexmath:[` and `]`.
-    The only variables in the equation should be the names of this or other
-    parameters.
+  * attr:len - valid length of the data described by the parameter.
+    If the parameter is a static array, attr:len must be less than or equal
+    to the size of the array; if not present for a static array, all
+    elements of the array are considered valid.
+    If the parameter is a pointer, attr:len is the length of the pointed-to
+    data.
+    attr:len must contain one or more expressions defining length (one for
+    each array indirection), separated by commas.
+    Each expression may be one of:
+  ** the name of another parameter of this command
+  ** `"null-terminated"`, indicating a pointer to a null-terminated UTF-8
+     string
+  ** `"1"` to indicate it is just a pointer (used for nested pointers)
+  ** an equation in math markup for incorporation in the specification (a
+     LaTeX math expression delimited by `latexmath:[` and `]`.
+     The only variables in the equation should be the names of parameters of
+     the command.
   * attr:altlen - if the attr:len attribute is specified, and contains a
     `latexmath:` equation, this attribute should be specified with an
     equivalent equation using only C builtin operators, C math library
@@ -1275,10 +1301,46 @@ that API and version.
     Version name, used as the C preprocessor token under which the version's
     interfaces are protected against multiple inclusion.
     Example: `"VK_VERSION_1_0"`.
-  * attr:number - required.
+  * attr:number - required, but deprecated and will eventually be removed.
     Feature version number, usually a string interpreted as
     `majorNumber.minorNumber`.
     Example: `4.2`.
++
+--
+[NOTE]
+.Note
+====
+attr:number is deprecated, replaced by attr:depends.
+attr:number is retained only for backwards compatibility with downstream
+consumers, and will eventually be removed.
+====
+--
+  * attr:depends - optional.
+    String containing a boolean expression of one or more API core version
+    and extension names.
+    The feature requires the expression in the string to be satisfied to
+    use any functionality it defines.
+    Supported operators include `,` for logical OR, `+` for logical AND, and
+    `(` `)` for grouping.
+    `,` and `+` are of equal precedence, and lower than `(` `)`.
+    Expressions must be evaluated left-to-right for operators of the same
+    precedence.
+    Terms which are core version names are true if the corresponding
+    API version is supported.
+    Terms which are extension names are true if the corresponding extension
+    is enabled.
++
+--
+[NOTE]
+.Note
+====
+attr:depends replaces the attr:number attribute used in the past.
+The expected purposes of this attribute include sorting features in
+dependency order when emitting them from generator scripts, and ensuring
+that all dependent features are included when building with a specified
+feature.
+====
+--
   * attr:sortorder - optional.
     A decimal number which specifies an order relative to other tag:feature
     tags when calling output generators.
@@ -1647,7 +1709,7 @@ Zero or more of the following tags, in any order:
 
 === Command Tags
 
-tag:command specifies an required (or removed) command defined in a
+tag:command specifies a required (or removed) command defined in a
 tag:commands block.
 The tag has no content, but contains attributes:
 
@@ -1658,7 +1720,7 @@ The tag has no content, but contains attributes:
 
 === Enum Tags
 
-tag:enum specifies an required (or removed) enumerant defined in a tag:enums
+tag:enum specifies a required (or removed) enumerant defined in an tag:enums
 block.
 All forms of this tag support the following attributes:
 
@@ -1681,10 +1743,10 @@ No attributes other than attr:name and attr:comment are supported for them.
 tag:enum tags appearing inside tag:remove tags should always be reference
 enums.
 Reference enums may also be used inside tag:require tags, if the
-corresponding value is defined in a tag:enums block.
+corresponding value is defined in an tag:enums block.
 This is typically used for constants not part of an enumerated type.
 
-_Extension enums_ define the value of an enumerant inline in an tag:feature
+_Extension enums_ define the value of an enumerant inline in a tag:feature
 or tag:extensions block.
 Typically these are used to add additional values specified by an extension
 or core feature to an existing enumerated type.
@@ -1733,7 +1795,7 @@ enumerant:
     It may also be used when token names have been changed as a result of
     profile changes, or for consistency purposes.
   * attr:protect - define a preprocessor protection symbol for the enum in
-    the same fashion as a tag:enum tag in an <<tag-enum,tag:enums>> block.
+    the same fashion as an tag:enum tag in an <<tag-enum,tag:enums>> block.
 
 Not all combinations of attributes are either meaningful or supported.
 The attr:protect attribute may always be present.
@@ -1937,15 +1999,22 @@ are part of an image format.
   * attr:numericFormat - required.
     A string specifying the scalar data type of the component.
     Must be one of the following values:
+  ** `"SFIXED5"` - signed fractional integer values that get converted to
+     floating-point in the range [eq]#[-1024,1023.96875]#
   ** `"SFLOAT"` - signed floating-point numbers
   ** `"SINT"` - signed integer values in the range [-2^n-1^,2^n-1^-1]
   ** `"SNORM"` - signed normalized values in the range [-1,1]
-  ** `"SRGB"` - R, G, and B components are unsigned normalized values that represent values using sRGB nonlinear encoding, while the A component (if one exists) is a regular unsigned normalized value
-  ** `"SSCALED"` - signed integer values that get converted to floating-point in the range [-2^n-1^,2^n-1^-1]
-  ** `"UFLOAT"` - unsigned floating-point numbers (used by packed, shared exponent, and some compressed formats)
+  ** `"SRGB"` - R, G, and B components are unsigned normalized values that
+     represent values using sRGB nonlinear encoding, while the A component
+     (if one exists) is a regular unsigned normalized value
+  ** `"SSCALED"` - signed integer values that get converted to
+     floating-point in the range [-2^n-1^,2^n-1^-1]
+  ** `"UFLOAT"` - unsigned floating-point numbers (used by packed, shared
+     exponent, and some compressed formats)
   ** `"UINT"` - unsigned integer values in the range [0,2^n^-1]
   ** `"UNORM"` - unsigned normalized values in the range [0,1]
-  ** `"USCALED"` - unsigned integer values that get converted to floating-point in the range [0,2^n^-1]
+  ** `"USCALED"` - unsigned integer values that get converted to
+     floating-point in the range [0,2^n^-1]
   * attr:planeIndex - optional.
     A decimal integer specifying which plane this component lies in.
     If present, must correspond to the attr:index attribute value of a
@@ -2017,7 +2086,7 @@ extensions which are defined for the API.
 == Contents of tag:spirvextensions Tags
 
 Each tag:spirvextensions block contains zero or more tag:spirvextension tags, each
-describing an single SPIR-V extension, in arbitrary order.
+describing a single SPIR-V extension, in arbitrary order.
 
 
 [[tag-spirvextension]]
@@ -2062,7 +2131,7 @@ capabilities which are defined for the API.
 == Contents of tag:spirvcapabilities Tags
 
 Each tag:spirvcapabilities block contains zero or more tag:spirvcapability
-tags, each describing an single SPIR-V capability, in arbitrary order.
+tags, each describing a single SPIR-V capability, in arbitrary order.
 
 
 [[tag-spirvcapability]]
@@ -2370,10 +2439,10 @@ These correspond to the definitions found in the first tag:enums section of
 
 [source,xml]
 --------------------------------------
-<enums name="API Constants"
+<enums name="API Constants" type="constants"
        comment="Vulkan hardcoded constants - not an enumerated type, part of the header boilerplate">
-    <enum value="256"        name="VK_MAX_PHYSICAL_DEVICE_NAME"/>
-    <enum value="256"        name="VK_MAX_EXTENSION_NAME"/>
+    <enum type="uint32_t" value="256"   name="VK_MAX_PHYSICAL_DEVICE_NAME"/>
+    <enum type="uint32_t" value="256"   name="VK_MAX_EXTENSION_NAME"/>
     ...
 --------------------------------------
 
@@ -2467,7 +2536,7 @@ extern "C" {
 #endif
 
 /*
-** Copyright 2015-2023 The Khronos Group Inc.
+** Copyright 2015-2024 The Khronos Group Inc.
     ...
 */
 
@@ -2574,7 +2643,7 @@ specified features are generated.
 == How to Add a Compile Time Constant
 
 Go to the desired tag:feature or tag:extension tag.
-Add (if not present) a nested tag:require block labelled
+Add (if not present) a nested tag:require block labeled
 
 [source,xml]
 --------------------------------------
@@ -2588,11 +2657,11 @@ In this block, add an (appropriately indented) tag like
     <enum name="VK_THE_ANSWER"/>
 --------------------------------------
 
-Then go to the tag:enums block labelled
+Then go to the tag:enums block labeled
 
 [source,xml]
 --------------------------------------
-<enums comment="Misc. hardcoded constants - not an enumerated type">
+<enums name="API Constants" type="constants" ...>
 --------------------------------------
 
 In this block, add a tag whose attr:name attribute matches the attr:name you
@@ -2646,7 +2715,7 @@ used.
 Otherwise, if the struct type is not used directly by a command in the API,
 nor required by a chain of type dependencies for other commands, an explicit
 tag:type dependency should be added to the tag:feature tag.
-Go to the tag:types tag and search for the nested block labelled
+Go to the tag:types tag and search for the nested block labeled
 
 [source,xml]
 --------------------------------------
@@ -2720,7 +2789,7 @@ API, nor required by a chain of type dependencies for commands and structs,
 an explicit tag:type dependency should be added to the tag:feature tag in
 exactly the same fashion as described above for `struct` types.
 
-Next, go to the line labelled
+Next, go to the line labeled
 
 [source,xml]
 --------------------------------------
@@ -2781,7 +2850,7 @@ exactly the same fashion as described above for `struct` types.
 
 Firstly, a definition is needed for the flags type used as a parameter to
 commands or member of functions.
-Go to the line labelled:
+Go to the line labeled:
 
 [source,xml]
 --------------------------------------
@@ -2800,7 +2869,7 @@ The attr:category defines this as a `"bitmask"` type.
 The attr:bitvalues attribute identifies the `*FlagBits` entry defining the
 flag bits associated with this type.
 
-Next, go to the line labelled:
+Next, go to the line labeled:
 
 [source,xml]
 --------------------------------------
@@ -2819,7 +2888,7 @@ This defines a type for the flag bits for generators that need it.
 The attr:category attribute of `"enum"` identifies that this is an
 enumerated type.
 
-Finally, go to the line labelled:
+Finally, go to the line labeled:
 
 [source,xml]
 --------------------------------------
@@ -3031,6 +3100,19 @@ Changes to the `.xml` files and Python scripts are logged in GitHub history.
 [[changelog]]
 = Change Log
 
+  * 2024-05-28 - Deprecate the tag:feature attr:number attribute with the
+    new attr:depends tag (public issue 2327).
+  * 2024-05-08 - Add a tag:enums attr:type `"constants"` value for
+    compile time constant definitions so they can be treated more
+    consistently (public issue 2359).
+  * 2024-04-03 - Add `"SFIXED5"` as an allowed tag:component
+    attr:numericFormat type (internal issue 3802).
+  * 2024-03-20 - Add a NOTE to the tag:command attr:errorcodes attribute
+    that certain errors should never be
+    included in the attribute (internal issue 3824).
+  * 2024-01-31 - Specify the meaning of the tag:member attr:len attribute of
+    structure members when the member is a static array (internal issue
+    3743).
   * 2023-11-24 - Clarify that the `promotedto` relationship which may be
     defined for <<tag-extension, tag:extension>> tags does not promise exact
     API-level compatibility (internal issue 4819).

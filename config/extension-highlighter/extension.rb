@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Khronos Group Inc.
+# Copyright 2016-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -40,7 +40,7 @@ class ExtensionHighlighterPreprocessorReader < PreprocessorReader
     # If it is an ifdef or ifndef, push the directive onto a stack
     # If it is an endif, pop the last one off.
     # This is done to apply the next bit of logic to both the start and end
-    # of an conditional block correctly
+    # of a conditional block correctly
     status = directive
     if directive == 'endif'
       status = @status_stack.pop
@@ -103,7 +103,7 @@ class ExtensionHighlighterPreprocessorReader < PreprocessorReader
     # If it is an ifdef or ifndef, push the directive onto a stack
     # If it is an endif, pop the last one off.
     # This is done to apply the next bit of logic to both the start and end
-    # of an conditional block correctly
+    # of a conditional block correctly
     status = directive
     if directive == 'endif'
       status = @status_stack.pop

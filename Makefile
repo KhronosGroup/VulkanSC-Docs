@@ -1,4 +1,4 @@
-# Copyright 2014-2023 The Khronos Group Inc.
+# Copyright 2014-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -74,6 +74,7 @@ CHECK_XREFS =
 endif
 allchecks: check-copyright-dates \
     check-contractions \
+    check-duplicates \
     check-spelling \
     check-writing \
     check-bullets \
@@ -114,6 +115,7 @@ OUTDIR	  = $(GENERATED)/out
 HTMLDIR   = $(OUTDIR)/html
 VUDIR	  = $(OUTDIR)/validation
 PDFDIR	  = $(OUTDIR)/pdf
+EPUBDIR   = $(OUTDIR)/epub
 PROPOSALDIR = $(OUTDIR)/proposals
 JSAPIMAP  = $(GENERATED)/apimap.cjs
 PYAPIMAP  = $(GENERATED)/apimap.py
@@ -136,12 +138,12 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 272
+PATCHVERSION = 286
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 14
+SCPATCHVERSION = 15
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
@@ -241,6 +243,13 @@ ADOCPDFOPTS  = $(ADOCPDFEXTS) -a mathematical-format=svg \
 	       -a imagesoutdir=$(PDFMATHDIR) \
 	       -a pdf-fontsdir=$(CONFIGS)/fonts,GEM_FONTS_DIR \
 	       -a pdf-stylesdir=$(CONFIGS)/themes -a pdf-style=pdf
+
+# EPUB target-specific Asciidoctor options
+ADOCEPUBOPTS = -r asciidoctor-epub3 \
+	       -r asciidoctor-mathematical \
+	       -r $(CONFIGS)/asciidoctor-mathematical-ext.rb \
+	       -a mathematical-format=svg \
+	       -a imagesoutdir=$(PDFMATHDIR)
 
 # Valid usage-specific Asciidoctor extensions and options
 ADOCVUEXTS = -r $(CONFIGS)/vu-to-json.rb -r $(CONFIGS)/quiet-include-failure.rb
@@ -363,6 +372,13 @@ $(PDFDIR)/vkspec.pdf: $(SPECSRC) $(COMMONDOCS)
 	$(QUIET)$(OPTIMIZEPDF) $@ $@.out.pdf && mv $@.out.pdf $@
 	$(QUIET)$(RMRF) $(PDFMATHDIR)
 
+# EPUB generation is community-contributed and not supported by Khronos.
+# See https://github.com/KhronosGroup/Vulkan-Docs/pull/2286
+epub: $(EPUBDIR)/vkspec.epub $(SPECSRC) $(COMMONDOCS)
+
+$(EPUBDIR)/vkspec.epub: $(SPECSRC) $(COMMONDOCS)
+	$(QUIET)$(ASCIIDOC) -b epub3 $(ADOCOPTS) $(ADOCEPUBOPTS) -o $@ $(SPECSRC)
+
 validusage: $(VUDIR)/validusage.json $(SPECSRC) $(COMMONDOCS)
 
 $(VUDIR)/validusage.json: $(SPECSRC) $(COMMONDOCS)
@@ -426,6 +442,14 @@ check-contractions:
 	if test `$(CHECK_CONTRACTIONS) | wc -l` != 0 ; then \
 	    echo "Contractions found that are not allowed:" ; \
 	    $(CHECK_CONTRACTIONS) ; \
+	    exit 1 ; \
+	fi
+
+# Look for duplicate words
+CHECK_DUPLICATES = $(PYTHON) $(ROOTDIR)/scripts/find_duplicates.py `find *.adoc appendices chapters config scripts style -name '*.adoc'`
+check-duplicates:
+	if ! $(CHECK_DUPLICATES) ; then \
+	    echo "Successive duplicate words found that are not allowed" ; \
 	    exit 1 ; \
 	fi
 

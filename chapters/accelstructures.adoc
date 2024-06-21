@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The Khronos Group Inc.
+// Copyright 2020-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -456,8 +456,6 @@ include::{chapters}/commonvalidity/build_acceleration_structure_device_common.ad
     `4`
   * [[VUID-vkCmdBuildAccelerationStructuresIndirectKHR-pIndirectStrides-03787]]
     Each element of pname:pIndirectStrides must: be a multiple of `4`
-  * [[VUID-vkCmdBuildAccelerationStructuresIndirectKHR-commandBuffer-03649]]
-    pname:commandBuffer must: not be a protected command buffer
   * [[VUID-vkCmdBuildAccelerationStructuresIndirectKHR-pIndirectDeviceAddresses-03651]]
     Each slink:VkAccelerationStructureBuildRangeInfoKHR structure referenced
     by any element of pname:pIndirectDeviceAddresses must: be a valid
@@ -501,8 +499,8 @@ include::{generated}/api/structs/VkAccelerationStructureBuildGeometryInfoKHR.ado
   * pname:mode is a elink:VkBuildAccelerationStructureModeKHR value
     specifying the type of operation to perform.
   * pname:srcAccelerationStructure is a pointer to an existing acceleration
-    structure that is to be used to update the pname:dst acceleration
-    structure when pname:mode is
+    structure that is to be used to update the
+    pname:dstAccelerationStructure acceleration structure when pname:mode is
     ename:VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR.
   * pname:dstAccelerationStructure is a pointer to the target acceleration
     structure for the build.
@@ -577,8 +575,8 @@ not modified.
   * [[VUID-VkAccelerationStructureBuildGeometryInfoKHR-type-03654]]
     pname:type must: not be ename:VK_ACCELERATION_STRUCTURE_TYPE_GENERIC_KHR
   * [[VUID-VkAccelerationStructureBuildGeometryInfoKHR-pGeometries-03788]]
-    Only one of pname:pGeometries or pname:ppGeometries can: be a valid
-    pointer, the other must: be `NULL`
+    If pname:geometryCount is not `0`, exactly one of pname:pGeometries or
+    pname:ppGeometries must: be a valid pointer, the other must: be `NULL`
   * [[VUID-VkAccelerationStructureBuildGeometryInfoKHR-type-03789]]
     If pname:type is ename:VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, the
     pname:geometryType member of elements of either pname:pGeometries or
@@ -744,8 +742,7 @@ include::{generated}/api/structs/VkAccelerationStructureGeometryTrianglesDataKHR
   * pname:vertexFormat is the elink:VkFormat of each vertex element.
   * pname:vertexData is a device or host address to memory containing vertex
     data for this geometry.
-  * pname:maxVertex is the highest index of a vertex that will be addressed
-    by a build command using this structure.
+  * pname:maxVertex is the number of vertices in pname:vertexData minus one.
   * pname:vertexStride is the stride in bytes between each vertex.
   * pname:indexType is the elink:VkIndexType of each index element.
   * pname:indexData is a device or host address to memory containing index
@@ -965,6 +962,11 @@ the sum of matching pname:count provided.
 
 .Valid Usage
 ****
+  * [[VUID-VkAccelerationStructureTrianglesDisplacementMicromapNV-displacementBiasAndScaleFormat-09501]]
+    pname:displacementBiasAndScaleFormat must: not be
+    ename:VK_FORMAT_UNDEFINED
+  * [[VUID-VkAccelerationStructureTrianglesDisplacementMicromapNV-displacementVectorFormat-09502]]
+    pname:displacementVectorFormat must: not be ename:VK_FORMAT_UNDEFINED
   * [[VUID-VkAccelerationStructureTrianglesDisplacementMicromapNV-pUsageCounts-07992]]
     Only one of pname:pUsageCounts or pname:ppUsageCounts can: be a valid
     pointer, the other must: be `NULL`
@@ -1259,7 +1261,7 @@ structure should be 152 bytes in size.
 include::{generated}/validity/structs/VkAccelerationStructureMotionInstanceNV.adoc[]
 --
 
-[open,refpage='VkAccelerationStructureMotionInstanceDataNV',desc='Union specifying a acceleration structure motion instance data for building into an acceleration structure geometry',type='structs']
+[open,refpage='VkAccelerationStructureMotionInstanceDataNV',desc='Union specifying an acceleration structure motion instance data for building into an acceleration structure geometry',type='structs']
 --
 :refpage: VkAccelerationStructureMotionInstanceDataNV
 
@@ -1670,8 +1672,8 @@ ename:VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR.
     The pname:buffer used to create each acceleration structure in
     pname:pAccelerationStructures must: be bound to device memory
   * [[VUID-vkCmdWriteAccelerationStructuresPropertiesKHR-query-04880]]
-    The sum of pname:query plus pname:accelerationStructureCount must: be
-    less than or equal to the number of queries in pname:queryPool
+    The sum of pname:firstQuery plus pname:accelerationStructureCount must:
+    be less than or equal to the number of queries in pname:queryPool
 include::{chapters}/commonvalidity/write_acceleration_structure_properties_common.adoc[]
 ****
 
@@ -1767,6 +1769,10 @@ ename:VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR as appropriate.
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/copy_acceleration_structure_common.adoc[]
+  * [[VUID-vkCmdCopyAccelerationStructureNV-dst-07792]]
+    pname:dst must: be bound completely and contiguously to a single
+    sname:VkDeviceMemory object via
+    flink:vkBindAccelerationStructureMemoryNV
 ****
 
 include::{generated}/validity/protos/vkCmdCopyAccelerationStructureNV.adoc[]
@@ -2398,7 +2404,7 @@ endif::VK_KHR_device_group,VK_VERSION_1_1[]
     pname:pInfos[i].pname:ppGeometries with a pname:geometryType of
     ename:VK_GEOMETRY_TYPE_INSTANCES_KHR, each
     slink:VkAccelerationStructureInstanceKHR::pname:accelerationStructureReference
-    value in pname:geometry.instances.data.hostAddress must be a valid
+    value in pname:geometry.instances.data.hostAddress must: be a valid
     slink:VkAccelerationStructureKHR object
 ifdef::VK_NV_ray_tracing_motion_blur[]
   * [[VUID-vkBuildAccelerationStructuresKHR-pInfos-04930]]
@@ -2408,7 +2414,7 @@ ifdef::VK_NV_ray_tracing_motion_blur[]
     ename:VK_BUILD_ACCELERATION_STRUCTURE_MOTION_BIT_NV set, each
     pname:accelerationStructureReference in any structure in
     slink:VkAccelerationStructureMotionInstanceNV value in
-    pname:geometry.instances.data.hostAddress must be a valid
+    pname:geometry.instances.data.hostAddress must: be a valid
     slink:VkAccelerationStructureKHR object
 endif::VK_NV_ray_tracing_motion_blur[]
 ****
@@ -2439,13 +2445,14 @@ flink:vkCmdCopyAccelerationStructureKHR but is executed by the host.
   * [[VUID-vkCopyAccelerationStructureKHR-accelerationStructureHostCommands-03582]]
     The <<features-accelerationStructureHostCommands,
     sname:VkPhysicalDeviceAccelerationStructureFeaturesKHR::pname:accelerationStructureHostCommands>>
+    feature must: be enabled
 include::{chapters}/commonvalidity/deferred_operations_common.adoc[]
   * [[VUID-vkCopyAccelerationStructureKHR-buffer-03727]]
     The pname:buffer used to create pname:pInfo->src must: be bound to
     host-visible device memory
   * [[VUID-vkCopyAccelerationStructureKHR-buffer-03728]]
     The pname:buffer used to create pname:pInfo->dst must: be bound to
-    host-visible device memory feature must: be enabled
+    host-visible device memory
 ifdef::VK_KHR_device_group,VK_VERSION_1_1[]
   * [[VUID-vkCopyAccelerationStructureKHR-buffer-03780]]
     The pname:buffer used to create pname:pInfo->src must: be bound to

@@ -1,4 +1,4 @@
-// Copyright 2021-2023 The Khronos Group Inc.
+// Copyright 2021-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -26,9 +26,9 @@ However, this requires careful state management, and requires awkward sorting of
 Different applications may want to change the rate per-draw, per-triangle, or per-screen-region.
 While it would be possible to modify the behavior of sample shading to be modifiable at different rates to solve this, multisample state is relatively complex, and could result in tricky edge cases for some applications.
 The alternative is to provide a new shading rate state that is independent of multisampling, and enable it to be set at each separate rate.
-In either case, per draw rate can be set by pipeline or dynamic state, but for per-triangle and per-screen-region use cases, new mechanisms will be needed. For per-triangle state, the usual way of setting this is in the API is by providing data along with the provoking vertex. For the screen regions, two main options are viable - either an associated image which has sub regions identifying the state, or providing some sort of equation to be applied across the screen.
+In either case, per draw rate can be set by pipeline or dynamic state, but for per-triangle and per-screen-region use cases, new mechanisms will be needed. For per-triangle state, the usual way of setting this in the API is by providing data along with the provoking vertex. For the screen regions, two main options are viable - either an associated image which has sub regions identifying the state, or providing some sort of equation to be applied across the screen.
 
-Due to the complexity and potential fragility of multisample state, this proposal introduces new shading rate state to the API. As not all known use cases for screen-region state can be expressed as an straightforward equation, per-image state allowing arbitrary expression of regions is preferred.
+Due to the complexity and potential fragility of multisample state, this proposal introduces new shading rate state to the API. As not all known use cases for screen-region state can be expressed as a straightforward equation, per-image state allowing arbitrary expression of regions is preferred.
 
 
 == Proposal
@@ -303,8 +303,8 @@ typedef struct VkPhysicalDeviceFragmentShadingRateFeaturesKHR {
 
 Two concrete samples are available in the https://github.com/KhronosGroup/Vulkan-Samples[KhronosGroup/Vulkan-Samples] repository:
 
-  * https://github.com/KhronosGroup/Vulkan-Samples/tree/master/samples/extensions/fragment_shading_rate
-  * https://github.com/KhronosGroup/Vulkan-Samples/tree/master/samples/extensions/fragment_shading_rate_dynamic
+  * https://github.com/KhronosGroup/Vulkan-Samples/tree/main/samples/extensions/fragment_shading_rate
+  * https://github.com/KhronosGroup/Vulkan-Samples/tree/main/samples/extensions/fragment_shading_rate_dynamic
 
 == Issues
 

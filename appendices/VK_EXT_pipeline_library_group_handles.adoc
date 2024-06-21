@@ -1,4 +1,4 @@
-// Copyright 2021-2023 The Khronos Group Inc.
+// Copyright 2021-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -24,7 +24,7 @@ include::{generated}/meta/{refprefix}VK_EXT_pipeline_library_group_handles.adoc[
 When using pipeline libraries in ray tracing pipelines, a library might get
 linked into different pipelines in an incremental way.
 An application can have a strategy where a ray tracing pipeline is comprised
-of N pipeline libraries and is later augumented by creating a new pipeline
+of N pipeline libraries and is later augmented by creating a new pipeline
 with N + 1 libraries.
 Without this extension, all group handles must be re-queried as the group
 handle is tied to the pipeline, not the library.

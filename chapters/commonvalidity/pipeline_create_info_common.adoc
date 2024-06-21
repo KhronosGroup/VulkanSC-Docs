@@ -1,9 +1,17 @@
-// Copyright 2019-2023 The Khronos Group Inc.
+// Copyright 2019-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
 // Common Valid Usage
 // common to all pipeline creations
+  * [[VUID-{refpage}-None-09497]]
+    {empty}
+ifdef::VK_KHR_maintenance5[]
+    If the pname:pNext chain does not include a
+    slink:VkPipelineCreateFlags2CreateInfoKHR structure,
+endif::VK_KHR_maintenance5[]
+    pname:flags must be a valid combination of
+    elink:VkPipelineCreateFlagBits values
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-{refpage}-flags-07984]]
     If pname:flags contains the ename:VK_PIPELINE_CREATE_DERIVATIVE_BIT

@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2020-2023 The Khronos Group Inc.
+# Copyright 2020-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -17,7 +17,7 @@ from generator import (GeneratorOptions, OutputGenerator, noneStr,
 
 copyright = """
 /*
-** Copyright (c) 2020 The Khronos Group Inc.
+** Copyright 2020-2024 The Khronos Group Inc.
 **
 ** SPDX-License-Identifier: Apache-2.0
 */
@@ -242,7 +242,7 @@ class JSONCOutputGenerator(OutputGenerator):
     def endFeature(self):
         if self.emit:
             if self.feature_not_empty:
-                if self.genOpts.conventions.writeFeature(self.featureExtraProtect, self.genOpts.filename):
+                if self.genOpts.conventions.writeFeature(self.featureName, self.featureExtraProtect, self.genOpts.filename):
 
                     for section in self.TYPE_SECTIONS:
                         contents = self.sections[section]
@@ -479,7 +479,7 @@ class JSONCOutputGenerator(OutputGenerator):
             code += "        vk_json_printf(_OUT, \"[\\n\");\n"
             code += "        for (i = 0; i < %s(%s); i++) {\n" %(derefPtr, arraySize)
             code += "            char tmp[100];\n"
-            
+
             # Special case handling for giving unique names for pImmutableSamplers if there are multiple
             # bindings in the same Descriptor set layout.
             if name == "pImmutableSamplers":
@@ -500,7 +500,7 @@ class JSONCOutputGenerator(OutputGenerator):
             code += "     } else {\n"
             code += "         vk_json_printf(_OUT, \" \\\"NULL\\\"%s\\n\");\n" %(comma)
             code += "     }\n"
-            
+
             return code
 
     # Prints out member name followed by empty string.

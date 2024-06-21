@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The Khronos Group Inc.
+// Copyright 2020-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -43,6 +43,15 @@ ifdef::VK_KHR_shared_presentable_image[]
     pname:srcImageLayout must: be ename:VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR,
     ename:VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL or
     ename:VK_IMAGE_LAYOUT_GENERAL
+endif::VK_KHR_shared_presentable_image[]
+  * [[VUID-{refpage}-srcImage-09459]]
+    If pname:srcImage and pname:dstImage are the same, and an elements of
+    pname:pRegions contains the pname:srcSubresource and
+    pname:dstSubresource with matching pname:mipLevel and overlapping array
+    layers, then the pname:srcImageLayout and pname:dstImageLayout must: be
+    ename:VK_IMAGE_LAYOUT_GENERAL
+ifdef::VK_KHR_shared_presentable_image[]
+    or ename:VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR
 endif::VK_KHR_shared_presentable_image[]
   * [[VUID-{refpage}-dstImage-02000]]
     The <<resources-image-format-features,format features>> of

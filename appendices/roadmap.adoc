@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -14,3 +14,5 @@ and formats across these devices, and should be supported by all such new
 hardware shipping by the end of the target year or shortly thereafter.
 
 include::{appendices}/roadmap/Roadmap-2022.adoc[]
+
+include::{appendices}/roadmap/Roadmap-2024.adoc[]

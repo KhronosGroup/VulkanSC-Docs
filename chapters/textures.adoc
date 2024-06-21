@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -612,6 +612,36 @@ sampler or image view that enables <<samplers-YCbCr-conversion,sampler
 {YCbCr} conversion>>.
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
+If the underlying sname:VkImage format has an X component in its format
+description, undefined: values are read from those bits.
+
+[NOTE]
+.Note
+====
+If the sname:VkImage format and sname:VkImageView format are the same, these
+bits will be unused by format conversion and this will have no effect.
+However, if the sname:VkImageView format is different, then some bits of the
+result may be undefined:.
+For example, when a ename:VK_FORMAT_R10X6_UNORM_PACK16 sname:VkImage is
+sampled via a ename:VK_FORMAT_R16_UNORM sname:VkImageView, the low 6 bits of
+the value before format conversion are undefined: and format conversion may
+return a range of different values.
+====
+
+[NOTE]
+.Note
+====
+Some implementations will return undefined: values in the case where a
+sampler uses a elink:VkSamplerAddressMode of
+ename:VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT, the sampler is used with
+operands code:Offset, code:ConstOffset, or code:ConstOffsets, and the value
+of the offset is larger than or equal to the corresponding width, height, or
+depth of any accessed image level.
+
+This behavior was not tested prior to Vulkan conformance test suite version
+1.3.8.0.
+Affected implementations will have a conformance test waiver for this issue.
+====
 
 [[textures-integer-coordinate-validation]]
 ==== Integer Texel Coordinate Validation
@@ -1613,6 +1643,13 @@ Integer outputs are converted such that their value is preserved.
 The converted value of any integer that cannot be represented in the target
 format is undefined:.
 
+If the sname:VkImageView format has an X component in its format
+description, undefined: values are written to those bits.
+
+If the underlying sname:VkImage format has an X component in its format
+description, undefined: values are also written to those bits, even if
+result format conversion produces a valid value for those bits because the
+sname:VkImageView format is different.
 
 [[textures-normalized-operations]]
 == Normalized Texel Coordinate Operations
@@ -3594,9 +3631,9 @@ The target view and reference view can be the same view, allowing block
 matching of two blocks within a single image.
 
 Similar to an equivalent code:OpImageFetch instruction,
-code:opImageBlockMatchSAD and code:opImageBlockMatchSAD specify a code:image
-and an integer texel code:coordinate which which describes the bottom-left
-texel of the target block.
+code:opImageBlockMatchSAD and code:opImageBlockMatchSAD specify an
+code:image and an integer texel code:coordinate which describes the
+bottom-left texel of the target block.
 There are three additional inputs.
 The code:reference and code:refCoodinate specifies bottom-left texel of the
 reference block.
@@ -3768,10 +3805,9 @@ The target coordinates are combinations of coordinates from
 latexmath:[(u,v)] to latexmath:[(u + windowWidth - 1, v + windowHeight - 1)]
 where latexmath:[windowHeight] and latexmath:[windowWidth] are specified by
 slink:VkSamplerBlockMatchWindowCreateInfoQCOM::pname:windowExtent.
-At each each target coordinate, a
-<<textures-blockmatch-filteroperation,block matching operation>> is
-performed, resulting in a difference metric.
-The the reference coordinate latexmath:[(s,t)] is fixed.
+At each target coordinate, a <<textures-blockmatch-filteroperation,block
+matching operation>> is performed, resulting in a difference metric.
+The reference coordinate latexmath:[(s,t)] is fixed.
 The block matching operation is repeated latexmath:[windowWidth \times
 windowHeight] times.
 
@@ -3783,7 +3819,7 @@ The A component is 0.
 The minimum or maximum behavior is selected by
 slink:VkSamplerBlockMatchWindowCreateInfoQCOM::pname:windowCompareMode.
 
-The following psuedocode describes the operation
+The following pseudocode describes the operation
 code:opImageBlockMatchWindowSAD.
 The pseudocode for code:opImageBlockMatchWindowSSD follows an identical
 pattern.
@@ -3849,7 +3885,7 @@ For each block match operation, the reference coordinate is
 latexmath:[(s,t)].
 For each block match operation, only the R component of the target and
 reference images are compared.
-The following psuedocode describes the operation opImageBlockMatchGatherSAD.
+The following pseudocode describes the operation opImageBlockMatchGatherSAD.
 The pseudocode for opImageBlockMatchGatherSSD follows an identical pattern.
 
 [source,c]
@@ -3903,7 +3939,7 @@ sample from a [eq]#8 {times} 4# texel two-dimensional image, with
 unnormalized texture coordinates [eq]#(4.125, 2.625)# and code:boxSize of
 [eq]#(2.75, 2.25)#.
 The filter will read 12 texel values and compute a weights based portion of
-of each texel covered by the box.
+each texel covered by the box.
 
 [[textures-box-filter-diagrams]]
 image::{images}/vulkantexture_boxFilter.svg[align="center",title="Box Filter Sampling Example",opts="{imageopts}"]

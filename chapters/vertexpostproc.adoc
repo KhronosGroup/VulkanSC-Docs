@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -345,6 +345,10 @@ feedback buffer will not be captured.
     dlink:VK_NULL_HANDLE it must: have been created with a pname:usage value
     containing
     ename:VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT
+  * [[VUID-vkCmdBeginTransformFeedbackEXT-firstCounterBuffer-09630]]
+    The sum of pname:firstCounterBuffer and pname:counterBufferCount must:
+    be less than or equal to the number of transform feedback buffers
+    currently bound by flink:vkCmdBindTransformFeedbackBuffersEXT
   * [[VUID-vkCmdBeginTransformFeedbackEXT-None-06233]]
 ifdef::VK_EXT_shader_object[]
     If the <<features-shaderObject, pname:shaderObject>> feature is not
@@ -1299,11 +1303,11 @@ structure used in pipeline creation.
 [eq]#x~f~# and [eq]#y~f~# have limited precision, where the number of
 fractional bits retained is specified by
 sname:VkPhysicalDeviceLimits::pname:subPixelPrecisionBits.
-ifdef::VK_EXT_line_rasterization[]
+ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 When rasterizing <<primsrast-lines,line segments>>, the number of fractional
 bits is specified by
-sname:VkPhysicalDeviceLineRasterizationPropertiesEXT::pname:lineSubPixelPrecisionBits.
-endif::VK_EXT_line_rasterization[]
+sname:VkPhysicalDeviceLineRasterizationPropertiesKHR::pname:lineSubPixelPrecisionBits.
+endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 
 [open,refpage='VkPipelineViewportStateCreateInfo',desc='Structure specifying parameters of a newly created pipeline viewport state',type='structs']
 --

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright 2013-2023 The Khronos Group Inc.
+# Copyright 2013-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -16,28 +16,8 @@ import xml.etree.ElementTree as etree
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from cgenerator import CGeneratorOptions, COutputGenerator
-# Vulkan SC modules
-from json_parser import JSONParserGenerator, JSONParserOptions
-from schema_generator import SchemaGeneratorOptions, SchemaOutputGenerator
-from json_generator import JSONGeneratorOptions, JSONOutputGenerator
-from json_h_generator import JSONHeaderOutputGenerator, JSONHeaderGeneratorOptions
-from json_c_generator import JSONCOutputGenerator, JSONCGeneratorOptions
-
-from docgenerator import DocGeneratorOptions, DocOutputGenerator
-from extensionmetadocgenerator import (ExtensionMetaDocGeneratorOptions,
-                                       ExtensionMetaDocOutputGenerator)
-from interfacedocgenerator import InterfaceDocGenerator
-from generator import write
-from spirvcapgenerator import SpirvCapabilityOutputGenerator
-from hostsyncgenerator import HostSynchronizationOutputGenerator
-from formatsgenerator import FormatsOutputGenerator
-from syncgenerator import SyncOutputGenerator
-from jsgenerator import JSOutputGenerator
-from pygenerator import PyOutputGenerator
-from rubygenerator import RubyOutputGenerator
 from reflib import logDiag, logWarn, logErr, setLogFile
 from reg import Registry
-from validitygenerator import ValidityOutputGenerator
 from apiconventions import APIConventions
 
 # Simple timer functions
@@ -72,7 +52,7 @@ def makeGenOpts(args):
     by specified short names. The generator options incorporate the following
     parameters:
 
-    args is an parsed argument object; see below for the fields that are used."""
+    args is a parsed argument object; see below for the fields that are used."""
     global genOpts
     genOpts = {}
 
@@ -107,10 +87,10 @@ def makeGenOpts(args):
     genpath = args.genpath
 
     # Generate MISRA C-friendly headers
-    misracstyle = args.misracstyle;
+    misracstyle = args.misracstyle
 
     # Generate MISRA C++-friendly headers
-    misracppstyle = args.misracppstyle;
+    misracppstyle = args.misracppstyle
 
     # Descriptive names for various regexp patterns used to select
     # versions and extensions
@@ -128,7 +108,7 @@ def makeGenOpts(args):
     # The SPDX formatting below works around constraints of the 'reuse' tool
     prefixStrings = [
         '/*',
-        '** Copyright 2015-2023 The Khronos Group Inc.',
+        '** Copyright 2015-2024 The Khronos Group Inc.',
         '**',
         '** SPDX-License-Identifier' + ': Apache-2.0',
         '*/',
@@ -162,234 +142,252 @@ def makeGenOpts(args):
 
     isCTS = args.isCTS
 
-    # API include files for spec and ref pages
-    # Overwrites include subdirectories in spec source tree
-    # The generated include files do not include the calling convention
-    # macros (apientry etc.), unlike the header files.
-    # Because the 1.0 core branch includes ref pages for extensions,
-    # all the extension interfaces need to be generated, even though
-    # none are used by the core spec itself.
-    genOpts['apiinc'] = [
-          DocOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = genpath,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            apicall           = '',
-            apientry          = '',
-            apientryp         = '*',
-            alignFuncParam    = 48,
-            expandEnumerants  = False)
-        ]
+    # Try to set up specification generators if the needed modules are available
+    try:
+        from docgenerator import DocGeneratorOptions, DocOutputGenerator
+        from jsgenerator import JSOutputGenerator
+        from pygenerator import PyOutputGenerator
+        from rubygenerator import RubyOutputGenerator
+        from validitygenerator import ValidityOutputGenerator
+        from hostsyncgenerator import HostSynchronizationOutputGenerator
+        from extensionmetadocgenerator import (ExtensionMetaDocGeneratorOptions,
+                                            ExtensionMetaDocOutputGenerator)
+        from interfacedocgenerator import InterfaceDocGenerator
+        from spirvcapgenerator import SpirvCapabilityOutputGenerator
+        from formatsgenerator import FormatsOutputGenerator
+        from syncgenerator import SyncOutputGenerator
 
-    # JavaScript, Python, and Ruby representations of API information, used
-    # by scripts that do not need to load the full XML.
-    genOpts['apimap.cjs'] = [
-          JSOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'apimap.cjs',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        # API include files for spec and ref pages
+        # Overwrites include subdirectories in spec source tree
+        # The generated include files do not include the calling convention
+        # macros (apientry etc.), unlike the header files.
+        # Because the 1.0 core branch includes ref pages for extensions,
+        # all the extension interfaces need to be generated, even though
+        # none are used by the core spec itself.
+        genOpts['apiinc'] = [
+            DocOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = genpath,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                prefixText        = prefixStrings + vkPrefixStrings,
+                apicall           = '',
+                apientry          = '',
+                apientryp         = '*',
+                alignFuncParam    = 48,
+                expandEnumerants  = False)
+            ]
 
-    genOpts['apimap.py'] = [
-          PyOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'apimap.py',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        # JavaScript, Python, and Ruby representations of API information, used
+        # by scripts that do not need to load the full XML.
+        genOpts['apimap.cjs'] = [
+            JSOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'apimap.cjs',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
 
-    genOpts['apimap.rb'] = [
-          RubyOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'apimap.rb',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        genOpts['apimap.py'] = [
+            PyOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'apimap.py',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
 
+        genOpts['apimap.rb'] = [
+            RubyOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'apimap.rb',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
 
-    # API validity files for spec
-    #
-    # requireCommandAliases is set to True because we need validity files
-    # for the command something is promoted to even when the promoted-to
-    # feature is not included. This avoids wordy includes of validity files.
-    genOpts['validinc'] = [
-          ValidityOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            requireCommandAliases = True,
-            )
-        ]
+        # API validity files for spec
+        #
+        # requireCommandAliases is set to True because we need validity files
+        # for the command something is promoted to even when the promoted-to
+        # feature is not included. This avoids wordy includes of validity files.
+        genOpts['validinc'] = [
+            ValidityOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                requireCommandAliases = True,
+                )
+            ]
 
-    # API host sync table files for spec
-    genOpts['hostsyncinc'] = [
-          HostSynchronizationOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        # API host sync table files for spec
+        genOpts['hostsyncinc'] = [
+            HostSynchronizationOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
 
-    # Extension metainformation for spec extension appendices
-    # Includes all extensions by default, but only so that the generated
-    # 'promoted_extensions_*' files refer to all extensions that were
-    # promoted to a core version.
-    genOpts['extinc'] = [
-          ExtensionMetaDocOutputGenerator,
-          ExtensionMetaDocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = None,
-            defaultExtensions = defaultExtensions,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = None,
-            emitExtensions    = emitExtensionsPat)
-        ]
+        # Extension metainformation for spec extension appendices
+        # Includes all extensions by default, but only so that the generated
+        # 'promoted_extensions_*' files refer to all extensions that were
+        # promoted to a core version.
+        genOpts['extinc'] = [
+            ExtensionMetaDocOutputGenerator,
+            ExtensionMetaDocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = None,
+                defaultExtensions = defaultExtensions,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = None,
+                emitExtensions    = emitExtensionsPat)
+            ]
 
-    # Version and extension interface docs for version/extension appendices
-    # Includes all extensions by default.
-    genOpts['interfaceinc'] = [
-          InterfaceDocGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        # Version and extension interface docs for version/extension appendices
+        # Includes all extensions by default.
+        genOpts['interfaceinc'] = [
+            InterfaceDocGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
 
-    genOpts['spirvcapinc'] = [
-          SpirvCapabilityOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            emitSpirv         = emitSpirvPat,
-            reparentEnums     = False)
-        ]
+        genOpts['spirvcapinc'] = [
+            SpirvCapabilityOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                emitSpirv         = emitSpirvPat,
+                reparentEnums     = False)
+            ]
 
-    # Used to generate various format chapter tables
-    genOpts['formatsinc'] = [
-          FormatsOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            emitFormats       = emitFormatsPat,
-            reparentEnums     = False)
-        ]
+        # Used to generate various format chapter tables
+        genOpts['formatsinc'] = [
+            FormatsOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                emitFormats       = emitFormatsPat,
+                reparentEnums     = False)
+            ]
 
-    # Used to generate various synchronization chapter tables
-    genOpts['syncinc'] = [
-          SyncOutputGenerator,
-          DocGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'timeMarker',
-            directory         = directory,
-            genpath           = None,
-            apiname           = defaultAPIName,
-            profile           = None,
-            versions          = featuresPat,
-            emitversions      = featuresPat,
-            defaultExtensions = None,
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            reparentEnums     = False)
-        ]
+        # Used to generate various synchronization chapter tables
+        genOpts['syncinc'] = [
+            SyncOutputGenerator,
+            DocGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'timeMarker',
+                directory         = directory,
+                genpath           = None,
+                apiname           = defaultAPIName,
+                profile           = None,
+                versions          = featuresPat,
+                emitversions      = featuresPat,
+                defaultExtensions = None,
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                reparentEnums     = False)
+            ]
+
+    except ImportError:
+        # Module dependencies are not available for spec generation
+        pass
 
     # Platform extensions, in their own header files
     # Each element of the platforms[] array defines information for
@@ -413,15 +411,11 @@ def makeGenOpts(args):
     # the extension blocks.
     betaRequireExtensions = [
         'VK_KHR_portability_subset',
-        'VK_KHR_video_encode_queue',
-        'VK_EXT_video_encode_h264',
-        'VK_EXT_video_encode_h265',
         'VK_NV_displacement_micromap',
         'VK_AMDX_shader_enqueue',
     ]
 
     betaSuppressExtensions = [
-        'VK_KHR_video_queue',
         'VK_EXT_opacity_micromap',
         'VK_KHR_pipeline_library',
     ]
@@ -605,48 +599,28 @@ def makeGenOpts(args):
             misracppstyle     = misracppstyle)
         ]
 
-    genOpts['vk.json'] = [
-          SchemaOutputGenerator,
-          SchemaGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'vk.json',
-            directory         = directory,
-            apiname           = 'vulkansc',
-            profile           = None,
-            versions          = scVersions,
-            emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            genFuncPointers   = True,
-            protectFile       = protectFile,
-            protectFeature    = False,
-            protectProto      = '#ifndef',
-            protectProtoStr   = 'VK_NO_PROTOTYPES',
-            apicall           = 'VKAPI_ATTR ',
-            apientry          = 'VKAPI_CALL ',
-            apientryp         = 'VKAPI_PTR *',
-            alignFuncParam    = 48)
-        ]
+    # Try to set up Vulkan SC JSON generators if the needed modules are available
+    try:
+        from json_parser import JSONParserGenerator, JSONParserOptions
+        from schema_generator import SchemaGeneratorOptions, SchemaOutputGenerator
+        from json_generator import JSONGeneratorOptions, JSONOutputGenerator
+        from json_h_generator import JSONHeaderOutputGenerator, JSONHeaderGeneratorOptions
+        from json_c_generator import JSONCOutputGenerator, JSONCGeneratorOptions
 
-    if vulkanLayer:
-        genOpts['vulkan_json_data.hpp'] = [
-            JSONOutputGenerator,
-            JSONGeneratorOptions(
+        genOpts['vk.json'] = [
+            SchemaOutputGenerator,
+            SchemaGeneratorOptions(
                 conventions       = conventions,
-                filename          = 'vulkan_json_data.hpp',
+                filename          = 'vk.json',
                 directory         = directory,
-                apiname           = 'vulkan',
+                apiname           = 'vulkansc',
                 profile           = None,
-                versions          = featuresPat,
-                emitversions      = featuresPat,
-                defaultExtensions = None,
+                versions          = scVersions,
+                emitversions      = scVersions,
+                defaultExtensions = 'vulkansc',
                 addExtensions     = addExtensionsPat,
-                removeExtensions  = None,
-                emitExtensions    = None,
-                vulkanLayer       = vulkanLayer,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
                 prefixText        = prefixStrings + vkPrefixStrings,
                 genFuncPointers   = True,
                 protectFile       = protectFile,
@@ -658,120 +632,151 @@ def makeGenOpts(args):
                 apientryp         = 'VKAPI_PTR *',
                 alignFuncParam    = 48)
             ]
-    else:
-        genOpts['vulkan_json_data.hpp'] = [
-        JSONOutputGenerator,
-        JSONGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'vulkan_json_data.hpp',
-            directory         = directory,
-            apiname           = 'vulkansc',
-            profile           = None,
-            versions          = scVersions,
-            emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = removeExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            vulkanLayer       = vulkanLayer,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            genFuncPointers   = True,
-            protectFile       = protectFile,
-            protectFeature    = False,
-            protectProto      = '#ifndef',
-            protectProtoStr   = 'VK_NO_PROTOTYPES',
-            apicall           = 'VKAPI_ATTR ',
-            apientry          = 'VKAPI_CALL ',
-            apientryp         = 'VKAPI_PTR *',
-            isCTS             = isCTS,
-            alignFuncParam    = 48)
-        ]
 
-    # keep any relevant platform extensions for the following generators
-    # (needed for e.g. the vulkan_sci extensions)
-    explicitRemoveExtensionsPat = makeREstring(
-        removeExtensions, None, strings_are_regex=True)
+        if vulkanLayer:
+            genOpts['vulkan_json_data.hpp'] = [
+                JSONOutputGenerator,
+                JSONGeneratorOptions(
+                    conventions       = conventions,
+                    filename          = 'vulkan_json_data.hpp',
+                    directory         = directory,
+                    apiname           = 'vulkan',
+                    profile           = None,
+                    versions          = featuresPat,
+                    emitversions      = featuresPat,
+                    defaultExtensions = None,
+                    addExtensions     = addExtensionsPat,
+                    removeExtensions  = None,
+                    emitExtensions    = None,
+                    vulkanLayer       = vulkanLayer,
+                    prefixText        = prefixStrings + vkPrefixStrings,
+                    genFuncPointers   = True,
+                    protectFile       = protectFile,
+                    protectFeature    = False,
+                    protectProto      = '#ifndef',
+                    protectProtoStr   = 'VK_NO_PROTOTYPES',
+                    apicall           = 'VKAPI_ATTR ',
+                    apientry          = 'VKAPI_CALL ',
+                    apientryp         = 'VKAPI_PTR *',
+                    alignFuncParam    = 48)
+                ]
+        else:
+            genOpts['vulkan_json_data.hpp'] = [
+            JSONOutputGenerator,
+            JSONGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'vulkan_json_data.hpp',
+                directory         = directory,
+                apiname           = 'vulkansc',
+                profile           = None,
+                versions          = scVersions,
+                emitversions      = scVersions,
+                defaultExtensions = 'vulkansc',
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = removeExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                vulkanLayer       = vulkanLayer,
+                prefixText        = prefixStrings + vkPrefixStrings,
+                genFuncPointers   = True,
+                protectFile       = protectFile,
+                protectFeature    = False,
+                protectProto      = '#ifndef',
+                protectProtoStr   = 'VK_NO_PROTOTYPES',
+                apicall           = 'VKAPI_ATTR ',
+                apientry          = 'VKAPI_CALL ',
+                apientryp         = 'VKAPI_PTR *',
+                isCTS             = isCTS,
+                alignFuncParam    = 48)
+            ]
 
-    # Raw C header file generator.
-    genOpts['vulkan_json_gen.h'] = [
-          JSONHeaderOutputGenerator,
-          JSONHeaderGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'vulkan_json_gen.h',
-            directory         = directory,
-            apiname           = 'vulkansc',
-            profile           = None,
-            versions          = scVersions,
-            emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = explicitRemoveExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            genFuncPointers   = True,
-            protectFile       = protectFile,
-            protectFeature    = False,
-            protectProto      = '#ifndef',
-            protectProtoStr   = 'VK_NO_PROTOTYPES',
-            apicall           = 'VKAPI_ATTR ',
-            apientry          = 'VKAPI_CALL ',
-            apientryp         = 'VKAPI_PTR *',
-            alignFuncParam    = 48)
-        ]
+        # keep any relevant platform extensions for the following generators
+        # (needed for e.g. the vulkan_sci extensions)
+        explicitRemoveExtensionsPat = makeREstring(
+            removeExtensions, None, strings_are_regex=True)
 
-    # Raw C source file generator.
-    genOpts['vulkan_json_gen.c'] = [
-          JSONCOutputGenerator,
-          JSONCGeneratorOptions(
-            conventions       = conventions,
-            filename          = 'vulkan_json_gen.c',
-            directory         = directory,
-            apiname           = 'vulkansc',
-            profile           = None,
-            versions          = scVersions,
-            emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = explicitRemoveExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            genFuncPointers   = True,
-            protectFile       = protectFile,
-            protectFeature    = False,
-            protectProto      = '#ifndef',
-            protectProtoStr   = 'VK_NO_PROTOTYPES',
-            apicall           = 'VKAPI_ATTR ',
-            apientry          = 'VKAPI_CALL ',
-            apientryp         = 'VKAPI_PTR *',
-            alignFuncParam    = 48)
-        ]
+        # Raw C header file generator.
+        genOpts['vulkan_json_gen.h'] = [
+            JSONHeaderOutputGenerator,
+            JSONHeaderGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'vulkan_json_gen.h',
+                directory         = directory,
+                apiname           = 'vulkansc',
+                profile           = None,
+                versions          = scVersions,
+                emitversions      = scVersions,
+                defaultExtensions = 'vulkansc',
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = explicitRemoveExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                prefixText        = prefixStrings + vkPrefixStrings,
+                genFuncPointers   = True,
+                protectFile       = protectFile,
+                protectFeature    = False,
+                protectProto      = '#ifndef',
+                protectProtoStr   = 'VK_NO_PROTOTYPES',
+                apicall           = 'VKAPI_ATTR ',
+                apientry          = 'VKAPI_CALL ',
+                apientryp         = 'VKAPI_PTR *',
+                alignFuncParam    = 48)
+            ]
 
-    genOpts['vulkan_json_parser.hpp'] = [
-          JSONParserGenerator,
-          JSONParserOptions(
-            conventions       = conventions,
-            filename          = 'vulkan_json_parser.hpp',
-            directory         = directory,
-            apiname           = 'vulkansc',
-            profile           = None,
-            versions          = scVersions,
-            emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
-            addExtensions     = addExtensionsPat,
-            removeExtensions  = explicitRemoveExtensionsPat,
-            emitExtensions    = emitExtensionsPat,
-            prefixText        = prefixStrings + vkPrefixStrings,
-            genFuncPointers   = True,
-            protectFile       = protectFile,
-            protectFeature    = False,
-            protectProto      = '#ifndef',
-            protectProtoStr   = 'VK_NO_PROTOTYPES',
-            apicall           = 'VKAPI_ATTR ',
-            apientry          = 'VKAPI_CALL ',
-            apientryp         = 'VKAPI_PTR *',
-            isCTS             = isCTS,
-            alignFuncParam    = 48)
-        ]
+        # Raw C source file generator.
+        genOpts['vulkan_json_gen.c'] = [
+            JSONCOutputGenerator,
+            JSONCGeneratorOptions(
+                conventions       = conventions,
+                filename          = 'vulkan_json_gen.c',
+                directory         = directory,
+                apiname           = 'vulkansc',
+                profile           = None,
+                versions          = scVersions,
+                emitversions      = scVersions,
+                defaultExtensions = 'vulkansc',
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = explicitRemoveExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                prefixText        = prefixStrings + vkPrefixStrings,
+                genFuncPointers   = True,
+                protectFile       = protectFile,
+                protectFeature    = False,
+                protectProto      = '#ifndef',
+                protectProtoStr   = 'VK_NO_PROTOTYPES',
+                apicall           = 'VKAPI_ATTR ',
+                apientry          = 'VKAPI_CALL ',
+                apientryp         = 'VKAPI_PTR *',
+                alignFuncParam    = 48)
+            ]
+
+        genOpts['vulkan_json_parser.hpp'] = [
+            JSONParserGenerator,
+            JSONParserOptions(
+                conventions       = conventions,
+                filename          = 'vulkan_json_parser.hpp',
+                directory         = directory,
+                apiname           = 'vulkansc',
+                profile           = None,
+                versions          = scVersions,
+                emitversions      = scVersions,
+                defaultExtensions = 'vulkansc',
+                addExtensions     = addExtensionsPat,
+                removeExtensions  = explicitRemoveExtensionsPat,
+                emitExtensions    = emitExtensionsPat,
+                prefixText        = prefixStrings + vkPrefixStrings,
+                genFuncPointers   = True,
+                protectFile       = protectFile,
+                protectFeature    = False,
+                protectProto      = '#ifndef',
+                protectProtoStr   = 'VK_NO_PROTOTYPES',
+                apicall           = 'VKAPI_ATTR ',
+                apientry          = 'VKAPI_CALL ',
+                apientryp         = 'VKAPI_PTR *',
+                isCTS             = isCTS,
+                alignFuncParam    = 48)
+            ]
+    except ImportError:
+        # Module dependencies are not available for Vulkan SC JSON generation
+        pass
 
     # Unused - vulkan10.h target.
     # It is possible to generate a header with just the Vulkan 1.0 +
@@ -854,6 +859,8 @@ def makeGenOpts(args):
         'vulkan_video_codec_h265std',
         'vulkan_video_codec_h265std_decode',
         'vulkan_video_codec_h265std_encode',
+        'vulkan_video_codec_av1std',
+        'vulkan_video_codec_av1std_decode',
     ]
 
     # Unused at present
@@ -955,7 +962,7 @@ def genTarget(args):
     the requested target and command line options.
 
     This is encapsulated in a function so it can be profiled and/or timed.
-    The args parameter is an parsed argument object containing the following
+    The args parameter is a parsed argument object containing the following
     fields that are used:
 
     - target - target to generate
@@ -972,6 +979,7 @@ def genTarget(args):
         options = genOpts[args.target][1]
 
         logDiag('* Building', options.filename)
+        logDiag('* options.apiname           =', options.apiname)
         logDiag('* options.versions          =', options.versions)
         logDiag('* options.emitversions      =', options.emitversions)
         logDiag('* options.defaultExtensions =', options.defaultExtensions)

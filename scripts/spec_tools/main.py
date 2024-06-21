@@ -1,10 +1,10 @@
-"""Provides a re-usable command-line interface to a MacroChecker."""
+"""Provides a reusable command-line interface to a MacroChecker."""
 
 # Copyright (c) 2018-2019 Collabora, Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Author(s):    Ryan Pavlik <ryan.pavlik@collabora.com>
+# Author(s):    Rylie Pavlik <rylie.pavlik@collabora.com>
 
 
 import argparse

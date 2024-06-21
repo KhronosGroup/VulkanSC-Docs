@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -39,9 +39,9 @@ synchronization mechanisms are exposed by Vulkan:
     Pipeline barriers can: be used to control resource access within a
     single queue.
 
-<<renderpass,Render Passes>>::
-    Render passes provide a useful synchronization framework for most
-    rendering tasks, built upon the concepts in this chapter.
+<<renderpass-objects,Render Pass Objects>>::
+    Render pass objects provide a synchronization framework for rendering
+    tasks, built upon the concepts in this chapter.
     Many cases that would otherwise need an application to use other
     synchronization primitives can: be expressed more efficiently as part of
     a render pass.
@@ -1816,17 +1816,22 @@ ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
     or slink:VkSubmitInfo2
 endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
     from lowest index to highest.
-  . The order in which commands were recorded to a command buffer on the
-    host, from first to last:
-  ** For commands recorded outside a render pass, this includes all other
-     commands recorded outside a render pass, including
-     flink:vkCmdBeginRenderPass and flink:vkCmdEndRenderPass commands; it
-     does not directly include commands inside a render pass.
-  ** For commands recorded inside a render pass, this includes all other
-     commands recorded inside the same subpass, including the
-     flink:vkCmdBeginRenderPass and flink:vkCmdEndRenderPass commands that
-     delimit the same render pass instance; it does not include commands
-     recorded to other subpasses.
+  . The order in which commands outside of a render pass were recorded to a
+    command buffer on the host, from first to last.
+  . The order in which commands inside a single subpass were recorded to a
+    command buffer on the host, from first to last.
+
+[NOTE]
+.Note
+====
+When using a <<renderpass-objects,render pass object>> with multiple
+subpasses, commands in different subpasses have no defined submission order
+relative to each other, regardless of the order in which the subpasses were
+recorded.
+Commands within a subpass are still ordered relative to other commands in
+the same subpass, and those outside of the render pass.
+====
+
 <<fundamentals-queueoperation-command-types, State commands>> do not execute
 any operations on the device, instead they set the state of the command
 buffer when they execute on the host, in the order that they are recorded.
@@ -1961,6 +1966,7 @@ include::{generated}/api/handles/VkFence.adoc[]
 :refpage: vkCreateFence
 :objectnameplural: fences
 :objectnamecamelcase: fence
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a fence, call:
@@ -2408,7 +2414,7 @@ include::{generated}/api/enums/VkSciSyncClientTypeNV.adoc[]
   * ename:VK_SCI_SYNC_CLIENT_TYPE_WAITER_NV specifies the permission of the
     client as waiter.
     It indicates that the client can only wait on the imported fence or
-    semaphore and disallows signalling it.
+    semaphore and disallows signaling it.
     This type of permission is only used when the client imports NvSciSync
     handles, and export is not allowed.
   * ename:VK_SCI_SYNC_CLIENT_TYPE_SIGNALER_WAITER_NV specifies the
@@ -3311,6 +3317,7 @@ include::{generated}/api/handles/VkSemaphore.adoc[]
 :refpage: vkCreateSemaphore
 :objectnameplural: semaphores
 :objectnamecamelcase: semaphore
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create a semaphore, call:
@@ -4086,6 +4093,10 @@ slink:VkSemaphoreCreateInfo.
 [open,refpage='vkCreateSemaphoreSciSyncPoolNV',desc='Create a slink:VkSemaphoreSciSyncPoolNV object',type='protos']
 --
 :refpage: vkCreateSemaphoreSciSyncPoolNV
+:objectnameplural: semaphore pools
+:objectnamecamelcase: semaphoreSciSyncPool
+:objectnamestruct: VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV
+:objectcount: 1
 
 To create a sname:VkSemaphoreSciSyncPoolNV, call:
 
@@ -4104,18 +4115,11 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
-ifdef::VKSC_VERSION_1_0[]
-  * [[VUID-vkCreateSemaphoreSciSyncPoolNV-device-05150]]
-    The number of semaphore pools currently allocated from pname:device plus
-    1 must: be less than or equal to the total number of semaphore pools
-    requested via
-    slink:VkDeviceSemaphoreSciSyncPoolReservationCreateInfoNV::pname:semaphoreSciSyncPoolRequestCount
-    specified when pname:device was created
-endif::VKSC_VERSION_1_0[]
   * [[VUID-vkCreateSemaphoreSciSyncPoolNV-sciSyncSemaphore2-05151]]
     The <<features-sciSyncSemaphore2,
     slink:VkPhysicalDeviceExternalSciSync2FeaturesNV::pname:sciSyncSemaphore2>>
     feature must: be enabled
+include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
 ****
 
 include::{generated}/validity/protos/vkCreateSemaphoreSciSyncPoolNV.adoc[]
@@ -5310,6 +5314,7 @@ include::{generated}/api/handles/VkEvent.adoc[]
 :refpage: vkCreateEvent
 :objectnameplural: events
 :objectnamecamelcase: event
+:objectnamestruct: VkDeviceObjectReservationCreateInfo
 :objectcount: 1
 
 To create an event, call:
@@ -5330,6 +5335,15 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 .Valid Usage
 ****
+  * [[VUID-vkCreateEvent-device-09672]]
+    pname:device must: support at least one queue family with one of the
+ifdef::VK_KHR_video_encode_queue[]
+    ename:VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
+endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_VIDEO_DECODE_BIT_KHR,
+endif::VK_KHR_video_decode_queue[]
+    ename:VK_QUEUE_COMPUTE_BIT, or ename:VK_QUEUE_GRAPHICS_BIT capabilities
 ifdef::VK_KHR_portability_subset[]
   * [[VUID-vkCreateEvent-events-04468]]
     If the `apiext:VK_KHR_portability_subset` extension is enabled, and
@@ -5508,6 +5522,9 @@ ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
   * [[VUID-vkSetEvent-event-03941]]
     pname:event must: not have been created with
     ename:VK_EVENT_CREATE_DEVICE_ONLY_BIT
+  * [[VUID-vkSetEvent-event-09543]]
+    pname:event must: not be waited on by a command buffer in the
+    <<commandbuffers-lifecycle, pending state>>
 ****
 endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
 
@@ -5698,8 +5715,8 @@ endif::VK_KHR_synchronization2[]
 
 This structure defines a set of <<synchronization-dependencies-memory,
 memory dependencies>>, as well as <<synchronization-queue-transfers, queue
-family transfer operations>> and <<synchronization-image-layout-transitions,
-image layout transitions>>.
+family ownership transfer operations>> and
+<<synchronization-image-layout-transitions, image layout transitions>>.
 
 Each member of pname:pMemoryBarriers, pname:pBufferMemoryBarriers, and
 pname:pImageMemoryBarriers defines a separate
@@ -6278,14 +6295,8 @@ that occurred later in <<synchronization-submission-order,submission
 order>>.
 
 If fname:vkCmdPipelineBarrier2 is recorded within a render pass instance,
-the synchronization scopes are limited to operations within the same subpass
-ifdef::VK_EXT_shader_tile_image[]
-, or must: follow the restrictions for
-<<synchronization-pipeline-barriers-explicit-renderpass-tileimage, Tile
-Image Access Synchronization>> if the render pass instance was started with
-flink:vkCmdBeginRendering
-endif::VK_EXT_shader_tile_image[]
-.
+the synchronization scopes are limited to a subset of operations within the
+same subpass or render pass instance.
 
 .Valid Usage
 ****
@@ -6293,18 +6304,32 @@ include::{chapters}/commonvalidity/pipeline_barrier_common.adoc[]
   * [[VUID-vkCmdPipelineBarrier2-synchronization2-03848]]
     The <<features-synchronization2, pname:synchronization2>> feature must:
     be enabled
-  * [[VUID-vkCmdPipelineBarrier2-srcStageMask-03849]]
+  * [[VUID-vkCmdPipelineBarrier2-srcStageMask-09673]]
     The pname:srcStageMask member of any element of the
-    pname:pMemoryBarriers, pname:pBufferMemoryBarriers, or
-    pname:pImageMemoryBarriers members of pname:pDependencyInfo must: only
-    include pipeline stages valid for the queue family that was used to
-    create the command pool that pname:commandBuffer was allocated from
-  * [[VUID-vkCmdPipelineBarrier2-dstStageMask-03850]]
+    pname:pMemoryBarriers member of pname:pDependencyInfo must: only include
+    pipeline stages valid for the queue family that was used to create the
+    command pool that pname:commandBuffer was allocated from
+  * [[VUID-vkCmdPipelineBarrier2-dstStageMask-09674]]
     The pname:dstStageMask member of any element of the
-    pname:pMemoryBarriers, pname:pBufferMemoryBarriers, or
-    pname:pImageMemoryBarriers members of pname:pDependencyInfo must: only
-    include pipeline stages valid for the queue family that was used to
-    create the command pool that pname:commandBuffer was allocated from
+    pname:pMemoryBarriers member of pname:pDependencyInfo must: only include
+    pipeline stages valid for the queue family that was used to create the
+    command pool that pname:commandBuffer was allocated from
+  * [[VUID-vkCmdPipelineBarrier2-srcStageMask-09675]]
+    If a buffer or image memory barrier does not specify an
+    <<synchronization-queue-transfers-acquire,acquire operation>>, the
+    respective pname:srcStageMask member of the element of the
+    pname:pBufferMemoryBarriers or pname:pImageMemoryBarriers members of
+    pname:pDependencyInfo must: only include pipeline stages valid for the
+    queue family that was used to create the command pool that
+    pname:commandBuffer was allocated from
+  * [[VUID-vkCmdPipelineBarrier2-dstStageMask-09676]]
+    If a buffer or image memory barrier does not specify an
+    <<synchronization-queue-transfers-release,release operation>>, the
+    respective pname:dstStageMask member of the element of the
+    pname:pBufferMemoryBarriers or pname:pImageMemoryBarriers members of
+    pname:pDependencyInfo must: only include pipeline stages valid for the
+    queue family that was used to create the command pool that
+    pname:commandBuffer was allocated from
 ****
 
 include::{generated}/validity/protos/vkCmdPipelineBarrier2.adoc[]
@@ -6344,7 +6369,7 @@ include::{generated}/api/protos/vkCmdPipelineBarrier.adoc[]
 ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
 fname:vkCmdPipelineBarrier operates almost identically to
 flink:vkCmdPipelineBarrier2, except that the scopes and barriers are defined
-as direct parameters rather than being defined by an slink:VkDependencyInfo.
+as direct parameters rather than being defined by a slink:VkDependencyInfo.
 endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
 
 When flink:vkCmdPipelineBarrier is submitted to a queue, it defines a memory
@@ -6434,6 +6459,16 @@ include::{chapters}/commonvalidity/pipeline_barrier_common.adoc[]
     pname:commandBuffer was allocated from, as specified in the
     <<synchronization-pipeline-stages-supported, table of supported pipeline
     stages>>
+  * [[VUID-vkCmdPipelineBarrier-srcStageMask-09633]]
+    If either pname:srcStageMask or pname:dstStageMask includes
+    ename:VK_PIPELINE_STAGE_HOST_BIT, for any element of
+    pname:pImageMemoryBarriers, pname:srcQueueFamilyIndex and
+    pname:dstQueueFamilyIndex must: be equal
+  * [[VUID-vkCmdPipelineBarrier-srcStageMask-09634]]
+    If either pname:srcStageMask or pname:dstStageMask includes
+    ename:VK_PIPELINE_STAGE_HOST_BIT, for any element of
+    pname:pBufferMemoryBarriers, pname:srcQueueFamilyIndex and
+    pname:dstQueueFamilyIndex must: be equal
 ****
 
 include::{generated}/validity/protos/vkCmdPipelineBarrier.adoc[]
@@ -6470,49 +6505,6 @@ include::{generated}/api/flags/VkDependencyFlags.adoc[]
 tname:VkDependencyFlags is a bitmask type for setting a mask of zero or more
 elink:VkDependencyFlagBits.
 --
-
-
-ifdef::VK_EXT_shader_tile_image[]
-[[synchronization-pipeline-barriers-explicit-renderpass-tileimage]]
-=== Explicit Render Pass Tile Image Access Synchronization
-
-A fragment shader can: declare code:NonCoherentColorAttachmentReadEXT,
-code:NonCoherentDepthAttachmentReadEXT, or
-code:NonCoherentStencilAttachmentReadEXT execution modes to enable
-non-coherent tile image reads for color, depth, or stencil, respectively.
-When non-coherent tile image reads are enabled, writes via color, depth and
-stencil attachments are not automatically made visible to the corresponding
-attachment reads via tile images.
-For the writes to be made visible, an explicit memory dependency must: be
-inserted between when the attachment is written to and when it is read from
-by later fragments.
-Such memory dependencies must: be inserted every time a fragment will read
-values at a particular sample (x, y, layer, sample) coordinate, if those
-values have been written since the most recent pipeline barrier; or since
-the start of the render pass instance, if there have been no pipeline
-barriers since the start of the render pass instance.
-When such memory dependencies are used the values at all sample locations
-inside the fragment area are made visible, regardless of coverage.
-
-To insert a memory dependency for explicit render pass tile image
-synchronization, call flink:vkCmdPipelineBarrier2 inside a render pass
-instance started with flink:vkCmdBeginRendering.
-The following restrictions apply for such pipeline barriers:
-
-  * pname:dependencyFlags must: include ename:VK_DEPENDENCY_BY_REGION_BIT.
-  * The pipeline barriers can: only include memory barriers.
-    That is, buffer memory barriers and image memory barriers must: not be
-    used.
-  * The stages in slink:VkMemoryBarrier2::pname:srcStageMask and
-    slink:VkMemoryBarrier2::pname:dstStageMask are restricted to framebuffer
-    space stages.
-  * The access types in slink:VkMemoryBarrier2::pname:srcAccessMask and
-    slink:VkMemoryBarrier2::pname:dstAccessMask are restricted to the
-    following types: ename:VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT,
-    ename:VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
-    ename:VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT, and
-    ename:VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT.
-endif::VK_EXT_shader_tile_image[]
 
 [[synchronization-memory-barriers]]
 == Memory Barriers
@@ -6680,8 +6672,8 @@ endif::VK_KHR_synchronization2[]
 
 This structure defines a <<synchronization-dependencies-memory, memory
 dependency>> limited to a range of a buffer, and can: define a
-<<synchronization-queue-transfers, queue family transfer operation>> for
-that range.
+<<synchronization-queue-transfers, queue family ownership transfer
+operation>> for that range.
 
 The first <<synchronization-dependencies-scopes, synchronization scope>> and
 <<synchronization-dependencies-access-scopes, access scope>> described by
@@ -6700,23 +6692,23 @@ pname:offset and pname:size.
 If pname:buffer was created with ename:VK_SHARING_MODE_EXCLUSIVE, and
 pname:srcQueueFamilyIndex is not equal to pname:dstQueueFamilyIndex, this
 memory barrier defines a <<synchronization-queue-transfers, queue family
-transfer operation>>.
+ownership transfer operation>>.
 When executed on a queue in the family identified by
 pname:srcQueueFamilyIndex, this barrier defines a
 <<synchronization-queue-transfers-release, queue family release operation>>
-for the specified buffer range, and the second synchronization and access
-scopes do not synchronize operations on that queue.
+for the specified buffer range, and the second synchronization scope does
+not apply to this operation.
 When executed on a queue in the family identified by
 pname:dstQueueFamilyIndex, this barrier defines a
 <<synchronization-queue-transfers-acquire, queue family acquire operation>>
-for the specified buffer range, and the first synchronization and access
-scopes do not synchronize operations on that queue.
+for the specified buffer range, and the first synchronization scope does not
+apply to this operation.
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
-A <<synchronization-queue-transfers, queue family transfer operation>> is
-also defined if the values are not equal, and either is one of the special
-queue family values reserved for external memory ownership transfers, as
-described in <<synchronization-queue-transfers>>.
+A <<synchronization-queue-transfers, queue family ownership transfer
+operation>> is also defined if the values are not equal, and either is one
+of the special queue family values reserved for external memory ownership
+transfers, as described in <<synchronization-queue-transfers>>.
 A <<synchronization-queue-transfers-release, queue family release
 operation>> is defined when pname:dstQueueFamilyIndex is one of those
 values, and a <<synchronization-queue-transfers-acquire, queue family
@@ -6803,17 +6795,20 @@ host domain is automatically made visible to host domain, and any host write
 is automatically made available to host domain.
 ====
 
+[[buffer-memory-barrier-ownership-transfer]]
 If pname:srcQueueFamilyIndex is not equal to pname:dstQueueFamilyIndex, and
 pname:srcQueueFamilyIndex is equal to the current queue family, then the
 memory barrier defines a <<synchronization-queue-transfers-release, queue
 family release operation>> for the specified buffer range, and the second
-access scope includes no access, as if pname:dstAccessMask was `0`.
+synchronization scope of the calling command does not apply to this
+operation.
 
 If pname:dstQueueFamilyIndex is not equal to pname:srcQueueFamilyIndex, and
 pname:dstQueueFamilyIndex is equal to the current queue family, then the
 memory barrier defines a <<synchronization-queue-transfers-acquire, queue
 family acquire operation>> for the specified buffer range, and the first
-access scope includes no access, as if pname:srcAccessMask was `0`.
+synchronization scope of the calling command does not apply to this
+operation.
 
 .Valid Usage
 ****
@@ -6927,9 +6922,9 @@ endif::VK_KHR_synchronization2[]
 
 This structure defines a <<synchronization-dependencies-memory, memory
 dependency>> limited to an image subresource range, and can: define a
-<<synchronization-queue-transfers, queue family transfer operation>> and
-<<synchronization-image-layout-transitions, image layout transition>> for
-that subresource range.
+<<synchronization-queue-transfers, queue family ownership transfer
+operation>> and <<synchronization-image-layout-transitions, image layout
+transition>> for that subresource range.
 
 The first <<synchronization-dependencies-scopes, synchronization scope>> and
 <<synchronization-dependencies-access-scopes, access scope>> described by
@@ -6948,23 +6943,23 @@ defined by pname:subresourceRange.
 If pname:image was created with ename:VK_SHARING_MODE_EXCLUSIVE, and
 pname:srcQueueFamilyIndex is not equal to pname:dstQueueFamilyIndex, this
 memory barrier defines a <<synchronization-queue-transfers, queue family
-transfer operation>>.
+ownership transfer operation>>.
 When executed on a queue in the family identified by
 pname:srcQueueFamilyIndex, this barrier defines a
 <<synchronization-queue-transfers-release, queue family release operation>>
 for the specified image subresource range, and the second synchronization
-and access scopes do not synchronize operations on that queue.
+scope does not apply to this operation.
 When executed on a queue in the family identified by
 pname:dstQueueFamilyIndex, this barrier defines a
 <<synchronization-queue-transfers-acquire, queue family acquire operation>>
-for the specified image subresource range, and the first synchronization and
-access scopes do not synchronize operations on that queue.
+for the specified image subresource range, and the first synchronization,
+the first synchronization scope does not apply to this operation.
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
-A <<synchronization-queue-transfers, queue family transfer operation>> is
-also defined if the values are not equal, and either is one of the special
-queue family values reserved for external memory ownership transfers, as
-described in <<synchronization-queue-transfers>>.
+A <<synchronization-queue-transfers, queue family ownership transfer
+operation>> is also defined if the values are not equal, and either is one
+of the special queue family values reserved for external memory ownership
+transfers, as described in <<synchronization-queue-transfers>>.
 A <<synchronization-queue-transfers-release, queue family release
 operation>> is defined when pname:dstQueueFamilyIndex is one of those
 values, and a <<synchronization-queue-transfers-acquire, queue family
@@ -6976,8 +6971,8 @@ If pname:oldLayout is not equal to pname:newLayout, then the memory barrier
 defines an <<synchronization-image-layout-transitions, image layout
 transition>> for the specified image subresource range.
 If this memory barrier defines a <<synchronization-queue-transfers, queue
-family transfer operation>>, the layout transition is only executed once
-between the queues.
+family ownership transfer operation>>, the layout transition is only
+executed once between the queues.
 
 [NOTE]
 .Note
@@ -7073,19 +7068,20 @@ ename:VK_ACCESS_HOST_READ_BIT, available memory writes are also made visible
 to accesses of those types, as those access types are not performed through
 a resource.
 
+[[image-memory-barrier-ownership-transfer]]
 If pname:srcQueueFamilyIndex is not equal to pname:dstQueueFamilyIndex, and
 pname:srcQueueFamilyIndex is equal to the current queue family, then the
 memory barrier defines a <<synchronization-queue-transfers-release, queue
 family release operation>> for the specified image subresource range, and
-the second access scope includes no access, as if pname:dstAccessMask was
-`0`.
+the second synchronization scope of the calling command does not apply to
+this operation.
 
 If pname:dstQueueFamilyIndex is not equal to pname:srcQueueFamilyIndex, and
 pname:dstQueueFamilyIndex is equal to the current queue family, then the
 memory barrier defines a <<synchronization-queue-transfers-acquire, queue
 family acquire operation>> for the specified image subresource range, and
-the first access scope includes no access, as if pname:srcAccessMask was
-`0`.
+the first synchronization scope of the calling command does not apply to
+this operation.
 
 ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
 If the <<features-synchronization2, pname:synchronization2>> feature is not
@@ -7209,6 +7205,8 @@ transition.
 The application must: guarantee that any previously submitted command that
 reads from or writes to this subresource has completed before the host
 performs the layout transition.
+The memory of pname:image is accessed by the host as if <<memory-coherent,
+coherent>>.
 
 [NOTE]
 .Note
@@ -7216,6 +7214,22 @@ performs the layout transition.
 Image layout transitions performed on the host do not require queue family
 ownership transfers as the physical layout of the image will not vary
 between queue families for the layouts supported by this function.
+====
+
+[NOTE]
+.Note
+====
+If the device has written to the image memory, it is not automatically made
+available to the host.
+Before this command can be called, a memory barrier for this image must:
+have been issued on the device with the second
+<<synchronization-dependencies-scopes, synchronization scope>> including
+ename:VK_PIPELINE_STAGE_HOST_BIT and ename:VK_ACCESS_HOST_READ_BIT.
+
+Because queue submissions <<synchronization-submission-host-writes,
+automatically make host memory visible to the device>>, there would not be a
+need for a memory barrier before using the results of this layout transition
+on the device.
 ====
 
 .Valid Usage
@@ -7346,9 +7360,11 @@ the destination queue family index.
 pname:dstAccessMask is ignored for such a barrier, such that no visibility
 operation is executed - the value of this mask does not affect the validity
 of the barrier.
-The release operation happens-after the availability operation, and
-happens-before operations specified in the second synchronization scope of
-the calling command.
+The release operation happens-after the availability operation.
+pname:dstStageMask is also ignored for such a barrier as defined by
+<<buffer-memory-barrier-ownership-transfer,buffer memory ownership
+transfer>> and <<image-memory-barrier-ownership-transfer,image memory
+ownership transfer>>.
 
 [[synchronization-queue-transfers-acquire]] An _acquire operation_ is used
 to acquire exclusive ownership of a range of a buffer or image subresource
@@ -7366,8 +7382,15 @@ the destination queue family index.
 pname:srcAccessMask is ignored for such a barrier, such that no availability
 operation is executed - the value of this mask does not affect the validity
 of the barrier.
-The acquire operation happens-after operations in the first synchronization
-scope of the calling command, and happens-before the visibility operation.
+The acquire operation happens-before the visibility operation.
+pname:srcStageMask is also ignored for such a barrier as defined by
+<<buffer-memory-barrier-ownership-transfer,buffer memory ownership
+transfer>> and <<image-memory-barrier-ownership-transfer,image memory
+ownership transfer>>.
+As the first synchronization scope for an acquire operation is empty there
+is no happens-before dependency.
+Such a dependency can: be introduced by using
+ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT.
 
 [NOTE]
 .Note
@@ -7383,6 +7406,25 @@ use.
 In an earlier version of the specification, these were required to match on
 both sides - but this was subsequently relaxed.
 These masks should: be set to 0.
+====
+
+[NOTE]
+.Note
+====
+Since a release and acquire operation does not synchronize with second and
+first scopes respectively, the ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+stage must be used to wait for a release operation to complete.
+Typically, a release and acquire pair is performed by a slink:VkSemaphore
+signal and wait in their respective queues.
+Signaling a semaphore with flink:vkQueueSubmit waits for
+ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT.
+ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
+With flink:vkQueueSubmit2, pname:stageMask for the signal semaphore must be
+ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT.
+endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
+Similarly, for the acquire operation, waiting for a semaphore must use
+ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT to make sure the acquire operation
+is synchronized.
 ====
 
 If the transfer is via an image memory barrier, and an
@@ -7496,7 +7538,7 @@ associated with the resource.
     <<synchronization-queue-transfers>>), then each range of
     slink:VkDeviceMemory bound to the resource must: have remained
     unmodified during all time since the resource's most recent release of
-    ownership to the queue family.
+    ownership to the queue family
 ****
 
 include::{generated}/validity/structs/VkExternalMemoryAcquireUnmodifiedEXT.adoc[]
@@ -7606,13 +7648,13 @@ An event can: only be waited on by the same physical device that signaled it
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
 
 
-ifdef::VK_EXT_calibrated_timestamps[]
+ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 [[calibrated-timestamps]]
 == Calibrated Timestamps
 
-[open,refpage='vkGetCalibratedTimestampsEXT',desc='Query calibrated timestamps',type='protos']
+[open,refpage='vkGetCalibratedTimestampsKHR',desc='Query calibrated timestamps',type='protos',alias='vkGetCalibratedTimestampsEXT']
 --
-:refpage: vkGetCalibratedTimestampsEXT
+:refpage: vkGetCalibratedTimestampsKHR
 
 In order to be able to correlate the time a particular operation took place
 at on timelines of different time domains (e.g. a device operation vs. a
@@ -7621,12 +7663,20 @@ time domains.
 
 To query calibrated timestamps from a set of time domains, call:
 
+ifdef::VK_KHR_calibrated_timestamps[]
+include::{generated}/api/protos/vkGetCalibratedTimestampsKHR.adoc[]
+endif::VK_KHR_calibrated_timestamps[]
+
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or the equivalent command]
+
+ifdef::VK_EXT_calibrated_timestamps[]
 include::{generated}/api/protos/vkGetCalibratedTimestampsEXT.adoc[]
+endif::VK_EXT_calibrated_timestamps[]
 
   * pname:device is the logical device used to perform the query.
   * pname:timestampCount is the number of timestamps to query.
   * pname:pTimestampInfos is a pointer to an array of pname:timestampCount
-    slink:VkCalibratedTimestampInfoEXT structures, describing the time
+    slink:VkCalibratedTimestampInfoKHR structures, describing the time
     domains the calibrated timestamps should be captured from.
   * pname:pTimestamps is a pointer to an array of pname:timestampCount
     64-bit unsigned integer values in which the requested calibrated
@@ -7639,7 +7689,7 @@ include::{generated}/api/protos/vkGetCalibratedTimestampsEXT.adoc[]
 .Note
 ====
 The maximum deviation may: vary between calls to
-fname:vkGetCalibratedTimestampsEXT even for the same set of time domains due
+fname:vkGetCalibratedTimestampsKHR even for the same set of time domains due
 to implementation and platform specific reasons.
 It is the application's responsibility to assess whether the returned
 maximum deviation makes the timestamp values suitable for any particular
@@ -7657,43 +7707,55 @@ timestamps on a regular basis.
 .Valid Usage
 ****
   * [[VUID-vkGetCalibratedTimestampsEXT-timeDomain-09246]]
-    The pname:timeDomain value of each slink:VkCalibratedTimestampInfoEXT in
+    The pname:timeDomain value of each slink:VkCalibratedTimestampInfoKHR in
     pname:pTimestampInfos must: be unique
 ****
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
-include::{generated}/validity/protos/vkGetCalibratedTimestampsEXT.adoc[]
+include::{generated}/validity/protos/vkGetCalibratedTimestampsKHR.adoc[]
 --
 
-[open,refpage='VkCalibratedTimestampInfoEXT',desc='Structure specifying the input parameters of a calibrated timestamp query',type='structs']
+[open,refpage='VkCalibratedTimestampInfoKHR',desc='Structure specifying the input parameters of a calibrated timestamp query',type='structs',alias='VkCalibratedTimestampInfoEXT']
 --
-The sname:VkCalibratedTimestampInfoEXT structure is defined as:
+The sname:VkCalibratedTimestampInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkCalibratedTimestampInfoKHR.adoc[]
+
+ifdef::VK_EXT_calibrated_timestamps[]
+or the equivalent
 
 include::{generated}/api/structs/VkCalibratedTimestampInfoEXT.adoc[]
+endif::VK_EXT_calibrated_timestamps[]
 
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * pname:timeDomain is a elink:VkTimeDomainEXT value specifying the time
+  * pname:timeDomain is a elink:VkTimeDomainKHR value specifying the time
     domain from which the calibrated timestamp value should be returned.
 
 .Valid Usage
 ****
   * [[VUID-VkCalibratedTimestampInfoEXT-timeDomain-02354]]
-    pname:timeDomain must: be one of the elink:VkTimeDomainEXT values
-    returned by flink:vkGetPhysicalDeviceCalibrateableTimeDomainsEXT
+    pname:timeDomain must: be one of the elink:VkTimeDomainKHR values
+    returned by flink:vkGetPhysicalDeviceCalibrateableTimeDomainsKHR
 ****
-include::{generated}/validity/structs/VkCalibratedTimestampInfoEXT.adoc[]
+include::{generated}/validity/structs/VkCalibratedTimestampInfoKHR.adoc[]
 --
 
-[open,refpage='VkTimeDomainEXT',desc='Supported time domains',type='enums']
+[open,refpage='VkTimeDomainKHR',desc='Supported time domains',type='enums',alias='VkTimeDomainEXT']
 --
 The set of supported time domains consists of:
 
-include::{generated}/api/enums/VkTimeDomainEXT.adoc[]
+include::{generated}/api/enums/VkTimeDomainKHR.adoc[]
 
-  * ename:VK_TIME_DOMAIN_DEVICE_EXT specifies the device time domain.
+ifdef::VK_EXT_calibrated_timestamps[]
+or the equivalent
+
+include::{generated}/api/enums/VkTimeDomainEXT.adoc[]
+endif::VK_EXT_calibrated_timestamps[]
+
+  * ename:VK_TIME_DOMAIN_DEVICE_KHR specifies the device time domain.
     Timestamp values in this time domain use the same units and are
     comparable with device timestamp values captured using
     flink:vkCmdWriteTimestamp
@@ -7703,7 +7765,7 @@ endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
     and are defined to be incrementing according to the
     <<limits-timestampPeriod, pname:timestampPeriod>> of the device.
 
-  * ename:VK_TIME_DOMAIN_CLOCK_MONOTONIC_EXT specifies the CLOCK_MONOTONIC
+  * ename:VK_TIME_DOMAIN_CLOCK_MONOTONIC_KHR specifies the CLOCK_MONOTONIC
     time domain available on POSIX platforms.
     Timestamp values in this time domain are in units of nanoseconds and are
     comparable with platform timestamp values captured using the POSIX
@@ -7712,10 +7774,13 @@ endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
 [NOTE]
 .Note
 ====
-An implementation supporting `apiext:VK_EXT_calibrated_timestamps` will use
-the same time domain for all its slink:VkQueue so that timestamp values
-reported for ename:VK_TIME_DOMAIN_DEVICE_EXT can be matched to any timestamp
-captured through flink:vkCmdWriteTimestamp
+An implementation supporting
+ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
+ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
+ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
+will use the same time domain for all its slink:VkQueue so that timestamp
+values reported for ename:VK_TIME_DOMAIN_DEVICE_KHR can be matched to any
+timestamp captured through flink:vkCmdWriteTimestamp
 ifdef::VK_VERSION_1_3,VK_KHR_synchronization2[]
 or flink:vkCmdWriteTimestamp2
 endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
@@ -7729,7 +7794,7 @@ clock_gettime(CLOCK_MONOTONIC, &tv);
 return tv.tv_nsec + tv.tv_sec*1000000000ull;
 ----
 
-  * ename:VK_TIME_DOMAIN_CLOCK_MONOTONIC_RAW_EXT specifies the
+  * ename:VK_TIME_DOMAIN_CLOCK_MONOTONIC_RAW_KHR specifies the
     CLOCK_MONOTONIC_RAW time domain available on POSIX platforms.
     Timestamp values in this time domain are in units of nanoseconds and are
     comparable with platform timestamp values captured using the POSIX
@@ -7742,7 +7807,7 @@ clock_gettime(CLOCK_MONOTONIC_RAW, &tv);
 return tv.tv_nsec + tv.tv_sec*1000000000ull;
 ----
 
-  * ename:VK_TIME_DOMAIN_QUERY_PERFORMANCE_COUNTER_EXT specifies the
+  * ename:VK_TIME_DOMAIN_QUERY_PERFORMANCE_COUNTER_KHR specifies the
     performance counter (QPC) time domain available on Windows.
     Timestamp values in this time domain are in the same units as those
     provided by the Windows QueryPerformanceCounter API and are comparable
@@ -7756,4 +7821,4 @@ QueryPerformanceCounter(&counter);
 return counter.QuadPart;
 ----
 --
-endif::VK_EXT_calibrated_timestamps[]
+endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]

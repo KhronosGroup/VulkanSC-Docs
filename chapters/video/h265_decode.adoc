@@ -1,0 +1,523 @@
+// Copyright 2018-2024 The Khronos Group Inc.
+//
+// SPDX-License-Identifier: CC-BY-4.0
+
+[[decode-h265]]
+== H.265 Decode Operations
+
+Video decode operations using an <<decode-h265-profile,H.265 decode
+profile>> can: be used to decode elementary video stream sequences compliant
+to the <<itu-t-h265,ITU-T H.265 Specification>>.
+
+[NOTE]
+.Note
+====
+Refer to the <<preamble,Preamble>> for information on how the Khronos
+Intellectual Property Rights Policy relates to normative references to
+external materials not created by Khronos.
+====
+
+This process is performed according to the <<decode-operation-steps,video
+decode operation steps>> with the codec-specific semantics defined in
+section 8 of <<itu-t-h265,ITU-T H.265 Specification>>:
+
+  * Syntax elements, derived values, and other parameters are applied from
+    the following structures:
+  ** The code:StdVideoH265VideoParameterSet structure corresponding to the
+     <<decode-h265-active-vps,active VPS>> specifying the <<decode-h265-vps,
+     H.265 video parameter set>>.
+  ** The code:StdVideoH265SequenceParameterSet structure corresponding to
+     the <<decode-h265-active-sps,active SPS>> specifying the
+     <<decode-h265-sps, H.265 sequence parameter set>>.
+  ** The code:StdVideoH265PictureParameterSet structure corresponding to the
+     <<decode-h265-active-pps,active PPS>> specifying the <<decode-h265-pps,
+     H.265 picture parameter set>>.
+  ** The code:StdVideoDecodeH265PictureInfo structure specifying the
+     <<decode-h265-picture-info,H.265 picture information>>.
+  ** The code:StdVideoDecodeH265ReferenceInfo structures specifying the
+     <<decode-h265-reference-info,H.265 reference information>>
+     corresponding to the optional <<reconstructed-picture,reconstructed
+     picture>> and any <<active-reference-pictures,active reference
+     pictures>>.
+  * The contents of the provided video bitstream buffer range are
+    interpreted as defined in the <<decode-h265-bitstream-data-access,H.265
+    Decode Bitstream Data Access>> section.
+  * Picture data in the <<video-picture-resources,video picture resources>>
+    corresponding to the used <<decode-h265-active-reference-picture-info,
+    active reference pictures>>, <<decode-h265-output-picture-info,decode
+    output picture>>, and optional <<decode-h265-reconstructed-picture-info,
+    reconstructed picture>> is accessed as defined in the
+    <<decode-h265-picture-data-access,H.265 Decode Picture Data Access>>
+    section.
+  * The decision on <<decode-ref-pic-setup,reference picture setup>> is made
+    according to the parameters specified in the
+    <<decode-h265-ref-pic-setup,H.265 picture information>>.
+
+If the parameters and the bitstream adhere to the syntactic and semantic
+requirements defined in the corresponding sections of the <<itu-t-h265,ITU-T
+H.265 Specification>>, as described above, and the <<dpb-slot,DPB slots>>
+associated with the <<active-reference-pictures,active reference pictures>>
+all refer to <<dpb-slot-states,valid picture references>>, then the video
+decode operation will complete successfully.
+Otherwise, the video decode operation may: complete
+<<decode-unsuccessful,unsuccessfully>>.
+
+
+[[decode-h265-bitstream-data-access]]
+=== H.265 Decode Bitstream Data Access
+
+The video bitstream buffer range should: contain a VCL NAL unit comprised of
+the slice segment headers and data of a picture representing a frame, as
+defined in sections 7.3.6 and 7.3.8, and this data is interpreted as defined
+in sections 7.4.7 and 7.4.9 of the <<itu-t-h265, ITU-T H.265
+Specification>>, respectively.
+
+The offsets provided in
+slink:VkVideoDecodeH265PictureInfoKHR::pname:pSliceSegmentOffsets should:
+specify the starting offsets corresponding to each slice segment header
+within the video bitstream buffer range.
+
+
+[[decode-h265-picture-data-access]]
+=== H.265 Decode Picture Data Access
+
+Accesses to image data within a video picture resource happen at the
+granularity indicated by
+slink:VkVideoCapabilitiesKHR::pname:pictureAccessGranularity, as returned by
+flink:vkGetPhysicalDeviceVideoCapabilitiesKHR for the used <<video-profiles,
+video profile>>.
+Accordingly, the complete image subregion of a
+<<decode-output-picture,decode output picture>>,
+<<reference-picture,reference picture>>, or
+<<reconstructed-picture,reconstructed picture>> accessed by video coding
+operations using an <<decode-h265-profile,H.265 decode profile>> is defined
+as the set of texels within the coordinate range:
+
+  {empty}:: [eq]#([0,pname:endX),[0,pname:endY))#
+
+Where:
+
+  * [eq]#pname:endX# equals [eq]#pname:codedExtent.width# rounded up to the
+    nearest integer multiple of pname:pictureAccessGranularity.width and
+    clamped to the width of the image subresource
+    <<video-image-subresource-reference,referred>> to by the corresponding
+    slink:VkVideoPictureResourceInfoKHR structure;
+  * [eq]#endY# equals [eq]#pname:codedExtent.height# rounded up to the
+    nearest integer multiple of pname:pictureAccessGranularity.height and
+    clamped to the height of the image subresource
+    <<video-image-subresource-reference, referred>> to by the corresponding
+    slink:VkVideoPictureResourceInfoKHR structure;
+
+Where pname:codedExtent is the member of the
+slink:VkVideoPictureResourceInfoKHR structure corresponding to the picture.
+
+In case of video decode operations using an <<decode-h265-profile,H.265
+decode profile>>, any access to a picture at the coordinates
+[eq]#(pname:x,pname:y)#, as defined by the <<itu-t-h265,ITU-T H.265
+Specification>>, is an access to the image subresource
+<<video-image-subresource-reference,referred>> to by the corresponding
+slink:VkVideoPictureResourceInfoKHR structure at the texel coordinates
+[eq]#(pname:x,pname:y)#.
+
+
+[[decode-h265-profile]]
+=== H.265 Decode Profile
+
+[open,refpage='VkVideoDecodeH265ProfileInfoKHR',desc='Structure specifying H.265 decode profile',type='structs']
+--
+A video profile supporting H.265 video decode operations is specified by
+setting slink:VkVideoProfileInfoKHR::pname:videoCodecOperation to
+ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR and adding a
+sname:VkVideoDecodeH265ProfileInfoKHR structure to the
+slink:VkVideoProfileInfoKHR::pname:pNext chain.
+
+The sname:VkVideoDecodeH265ProfileInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkVideoDecodeH265ProfileInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:stdProfileIdc is a code:StdVideoH265ProfileIdc value specifying
+    the H.265 codec profile IDC, as defined in section A.3 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>.
+
+include::{generated}/validity/structs/VkVideoDecodeH265ProfileInfoKHR.adoc[]
+--
+
+
+=== H.265 Decode Capabilities
+
+[open,refpage='VkVideoDecodeH265CapabilitiesKHR',desc='Structure describing H.265 decode capabilities',type='structs']
+--
+When calling flink:vkGetPhysicalDeviceVideoCapabilitiesKHR to query the
+capabilities for an <<decode-h265-profile,H.265 decode profile>>, the
+slink:VkVideoCapabilitiesKHR::pname:pNext chain must: include a
+sname:VkVideoDecodeH265CapabilitiesKHR structure that will be filled with
+the profile-specific capabilities.
+
+The sname:VkVideoDecodeH265CapabilitiesKHR structure is defined as:
+
+include::{generated}/api/structs/VkVideoDecodeH265CapabilitiesKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:maxLevelIdc is a code:StdVideoH265LevelIdc value indicating the
+    maximum H.265 level supported by the profile, where enum constant
+    `STD_VIDEO_H265_LEVEL_IDC_<major>_<minor>` identifies H.265 level
+    `<major>.<minor>` as defined in section A.4 of the <<itu-t-h265,ITU-T
+    H.265 Specification>>.
+
+include::{generated}/validity/structs/VkVideoDecodeH265CapabilitiesKHR.adoc[]
+--
+
+
+[[decode-h265-parameter-sets]]
+=== H.265 Decode Parameter Sets
+
+<<video-session-parameters,Video session parameters>> objects created with
+the video codec operation ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR
+can: contain the following types of parameters:
+
+:operationType: decode
+include::{chapters}/video/h265_parameter_sets.adoc[]
+
+[open,refpage='VkVideoDecodeH265SessionParametersCreateInfoKHR',desc='Structure specifies H.265 decoder parameter set information',type='structs']
+--
+When a <<video-session-parameters,video session parameters>> object is
+created with the codec operation
+ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR, the
+slink:VkVideoSessionParametersCreateInfoKHR::pname:pNext chain must: include
+a sname:VkVideoDecodeH265SessionParametersCreateInfoKHR structure specifying
+the capacity and initial contents of the object.
+
+The sname:VkVideoDecodeH265SessionParametersCreateInfoKHR structure is
+defined as:
+
+include::{generated}/api/structs/VkVideoDecodeH265SessionParametersCreateInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:maxStdVPSCount is the maximum number of <<decode-h265-vps,H.265
+    VPS>> entries the created sname:VkVideoSessionParametersKHR can:
+    contain.
+  * pname:maxStdSPSCount is the maximum number of <<decode-h265-sps,H.265
+    SPS>> entries the created sname:VkVideoSessionParametersKHR can:
+    contain.
+  * pname:maxStdPPSCount is the maximum number of <<decode-h265-pps,H.265
+    PPS>> entries the created sname:VkVideoSessionParametersKHR can:
+    contain.
+  * pname:pParametersAddInfo is `NULL` or a pointer to a
+    slink:VkVideoDecodeH265SessionParametersAddInfoKHR structure specifying
+    H.265 parameters to add upon object creation.
+
+include::{generated}/validity/structs/VkVideoDecodeH265SessionParametersCreateInfoKHR.adoc[]
+--
+
+[open,refpage='VkVideoDecodeH265SessionParametersAddInfoKHR',desc='Structure specifies H.265 decoder parameter set information',type='structs']
+--
+The sname:VkVideoDecodeH265SessionParametersAddInfoKHR structure is defined
+as:
+
+include::{generated}/api/structs/VkVideoDecodeH265SessionParametersAddInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:stdVPSCount is the number of elements in the pname:pStdVPSs array.
+  * pname:pStdVPSs is a pointer to an array of
+    code:StdVideoH265VideoParameterSet structures describing the
+    <<decode-h265-vps,H.265 VPS>> entries to add.
+  * pname:stdSPSCount is the number of elements in the pname:pStdSPSs array.
+  * pname:pStdSPSs is a pointer to an array of
+    code:StdVideoH265SequenceParameterSet structures describing the
+    <<decode-h265-sps,H.265 SPS>> entries to add.
+  * pname:stdPPSCount is the number of elements in the pname:pStdPPSs array.
+  * pname:pStdPPSs is a pointer to an array of
+    code:StdVideoH265PictureParameterSet structures describing the
+    <<decode-h265-pps,H.265 PPS>> entries to add.
+
+This structure can: be specified in the following places:
+
+  * In the pname:pParametersAddInfo member of the
+    slink:VkVideoDecodeH265SessionParametersCreateInfoKHR structure
+    specified in the pname:pNext chain of
+    slink:VkVideoSessionParametersCreateInfoKHR used to create a
+    <<video-session-parameters,video session parameters>> object.
+    In this case, if the video codec operation the video session parameters
+    object is created with is
+    ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR, then it defines the
+    set of initial parameters to add to the created object (see
+    <<creating-video-session-parameters,Creating Video Session
+    Parameters>>).
+  * In the pname:pNext chain of slink:VkVideoSessionParametersUpdateInfoKHR.
+    In this case, if the video codec operation the
+    <<video-session-parameters,video session parameters>> object to be
+    updated was created with is
+    ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR, then it defines the
+    set of parameters to add to it (see
+    <<video-session-parameters-update,Updating Video Session Parameters>>).
+
+.Valid Usage
+****
+  * [[VUID-VkVideoDecodeH265SessionParametersAddInfoKHR-None-04833]]
+    The pname:vps_video_parameter_set_id member of each
+    code:StdVideoH265VideoParameterSet structure specified in the elements
+    of pname:pStdVPSs must: be unique within pname:pStdVPSs
+  * [[VUID-VkVideoDecodeH265SessionParametersAddInfoKHR-None-04834]]
+    The pair constructed from the pname:sps_video_parameter_set_id and
+    pname:sps_seq_parameter_set_id members of each
+    code:StdVideoH265SequenceParameterSet structure specified in the
+    elements of pname:pStdSPSs must: be unique within pname:pStdSPSs
+  * [[VUID-VkVideoDecodeH265SessionParametersAddInfoKHR-None-04835]]
+    The triplet constructed from the pname:sps_video_parameter_set_id,
+    pname:pps_seq_parameter_set_id, and pname:pps_pic_parameter_set_id
+    members of each code:StdVideoH265PictureParameterSet structure specified
+    in the elements of pname:pStdPPSs must: be unique within pname:pStdPPSs
+****
+
+include::{generated}/validity/structs/VkVideoDecodeH265SessionParametersAddInfoKHR.adoc[]
+--
+
+
+=== H.265 Decoding Parameters
+
+[open,refpage='VkVideoDecodeH265PictureInfoKHR',desc='Structure specifies H.265 picture information when decoding a frame',type='structs']
+--
+The sname:VkVideoDecodeH265PictureInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkVideoDecodeH265PictureInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pStdPictureInfo is a pointer to a
+    code:StdVideoDecodeH265PictureInfo structure specifying
+    <<decode-h265-picture-info,H.265 picture information>>.
+  * pname:sliceSegmentCount is the number of elements in
+    pname:pSliceSegmentOffsets.
+  * pname:pSliceSegmentOffsets is a pointer to an array of
+    pname:sliceSegmentCount offsets specifying the start offset of the slice
+    segments of the picture within the video bitstream buffer range
+    specified in slink:VkVideoDecodeInfoKHR.
+
+This structure is specified in the pname:pNext chain of the
+slink:VkVideoDecodeInfoKHR structure passed to flink:vkCmdDecodeVideoKHR to
+specify the codec-specific picture information for an <<decode-h265,H.265
+decode operation>>.
+
+[[decode-h265-output-picture-info]]
+Decode Output Picture Information::
+
+When this structure is specified in the pname:pNext chain of the
+slink:VkVideoDecodeInfoKHR structure passed to flink:vkCmdDecodeVideoKHR,
+the information related to the <<decode-output-picture-info,decode output
+picture>> is defined as follows:
+
+  * The image subregion used is determined according to the
+    <<decode-h265-picture-data-access,H.265 Decode Picture Data Access>>
+    section.
+  * The decode output picture is associated with the
+    <<decode-h265-picture-info,H.265 picture information>> provided in
+    pname:pStdPictureInfo.
+
+[[decode-h265-picture-info]]
+Std Picture Information::
+
+The members of the code:StdVideoDecodeH265PictureInfo structure pointed to
+by pname:pStdPictureInfo are interpreted as follows:
+
+  * code:reserved is used only for padding purposes and is otherwise
+    ignored;
+  * code:flags.IrapPicFlag as defined in section 3.73 of the <<itu-t-h265,
+    ITU-T H.265 Specification>>;
+  * code:flags.IdrPicFlag as defined in section 3.67 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>;
+  * code:flags.IsReference as defined in section 3.132 of the <<itu-t-h265,
+    ITU-T H.265 Specification>>;
+  * code:sps_video_parameter_set_id, code:pps_seq_parameter_set_id, and
+    code:pps_pic_parameter_set_id are used to identify the active parameter
+    sets, as described below;
+  * code:PicOrderCntVal as defined in section 8.3.1 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>;
+  * code:NumBitsForSTRefPicSetInSlice is the number of bits used in
+    `st_ref_pic_set` when `short_term_ref_pic_set_sps_flag` is `0`, or `0`
+    otherwise, as defined in sections 7.4.7 and 7.4.8 of the <<itu-t-h265,
+    ITU-T H.265 Specification>>;
+  * code:NumDeltaPocsOfRefRpsIdx is the value of `NumDeltaPocs[RefRpsIdx]`
+    when `short_term_ref_pic_set_sps_flag` is `1`, or `0` otherwise, as
+    defined in sections 7.4.7 and 7.4.8 of the <<itu-t-h265,ITU-T H.265
+    Specification>>;
+  * code:RefPicSetStCurrBefore, code:RefPicSetStCurrAfter, and
+    code:RefPicSetLtCurr are interpreted as defined in section 8.3.2 of the
+    <<itu-t-h265,ITU-T H.265 Specification>> where each element of these
+    arrays either identifies an
+    <<decode-active-reference-picture-info,active reference picture>> using
+    its <<dpb-slot,DPB slot>> index or contains the value
+    code:STD_VIDEO_H265_NO_REFERENCE_PICTURE to indicate "`no reference
+    picture`";
+  * all other members are interpreted as defined in section 8.3.2 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>.
+
+[[decode-h265-ref-pic-setup]]
+Reference picture setup is controlled by the value of
+code:StdVideoDecodeH265PictureInfo::pname:flags.IsReference.
+If it is set and a <<decode-reconstructed-picture-info,reconstructed
+picture>> is specified, then the latter is used as the target of picture
+reconstruction to <<dpb-slot-states,activate>> the corresponding
+<<dpb-slot,DPB slot>>.
+If code:StdVideoDecodeH265PictureInfo::pname:flags.IsReference is not set,
+but a <<decode-reconstructed-picture-info,reconstructed picture>> is
+specified, then the corresponding picture reference associated with the
+<<dpb-slot,DPB slot>> is invalidated, as described in the
+<<dpb-slot-states,DPB Slot States>> section.
+
+Active Parameter Sets::
+
+The members of the code:StdVideoDecodeH265PictureInfo structure pointed to
+by pname:pStdPictureInfo are used to select the active parameter sets to use
+from the bound video session parameters object, as follows:
+
+  * [[decode-h265-active-vps]] The _active VPS_ is the
+    <<decode-h265-vps,VPS>> identified by the key specified in
+    code:StdVideoDecodeH265PictureInfo::code:sps_video_parameter_set_id.
+  * [[decode-h265-active-sps]] The _active SPS_ is the
+    <<decode-h265-sps,SPS>> identified by the key specified by the pair
+    constructed from
+    code:StdVideoDecodeH265PictureInfo::code:sps_video_parameter_set_id and
+    code:StdVideoDecodeH265PictureInfo::code:pps_seq_parameter_set_id.
+  * [[decode-h265-active-pps]] The _active PPS_ is the
+    <<decode-h265-pps,PPS>> identified by the key specified by the triplet
+    constructed from
+    code:StdVideoDecodeH265PictureInfo::code:sps_video_parameter_set_id,
+    code:StdVideoDecodeH265PictureInfo::code:pps_seq_parameter_set_id, and
+    code:StdVideoDecodeH265PictureInfo::code:pps_pic_parameter_set_id.
+
+include::{generated}/validity/structs/VkVideoDecodeH265PictureInfoKHR.adoc[]
+--
+
+[open,refpage='VkVideoDecodeH265DpbSlotInfoKHR',desc='Structure specifies H.265 DPB information when decoding a frame',type='structs']
+--
+The sname:VkVideoDecodeH265DpbSlotInfoKHR structure is defined as:
+
+include::{generated}/api/structs/VkVideoDecodeH265DpbSlotInfoKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:pStdReferenceInfo is a pointer to a
+    code:StdVideoDecodeH265ReferenceInfo structure specifying reference
+    picture information described in section 8.3 of the <<itu-t-h265,ITU-T
+    H.265 Specification>>.
+
+This structure is specified in the pname:pNext chain of
+slink:VkVideoDecodeInfoKHR::pname:pSetupReferenceSlot, if not `NULL`, and
+the pname:pNext chain of the elements of
+slink:VkVideoDecodeInfoKHR::pname:pReferenceSlots to specify the
+codec-specific reference picture information for an <<decode-h265,H.265
+decode operation>>.
+
+[[decode-h265-active-reference-picture-info]]
+Active Reference Picture Information::
+
+When this structure is specified in the pname:pNext chain of the elements of
+slink:VkVideoDecodeInfoKHR::pname:pReferenceSlots, one element is added to
+the list of <<decode-active-reference-picture-info,active reference
+pictures>> used by the video decode operation for each element of
+slink:VkVideoDecodeInfoKHR::pname:pReferenceSlots as follows:
+
+  * The image subregion used is determined according to the
+    <<decode-h265-picture-data-access,H.265 Decode Picture Data Access>>
+    section.
+  * The reference picture is associated with the <<dpb-slot,DPB slot>> index
+    specified in the pname:slotIndex member of the corresponding element of
+    slink:VkVideoDecodeInfoKHR::pname:pReferenceSlots.
+  * The reference picture is associated with the
+    <<decode-h265-reference-info,H.265 reference information>> provided in
+    pname:pStdReferenceInfo.
+
+[[decode-h265-reconstructed-picture-info]]
+Reconstructed Picture Information::
+
+When this structure is specified in the pname:pNext chain of
+slink:VkVideoDecodeInfoKHR::pname:pSetupReferenceSlot, the information
+related to the <<decode-reconstructed-picture-info,reconstructed picture>>
+is defined as follows:
+
+  * The image subregion used is determined according to the
+    <<decode-h265-picture-data-access,H.265 Decode Picture Data Access>>
+    section.
+  * If <<decode-h265-ref-pic-setup,reference picture setup>> is requested,
+    then the reconstructed picture is used to <<dpb-slot-states,activate>>
+    the <<dpb-slot,DPB slot>> with the index specified in
+    slink:VkVideoDecodeInfoKHR::pname:pSetupReferenceSlot->slotIndex.
+  * The reconstructed picture is associated with the
+    <<decode-h265-reference-info,H.265 reference information>> provided in
+    pname:pStdReferenceInfo.
+
+[[decode-h265-reference-info]]
+Std Reference Information::
+
+The members of the code:StdVideoDecodeH265ReferenceInfo structure pointed to
+by pname:pStdReferenceInfo are interpreted as follows:
+
+  * code:flags.used_for_long_term_reference is used to indicate whether the
+    picture is marked as "`used for long-term reference`" as defined in
+    section 8.3.2 of the <<itu-t-h265,ITU-T H.265 Specification>>;
+  * code:flags.unused_for_reference is used to indicate whether the picture
+    is marked as "`unused for reference`" as defined in section 8.3.2 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>;
+  * all other members are interpreted as defined in section 8.3 of the
+    <<itu-t-h265,ITU-T H.265 Specification>>.
+
+include::{generated}/validity/structs/VkVideoDecodeH265DpbSlotInfoKHR.adoc[]
+--
+
+
+[[decode-h265-requirements]]
+=== H.265 Decode Requirements
+
+This section describes the required: H.265 decoding capabilities for
+physical devices that have at least one queue family that supports the video
+codec operation ename:VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR, as
+returned by flink:vkGetPhysicalDeviceQueueFamilyProperties2 in
+slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations.
+
+.Required <<video-std-header-version,Video Std Header Versions>>
+[options="header"]
+|====
+| Video Std Header Name | Version
+| `vulkan_video_codec_h265std_decode` | 1.0.0
+|====
+
+ifdef::VK_KHR_video_maintenance1[]
+.Required Video Capabilities
+[width="100%",cols="<35,<14,<11",options="header"]
+|====
+| Video Capability | Requirement | Requirement Type^1^
+| **slink:VkVideoCapabilitiesKHR** | |
+| pname:flags | - | min
+| pname:minBitstreamBufferOffsetAlignment | 4096 | max
+| pname:minBitstreamBufferSizeAlignment | 4096 | max
+| pname:pictureAccessGranularity | (64,64) | max
+| pname:minCodedExtent | - | max
+| pname:maxCodedExtent | - | min
+| pname:maxDpbSlots | 0 | min
+| pname:maxActiveReferencePictures | 0 | min
+| **slink:VkVideoDecodeCapabilitiesKHR** | |
+| pname:flags | ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR or
+                ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR | min
+| **slink:VkVideoDecodeH265CapabilitiesKHR** | |
+| pname:maxLevelIdc | code:STD_VIDEO_H265_LEVEL_IDC_1_0 | min
+|====
+
+1::
+    The *Requirement Type* column specifies the requirement is either the
+    minimum value all implementations must: support, the maximum value all
+    implementations must: support, or the exact value all implementations
+    must: support.
+    For bitmasks a minimum value is the least bits all implementations must:
+    set, but they may: have additional bits set beyond this minimum.
+endif::VK_KHR_video_maintenance1[]

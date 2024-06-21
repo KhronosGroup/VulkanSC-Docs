@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2017-2023 The Khronos Group Inc.
+# Copyright 2017-2024 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 """Generate a mapping of extension name -> all required extension names for
@@ -130,7 +130,7 @@ class ApiDependencies:
             if api_name in supported.split(','):
                 self.allExts.add(name)
 
-                if 'KHR' in name:
+                if conventions.KHR_prefix in name:
                     self.khrExts.add(name)
 
                 if api_name in ratified.split(','):

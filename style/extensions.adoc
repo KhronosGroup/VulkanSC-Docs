@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -929,7 +929,7 @@ This case will come up very rarely.
 
 When an extension introduces a new flags (etext:*Flags) type, it should also
 introduce a corresponding new bitmask (etext:*FlagBits) type.
-The flags type contains zero more more bits from the bitmask, and is used to
+The flags type contains zero or more bits from the bitmask, and is used to
 specify sets of bits for commands or structures.
 
 In some cases, a new flags type will be defined with no individual bits yet
@@ -1233,10 +1233,10 @@ feature of an extension.
 [source,asciidoc]
 .Example Markup
 ----
-ifdef::VK_EXT_image_robustness[]
+\ifdef::VK_EXT_image_robustness[]
   * <<features-robustImageAccess, pname:robustImageAccess>>, if the
     `apiext:VK_EXT_image_robustness` extension is supported.
-endif::VK_EXT_image_robustness[]
+\endif::VK_EXT_image_robustness[]
 ----
 
 For WSI extensions, it is often necessary to extend

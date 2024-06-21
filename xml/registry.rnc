@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Khronos Group Inc.
+# Copyright 2013-2024 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 # Relax NG schema for Khronos API Registry XML
@@ -199,18 +199,18 @@ Type = element type {
 # <enums> defines a group of enumerants
 #   name - identifies a type name associated with this group. Should
 #       match a <type> name to trigger generation of the type.
-#   type - 'enum' or 'bitmask', if present
+#   type - 'bitmask', 'constants' or 'enum'.
 #   bitwidth - bit width of the enum value type.
 #   comment - descriptive text with no semantic meaning
 Enums = element enums {
     attribute name { text } ? ,
-    attribute type { text } ? ,
+    attribute type { text } ,
     attribute bitwidth { Integer } ? ,
     Comment ? ,
     (
         Enum |
         Unused |
-        element comment { text}
+        element comment { text }
     ) *
 }
 
@@ -406,7 +406,9 @@ Command = element command {
 #   api - API tag (e.g. 'gl', 'gles2', etc. - used internally, not
 #     necessarily an actual API name
 #   name - version name (C preprocessor name, e.g. GL_VERSION_4_2)
-#   number - version number, e.g. 4.2
+#   number - version number, e.g. 4.2 (deprecated)
+#   depends - boolean expression of API and/or extension names
+#       upon which this feature depends.
 #   protect - additional #ifdef symbol to place around the feature
 #   sortorder - order relative to other features, default 0
 #   <require> / <remove> contains features to require or remove in
@@ -416,7 +418,8 @@ Command = element command {
 Feature = element feature {
     attribute api { text } ,
     Name ,
-    attribute number { xsd:float } ,
+    attribute number { xsd:float } ?,
+    attribute depends { text } ?,
     attribute protect { text } ? ,
     attribute sortorder { xsd:integer } ?,
     Comment ? ,
@@ -709,7 +712,7 @@ InterfaceElement =
 # as a placeholder.
 Integer = text
 
-# EnumName is an compile-time constant name
+# EnumName is a compile-time constant name
 EnumName = text
 
 # TypeName is an argument/return value C type name

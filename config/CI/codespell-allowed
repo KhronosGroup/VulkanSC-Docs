@@ -1,4 +1,4 @@
-# Copyright 2022-2023 The Khronos Group Inc.
+# Copyright 2022-2024 The Khronos Group Inc.
 # SPDX-License-Identifier: CC-BY-4.0
 # Spec words
 imbed
@@ -13,14 +13,20 @@ uscaled
 # Markup/script/style guide words
 captable
 crate
+implementor
+implementors
 rouge
 shouldnot
 tesselation
 # Proper names
+alis
+benj
 calle
 ser
+labour
 # proposals/ words
-esponding
 pares
 # vk.xml words
 halfs
+# Errors in codespell dictionaries
+aesthetically

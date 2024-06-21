@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 #
-# Copyright 2013-2023 The Khronos Group Inc.
+# Copyright 2013-2024 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -37,7 +37,7 @@ class SyncOutputGenerator(OutputGenerator):
 
         # <Pipeline Stage, condition as asciidoc string>
         self.pipeline_stage_condition = dict()
-        # <sccess flag, condition as asciidoc string>
+        # <success flag, condition as asciidoc string>
         self.access_flag_condition = dict()
 
         # <Pipeline Stage, [equivalent pipeline stages]>

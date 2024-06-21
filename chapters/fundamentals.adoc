@@ -1,4 +1,4 @@
-// Copyright 2015-2023 The Khronos Group Inc.
+// Copyright 2015-2024 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -174,30 +174,36 @@ Commands recorded in command buffers can perform actions, set state that
 persists across commands, synchronize other commands, or indirectly launch
 other commands, with some commands fulfilling several of these roles.
 The "`Command Properties`" section for each such command lists which of
-these roles the command takes.
-State setting commands update the _current state_ of the command buffer.
-Some commands that perform actions (e.g. draw/dispatch) do so based on the
-current state set cumulatively since the start of the command buffer.
-The work involved in performing action commands is often allowed to overlap
-or to be reordered, but doing so must: not alter the state to be used by
-each action command.
-In general, action commands are those commands that alter framebuffer
-attachments, read/write buffer or image memory, or write to query pools.
+these roles the command takes:
 
-Synchronization commands introduce explicit
-<<synchronization-dependencies,execution and memory dependencies>> between
-two sets of action commands, where the second set of commands depends on the
-first set of commands.
-These dependencies enforce both that the execution of certain
-<<synchronization-pipeline-stages, pipeline stages>> in the later set occurs
-after the execution of certain stages in the source set, and that the
-effects of <<synchronization-global-memory-barriers,memory accesses>>
-performed by certain pipeline stages occur in order and are visible to each
-other.
-When not enforced by an explicit dependency or <<synchronization-implicit,
-implicit ordering guarantees>>, action commands may: overlap execution or
-execute out of order, and may: not see the side effects of each other's
-memory accesses.
+Action::
+  _Action commands_ perform operations that can update values in memory.
+  E.g. <<drawing,draw commands>>, <<dispatch,dispatch commands>>.
+
+State::
+  _State setting commands_ update the current state of a command buffer,
+  affecting the operation of future action commands.
+
+Synchronization::
+  _Synchronization commands_ impose ordering constraints on action commands,
+  by introducing explicit <<synchronization-dependencies,execution and
+  memory dependencies>>.
+
+Indirection::
+  _Indirection commands_ execute other commands which were not directly
+  recorded in the same command buffer.
+
+[NOTE]
+.Note
+====
+In the absence of explicit synchronization or <<synchronization-implicit,
+implicit ordering guarantees>>, action commands may overlap execution or
+execute out of order, potentially leading to data races.
+However, such reordering does not affect the current state observed by any
+action command.
+Each action command uses the state in effect at the point where the command
+occurs in the command buffer, regardless of when it is executed.
+====
 
 
 [[fundamentals-objectmodel-overview]]
@@ -883,7 +889,7 @@ valid usage statements are attached to the place where all state needs to be
 valid - at the drawing command.
 ====
 
-Valid usage conditions are described in a block labelled "`Valid Usage`"
+Valid usage conditions are described in a block labeled "`Valid Usage`"
 following each command or structure they apply to.
 
 
@@ -915,7 +921,7 @@ endif::VKSC_VERSION_1_0[]
 Some valid usage conditions apply to all commands and structures in the API,
 unless explicitly denoted otherwise for a specific command or structure.
 These conditions are considered _implicit_, and are described in a block
-labelled "`Valid Usage (Implicit)`" following each command or structure they
+labeled "`Valid Usage (Implicit)`" following each command or structure they
 apply to.
 Implicit valid usage conditions are described in detail below.
 
@@ -959,9 +965,14 @@ a structure) satisfy the alignment requirements of the host processor.
 [[fundamentals-validusage-strings]]
 ==== Valid Usage for Strings
 
-Any parameter that is a pointer to `char` must: be a finite sequence of
+Any parameter that is a pointer to code:char must: be a finite sequence of
 values terminated by a null character, or if _explicitly called out in the
 Specification_, can: be `NULL`.
+
+Strings specified as UTF-8 encoded must: not contain invalid UTF-8
+sequences.
+See <<fundamentals-strings, String Representation>> for additional
+information about strings.
 
 
 [[fundamentals-validusage-enums]]
@@ -1333,6 +1344,20 @@ ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
     have required compilation, but the application requested compilation to
     not be performed.
 endif::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
+ifdef::VK_EXT_shader_object[]
+  * ename:VK_INCOMPATIBLE_SHADER_BINARY_EXT The provided binary shader code
+    is not compatible with this device.
++
+[NOTE]
+.Note
+====
+In the initial version of the `apiext:VK_EXT_shader_object` extension, this
+return code was named ename:VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT and
+improperly described as an error code.
+The name has been changed, but the old name is retained as an alias for
+compatibility with old code.
+====
+endif::VK_EXT_shader_object[]
 
 [[fundamentals-errorcodes]]
 .Error codes
@@ -1482,10 +1507,12 @@ ifdef::VK_KHR_video_encode_queue[]
     not adhere to the capabilities of the video compression standard or the
     implementation.
 endif::VK_KHR_video_encode_queue[]
-ifdef::VK_EXT_shader_object[]
-  * ename:VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT The provided binary shader
-    code is not compatible with this device.
-endif::VK_EXT_shader_object[]
+ifdef::VK_KHR_global_priority,VK_EXT_global_priority[]
+  * ename:VK_ERROR_NOT_PERMITTED_KHR The driver implementation has denied a
+    request to acquire a priority above the default priority
+    (ename:VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT) because the application does
+    not have sufficient privileges.
+endif::VK_KHR_global_priority,VK_EXT_global_priority[]
   * ename:VK_ERROR_UNKNOWN An unknown error has occurred; either the
     application has provided invalid input, or an implementation failure has
     occurred.
@@ -1797,6 +1824,41 @@ be assigned [eq]#-(2^b-1^ - 1)#, 0, or [eq]#2^b-1^ - 1#, respectively.
 
 This equation is used everywhere that floating-point values are converted to
 signed normalized fixed-point.
+
+
+[[fundamentals-strings]]
+== String Representation
+
+Strings passed into and returned from Vulkan API commands are usually
+defined to be null-terminated and UTF-8 encoded.
+
+[NOTE]
+.Note
+====
+Exceptions to this rule exist only when strings are defined or used by
+operating system APIs where that OS has a different convention.
+For example, slink:VkExportMemoryWin32HandleInfoKHR::pname:name is a
+null-terminated UTF-16 encoded string used in conjunction with Windows
+handles.
+====
+
+When a UTF-8 string is *returned from* a Vulkan API query, it is returned in
+a fixed-length buffer of C code:char.
+For example, a string returned in
+slink:VkPhysicalDeviceProperties::pname:deviceName has maximum length
+ename:VK_MAX_PHYSICAL_DEVICE_NAME_SIZE, and a string returned in
+slink:VkExtensionProperties::pname:extensionName has maximum length
+ename:VK_MAX_EXTENSION_NAME_SIZE.
+The string, *including* its null terminator, will always fit completely
+within this buffer.
+If the string is shorter than the buffer size, the contents of code:char in
+the buffer following the null terminator are undefined:.
+
+When a UTF-8 string is *passed into* a Vulkan API, such as
+slink:VkDeviceCreateInfo::pname:ppEnabledExtensionNames, there is no
+explicit limit on the length of that string.
+However, the string must: contain a valid UTF-8 encoded string and must: be
+null-terminated.
 
 
 [[fundamentals-common-objects]]
