@@ -68,7 +68,6 @@ toolchain installed, you can just invoke the same `make` commands from the
 repository root.
 
 [NOTE]
-.Note
 ====
 You can modify the `runDocker` script to change the `docker` command-line
 options, but it is important to always use the Docker image specified in
@@ -76,7 +75,6 @@ that script, so you have the latest version of the spec toolchain.
 ====
 
 [NOTE]
-.Note
 ====
   * While it is possible to invoke `make` directly, this is rarely
     appropriate or useful.
@@ -270,7 +268,6 @@ of each section which links to the next difference section.
 The first diff section is `#difference1`.
 
 [NOTE]
-.Note
 ====
 This output is not without errors.
 It may instead result in visible `+++[.added]##content##+++` and
@@ -426,7 +423,7 @@ image name. The SHA256 can be determined from
 
 which will print a line like
 
-    image: khronosgroup/docker-images@sha256:42123ba13792c4e809d037b69152c2230ad97fbf43b677338075ab9c928ab6ed
+    image: khronosgroup/docker-images@sha256:5e021da240f12121f064d2135e06320c021ac231c9ae8abbf6205b6130deb58b
 
 Everything following `image: ` is the <imagename> to use. The first time you
 try to run a container with this <imagename>, as is done by the `runDocker`
@@ -438,7 +435,6 @@ This image is used to build Specification output documents or other Makefile
 targets.
 
 [NOTE]
-.Note
 ====
 When we update the image on Dockerhub, it is to add new components or update
 versions of components used in the specification toolchain.
@@ -468,7 +464,6 @@ link:https://github.com/KhronosGroup/Vulkan-Docs/blob/v1.2.135/BUILD.adoc#depend
 version of BUILD.adoc in the v1.2.135 repository tag]
 
 [NOTE]
-.Note
 ====
 While you do not have to use our Docker image, we cannot support every
 possible build environment.
@@ -520,7 +515,7 @@ https://github.com/KhronosGroup/Vulkan-Docs/pull/2286 for more.
   * 2017-01-06 - Replace MathJax with KaTeX.
   * 2016-08-25 - Update for the single-branch model.
   * 2016-07-10 - Update for current state of spec and ref page generation.
-  * 2015-11-11 - Add new can: etc.
+  * 2015-11-11 - Add new *can* etc.
     macros and DBLATEXPREFIX variable.
   * 2015-09-21 - Convert document to asciidoc and rename to README.md in the
     hope the gitlab browser will render it in some fashion.

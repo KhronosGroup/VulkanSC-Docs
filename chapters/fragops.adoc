@@ -788,7 +788,6 @@ executed, and undefined: values may: be written to all color attachment
 outputs during this fragment operation.
 
 [NOTE]
-.Note
 ====
 Multiple fragment shader invocations may be executed for the same fragment
 for any number of implementation-dependent reasons.
@@ -837,6 +836,7 @@ code:SampleMask>> built-in in the code:Output storage class will be used by
 the <<fragops-covg, multisample coverage>> operation, with the same encoding
 as the input built-in.
 
+
 ifdef::VK_EXT_shader_tile_image[]
 [[fragops-shader-tileimage-reads]]
 === Fragment Shader Tile Image Reads
@@ -850,7 +850,6 @@ fragment shader invocations can: read the framebuffer color, depth, and
 stencil values at the fragment location via tile images.
 
 [NOTE]
-.Note
 ====
 Even though fragment shader invocation can only read from the corresponding
 fragment location, the abstraction of a tile image is introduced for the
@@ -952,7 +951,6 @@ are used, otherwise the implementation prefers that non-coherent tile image
 reads are used.
 
 [NOTE]
-.Note
 ====
 In practice, the most common tile image reads usage patterns fall under one
 of the following:
@@ -980,8 +978,8 @@ only the latter three are supported when non-coherent reads are used as
 there is no mechanism to synchronize non-coherent reads with writes within a
 draw call.
 ====
-
 endif::VK_EXT_shader_tile_image[]
+
 
 [[fragops-shader-depthreplacement]]
 === Depth Replacement
@@ -1203,7 +1201,6 @@ of 1.0 and all 0's corresponding to 0.0.
 The algorithm may: be different at different framebuffer coordinates.
 
 [NOTE]
-.Note
 ====
 Using different algorithms at different framebuffer coordinates may: help to
 avoid artifacts caused by regular coverage sample locations.
@@ -1377,7 +1374,7 @@ depth/stencil attachment at each sample's framebuffer coordinates
 [eq]#(x~f~,y~f~)# and <<primsrast-multisampling-coverage-mask, sample
 index>> [eq]#i# against a set of _depth bounds_.
 
-The depth bounds are determined by two floating point values defining a
+The depth bounds are determined by two floating-point values defining a
 minimum (pname:minDepthBounds) and maximum (pname:maxDepthBounds) depth
 value.
 These values are either set by the
@@ -1436,6 +1433,9 @@ value used to create the currently active pipeline.
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/dynamic_state_feature_common.adoc[]
+  * [[VUID-vkCmdSetDepthBoundsTestEnable-depthBounds-10010]]
+    If the <<features-depthBounds, pname:depthBounds>> feature is not
+    enabled, pname:depthBoundsTestEnable must: be ename:VK_FALSE
 ****
 
 include::{generated}/validity/protos/vkCmdSetDepthBoundsTestEnable.adoc[]
@@ -2521,10 +2521,10 @@ include::{generated}/api/protos/vkGetPhysicalDeviceSupportedFramebufferMixedSamp
 
 If pname:pCombinations is `NULL`, then the number of supported combinations
 for the given pname:physicalDevice is returned in pname:pCombinationCount.
-Otherwise, pname:pCombinationCount must: point to a variable set by the user
-to the number of elements in the pname:pCombinations array, and on return
-the variable is overwritten with the number of values actually written to
-pname:pCombinations.
+Otherwise, pname:pCombinationCount must: point to a variable set by the
+application to the number of elements in the pname:pCombinations array, and
+on return the variable is overwritten with the number of values actually
+written to pname:pCombinations.
 If the value of pname:pCombinationCount is less than the number of
 combinations supported for the given pname:physicalDevice, at most
 pname:pCombinationCount values will be written to pname:pCombinations, and
@@ -2618,7 +2618,7 @@ The values of pname:pCoverageModulationTable may: be rounded to an
 implementation-dependent precision, which is at least as fine as [eq]#1 /
 N#, and clamped to [eq]#[0,1]#.
 
-For each color attachment with a floating point or normalized color format,
+For each color attachment with a floating-point or normalized color format,
 each fragment output color value is replicated to [eq]#M# values which can:
 each be modulated (multiplied) by that color sample's associated value of
 [eq]#R#.

@@ -10,7 +10,6 @@ profile>> can: be used to decode elementary video stream sequences compliant
 to the <<itu-t-h265,ITU-T H.265 Specification>>.
 
 [NOTE]
-.Note
 ====
 Refer to the <<preamble,Preamble>> for information on how the Khronos
 Intellectual Property Rights Policy relates to normative references to
@@ -93,7 +92,7 @@ Accordingly, the complete image subregion of a
 operations using an <<decode-h265-profile,H.265 decode profile>> is defined
 as the set of texels within the coordinate range:
 
-  {empty}:: [eq]#([0,pname:endX),[0,pname:endY))#
+  {empty}:: [eq]#([0,pname:endX), [0,pname:endY))#
 
 Where:
 

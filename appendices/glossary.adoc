@@ -87,6 +87,10 @@ Allocation Scope::
     as the parent object is freed or destroyed, or during the parent
     command.
 
+API command::
+    Any command defined in the Vulkan specification.
+    These entry points all have a vk prefix.
+
 Aspect (Image)::
     Some image types contain multiple kinds (called "`aspects`") of data for
     each pixel, where each aspect is used in a particular way by the
@@ -167,7 +171,7 @@ ifndef::VKSC_VERSION_1_0[, and using the flink:vkQueueBindSparse command for spa
     .
 
 Blend Constant::
-    Four floating point (RGBA) values used as an input to blending.
+    Four floating-point (RGBA) values used as an input to blending.
 
 Blending::
     Arithmetic operations between a fragment color value and a value in a
@@ -212,6 +216,19 @@ Clip Distance::
 
 Clip Volume::
     The intersection of the view volume with all clip half-spaces.
+
+ifdef::VK_KHR_video_queue[]
+Coding Block (Video)::
+    An element of a video picture, comprising a rectangular block of texel
+    values that are coded as a single unit in video coding.
+    Video coding blocks have a corresponding coding block size (width and
+    height) defining the dimensions of these elements in units of texels.
+    These dimensions are usually codec-specific and a single video
+    compression standard may: support more than one coding block type and
+    size.
+    Video compression standards may: use multiple coding block types to
+    organize coding blocks of different kinds and sizes into hierarchies.
+endif::VK_KHR_video_queue[]
 
 Color Attachment::
     A subpass attachment point, or image view, that is the target of
@@ -275,7 +292,7 @@ Compatible Queues::
 
 Complete Mipmap Chain::
     The entire set of mip levels that can be provided for an image, from the
-    largest application specified mip level size down to the _minimum mip
+    largest application-specified mip level size down to the _minimum mip
     level size_.
     See <<resources-image-mip-level-sizing, Image Mip Level Sizing>>.
 
@@ -303,6 +320,7 @@ Compressed Texel Block::
     elements in units of texels, and a size in bytes of the encoding in
     memory.
 
+[[glossary-constant-integral-expression]]
 Constant Integral Expressions::
     A SPIR-V constant instruction whose type is code:OpTypeInt.
     See _Constant Instruction_ in section 2.2.1 "`Instructions`" of the
@@ -394,12 +412,12 @@ Depth/Stencil Resolve Attachment::
 endif::VK_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
 
 Derivative Group::
-    A set of fragment
-ifdef::VK_NV_compute_shader_derivatives[]
-    or compute
-endif::VK_NV_compute_shader_derivatives[]
-    shader invocations that cooperate to compute derivatives, including
-    implicit derivatives for sampled image operations.
+    A set of
+ifdef::VK_KHR_compute_shader_derivatives,VK_NV_compute_shader_derivatives[compute,]
+ifdef::VK_KHR_compute_shader_derivatives[mesh, task,]
+ifdef::VK_KHR_compute_shader_derivatives,VK_NV_compute_shader_derivatives[or]
+    fragment shader invocations that cooperate to compute derivatives,
+    including implicit derivatives for sampled image operations.
 
 Descriptor::
     Information about a resource or resource view written into a descriptor
@@ -1012,10 +1030,27 @@ Instance (Resource)::
     Each such replicated resource is an instance of the resource.
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
 
+ifdef::VK_KHR_video_queue[]
+Inter Block (Video)::
+    A video coding block that uses inter prediction.
+
+Inter Prediction (Video)::
+    Sample prediction derived from reference picture samples or metadata.
+endif::VK_KHR_video_queue[]
+
 Internal Synchronization::
     A type of synchronization required: of the implementation, where
     parameters not defined to be externally synchronized may: require
     internal mutexing to avoid multithreaded race conditions.
+
+ifdef::VK_KHR_video_queue[]
+Intra Block (Video)::
+    A video coding block that only uses intra prediction.
+
+Intra Prediction (Video)::
+    Sample prediction that is not derived from reference picture samples or
+    metadata.
+endif::VK_KHR_video_queue[]
 
 Invocation (Shader)::
     A single execution of an entry point in a SPIR-V module.
@@ -1298,6 +1333,15 @@ Physical-Device-Level Functionality::
 Physical-Device-Level Object::
     Physical device objects.
     For example, slink:VkPhysicalDevice is a physical-device-level object.
+
+ifdef::VK_KHR_video_queue[]
+Picture Partition (Video)::
+    Collective term that refers to a subregion of a video picture resource
+    that may: be decoded or encoded independently according to the
+    partitioning scheme defined in the corresponding video compression
+    standard.
+    Picture partitions may: be non-rectangular.
+endif::VK_KHR_video_queue[]
 
 Pipeline::
     An object controlling how graphics or compute work is executed on the
@@ -2025,7 +2069,7 @@ Info::
     Information
 
 LOD::
-    Level of Detail
+    Level{nbsp} of Detail
 
 Log::
     Logarithm

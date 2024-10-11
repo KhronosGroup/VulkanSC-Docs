@@ -37,14 +37,14 @@ include::{generated}/api/protos/vkGetPhysicalDeviceDisplayPropertiesKHR.adoc[]
   * pname:pPropertyCount is a pointer to an integer related to the number of
     display devices available or queried, as described below.
   * pname:pProperties is either `NULL` or a pointer to an array of
-    sname:VkDisplayPropertiesKHR structures.
+    slink:VkDisplayPropertiesKHR structures.
 
 If pname:pProperties is `NULL`, then the number of display devices available
 for pname:physicalDevice is returned in pname:pPropertyCount.
-Otherwise, pname:pPropertyCount must: point to a variable set by the user to
-the number of elements in the pname:pProperties array, and on return the
-variable is overwritten with the number of structures actually written to
-pname:pProperties.
+Otherwise, pname:pPropertyCount must: point to a variable set by the
+application to the number of elements in the pname:pProperties array, and on
+return the variable is overwritten with the number of structures actually
+written to pname:pProperties.
 If the value of pname:pPropertyCount is less than the number of display
 devices for pname:physicalDevice, at most pname:pPropertyCount structures
 will be written, and ename:VK_INCOMPLETE will be returned instead of
@@ -77,7 +77,6 @@ include::{generated}/api/structs/VkDisplayPropertiesKHR.adoc[]
     resolution of the display.
 
 [NOTE]
-.Note
 ====
 For devices which have no natural value to return here, implementations
 should: return the maximum resolution supported.
@@ -96,7 +95,6 @@ should: return the maximum resolution supported.
     operations on swapchains created against this display.
 
 [NOTE]
-.Note
 ====
 Persistent presents may: have higher latency, and may: use less power when
 the screen content is updated infrequently, or when only a portion of the
@@ -161,7 +159,7 @@ Devices must: support at least one plane on each display.
 Planes can: be stacked and blended to composite multiple images on one
 display.
 Devices may: support only a fixed stacking order and fixed mapping between
-planes and displays, or they may: allow arbitrary application specified
+planes and displays, or they may: allow arbitrary application-specified
 stacking orders and mappings between planes and displays.
 To query the properties of device display planes, call:
 
@@ -175,10 +173,10 @@ include::{generated}/api/protos/vkGetPhysicalDeviceDisplayPlanePropertiesKHR.ado
 
 If pname:pProperties is `NULL`, then the number of display planes available
 for pname:physicalDevice is returned in pname:pPropertyCount.
-Otherwise, pname:pPropertyCount must: point to a variable set by the user to
-the number of elements in the pname:pProperties array, and on return the
-variable is overwritten with the number of structures actually written to
-pname:pProperties.
+Otherwise, pname:pPropertyCount must: point to a variable set by the
+application to the number of elements in the pname:pProperties array, and on
+return the variable is overwritten with the number of structures actually
+written to pname:pProperties.
 If the value of pname:pPropertyCount is less than the number of display
 planes for pname:physicalDevice, at most pname:pPropertyCount structures
 will be written.
@@ -265,10 +263,10 @@ include::{generated}/api/protos/vkGetDisplayPlaneSupportedDisplaysKHR.adoc[]
 If pname:pDisplays is `NULL`, then the number of displays usable with the
 specified pname:planeIndex for pname:physicalDevice is returned in
 pname:pDisplayCount.
-Otherwise, pname:pDisplayCount must: point to a variable set by the user to
-the number of elements in the pname:pDisplays array, and on return the
-variable is overwritten with the number of handles actually written to
-pname:pDisplays.
+Otherwise, pname:pDisplayCount must: point to a variable set by the
+application to the number of elements in the pname:pDisplays array, and on
+return the variable is overwritten with the number of handles actually
+written to pname:pDisplays.
 If the value of pname:pDisplayCount is less than the number of usable
 display-plane pairs for pname:physicalDevice, at most pname:pDisplayCount
 handles will be written, and ename:VK_INCOMPLETE will be returned instead of
@@ -321,10 +319,10 @@ include::{generated}/api/protos/vkGetDisplayModePropertiesKHR.adoc[]
 If pname:pProperties is `NULL`, then the number of display modes available
 on the specified pname:display for pname:physicalDevice is returned in
 pname:pPropertyCount.
-Otherwise, pname:pPropertyCount must: point to a variable set by the user to
-the number of elements in the pname:pProperties array, and on return the
-variable is overwritten with the number of structures actually written to
-pname:pProperties.
+Otherwise, pname:pPropertyCount must: point to a variable set by the
+application to the number of elements in the pname:pProperties array, and on
+return the variable is overwritten with the number of structures actually
+written to pname:pProperties.
 If the value of pname:pPropertyCount is less than the number of display
 modes for pname:physicalDevice, at most pname:pPropertyCount structures will
 be written, and ename:VK_INCOMPLETE will be returned instead of
@@ -412,7 +410,6 @@ include::{generated}/api/structs/VkDisplayModeParametersKHR.adoc[]
     display is refreshed each second multiplied by 1000.
 
 [NOTE]
-.Note
 ====
 For example, a 60Hz display mode would report a pname:refreshRate of 60,000.
 ====
@@ -605,7 +602,6 @@ include::{generated}/api/structs/VkDisplayPlaneInfo2KHR.adoc[]
     using the specified plane.
 
 [NOTE]
-.Note
 ====
 This parameter also implicitly specifies a display.
 ====
@@ -696,7 +692,6 @@ include::{generated}/api/structs/VkDisplaySurfaceCreateInfoKHR.adoc[]
     surface.
 
 [NOTE]
-.Note
 ====
 Creating a display surface must: not modify the state of the displays,
 planes, or other resources it names.

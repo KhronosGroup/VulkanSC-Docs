@@ -499,7 +499,6 @@ image::{images}/primitive_topology_triangle_strip_last.svg[align="center",opts="
 endif::VK_EXT_provoking_vertex[]
 
 [NOTE]
-.Note
 ====
 The ordering of the vertices in each successive triangle is reversed, so
 that the winding order is consistent throughout the strip.
@@ -539,7 +538,6 @@ endif::VK_EXT_provoking_vertex[]
 
 ifdef::VK_KHR_portability_subset[]
 [NOTE]
-.Note
 ====
 If the `apiext:VK_KHR_portability_subset` extension is enabled, and
 slink:VkPhysicalDevicePortabilitySubsetFeaturesKHR::pname:triangleFans is
@@ -695,7 +693,6 @@ the total primitive in all cases, with the remaining three vertices only
 accessible in a <<geometry,geometry shader>>.
 
 [NOTE]
-.Note
 ====
 The ordering of the vertices in each successive triangle is altered so that
 the winding order is consistent throughout the strip.
@@ -1256,7 +1253,7 @@ include::{chapters}/commonvalidity/draw_indirect_drawcount.adoc[]
 include::{generated}/validity/protos/vkCmdDrawIndirect.adoc[]
 --
 
-[open,refpage='VkDrawIndirectCommand',desc='Structure specifying a indirect drawing command',type='structs',xrefs='vkCmdDrawIndirect']
+[open,refpage='VkDrawIndirectCommand',desc='Structure specifying an indirect drawing command',type='structs',xrefs='vkCmdDrawIndirect']
 --
 :refpage: VkDrawIndirectCommand
 
@@ -1416,7 +1413,7 @@ include::{chapters}/commonvalidity/draw_indexed_common.adoc[]
 include::{generated}/validity/protos/vkCmdDrawIndexedIndirect.adoc[]
 --
 
-[open,refpage='VkDrawIndexedIndirectCommand',desc='Structure specifying a indexed indirect drawing command',type='structs',xrefs='vkCmdDrawIndexedIndirect']
+[open,refpage='VkDrawIndexedIndirectCommand',desc='Structure specifying an indexed indirect drawing command',type='structs',xrefs='vkCmdDrawIndexedIndirect']
 --
 :refpage: VkDrawIndexedIndirectCommand
 

@@ -16,7 +16,6 @@ Host memory is memory needed by the Vulkan implementation for
 non-device-visible storage.
 
 [NOTE]
-.Note
 ====
 This memory may: be used to store the implementation's representation and
 state of Vulkan objects.
@@ -97,13 +96,13 @@ ifndef::VKSC_VERSION_1_0[]
 .Valid Usage
 ****
   * [[VUID-VkAllocationCallbacks-pfnAllocation-00632]]
-    pname:pfnAllocation must: be a valid pointer to a valid user-defined
-    tlink:PFN_vkAllocationFunction
+    pname:pfnAllocation must: be a valid pointer to a valid
+    application-defined tlink:PFN_vkAllocationFunction
   * [[VUID-VkAllocationCallbacks-pfnReallocation-00633]]
-    pname:pfnReallocation must: be a valid pointer to a valid user-defined
-    tlink:PFN_vkReallocationFunction
+    pname:pfnReallocation must: be a valid pointer to a valid
+    application-defined tlink:PFN_vkReallocationFunction
   * [[VUID-VkAllocationCallbacks-pfnFree-00634]]
-    pname:pfnFree must: be a valid pointer to a valid user-defined
+    pname:pfnFree must: be a valid pointer to a valid application-defined
     tlink:PFN_vkFreeFunction
   * [[VUID-VkAllocationCallbacks-pfnInternalAllocation-00635]]
     If either of pname:pfnInternalAllocation or pname:pfnInternalFree is not
@@ -149,7 +148,6 @@ allocation containing at least pname:size bytes, and with the pointer value
 being a multiple of pname:alignment.
 
 [NOTE]
-.Note
 ====
 Correct Vulkan operation cannot: be assumed if the application does not
 follow these rules.
@@ -481,6 +479,7 @@ endif::VK_EXT_validation_cache[]
 
 endif::VKSC_VERSION_1_0[]
 
+
 [[memory-device]]
 == Device Memory
 
@@ -669,7 +668,6 @@ ifdef::VK_AMD_device_coherent_memory[]
 endif::VK_AMD_device_coherent_memory[]
 
 [NOTE]
-.Note
 ====
 There is no ordering requirement between *X* and *Y* elements for the case
 their pname:propertyFlags members are not in a subset relation.
@@ -848,7 +846,6 @@ endif::VKSC_VERSION_1_0[]
 
 ifdef::VKSC_VERSION_1_0[]
 [NOTE]
-.Note
 ====
 Many safety critical environments are required to contend with single event
 upsets (SEUs).
@@ -947,7 +944,6 @@ are always automatically available and visible to both host and device
 memory domains.
 
 [NOTE]
-.Note
 ====
 Device coherence is a useful property for certain debugging use cases (e.g.
 crash analysis, where performing separate coherence actions could mean
@@ -1069,7 +1065,6 @@ constraint:
     were previously freed.
 
 [NOTE]
-.Note
 ====
 The contents of memory allocated by one application should: not be a
 function of data from protected memory objects of another application, even
@@ -1086,7 +1081,6 @@ before encountering these internal limits.
 
 ifndef::VKSC_VERSION_1_0[]
 [NOTE]
-.Note
 ====
 For historical reasons, if pname:maxMemoryAllocationCount is exceeded, some
 implementations may return ename:VK_ERROR_TOO_MANY_OBJECTS.
@@ -1097,7 +1091,6 @@ when the limit is reached.
 endif::VKSC_VERSION_1_0[]
 
 [NOTE]
-.Note
 ====
 Many protected memory implementations involve complex hardware and system
 software support, and often have additional and much lower limits on the
@@ -1167,7 +1160,7 @@ endif::VK_EXT_pageable_device_local_memory[]
 ****
   * [[VUID-vkAllocateMemory-pAllocateInfo-01713]]
     pname:pAllocateInfo->allocationSize must: be less than or equal to
-    slink:VkPhysicalDeviceMemoryProperties::pname:memoryHeaps[`memindex`].pname:size
+    slink:VkPhysicalDeviceMemoryProperties::pname:memoryHeaps[memindex].pname:size
     where `memindex` =
     slink:VkPhysicalDeviceMemoryProperties::pname:memoryTypes[pname:pAllocateInfo->memoryTypeIndex].pname:heapIndex
     as returned by flink:vkGetPhysicalDeviceMemoryProperties for the
@@ -1277,7 +1270,6 @@ been initialized does not allow the importing Vulkan instance to obtain data
 from the exporting Vulkan instance or vice-versa.
 
 [NOTE]
-.Note
 ====
 How exported and imported memory is isolated is left to the implementation,
 but applications should be aware that such isolation may: prevent
@@ -1288,12 +1280,10 @@ objects whenever possible.
 ====
 
 Importing memory must: not increase overall heap usage within a system.
-ifdef::VK_VERSION_1_1,VK_KHR_maintenance3,VK_EXT_memory_budget[]
 However, it must: affect the following per-process values:
 
-ifdef::VK_VERSION_1_1,VK_KHR_maintenance3[]
-  * slink:VkPhysicalDeviceMaintenance3Properties::pname:maxMemoryAllocationCount
-endif::VK_VERSION_1_1,VK_KHR_maintenance3[]
+  * slink:VkPhysicalDeviceLimits::pname:maxMemoryAllocationCount
+ifdef::VK_VERSION_1_1,VK_KHR_maintenance3,VK_EXT_memory_budget[]
 ifdef::VK_EXT_memory_budget[]
   * slink:VkPhysicalDeviceMemoryBudgetPropertiesEXT::pname:heapUsage
 endif::VK_EXT_memory_budget[]
@@ -1317,7 +1307,7 @@ implementations should: not strictly follow pname:memoryTypeIndex.
 Instead, they should: modify the allocation internally to use the required
 memory type for the application's given usage.
 This is because for an export operation, there is currently no way for the
-client to know the memory type index before allocating.
+application to know the memory type index before allocating.
 endif::VK_ANDROID_external_memory_android_hardware_buffer[]
 
 endif::VK_KHR_external_memory_win32,VK_KHR_external_memory_fd,VK_EXT_external_memory_host,VK_ANDROID_external_memory_android_hardware_buffer,VK_FUCHSIA_external_memory,VK_NV_external_memory_sci_buf,VK_QNX_external_memory_screen_buffer[]
@@ -1348,7 +1338,7 @@ ifdef::VK_FUCHSIA_buffer_collection[]
     slink:VkBufferCollectionFUCHSIA, and
     slink:VkMemoryDedicatedAllocateInfo::pname:buffer is present and
     non-NULL, slink:VkImportMemoryBufferCollectionFUCHSIA::pname:collection
-    and slink:VkImportMemoryBufferCollectionFUCHSIA::pname:index must match
+    and slink:VkImportMemoryBufferCollectionFUCHSIA::pname:index must: match
     slink:VkBufferCollectionBufferCreateInfoFUCHSIA::pname:collection and
     slink:VkBufferCollectionBufferCreateInfoFUCHSIA::pname:index,
     respectively, of the slink:VkBufferCollectionBufferCreateInfoFUCHSIA
@@ -1359,7 +1349,7 @@ ifdef::VK_FUCHSIA_buffer_collection[]
     slink:VkBufferCollectionFUCHSIA, and
     slink:VkMemoryDedicatedAllocateInfo::pname:image is present and
     non-NULL, slink:VkImportMemoryBufferCollectionFUCHSIA::pname:collection
-    and slink:VkImportMemoryBufferCollectionFUCHSIA::pname:index must match
+    and slink:VkImportMemoryBufferCollectionFUCHSIA::pname:index must: match
     slink:VkBufferCollectionImageCreateInfoFUCHSIA::pname:collection and
     slink:VkBufferCollectionImageCreateInfoFUCHSIA::pname:index,
     respectively, of the slink:VkBufferCollectionImageCreateInfoFUCHSIA
@@ -1629,7 +1619,7 @@ ifdef::VK_QNX_external_memory_screen_buffer[]
     If the parameters define an import operation, the external handle is a
     QNX Screen buffer, and the pname:pNext chain includes a
     slink:VkMemoryDedicatedAllocateInfo with pname:image that is not
-    dlink:VK_NULL_HANDLE, the QNX Screen's buffer must be a
+    dlink:VK_NULL_HANDLE, the QNX Screen's buffer must: be a
     <<memory-external-screen-buffer-validity,valid QNX Screen buffer>>
   * [[VUID-VkMemoryAllocateInfo-pNext-08945]]
     If the parameters define an import operation, the external handle is an
@@ -1645,7 +1635,7 @@ ifdef::VK_QNX_external_memory_screen_buffer[]
     QNX Screen buffer, and the pname:pNext chain includes a
     slink:VkMemoryDedicatedAllocateInfo structure with pname:image that is
     not dlink:VK_NULL_HANDLE, the width, height, and array layer dimensions
-    of pname:image and the QNX Screen buffer's code:_screen_buffer must be
+    of pname:image and the QNX Screen buffer's code:_screen_buffer must: be
     identical
 endif::VK_QNX_external_memory_screen_buffer[]
 ifdef::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
@@ -2020,6 +2010,7 @@ ifdef::VK_NV_external_memory[]
 include::{chapters}/VK_NV_external_memory/allocate_memory.adoc[]
 endif::VK_NV_external_memory[]
 
+
 ifdef::VK_KHR_external_memory_win32,VK_NV_external_memory_win32[]
 === Win32 External Memory
 endif::VK_KHR_external_memory_win32,VK_NV_external_memory_win32[]
@@ -2106,7 +2097,6 @@ For handle types defined as NT handles, the imported memory object holds a
 reference to its payload.
 
 [NOTE]
-.Note
 ====
 Non-NT handle import operations do not add a reference to their associated
 payload.
@@ -2186,7 +2176,6 @@ To avoid leaking resources, the application must: release ownership of them
 using the code:CloseHandle system call when they are no longer needed.
 
 [NOTE]
-.Note
 ====
 Non-NT handle types do not add a reference to their associated payload.
 If the original object owning the payload is destroyed, all resources and
@@ -2284,6 +2273,7 @@ include::{chapters}/VK_NV_external_memory_win32/import_memory_win32.adoc[]
 
 include::{chapters}/VK_NV_external_memory_win32/get_handle_win32.adoc[]
 endif::VK_NV_external_memory_win32[]
+
 
 ifdef::VK_KHR_external_memory_fd[]
 === File Descriptor External Memory
@@ -2399,7 +2389,6 @@ properties of the defined external memory handle types.
 
 ifdef::VK_EXT_external_memory_dma_buf[]
 [NOTE]
-.Note
 ====
 The size of the exported file may: be larger than the size requested by
 slink:VkMemoryAllocateInfo::pname:allocationSize.
@@ -2475,6 +2464,7 @@ include::{generated}/validity/structs/VkMemoryFdPropertiesKHR.adoc[]
 --
 endif::VK_KHR_external_memory_fd[]
 
+
 ifdef::VK_EXT_external_memory_host[]
 === Host External Memory
 
@@ -2531,7 +2521,6 @@ Implementations running on general-purpose operating systems should: not
 support importing host pointers for memory types which are not host-visible.
 
 [NOTE]
-.Note
 ====
 Using host pointers to back non-host visible allocations is a
 platform-specific use case, and applications should not attempt to do this
@@ -2632,8 +2621,8 @@ Behavior for imported pointers of such types is defined by
 
 include::{generated}/validity/structs/VkMemoryHostPointerPropertiesEXT.adoc[]
 --
-
 endif::VK_EXT_external_memory_host[]
+
 
 ifdef::VK_ANDROID_external_memory_android_hardware_buffer[]
 === Android Hardware Buffer External Memory
@@ -2825,7 +2814,6 @@ ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT and
 ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT.
 
 [NOTE]
-.Note
 ====
 The pname:formatFeatures member only indicates the features available when
 using an
@@ -2877,7 +2865,6 @@ image via code:samplerExternalOES in OpenGL ES using equivalent sampler
 parameters.
 
 [NOTE]
-.Note
 ====
 Since
 {GLregistry}/OES/OES_EGL_image_external.txt[`GL_OES_EGL_image_external`]
@@ -2967,7 +2954,6 @@ flag must: be renderable in some way in Vulkan, either:
 include::{generated}/validity/structs/VkAndroidHardwareBufferFormatResolvePropertiesANDROID.adoc[]
 --
 endif::VK_ANDROID_external_format_resolve[]
-
 endif::VK_ANDROID_external_memory_android_hardware_buffer[]
 
 
@@ -3039,6 +3025,7 @@ endif::VK_FUCHSIA_external_memory[]
 ifdef::VK_EXT_metal_objects[]
 include::{chapters}/VK_EXT_metal_objects/device_memory.adoc[]
 endif::VK_EXT_metal_objects[]
+
 
 ifdef::VK_NV_external_memory_sci_buf[]
 === NvSciBuf External Memory
@@ -3259,6 +3246,7 @@ ifdef::VK_QNX_external_memory_screen_buffer[]
 include::{chapters}/VK_QNX_external_memory_screen_buffer/device_memory.adoc[]
 endif::VK_QNX_external_memory_screen_buffer[]
 
+
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
 === Device Group Memory Allocations
 
@@ -3305,7 +3293,6 @@ ename:VK_TRUE, then memory is only consumed for the devices in the device
 mask.
 
 [NOTE]
-.Note
 ====
 In practice, most allocations on a multi-instance heap will be allocated
 across all physical devices.
@@ -3402,7 +3389,6 @@ retrieved from flink:vkGetDeviceMemoryOpaqueCaptureAddress on an identically
 created memory allocation on the same implementation.
 
 [NOTE]
-.Note
 ====
 In most cases, it is expected that a non-zero pname:opaqueAddress is an
 address retrieved from flink:vkGetDeviceMemoryOpaqueCaptureAddress on an
@@ -3419,7 +3405,6 @@ zero.
 
 include::{generated}/validity/structs/VkMemoryOpaqueCaptureAddressAllocateInfo.adoc[]
 --
-
 endif::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
 
 
@@ -3471,7 +3456,6 @@ If a memory object is mapped at the time it is freed, it is implicitly
 unmapped.
 
 [NOTE]
-.Note
 ====
 As described <<memory-device-unmap-does-not-flush, below>>, host writes are
 not implicitly flushed when the memory object is unmapped, but the
@@ -3489,6 +3473,7 @@ affect any other memory.
 include::{generated}/validity/protos/vkFreeMemory.adoc[]
 --
 endif::VKSC_VERSION_1_0[]
+
 
 [[memory-device-hostaccess]]
 === Host Access to Device Memory Objects
@@ -3535,14 +3520,12 @@ After a successful call to fname:vkMapMemory the memory object pname:memory
 is considered to be currently _host mapped_.
 
 [NOTE]
-.Note
 ====
 It is an application error to call fname:vkMapMemory on a memory object that
 is already _host mapped_.
 ====
 
 [NOTE]
-.Note
 ====
 fname:vkMapMemory will fail if the implementation is unable to allocate an
 appropriately sized contiguous virtual address range, e.g. due to virtual
@@ -3576,7 +3559,6 @@ responsible for synchronizing both device and host access to that memory
 range.
 
 [NOTE]
-.Note
 ====
 It is important for the application developer to become meticulously
 familiar with all of the mechanisms described in the chapter on
@@ -3629,8 +3611,8 @@ memory map, are:
 include::{generated}/api/enums/VkMemoryMapFlagBits.adoc[]
 
   * ename:VK_MEMORY_MAP_PLACED_BIT_EXT requests that the implementation
-    place the memory map at the virtual address specified by the client via
-    slink:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress, replacing any
+    place the memory map at the virtual address specified by the application
+    via slink:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress, replacing any
     existing mapping at that address.
     This flag must: not be used with flink:vkMapMemory as there is no way to
     specify the placement address.
@@ -3767,8 +3749,8 @@ The implementation will place the memory map at the specified address,
 replacing any existing maps in the specified memory range.
 Replacing memory maps in this way does not implicitly unmap Vulkan memory
 objects.
-Instead, the client must: ensure no other Vulkan memory objects are mapped
-anywhere in the specified virtual address range.
+Instead, the application must: ensure no other Vulkan memory objects are
+mapped anywhere in the specified virtual address range.
 If successful, pname:ppData will be set to the same value as
 sname:VkMemoryMapPlacedInfoEXT::pname:pPlacedAddress and
 fname:vkMapMemory2KHR will return ename:VK_SUCCESS.
@@ -3812,7 +3794,6 @@ memory allocations: fname:vkFlushMappedMemoryRanges and
 fname:vkInvalidateMappedMemoryRanges.
 
 [NOTE]
-.Note
 ====
 If the memory object was created with the
 ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT set,
@@ -3826,7 +3807,6 @@ types>> for more information.
 
 ifdef::VK_EXT_external_memory_host[]
 [NOTE]
-.Note
 ====
 While memory objects imported from a handle type of
 ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_ALLOCATION_BIT_EXT or
@@ -3890,7 +3870,6 @@ However, implementations must: ensure that writes that have not been flushed
 do not become visible to any other memory.
 
 [NOTE]
-.Note
 ====
 The above guarantee avoids a potential memory corruption in scenarios where
 host writes to a mapped memory object have not been flushed before the
@@ -3932,7 +3911,6 @@ that set has been written by the device since it was first host mapped, or
 the last time it was invalidated.
 
 [NOTE]
-.Note
 ====
 Mapping non-coherent memory does not implicitly invalidate that memory.
 ====
@@ -4080,7 +4058,7 @@ include::{generated}/api/enums/VkMemoryUnmapFlagBitsKHR.adoc[]
     flink:vkUnmapMemory2KHR call completes.
     Future system memory map operations or calls to flink:vkMapMemory or
     flink:vkMapMemory2KHR will not return addresses in that range unless the
-    range has since been unreserved by the client or the mapping is
+    range has since been unreserved by the application or the mapping is
     explicitly placed in that range by calling flink:vkMapMemory2KHR with
     ename:VK_MEMORY_MAP_PLACED_BIT_EXT, or doing the system memory map
     equivalent.
@@ -4100,6 +4078,7 @@ more elink:VkMemoryUnmapFlagBitsKHR.
 --
 endif::VK_KHR_map_memory2[]
 
+
 [[memory-device-lazy_allocation]]
 === Lazily Allocated Memory
 
@@ -4115,7 +4094,6 @@ sname:VkImage whose usage flags include
 ename:VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT.
 
 [NOTE]
-.Note
 ====
 Using lazily allocated memory objects for framebuffer attachments that are
 not needed once a render pass instance has completed may: allow some
@@ -4193,7 +4171,6 @@ Protected memory adds the following concepts:
 
 ifdef::VK_EXT_pipeline_protected_access[]
 [NOTE]
-.Note
 ====
 When the <<features-protectedMemory, pname:protectedMemory>> feature is
 enabled, all pipelines may: be recorded in either protected or unprotected
@@ -4267,7 +4244,6 @@ The actual basetype:AHardwareBuffer type is defined in Android NDK headers.
 --
 
 [NOTE]
-.Note
 ====
 The NDK format, usage, and size/dimensions of an basetype:AHardwareBuffer
 object can be obtained with the code:AHardwareBuffer_describe function.
@@ -4348,12 +4324,9 @@ formats, layouts, color models, etc., which do not have Vulkan equivalents.
 Such _external formats_ are commonly used by external image sources such as
 video decoders or cameras.
 Vulkan can: import Android hardware buffers that have external formats, but
-since the image contents are in an undiscoverable and possibly proprietary
-representation, images with external formats must: only be used as
-ifdef::VK_ANDROID_external_format_resolve[]
-resolve images or
-endif::VK_ANDROID_external_format_resolve[]
-sampled images, and must: have optimal tiling.
+since the image contents are in a possibly proprietary representation,
+images with external formats must: have optimal tiling, and their use is
+restricted.
 Images with external formats must: only be sampled with a sampler that has
 {YCbCr} conversion enabled.
 
@@ -4504,7 +4477,6 @@ endif::VK_VERSION_1_1[]
 
 ifdef::VK_VERSION_1_2,VK_KHR_image_format_list[]
 [NOTE]
-.Note
 ====
 When using ename:VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT with Android hardware
 buffer images, applications should: use slink:VkImageFormatListCreateInfo to
@@ -4533,6 +4505,7 @@ code:AHARDWAREBUFFER_USAGE_GPU_DATA_BUFFER, code:width must: equal the
 device memory allocation size, and code:height and code:layers must: be `1`.
 endif::VK_KHR_external_memory_capabilities+VK_ANDROID_external_memory_android_hardware_buffer[]
 
+
 ifdef::VK_QNX_external_memory_screen_buffer[]
 ifndef::VK_ANDROID_external_memory_android_hardware_buffer[]
 [[memory-external-handle-types]]
@@ -4541,6 +4514,7 @@ endif::VK_ANDROID_external_memory_android_hardware_buffer[]
 
 include::{chapters}/VK_QNX_external_memory_screen_buffer/qnx_screen_buffer.adoc[]
 endif::VK_QNX_external_memory_screen_buffer[]
+
 
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
 [[memory-peer-memory-features]]
@@ -4618,7 +4592,6 @@ endif::VK_KHR_device_group[]
     Shader atomics are considered to be writes.
 
 [NOTE]
-.Note
 ====
 The peer memory features of a memory heap also apply to any accesses that
 may: be performed during <<synchronization-image-layout-transitions, image
@@ -4652,6 +4625,7 @@ or more elink:VkPeerMemoryFeatureFlagBits.
 --
 endif::VK_VERSION_1_1,VK_KHR_device_group[]
 
+
 ifdef::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
 === Opaque Capture Address Query
 
@@ -4683,7 +4657,6 @@ slink:VkMemoryOpaqueCaptureAddressAllocateInfo::pname:opaqueCaptureAddress,
 the return value must: be the same address.
 
 [NOTE]
-.Note
 ====
 The expected usage for these opaque addresses is only for trace
 capture/replay tools to store these addresses in a trace and subsequently

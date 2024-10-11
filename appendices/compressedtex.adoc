@@ -23,6 +23,7 @@ The conversion between linear and nonlinear encoding is performed as
 described in the "`KHR_DF_TRANSFER_SRGB`" section of the Khronos Data Format
 Specification.
 
+
 <<<
 
 [[appendix-compressedtex-bc]]
@@ -60,6 +61,7 @@ chapter.
 | ename:VK_FORMAT_BC7_SRGB_BLOCK      |BC7, sRGB-encoded
 |====
 
+
 <<<
 
 [[appendix-compressedtex-etc2]]
@@ -83,6 +85,7 @@ Formats`" chapter of the <<data-format,Khronos Data Format Specification>>.
 | ename:VK_FORMAT_EAC_R11G11_UNORM_BLOCK      |Unsigned RG11 EAC
 | ename:VK_FORMAT_EAC_R11G11_SNORM_BLOCK      |Signed RG11 EAC
 |====
+
 
 <<<
 
@@ -152,7 +155,6 @@ using an ASTC SFLOAT texture format.
 endif::VK_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
 
 [NOTE]
-.Note
 ====
 An HDR block in a texture passed using a LDR UNORM format will return the
 appropriate ASTC error color if the implementation supports only the ASTC
@@ -160,8 +162,8 @@ LDR profile, but may result in either the error color or a decompressed HDR
 color if the implementation supports HDR decoding.
 ====
 
-ifdef::VK_EXT_astc_decode_mode[]
 
+ifdef::VK_EXT_astc_decode_mode[]
 === ASTC Decode Mode
 
 If the `VK_EXT_astc_decode_mode` extension is enabled, the decode mode is

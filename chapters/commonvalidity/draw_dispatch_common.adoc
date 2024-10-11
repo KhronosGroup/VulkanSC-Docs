@@ -187,6 +187,11 @@ ifdef::VK_EXT_shader_object[]
     slink:VkShaderEXT
 endif::VK_EXT_shader_object[]
     , as described in <<descriptorsets-compatibility>>
+  * [[VUID-{refpage}-None-10068]]
+    For each array of resources that is used by <<shaders-binding,a bound
+    shader>>, the indices used to access members of the array must: be less
+    than the descriptor count for the identified binding in the descriptor
+    sets used by this command
 ifdef::VK_VERSION_1_3,VK_KHR_maintenance4[]
   * [[VUID-{refpage}-maintenance4-08602]]
     If the <<features-maintenance4, pname:maintenance4>> feature is not
@@ -263,9 +268,8 @@ ifdef::VK_EXT_shader_object[]
 endif::VK_EXT_shader_object[]
 ifndef::VK_EXT_shader_object[There]
     must: not have been any calls to dynamic state setting commands for any
-    state not specified as dynamic in the slink:VkPipeline object bound to
-    the pipeline bind point used by this command, since that pipeline was
-    bound
+    state specified statically in the slink:VkPipeline object bound to the
+    pipeline bind point used by this command, since that pipeline was bound
   * [[VUID-{refpage}-None-08609]]
     If the slink:VkPipeline object bound to the pipeline bind point used by
     this command
@@ -374,7 +378,7 @@ endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-{refpage}-viewType-07752]]
     If a slink:VkImageView is accessed as a result of this command, then the
     image view's pname:viewType must: match the code:Dim operand of the
-    code:OpTypeImage as described in <<textures-operation-validation>>
+    code:OpTypeImage as described in <<spirvenv-image-dimensions>>
   * [[VUID-{refpage}-format-07753]]
     If a slink:VkImageView is accessed as a result of this command, then the
     <<formats-numericformat, numeric type>> of the image view's pname:format

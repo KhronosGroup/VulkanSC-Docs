@@ -104,7 +104,6 @@ This subset was decided by:
   * Non-KHR or EXT extension are supported on request.
 
 [NOTE]
-.Note
 ====
 During development it is likely that application developers will need
 additional functionality in a Vulkan SC implementation beyond what is
@@ -271,7 +270,7 @@ a framework for handling deviations.
 |Rule       |8.6: "An identifier with external linkage shall have exactly one
              external definition"
 |Category   |Required
-|Note       |This is reported for every API entry point declaration, and the
+|Note       |This is reported for every API command declaration, and the
              external definitions are provided by the implementation.
 |Rationale  |It is expected that a Vulkan SC application will link against an
              implementation that provides these definitions.

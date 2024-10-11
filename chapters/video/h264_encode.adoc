@@ -10,7 +10,6 @@ profile>> can: be used to encode elementary video stream sequences compliant
 to the <<itu-t-h264,ITU-T H.264 Specification>>.
 
 [NOTE]
-.Note
 ====
 Refer to the <<preamble, Preamble>> for information on how the Khronos
 Intellectual Property Rights Policy relates to normative references to
@@ -40,15 +39,14 @@ section 8 of the <<itu-t-h264,ITU-T H.264 Specification>> as follows:
      picture>> and any <<active-reference-pictures,active reference
      pictures>>.
   * The encoded bitstream data is written to the destination video bitstream
-     buffer range as defined in the
-     <<encode-h264-bitstream-data-access,H.264 Encode Bitstream Data
-     Access>> section.
+    buffer range as defined in the <<encode-h264-bitstream-data-access,H.264
+    Encode Bitstream Data Access>> section.
   * Picture data in the <<video-picture-resources,video picture resources>>
-     corresponding to the used <<encode-input-picture,encode input
-     picture>>, <<active-reference-pictures,active reference pictures>>, and
-     optional <<reconstructed-picture,reconstructed picture>> is accessed as
-     defined in the <<encode-h264-picture-data-access,H.264 Encode Picture
-     Data Access>> section.
+    corresponding to the used <<encode-input-picture,encode input picture>>,
+    <<active-reference-pictures,active reference pictures>>, and optional
+    <<reconstructed-picture,reconstructed picture>> is accessed as defined
+    in the <<encode-h264-picture-data-access,H.264 Encode Picture Data
+    Access>> section.
   * The decision on <<encode-ref-pic-setup,reference picture setup>> is made
     according to the parameters specified in the
     <<encode-h264-ref-pic-setup,H.264 picture information>>.
@@ -137,7 +135,7 @@ input picture>>, <<reference-picture,reference picture>>, or
 operations using an <<encode-h264-profile,H.264 encode profile>> is defined
 as the set of texels within the coordinate range:
 
-  {empty}:: [eq]#([0,pname:endX),[0,pname:endY))#
+  {empty}:: [eq]#([0,pname:endX), [0,pname:endY))#
 
 Where:
 
@@ -176,6 +174,9 @@ reference picture data for sample prediction).
 
 H.264 pictures are partitioned into slices, as defined in section 6.3 of the
 <<itu-t-h264,ITU-T H.264 Specification>>.
+
+For the purposes of this specification, the H.264 slices comprising a
+picture are referred to as the _picture partitions_ of the picture.
 
 Video encode operations using an <<encode-h264-profile,H.264 encode
 profile>> can: encode slices of different types, as defined in section 7.4.3
@@ -219,6 +220,13 @@ enumeration type code:StdVideoH264PictureType:
     Specification>>.
     A frame consisting of an IDR picture is also referred to as an _IDR
     frame_.
+
+
+[[encode-h264-coding-blocks]]
+=== H.264 Coding Blocks
+
+H.264 encode supports a single type of coding block called a _macroblock_,
+as defined in section 3.84 of the <<itu-t-h264,ITU-T H.264 Specification>>.
 
 
 [[encode-h264-profile]]
@@ -281,7 +289,6 @@ include::{generated}/api/structs/VkVideoEncodeH264CapabilitiesKHR.adoc[]
     for <<encode-h264-p-pic,P pictures>>.
 +
 [NOTE]
-.Note
 ====
 As implementations may: <<encode-overrides,override>> the reference lists,
 pname:maxPPictureL0ReferenceCount does not limit the number of elements that
@@ -297,7 +304,6 @@ pictures is not allowed.
     encoding of <<encode-h264-b-pic,B pictures>> is supported.
 +
 [NOTE]
-.Note
 ====
 As implementations may: <<encode-overrides,override>> the reference lists,
 pname:maxBPictureL0ReferenceCount and pname:maxL1ReferenceCount does not
@@ -768,7 +774,7 @@ parameter data to the output buffer in the following order:
 .Valid Usage
 ****
   * [[VUID-VkVideoEncodeH264SessionParametersGetInfoKHR-writeStdSPS-08279]]
-    At least one of pname:writeStdSPS and pname:writeStdPPS must: be set to
+    At least one of pname:writeStdSPS and pname:writeStdPPS must: be
     ename:VK_TRUE
 ****
 
@@ -798,6 +804,7 @@ include::{generated}/api/structs/VkVideoEncodeH264SessionParametersFeedbackInfoK
 
 include::{generated}/validity/structs/VkVideoEncodeH264SessionParametersFeedbackInfoKHR.adoc[]
 --
+
 
 === H.264 Encoding Parameters
 
@@ -1101,6 +1108,7 @@ include::{generated}/validity/structs/VkVideoEncodeH264DpbSlotInfoKHR.adoc[]
 [[encode-h264-rate-control]]
 === H.264 Encode Rate Control
 
+
 [[encode-h264-gop]]
 ==== Group of Pictures
 
@@ -1202,7 +1210,6 @@ Dyadic Temporal Layer Pattern::
 image::{images}/h26x_layer_pattern_dyadic.svg[align="center",title="H.264 dyadic temporal layer pattern",opts="{imageopts}"]
 
 [NOTE]
-.Note
 ====
 Multi-layer rate control and multi-layer coding are typically used for
 streaming cases where low latency is expected, hence B pictures with
@@ -1253,7 +1260,6 @@ Otherwise the new rate control state may: be applied without a reset
 depending on the implementation and the specified rate control parameters.
 
 [NOTE]
-.Note
 ====
 It would be possible to infer the picture type to be used when encoding a
 frame, on the basis of the values provided for pname:consecutiveBFrameCount,
@@ -1385,7 +1391,6 @@ following:
     sname:VkVideoEncodeH264RateControlLayerInfoKHR.
 
 [NOTE]
-.Note
 ====
 In general, applications need to configure rate control parameters
 appropriately in order to be able to get the desired rate control behavior,

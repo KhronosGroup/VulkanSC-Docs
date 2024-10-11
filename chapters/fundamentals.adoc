@@ -24,13 +24,12 @@ the host environment with respect to Vulkan implementations:
     their size in bytes.
   * The host must: have runtime support for 32- and 64-bit floating-point
     types satisfying the range and precision constraints in the
-    <<fundamentals-floatingpoint,Floating Point Computation>> section.
+    <<fundamentals-floating-point, Floating-Point Computation>> section.
   * The representation and endianness of these types on the host must: match
     the representation and endianness of the same types on every physical
     device supported.
 
 [NOTE]
-.Note
 ====
 Since a variety of data types and structures in Vulkan may: be accessible by
 both host and physical device operations, the implementation should: be able
@@ -65,7 +64,6 @@ ifndef::VKSC_VERSION_1_0[sparse memory management,]
 and transfer.
 
 [NOTE]
-.Note
 ====
 A single device may: report multiple similar queue families rather than, or
 as well as, reporting multiple members of one or more of those families.
@@ -162,7 +160,6 @@ Additional explicit ordering constraints can be expressed with the various
 <<synchronization, explicit synchronization primitives>>.
 
 [NOTE]
-.Note
 ====
 Implementations have significant freedom to overlap execution of work
 submitted to a queue, and this is common due to deep pipelining and
@@ -194,7 +191,6 @@ Indirection::
   recorded in the same command buffer.
 
 [NOTE]
-.Note
 ====
 In the absence of explicit synchronization or <<synchronization-implicit,
 implicit ordering guarantees>>, action commands may overlap execution or
@@ -265,7 +261,7 @@ frees.
 ifdef::VKSC_VERSION_1_0[]
 In Vulkan SC, data structures for objects are reserved by the implementation
 at device creation time in order to enable implementations to rely solely on
-static memory management at run-time.
+static memory management at runtime.
 The slink:VkDeviceObjectReservationCreateInfo structure provides upper
 bounds on the simultaneous number of objects of each type that can: be
 allocated during the lifetime of the slink:VkDevice.
@@ -333,9 +329,9 @@ sname:VkDescriptorSetLayout objects may: be accessed by commands that
 operate on descriptor sets allocated using that layout, and those descriptor
 sets must: not be updated with flink:vkUpdateDescriptorSets after the
 descriptor set layout has been destroyed.
-Otherwise, a sname:VkDescriptorSetLayout object passed as a parameter to
-create another object is not further accessed by that object after the
-duration of the command it is passed into.
+Otherwise, a slink:VkDescriptorSetLayout object is no longer referenced by
+an API command it is passed into once host execution of that command
+completes.
 
 The application must: not destroy any other type of Vulkan object until all
 uses of that object by the device (such as via command buffer execution)
@@ -538,7 +534,6 @@ To bring an external object into scope, an external handle must: be exported
 from the object in the source scope and imported into the destination scope.
 
 [NOTE]
-.Note
 ====
 The scope of external handles and their associated resources may: vary
 according to their type, but they can: generally be shared across process
@@ -591,7 +586,6 @@ They may: also provide library symbols for commands defined by additional
 extensions.
 
 [NOTE]
-.Note
 ====
 These requirements and recommendations are intended to allow implementors to
 take advantage of platform-specific conventions for SDKs, ABIs, library
@@ -721,6 +715,103 @@ calling the same command with the same parameters, so long as those
 parameters themselves all remain valid.
 
 
+[[fundamentals-commandsyntax-array-results]]
+=== Array Results
+
+Some query commands of the form ftext:vkGet* and ftext:vkEnumerate* enable
+retrieving multiple results in the form of a return array.
+Such commands typically have two pointer arguments as follows:
+
+  * An element count pointer pointing to an integer variable, conventionally
+    named as ftext:p*Count where ftext:* is the capitalized singular form of
+    the name of the retrieved values.
+  * A pointer to an array where the result array is retrieved,
+    conventionally named as ftext:p* where ftext:* is the capitalized plural
+    form of the name of the retrieved values.
+
+If such commands are called with the array pointer set to `NULL`, then the
+number of retrievable elements is returned in the variable pointed to by the
+element count pointer.
+Otherwise, the element count pointer must: point to a variable set by the
+application to the number of elements in the return array, and on return the
+variable is overwritten with the number of elements actually written to the
+return array.
+If the input element count is less than the number of retrievable array
+elements, the query will write only as many elements to the return array as
+specified by the element count variable set by the application, and the
+command will return ename:VK_INCOMPLETE instead of ename:VK_SUCCESS, to
+indicate that not all retrievable array elements were returned.
+
+[NOTE]
+====
+In practice, this means that applications will typically call such query
+commands twice:
+
+  * First, with the array pointer set to `NULL`, to retrieve the number of
+    retrievable elements.
+  * Second, with the array pointer pointing to an application allocated
+    storage for at least as many elements as indicated by the variable
+    pointed to by the element count pointer, to retrieve at most as many of
+    the retrievable elements.
+====
+
+Query commands that return one or more structures, regardless of whether
+they return a single or an array of structures with or without a pname:pNext
+chain, may: also contain arrays within those structures.
+Such return arrays are typically defined in the form of two members as
+follows:
+
+  * An integer value specifying the element count, conventionally named as
+    ftext:*Count where ftext:* is the singular form of the name of the
+    retrieved values.
+  * A pointer to an array where the result array is retrieved,
+    conventionally named as ftext:p* where ftext:* is the capitalized plural
+    form of the name of the retrieved values.
+
+Analogously to query commands that return multiple results, if the command
+is called with the array pointer member of the output structure in question
+set to `NULL`, then the number of retrievable elements is returned in the
+element count member of that output structure.
+Otherwise, the element count must: specify the number of elements in the
+return array, and on return the element count member is overwritten with the
+number of elements actually written to the return array.
+If the input element count is less than the number of retrievable array
+elements, the query will write only as many elements to the return array as
+specified by the input element count, and the command will return
+ename:VK_INCOMPLETE instead of ename:VK_SUCCESS, if the query command has a
+elink:VkResult return type, to indicate that not all retrievable array
+elements were returned.
+
+[NOTE]
+====
+Applications need to separately track the value they provided as the input
+element count member for such arrays and compare those with the returned
+element counts in order to determine whether the actually returned element
+count is smaller than the size of the return array.
+Another side effect of this is that it is impossible for the application to
+determine if the number of retrievable elements has increased beyond the
+provided input element count so using return arrays in output structures
+should: be limited to _invariant_ array results.
+In practice, this means that applications will typically call such query
+commands multiple times:
+
+  * First, with the array pointer member(s) set to `NULL`, to retrieve the
+    number(s) of retrievable elements.
+  * Second, with the array pointer(s) pointing to an application allocated
+    storage for at least as many elements as indicated by the element count
+    member(s), to retrieve at most as many of the retrievable elements.
+  * Then the process may: need to be repeated for all other newly introduced
+    return arrays in any nested output structures indirectly specified
+    through the previously retrieved result arrays.
+====
+
+Regardless of the type of query command, any array pointer member of an
+output structure must: either be `NULL`, or point to an
+application-allocated array.
+Query commands must: not return a pointer to implementation allocated
+storage in any output structure.
+
+
 [[fundamentals-threadingbehavior]]
 == Threading Behavior
 
@@ -743,7 +834,6 @@ that the two commands are separated by an appropriate memory barrier (if
 needed).
 
 [NOTE]
-.Note
 ====
 Memory barriers are particularly relevant for hosts based on the ARM CPU
 architecture, which is more weakly ordered than many developers are
@@ -794,8 +884,9 @@ is extended with the pname:pipelineCache parameter to
 ftext:vkCreate*Pipelines being externally synchronized.
 endif::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
 
-There are also a few instances where a command can: take in a user allocated
-list whose contents are externally synchronized parameters.
+There are also a few instances where a command can: take in an
+application-allocated list whose contents are externally synchronized
+parameters.
 In these cases, the caller must: guarantee that at most one thread is using
 a given element within the list at a given time.
 These parameters are listed below.
@@ -828,7 +919,7 @@ core layer to an application using the API incorrectly is undefined:, and
 may: include program termination.
 However, implementations must: ensure that incorrect usage by an application
 does not affect the integrity of the operating system, the Vulkan
-implementation, or other Vulkan client applications in the system.
+implementation, or other applications in the system using Vulkan.
 In particular, any guarantees made by an operating system about whether
 memory from one process can: be visible to another process or not must: not
 be violated by a Vulkan implementation for *any memory allocation*.
@@ -837,7 +928,6 @@ integrity guarantees beyond those provided by the OS unless explicitly
 directed by the application's use of a particular feature or extension.
 
 [NOTE]
-.Note
 ====
 For instance, if an operating system guarantees that data in all its memory
 allocations are set to zero when newly allocated, the Vulkan implementation
@@ -874,7 +964,6 @@ This is such that a validation layer or linter can: be written directly
 against these statements at the point they are specified.
 
 [NOTE]
-.Note
 ====
 This does lead to some non-obvious places for valid usage statements.
 For instance, the valid values for a structure might depend on a separate
@@ -1027,7 +1116,6 @@ Reserved values are values not defined by any extension for that enumerated
 type.
 
 [NOTE]
-.Note
 ====
 In some special cases, an enumerant is only meaningful if a feature defined
 by an extension is also enabled, as well as the extension itself.
@@ -1036,7 +1124,6 @@ cases.
 ====
 
 [NOTE]
-.Note
 ====
 This language is intended to accommodate cases such as "`hidden`" extensions
 known only to driver internals, or layers enabling extensions without
@@ -1045,7 +1132,6 @@ by any extension.
 ====
 
 [NOTE]
-.Note
 ====
 Application developers are encouraged to be careful when using `switch`
 statements with Vulkan API enums.
@@ -1096,7 +1182,6 @@ Only the low-order 31 bits (bit positions zero through 30) are available for
 use as flag bits.
 
 [NOTE]
-.Note
 ====
 This restriction is due to poorly defined behavior by C compilers given a C
 enumerant value of `0x80000000`.
@@ -1139,7 +1224,6 @@ undefined: in its corresponding etext:Vk*FlagBits2 type.
 An application cannot: rely on the state of these unspecified bits.
 
 [NOTE]
-.Note
 ====
 Both the etext:Vk*FlagBits2 type, and the individual bits defined for that
 type, are defined as `uint64_t` integers in the C API.
@@ -1260,7 +1344,7 @@ ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 Physical-device-level functionality or behavior added by a <<extensions,
 device extension>> to the API must: not be used unless the conditions
 described in <<initialization-phys-dev-extensions, Extending Physical Device
-Core Functionality>> are met.
+From Device Extensions>> are met.
 endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 
 Device-level functionality added by a <<extensions, device extension>> that
@@ -1268,6 +1352,7 @@ is dispatched from a slink:VkDevice, or from a child object of a
 slink:VkDevice must: not be used unless that extension is supported by the
 device as determined by flink:vkEnumerateDeviceExtensionProperties, and that
 extension is enabled in slink:VkDeviceCreateInfo.
+
 
 [[fundamentals-validusage-versions]]
 ==== Valid Usage for Newer Core Versions
@@ -1306,7 +1391,7 @@ two categories:
   * Successful completion codes are returned when a command needs to
     communicate success or status information.
     All successful completion codes are non-negative values.
-  * Run time error codes are returned when a command needs to communicate a
+  * Runtime error codes are returned when a command needs to communicate a
     failure that could only be detected at runtime.
     All runtime error codes are negative values.
 
@@ -1344,12 +1429,18 @@ ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
     have required compilation, but the application requested compilation to
     not be performed.
 endif::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
+ifdef::VK_KHR_pipeline_binary[]
+  * ename:VK_PIPELINE_BINARY_MISSING_KHR The application attempted to create
+    a pipeline binary by querying an internal cache, but the internal cache
+    entry did not exist.
+  * ename:VK_ERROR_NOT_ENOUGH_SPACE_KHR The application did not provide
+    enough space to return all the required data.
+endif::VK_KHR_pipeline_binary[]
 ifdef::VK_EXT_shader_object[]
   * ename:VK_INCOMPATIBLE_SHADER_BINARY_EXT The provided binary shader code
     is not compatible with this device.
 +
 [NOTE]
-.Note
 ====
 In the initial version of the `apiext:VK_EXT_shader_object` extension, this
 return code was named ename:VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT and
@@ -1545,7 +1636,6 @@ endif::hidden[]
 endif::VKSC_VERSION_1_0[]
 
 [NOTE]
-.Note
 ====
 As a general rule, ftext:Free, ftext:Release, and ftext:Reset commands do
 not return ename:VK_ERROR_OUT_OF_HOST_MEMORY, while any other command with a
@@ -1560,7 +1650,6 @@ Under these conditions, it may: be returned from any command returning a
 elink:VkResult.
 
 [NOTE]
-.Note
 ====
 ename:VK_ERROR_UNKNOWN is not expected to ever be returned if the
 application behavior is valid, and if the implementation is bug-free.
@@ -1587,7 +1676,6 @@ are reported by fname:vkEndCommandBuffer.
 
 ifdef::VKSC_VERSION_1_0[]
 [NOTE]
-.Note
 ====
 Implementations can also use <<fault-handling>> to report runtime errors
 where suitable return values are not available or to provide more prompt
@@ -1617,7 +1705,7 @@ by Vulkan.
 Specific floating-point formats are described later in this section.
 
 
-[[fundamentals-floatingpoint]]
+[[fundamentals-floating-point]]
 === Floating-Point Computation
 
 Most floating-point computation is performed in SPIR-V shader modules.
@@ -1631,20 +1719,6 @@ For these computations, we do not specify how floating-point numbers are to
 be represented, or the details of how operations on them are performed, but
 only place minimal requirements on representation and precision as described
 in the remainder of this section.
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-(Jon, Bug 14966) This is a rat's nest of complexity, both in terms of
-describing/enumerating places such computation may: take place (other than
-"`not shader code`") and in how implementations may: do it.
-We have consciously deferred the resolution of this issue to post-1.0, and
-in the meantime, the following language inherited from the OpenGL
-Specification is inserted as a placeholder.
-Hopefully it can: be tightened up considerably.
-====
-endif::editing-notes[]
 
 We require simply that numbers`' floating-point parts contain enough bits
 and that their exponent fields are large enough so that individual results
@@ -1690,23 +1764,23 @@ formats; and any [eq]#NaN# is converted to a [eq]#NaN#.
 [[fundamentals-fp16]]
 === 16-Bit Floating-Point Numbers
 
-16-bit floating point numbers are defined in the "`16-bit floating point
+16-bit floating-point numbers are defined in the "`16-bit floating-point
 numbers`" section of the <<data-format,Khronos Data Format Specification>>.
 
 
 [[fundamentals-fp11]]
 === Unsigned 11-Bit Floating-Point Numbers
 
-Unsigned 11-bit floating point numbers are defined in the "`Unsigned 11-bit
-floating point numbers`" section of the <<data-format,Khronos Data Format
+Unsigned 11-bit floating-point numbers are defined in the "`Unsigned 11-bit
+floating-point numbers`" section of the <<data-format,Khronos Data Format
 Specification>>.
 
 
 [[fundamentals-fp10]]
 === Unsigned 10-Bit Floating-Point Numbers
 
-Unsigned 10-bit floating point numbers are defined in the "`Unsigned 10-bit
-floating point numbers`" section of the <<data-format,Khronos Data Format
+Unsigned 10-bit floating-point numbers are defined in the "`Unsigned 10-bit
+floating-point numbers`" section of the <<data-format,Khronos Data Format
 Specification>>.
 
 
@@ -1760,9 +1834,9 @@ The conversion from an unsigned normalized fixed-point value [eq]#c# to the
 corresponding floating-point value [eq]#f# is defined as
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 f = { c \over { 2^b - 1 } }
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 Signed normalized fixed-point integers represent numbers in the range
 [eq]#[-1,1]#.
@@ -1770,9 +1844,9 @@ The conversion from a signed normalized fixed-point value [eq]#c# to the
 corresponding floating-point value [eq]#f# is performed using
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 f = \max\left( {c \over {2^{b-1} - 1}}, -1.0 \right)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 Only the range [eq]#[-2^b-1^ {plus} 1, 2^b-1^ - 1]# is used to represent
 signed fixed-point values in the range [eq]#[-1,1]#.
@@ -1833,7 +1907,6 @@ Strings passed into and returned from Vulkan API commands are usually
 defined to be null-terminated and UTF-8 encoded.
 
 [NOTE]
-.Note
 ====
 Exceptions to this rule exist only when strings are defined or used by
 operating system APIs where that OS has a different convention.
@@ -2006,7 +2079,6 @@ The alias is deprecated and should not be used, but will be retained
 indefinitely.
 
 [NOTE]
-.Note
 ====
 etext:VK_STENCIL_FRONT_AND_BACK is an example of a _typo alias_.
 It was initially defined as part of elink:VkStencilFaceFlagBits.

@@ -41,6 +41,7 @@ The implementation must: document the implementation-specific fault data,
 how the faults are communicated, and expected responses from the application
 for each of the faults that it can: report.
 
+
 [[fault-data]]
 === Fault Data
 
@@ -156,10 +157,10 @@ If pname:pFaults is `NULL`, then the number of faults with the specified
 pname:faultQueryBehavior characteristics associated with pname:device is
 returned in pname:pFaultCount, and pname:pUnrecordedFaults is set as
 indicated above.
-Otherwise, pname:pFaultCount must: point to a variable set by the user to
-the number of elements in the pname:pFaults array, and on return the
-variable is overwritten with the number of faults actually written to
-pname:pFaults.
+Otherwise, pname:pFaultCount must: point to a variable set by the
+application to the number of elements in the pname:pFaults array, and on
+return the variable is overwritten with the number of faults actually
+written to pname:pFaults.
 If pname:pFaultCount is less than the number of recorded pname:device faults
 with the specified pname:faultQueryBehavior characteristics, at most
 pname:pFaultCount faults will be written, and ename:VK_INCOMPLETE will be
@@ -175,7 +176,6 @@ implementation will fill in any implementation-specific structures
 applicable to that fault that are included in the pname:pNext chain.
 
 [NOTE]
-.Note
 ====
 In order to simplify the application logic, an application could have a
 static allocation sized to <<limits-maxQueryFaultCount,
@@ -213,6 +213,7 @@ include::{generated}/api/enums/VkFaultQueryBehavior.adoc[]
 
 --
 
+
 [[fault-callback]]
 === Fault Callback
 
@@ -249,7 +250,6 @@ If provided, the implementation may: make use of the pname:pFaults array to
 return fault data to the application when using the fault callback.
 
 [NOTE]
-.Note
 ====
 Prior to Vulkan SC 1.0.11, the application was required to provide the
 pname:pFaults array for fault callback data.
@@ -264,7 +264,6 @@ accessible throughout the lifetime of the logical device that was created
 with this structure.
 
 [NOTE]
-.Note
 ====
 The memory pointed to by pname:pFaults will be updated by the implementation
 and should not be used or accessed by the application outside of the fault

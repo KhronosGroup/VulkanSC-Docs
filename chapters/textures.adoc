@@ -20,7 +20,6 @@ itself.
 The "`Depth`" operand of code:OpTypeImage is ignored.
 
 [NOTE]
-.Note
 ====
 Texel is a term which is a combination of the words texture and element.
 Early interactive computer graphics supported texture operations on
@@ -222,7 +221,6 @@ two dimensional image.
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 [NOTE]
-.Note
 ====
 For formats with reduced-resolution components, [eq]#{DeltaUpper}~i~# and
 [eq]#{DeltaUpper}~j~# are relative to the resolution of the
@@ -254,18 +252,6 @@ endif::VK_NV_corner_sampled_image[]
 
 == Conversion Formulas
 
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-(Bill) These Conversion Formulas will likely move to Section 2.7 Fixed-Point
-Data Conversions (RGB to sRGB and sRGB to RGB) and section 2.6 Numeric
-Representation and Computation (RGB to Shared Exponent and Shared Exponent
-to RGB)
-====
-endif::editing-notes[]
-
-
 [[textures-RGB-sexp]]
 === RGB to Shared Exponent Conversion
 
@@ -283,17 +269,16 @@ First, the components [eq]#(red, green, blue)# are clamped to
 where:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 N               & = 9  & \text{number of mantissa bits per component} \\
 B               & = 15 & \text{exponent bias} \\
 E_{max}         & = 31 & \text{maximum possible biased exponent value} \\
 sharedexp_{max} & = \frac{(2^N-1)}{2^N} \times 2^{(E_{max}-B)}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 [NOTE]
-.Note
 ====
 // The trailing + is to avoid the asciidoc parser treating the custom role
 // as a block attribute in some cases.
@@ -309,7 +294,7 @@ The largest clamped component, [eq]#max~clamped~# is determined:
 
 A preliminary shared exponent [eq]#exp'# is computed:
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 exp' =
   \begin{cases}
@@ -319,22 +304,22 @@ exp' =
       & \text{for}\  max_{clamped} \leq 2^{-(B+1)}
   \end{cases}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 The shared exponent [eq]#exp~shared~# is computed:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 max_{shared} =
     \left \lfloor
         { \frac{max_{clamped}}{2^{(exp'-B-N)}} + \frac{1}{2} }
     \right \rfloor
 \end{aligned}
-+++++++++++++++++++
+++++
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 exp_{shared} =
   \begin{cases}
@@ -342,13 +327,13 @@ exp_{shared} =
     exp'+1 & \text{for}\  max_{shared} = 2^N
   \end{cases}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 Finally, three integer values in the range [eq]#0# to [eq]#2^N^# are
 computed:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 red_{shared} & =
     \left \lfloor
@@ -363,7 +348,7 @@ blue_{shared} & =
         { \frac{blue_{clamped}}{2^{(exp_{shared}-B-N)}}+ \frac{1}{2} }
     \right \rfloor
 \end{aligned}
-+++++++++++++++++++
+++++
 
 
 [[textures-sexp-RGB]]
@@ -384,6 +369,7 @@ where:
   {empty}:: [eq]#B = 15# (exponent bias)
 
 
+[[textures-input]]
 == Texel Input Operations
 
 _Texel input instructions_ are SPIR-V image instructions that read from an
@@ -549,20 +535,11 @@ ifdef::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
 endif::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
   * The SPIR-V instruction's image variable's properties are not compatible
     with the image view:
-  ** Rules for pname:viewType:
-  *** ename:VK_IMAGE_VIEW_TYPE_1D must: have code:Dim = 1D, code:Arrayed =
-      0, code:MS = 0.
-  *** ename:VK_IMAGE_VIEW_TYPE_2D must: have code:Dim = 2D, code:Arrayed = 0.
-  *** ename:VK_IMAGE_VIEW_TYPE_3D must: have code:Dim = 3D, code:Arrayed =
-      0, code:MS = 0.
-  *** ename:VK_IMAGE_VIEW_TYPE_CUBE must: have code:Dim = Cube, code:Arrayed
-      = 0, code:MS = 0.
-  *** ename:VK_IMAGE_VIEW_TYPE_1D_ARRAY must: have code:Dim = 1D,
-      code:Arrayed = 1, code:MS = 0.
-  *** ename:VK_IMAGE_VIEW_TYPE_2D_ARRAY must: have code:Dim = 2D,
-      code:Arrayed = 1.
-  *** ename:VK_IMAGE_VIEW_TYPE_CUBE_ARRAY must: have code:Dim = Cube,
-      code:Arrayed = 1, code:MS = 0.
+  ** If the image view's pname:viewType is one of
+     ename:VK_IMAGE_VIEW_TYPE_1D_ARRAY, ename:VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+     or ename:VK_IMAGE_VIEW_TYPE_CUBE_ARRAY then the instruction must: have
+     code:Arrayed = 1.
+     Otherwise the instruction must: have code:Arrayed = 0.
   ** If the image was created with slink:VkImageCreateInfo::pname:samples
      equal to ename:VK_SAMPLE_COUNT_1_BIT, the instruction must: have
      code:MS = 0.
@@ -616,7 +593,6 @@ If the underlying sname:VkImage format has an X component in its format
 description, undefined: values are read from those bits.
 
 [NOTE]
-.Note
 ====
 If the sname:VkImage format and sname:VkImageView format are the same, these
 bits will be unused by format conversion and this will have no effect.
@@ -629,7 +605,6 @@ return a range of different values.
 ====
 
 [NOTE]
-.Note
 ====
 Some implementations will return undefined: values in the case where a
 sampler uses a elink:VkSamplerAddressMode of
@@ -642,6 +617,7 @@ This behavior was not tested prior to Vulkan conformance test suite version
 1.3.8.0.
 Affected implementations will have a conformance test waiver for this issue.
 ====
+
 
 [[textures-integer-coordinate-validation]]
 ==== Integer Texel Coordinate Validation
@@ -775,7 +751,7 @@ endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 === Format Conversion
 
 Texels undergo a format conversion from the elink:VkFormat of the image view
-to a vector of either floating point or signed or unsigned integer
+to a vector of either floating-point or signed or unsigned integer
 components, with the number of components based on the number of components
 present in the format.
 
@@ -862,7 +838,6 @@ exceed one ULP of the image's pname:format.
 endif::VK_EXT_custom_border_color[]
 
 [NOTE]
-.Note
 ====
 The names etext:VK_BORDER_COLOR_*\_TRANSPARENT_BLACK,
 etext:VK_BORDER_COLOR_*\_OPAQUE_BLACK, and
@@ -1033,7 +1008,7 @@ It is defined as follows for each color [eq]#component#:
 
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 Color'_{component} & =
 \begin{cases}
@@ -1046,16 +1021,16 @@ one              & \text{for ONE swizzle} \\
 identity         & \text{for IDENTITY swizzle}
 \end{cases}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 where:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 one & =
 \begin{cases}
-& 1.0\text{f}  & \text{for floating point components} \\
+& 1.0\text{f}  & \text{for floating-point components} \\
 & 1            & \text{for integer components} \\
 \end{cases}
 \\
@@ -1067,7 +1042,7 @@ identity & =
 & Color_a          & \text{for}\ component = a \\
 \end{cases}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 If the border color is one of the etext:VK_BORDER_COLOR_*_OPAQUE_BLACK enums
 and the elink:VkComponentSwizzle is not the
@@ -1132,8 +1107,8 @@ sample may be shared among several texels in one or both texture dimensions.
 The process of reconstructing a full color value for texture access involves
 accessing both chroma and luma values at the same location.
 To generate the color accurately, the values of the lower-resolution
-components at the location of the luma samples must be reconstructed from
-the lower-resolution sample locations, an operation known here as "`chroma
+components at the location of the luma samples are reconstructed from the
+lower-resolution sample locations, an operation known here as "`chroma
 reconstruction`" irrespective of the actual color model.
 
 The location of the chroma samples relative to the luma coordinates is
@@ -1148,7 +1123,6 @@ texel coordinates of reduced-resolution chroma components, shown as crosses
 in red.
 
 [NOTE]
-.Note
 ====
 If the chroma values are reconstructed at the locations of the luma samples
 by means of interpolation, chroma samples from outside the image bounds are
@@ -1203,12 +1177,12 @@ section.
      reconstructed as follows:
 +
 [latexmath]
-++++++++++++++
+++++
 \begin{aligned}
 \tau_R'(i, j) & = \tau_R(\left\lfloor{i\times 0.5}\right\rfloor, j)[level] \\
 \tau_B'(i, j) & = \tau_B(\left\lfloor{i\times 0.5}\right\rfloor, j)[level]
 \end{aligned}
-++++++++++++++
+++++
 
   ** If the format's R and B components are reduced in resolution in width
      and height by a factor of two relative to the G component (i.e. this is
@@ -1217,15 +1191,14 @@ section.
      reconstructed as follows:
 +
 [latexmath]
-++++++++++++++
+++++
 \begin{aligned}
 \tau_R'(i, j) & = \tau_R(\left\lfloor{i\times 0.5}\right\rfloor, \left\lfloor{j\times 0.5}\right\rfloor)[level] \\
 \tau_B'(i, j) & = \tau_B(\left\lfloor{i\times 0.5}\right\rfloor, \left\lfloor{j\times 0.5}\right\rfloor)[level]
 \end{aligned}
-++++++++++++++
+++++
 +
 [NOTE]
-.Note
 ====
 pname:xChromaOffset and pname:yChromaOffset have no effect if
 pname:chromaFilter is ename:VK_FILTER_NEAREST for explicit reconstruction.
@@ -1240,25 +1213,25 @@ pname:chromaFilter is ename:VK_FILTER_NEAREST for explicit reconstruction.
   *** If pname:xChromaOffset is ename:VK_CHROMA_LOCATION_COSITED_EVEN:
 +
 [latexmath]
-+++++
+++++
 \tau_{RB}'(i,j) = \begin{cases}
 \tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor,j)[level], & 0.5 \times i = \left\lfloor{0.5 \times i}\right\rfloor\\
 0.5\times\tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor,j)[level] + \\
 0.5\times\tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor + 1,j)[level], & 0.5 \times i \neq \left\lfloor{0.5 \times i}\right\rfloor
 \end{cases}
-+++++
+++++
 +
   *** If pname:xChromaOffset is ename:VK_CHROMA_LOCATION_MIDPOINT:
 +
 [latexmath]
-+++++
+++++
 \tau_{RB}'(i,j) = \begin{cases}
 0.25 \times \tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor - 1,j)[level] + \\
 0.75 \times \tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor,j)[level], & 0.5 \times i = \left\lfloor{0.5 \times i}\right\rfloor\\
 0.75 \times \tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor,j)[level] + \\
 0.25 \times \tau_{RB}(\left\lfloor{i\times 0.5}\right\rfloor + 1,j)[level], & 0.5 \times i \neq \left\lfloor{0.5 \times i}\right\rfloor
 \end{cases}
-+++++
+++++
 
   ** If the format's R and B components are reduced in resolution in width
      and height by a factor of two relative to the G component (i.e. this is
@@ -1267,7 +1240,7 @@ pname:chromaFilter is ename:VK_FILTER_NEAREST for explicit reconstruction.
      concisely as follows:
 +
 [latexmath]
-+++++
+++++
 \begin{aligned}
   i_{RB} & =
     \begin{cases}
@@ -1286,10 +1259,10 @@ pname:chromaFilter is ename:VK_FILTER_NEAREST for explicit reconstruction.
   i_{frac} & = i_{RB} - i_{floor} \\
   j_{frac} & = j_{RB} - j_{floor}
 \end{aligned}
-+++++
+++++
 +
 [latexmath]
-+++++
+++++
 \begin{aligned}
 \tau_{RB}'(i,j) =
     & \tau_{RB}(     i_{floor},     j_{floor})[level]
@@ -1305,10 +1278,9 @@ pname:chromaFilter is ename:VK_FILTER_NEAREST for explicit reconstruction.
         & \times & (     i_{frac} ) &
         & \times & (     j_{frac} ) &
 \end{aligned}
-+++++
+++++
 
 [NOTE]
-.Note
 ====
 In the case where the texture itself is bilinearly interpolated as described
 in <<textures-texel-filtering,Texel Filtering>>, thus requiring four
@@ -1331,7 +1303,6 @@ behave as if pname:xChromaOffset and pname:yChromaOffset were both
 ename:VK_CHROMA_LOCATION_MIDPOINT, irrespective of the values set.
 
 [NOTE]
-.Note
 ====
 This will not have any visible effect if the locations of the luma samples
 coincide with the location of the samples used for rasterization.
@@ -1343,7 +1314,7 @@ if the component has a downsample factor of two relative to the luma
 component):
 
 [latexmath]
-++++++
+++++
 \begin{aligned}
 u_{RB}' (422/420) &=
   \begin{cases}
@@ -1356,7 +1327,7 @@ v_{RB}' (420) &=
      0.5\times v, & \textrm{yChromaOffset = MIDPOINT}
   \end{cases}
 \end{aligned}
-++++++
+++++
 
 
 [[textures-sampler-YCbCr-conversion]]
@@ -1382,7 +1353,7 @@ normal <<textures-format-conversion,format conversion>> rules.
 
 ifdef::VK_QCOM_ycbcr_degamma[]
 The input values to this stage may have been converted using sRGB to linear
-conversion if <<features-ycbcr-degamma,pname:ycbcrDegamma>> is enabled.
+conversion if <<features-ycbcrDegamma,pname:ycbcrDegamma>> is enabled.
 endif::VK_QCOM_ycbcr_degamma[]
 
 Sampler {YCbCr} range expansion is not applied if pname:ycbcrModel is
@@ -1407,16 +1378,15 @@ of the slink:VkSamplerYcbcrConversionCreateInfo structure:
     following transformations are applied:
 +
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 Y' &= C'_{rgba}[G] \\
 C_B &= C'_{rgba}[B] - {{2^{(n-1)}}\over{(2^n) - 1}} \\
 C_R &= C'_{rgba}[R] - {{2^{(n-1)}}\over{(2^n) - 1}}
 \end{aligned}
-+++++++++++++++++++
+++++
 +
 [NOTE]
-.Note
 ====
 These formulae correspond to the "`full range`" encoding in the
 "`Quantization schemes`" chapter of the <<data-format,Khronos Data Format
@@ -1430,16 +1400,15 @@ updated to maintain parity.
     following transformations are applied:
 +
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 Y' &= {{C'_{rgba}[G] \times (2^n-1) - 16\times 2^{n-8}}\over{219\times 2^{n-8}}} \\
 C_B &= {{C'_{rgba}[B] \times \left(2^n-1\right) - 128\times 2^{n-8}}\over{224\times 2^{n-8}}} \\
 C_R &= {{C'_{rgba}[R] \times \left(2^n-1\right) - 128\times 2^{n-8}}\over{224\times 2^{n-8}}}
 \end{aligned}
-+++++++++++++++++++
+++++
 +
 [NOTE]
-.Note
 ====
 These formulae correspond to the "`narrow range`" encoding in the
 "`Quantization schemes`" chapter of the <<data-format,Khronos Data Format
@@ -1499,7 +1468,6 @@ at least that of the source format.
 The alpha component is not modified by these model conversions.
 
 [NOTE]
-.Note
 ====
 Sampling operations in a non-linear color space can introduce color and
 intensity shifts at sharp transition boundaries.
@@ -1628,7 +1596,7 @@ R, G, and B components as described in the "`sRGB EOTF`" section of the
 <<data-format,Khronos Data Format Specification>>.
 The A component, if present, is unchanged.
 
-Texels then undergo a format conversion from the floating point, signed, or
+Texels then undergo a format conversion from the floating-point, signed, or
 unsigned integer type of the texel data to the elink:VkFormat of the image
 view.
 If the number of components in the texel data is larger than the number of
@@ -1651,6 +1619,7 @@ description, undefined: values are also written to those bits, even if
 result format conversion produces a valid value for those bits because the
 sname:VkImageView format is different.
 
+
 [[textures-normalized-operations]]
 == Normalized Texel Coordinate Operations
 
@@ -1666,7 +1635,7 @@ For code:Proj image operations, the normalized texel coordinates
 transformed as follows:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 s       & = \frac{s}{q},       & \text{for 1D, 2D, or 3D image} \\
 \\
@@ -1676,7 +1645,7 @@ r       & = \frac{r}{q},       & \text{for 3D image} \\
 \\
 D_{\textit{ref}} & = \frac{D_{\textit{ref}}}{q}, & \text{if provided}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 
 [[textures-derivative-image-operations]]
@@ -1684,8 +1653,11 @@ D_{\textit{ref}} & = \frac{D_{\textit{ref}}}{q}, & \text{if provided}
 
 Derivatives are used for LOD selection.
 These derivatives are either implicit (in an code:ImplicitLod image
-instruction in a fragment shader) or explicit (provided explicitly by shader
-to the image instruction in any shader).
+instruction in a
+ifdef::VK_KHR_compute_shader_derivatives[mesh, task,]
+ifdef::VK_KHR_compute_shader_derivatives,VK_NV_compute_shader_derivatives[compute, or]
+fragment shader) or explicit (provided explicitly by shader to the image
+instruction in any shader).
 
 For implicit derivatives image instructions, the derivatives of texel
 coordinates are calculated in the same manner as
@@ -1693,13 +1665,13 @@ coordinates are calculated in the same manner as
 That is:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 \partial{s}/\partial{x} & = dPdx(s), & \partial{s}/\partial{y} & = dPdy(s), & \text{for 1D, 2D, Cube, or 3D image} \\
 \partial{t}/\partial{x} & = dPdx(t), & \partial{t}/\partial{y} & = dPdy(t), & \text{for 2D, Cube, or 3D image} \\
 \partial{r}/\partial{x} & = dPdx(r), & \partial{r}/\partial{y} & = dPdy(r), & \text{for Cube or 3D image}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 Partial derivatives not defined above for certain image dimensionalities are
 set to zero.
@@ -1712,7 +1684,7 @@ dimensionality matches the number of partial derivatives computed above.
 If the optional: SPIR-V operand code:Lod is provided, then derivatives are
 set to zero, the cube map derivative transformation is skipped, and the
 scale factor operation is skipped.
-Instead, the floating point scalar coordinate is directly assigned to
+Instead, the floating-point scalar coordinate is directly assigned to
 [eq]#{lambda}~base~# as described in <<textures-level-of-detail-operation,
 LOD Operation>>.
 
@@ -1815,20 +1787,20 @@ following two tables.
 === Cube Map Coordinate Transformation
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 s_{\textit{face}} & =
     \frac{1}{2} \times \frac{s_c}{|r_c|} + \frac{1}{2} \\
 t_{\textit{face}} & =
     \frac{1}{2} \times \frac{t_c}{|r_c|} + \frac{1}{2} \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 
 === Cube Map Derivative Transformation
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \frac{\partial{s_{\textit{face}}}}{\partial{x}} &=
     \frac{\partial}{\partial{x}} \left ( \frac{1}{2} \times \frac{s_{c}}{|r_{c}|}
@@ -1845,10 +1817,10 @@ t_{\textit{face}} & =
     {\left ( r_{c} \right )^2}
     \right )
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \frac{\partial{s_{\textit{face}}}}{\partial{y}} &=
     \frac{1}{2} \times
@@ -1875,19 +1847,7 @@ t_{\textit{face}} & =
     {\left ( r_{c} \right )^2}
     \right )
 \end{aligned}
-++++++++++++++++++++++++
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-(Bill) Note that we never revisited ARB_texture_cubemap after we introduced
-dependent texture fetches (ARB_fragment_program and ARB_fragment_shader).
-
-The derivatives of [eq]#s~face~# and [eq]#t~face~# are only valid for
-non-dependent texture fetches (pre OpenGL 2.0).
-====
-endif::editing-notes[]
+++++
 
 
 [[textures-lod-and-scale-factor]]
@@ -1952,7 +1912,7 @@ maximum scale factors.
 [eq]#f~x~# and [eq]#f~y~#, subject to the following constraints:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 & f_x \text{\ is\ continuous\ and\ monotonically\ increasing\ in\ each\ of\ }
     m_{ux},
@@ -1963,38 +1923,17 @@ maximum scale factors.
     m_{vy}, \text{\ and\ }
     m_{wy}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \max(|m_{ux}|, |m_{vx}|, |m_{wx}|) \leq f_{x}
 \leq \sqrt{2} (|m_{ux}| + |m_{vx}| + |m_{wx}|) \\
 \max(|m_{uy}|, |m_{vy}|, |m_{wy}|) \leq f_{y}
 \leq \sqrt{2} (|m_{uy}| + |m_{vy}| + |m_{wy}|)
 \end{aligned}
-++++++++++++++++++++++++
-
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-(Bill) For reviewers only - anticipating questions.
-
-We only support implicit derivatives for normalized texel coordinates.
-
-So we are documenting the derivatives in s,t,r (normalized texel
-coordinates) rather than u,v,w (unnormalized texel coordinates) as in OpenGL
-and OpenGL ES specifications.
-(I know, u,v,w is the way it has been documented since OpenGL V1.0.)
-
-Also there is no reason to have conditional application of [eq]#w~base~,
-h~base~, d~base~# for rectangle textures either, since they do not support
-implicit derivatives.
-====
-endif::editing-notes[]
-
+++++
 
 The minimum and maximum scale factors [eq]#({rho}~min~,{rho}~max~)# are
 determined by:
@@ -2046,7 +1985,7 @@ An implementation may: use the value of [eq]#N# as an approximation of
 The LOD parameter [eq]#{lambda}# is computed as follows:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \lambda_{base}(x,y) & =
   \begin{cases}
@@ -2062,12 +2001,12 @@ The LOD parameter [eq]#{lambda}# is computed as follows:
     \textit{undefined}, & lod_{min} > lod_{max}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 sampler.bias       & = mipLodBias & \text{(from sampler descriptor)} \\
 shaderOp.bias      & =
@@ -2085,7 +2024,7 @@ shaderOp.lod_{min} & =
 lod_{min}          & = \max(sampler.lod_{min}, shaderOp.lod_{min}) \\
 lod_{max}          & = maxLod & \text{(from sampler descriptor)}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 and [eq]#maxSamplerLodBias# is the value of the slink:VkPhysicalDeviceLimits
 feature <<limits-maxSamplerLodBias, pname:maxSamplerLodBias>>.
@@ -2099,7 +2038,7 @@ read from are determined by an image-level parameter [eq]#d~l~#, which is
 computed based on the LOD parameter, as follows:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 d_{l} =
   \begin{cases}
@@ -2107,12 +2046,12 @@ d_{l} =
     d',           & \text{otherwise}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 ifdef::VK_EXT_image_view_min_lod[]
 d' = max(level_{base} + \text{clamp}(\lambda, 0, q), minLod_{imageView})
@@ -2122,10 +2061,10 @@ d' = level_{base} + \text{clamp}(\lambda, 0, q)
 endif::VK_EXT_image_view_min_lod[]
 
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 nearest(d') & =
   \begin{cases}
@@ -2135,13 +2074,13 @@ nearest(d') & =
         \text{alternative}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 and:
 
 ifdef::VK_EXT_image_view_min_lod[]
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 minLod_{imageView} & =
   \begin{cases}
@@ -2151,16 +2090,17 @@ minLod_{imageView} & =
 level_{base}       & = baseMipLevel \\
 q                  & = levelCount - 1
 \end{aligned}
-++++++++++++++++++++++++
+++++
 endif::VK_EXT_image_view_min_lod[]
+
 ifndef::VK_EXT_image_view_min_lod[]
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 level_{base}       & = baseMipLevel \\
 q                  & = levelCount - 1
 \end{aligned}
-++++++++++++++++++++++++
+++++
 endif::VK_EXT_image_view_min_lod[]
 
 pname:baseMipLevel and pname:levelCount are taken from the
@@ -2177,13 +2117,13 @@ If the sampler's pname:mipmapMode is ename:VK_SAMPLER_MIPMAP_MODE_LINEAR,
 two neighboring levels are selected:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 d_{hi} & = \left\lfloor d_{l} \right\rfloor \\
 d_{lo} & = min( d_{hi} + 1, level_{base} + q ) \\
 \delta & = d_{l} - d_{hi}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [eq]#{delta}# is the fractional value, quantized to the number of
 <<limits-mipmapPrecisionBits, mipmap precision bits>>, used for
@@ -2201,7 +2141,7 @@ This transformation is performed once for each level used in
 [eq]#d~lo~#).
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 u(x,y) & = s(x,y) \times width_{scale} + \Delta_i\\
 v(x,y) & =
@@ -2221,7 +2161,7 @@ a(x,y) & =
     0                         & \text{otherwise}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
@@ -2266,7 +2206,7 @@ range of the image view, pname:baseArrayLayer is the first layer from the
 subresource range, and where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \mathbin{RNE}(a) & =
   \begin{cases}
@@ -2274,7 +2214,7 @@ subresource range, and where:
     \left \lfloor a + 0.5 \right \rfloor & \text{alternative}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 The sample index [eq]#n# is assigned the value 0.
 
@@ -2282,13 +2222,13 @@ Nearest filtering (ename:VK_FILTER_NEAREST) computes the integer texel
 coordinates that the unnormalized coordinates lie within:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i &= \left\lfloor u + shift \right\rfloor \\
 j &= \left\lfloor v + shift \right\rfloor \\
 k &= \left\lfloor w + shift \right\rfloor
 \end{aligned}
-++++++++++++++++++++++++
+++++
 where:
 
   {empty}:: [eq]#shift = 0.0#
@@ -2308,7 +2248,7 @@ The integer texel coordinates are combinations of [eq]#i~0~# or [eq]#i~1~#,
 [eq]#{alpha}, {beta}#, and [eq]#{gamma}#.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_0 &= \left\lfloor u - shift \right\rfloor \\
 i_1 &= i_0 + 1 \\
@@ -2317,16 +2257,16 @@ j_1 &= j_0 + 1 \\
 k_0 &= \left\lfloor w - shift \right\rfloor \\
 k_1 &= k_0 + 1
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \alpha &= \mathbin{frac}\left(u - shift\right)  \\[1em]
 \beta &= \mathbin{frac}\left(v - shift\right)  \\[1em]
 \gamma &= \mathbin{frac}\left(w - shift\right)
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
@@ -2342,9 +2282,10 @@ endif::VK_NV_corner_sampled_image[]
 and where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \mathbin{frac}(x) = x -  \left\lfloor x \right\rfloor
-++++++++++++++++++++++++
+++++
+
 where the number of fraction bits retained is specified by
 sname:VkPhysicalDeviceLimits::pname:subTexelPrecisionBits.
 
@@ -2363,50 +2304,48 @@ endif::VK_EXT_filter_cubic[]
 
 ifndef::VK_EXT_filter_cubic[]
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_{0}  & = {\left \lfloor {u - \frac{3}{2}} \right \rfloor} & i_{1} & = i_{0} + 1 & i_{2} & = i_{1} + 1 & i_{3} & = i_{2} + 1 \\[1em]
 j_{0}  & = {\left \lfloor {v - \frac{3}{2}} \right \rfloor} & j_{1} & = j_{0} + 1 & j_{2} & = j_{1} + 1 & j_{3} & = j_{2} + 1
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 alpha &= \mathbin{frac}\left(u - \frac{1}{2}\right)  \\[1em]
 \beta &= \mathbin{frac}\left(v - \frac{1}{2}\right)
 \end{aligned}
-++++++++++++++++++++++++
-
+++++
 endif::VK_EXT_filter_cubic[]
 
 ifdef::VK_EXT_filter_cubic[]
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_{0}  & = {\left \lfloor {u - \frac{3}{2}} \right \rfloor} & i_{1} & = i_{0} + 1 & i_{2} & = i_{1} + 1 & i_{3} & = i_{2} + 1 \\[1em]
 j_{0}  & = {\left \lfloor {v - \frac{3}{2}} \right \rfloor} & j_{1} & = j_{0} + 1 & j_{2} & = j_{1} + 1 & j_{3} & = j_{2} + 1 \\[1em]
 k_{0}  & = {\left \lfloor {w - \frac{3}{2}} \right \rfloor} & k_{1} & = k_{0} + 1 & k_{2} & = k_{1} + 1 & k_{3} & = k_{2} + 1
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \alpha &= \mathbin{frac}\left(u - \frac{1}{2}\right)  \\[1em]
 \beta &= \mathbin{frac}\left(v - \frac{1}{2}\right)  \\[1em]
 \gamma &= \mathbin{frac}\left(w - \frac{1}{2}\right)
 \end{aligned}
-++++++++++++++++++++++++
-
+++++
 endif::VK_EXT_filter_cubic[]
 
 where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \mathbin{frac}(x) = x -  \left\lfloor x \right\rfloor
-++++++++++++++++++++++++
+++++
 
 where the number of fraction bits retained is specified by
 sname:VkPhysicalDeviceLimits::pname:subTexelPrecisionBits.
@@ -2430,7 +2369,7 @@ If the code:Lod is provided then it must: be an integer.
 
 The image level selected is:
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 d & = level_{base} +
   \begin{cases}
@@ -2438,7 +2377,7 @@ d & = level_{base} +
     0   & \text{otherwise}
   \end{cases} \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 If [eq]#d# does not lie in the range [eq]#[pname:baseMipLevel,
 pname:baseMipLevel {plus} pname:levelCount)#
@@ -2475,7 +2414,7 @@ The first integer texel coordinate i is transformed based on the
 pname:addressModeU parameter of the sampler.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i &=
   \begin{cases}
@@ -2487,12 +2426,12 @@ i &=
     \mathbin{clamp}(\mathbin{mirror}(i),0,size-1) & \text{for mirror clamp to edge}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 & \mathbin{mirror}(n) =
   \begin{cases}
@@ -2500,7 +2439,7 @@ where:
     -(1+n) & \text{otherwise}
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [eq]#j# (for 2D and Cube image) and [eq]#k# (for 3D image) are similarly
 transformed based on the pname:addressModeV and pname:addressModeW
@@ -2524,32 +2463,32 @@ If the operation does not use the code:ConstOffsets image operand then the
 four texels form the 2 {times} 2 rectangle used for texture filtering:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau[R] &= \tau_{i0j1}[level_{base}][comp] \\
 \tau[G] &= \tau_{i1j1}[level_{base}][comp] \\
 \tau[B] &= \tau_{i1j0}[level_{base}][comp] \\
 \tau[A] &= \tau_{i0j0}[level_{base}][comp]
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 If the operation does use the code:ConstOffsets image operand then the
 offsets allow a custom filter to be defined:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau[R] &= \tau_{i0j0 + \Delta_0}[level_{base}][comp] \\
 \tau[G] &= \tau_{i0j0 + \Delta_1}[level_{base}][comp] \\
 \tau[B] &= \tau_{i0j0 + \Delta_2}[level_{base}][comp] \\
 \tau[A] &= \tau_{i0j0 + \Delta_3}[level_{base}][comp]
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau[level_{base}][comp] &=
   \begin{cases}
@@ -2560,7 +2499,7 @@ where:
   \end{cases}\\
 comp & \,\text{from SPIR-V operand Component}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 code:OpImage*Gather must: not be used on a sampled image with
@@ -2600,7 +2539,7 @@ using the [eq]#(i, j, k)# texel coordinates, with all texels taken from
 layer l.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau[level] &=
   \begin{cases}
@@ -2609,7 +2548,7 @@ layer l.
      \tau_{i}[level],   & \text{for 1D image}
    \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 
 [[textures-texel-linear-filtering]]
@@ -2622,7 +2561,7 @@ The linear weights are derived from the fractions computed earlier:
 
 [latexmath]
 
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 w_{i_0} &= (1-\alpha) \\
 w_{i_1} &= (\alpha)   \\
@@ -2631,7 +2570,7 @@ w_{j_1} &= (\beta)    \\
 w_{k_0} &= (1-\gamma) \\
 w_{k_1} &= (\gamma)
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifndef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 The values of multiple texels, together with their weights, are combined
@@ -2652,13 +2591,13 @@ computed:
 endif::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{3D} &= \sum_{k=k_0}^{k_1}\sum_{j=j_0}^{j_1}\sum_{i=i_0}^{i_1}(w_{i})(w_{j})(w_{k})\tau_{ijk} \\
 \tau_{2D} &= \sum_{j=j_0}^{j_1}\sum_{i=i_0}^{i_1}(w_{i})(w_{j})\tau_{ij} \\
 \tau_{1D} &= \sum_{i=i_0}^{i_1}(w_{i})\tau_{i}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 However, if the reduction mode is ename:VK_SAMPLER_REDUCTION_MODE_MIN or
@@ -2696,7 +2635,7 @@ are derived from the fractions computed earlier.
 
 ifndef::VK_EXT_filter_cubic[]
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \begin{bmatrix}
 w_{i_0}\phantom{,} w_{i_1}\phantom{,} w_{i_2}\phantom{,} w_{i_3}
@@ -2726,24 +2665,24 @@ w_{j_0}\phantom{,} w_{j_1}\phantom{,} w_{j_2}\phantom{,} w_{j_3}
 -1 &  \phantom{-}3 & -3 &  \phantom{-}1
 \end{bmatrix}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 The values of multiple texels, together with their weights, are combined
 using a weighted average to produce a filtered value:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{2D} &= \sum_{j=j_0}^{j_3}\sum_{i=i_0}^{i_3}(w_{i})(w_{j})\tau_{ij} \\
 \tau_{1D} &= \sum_{i=i_0}^{i_3}(w_{i})\tau_{i}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 endif::VK_EXT_filter_cubic[]
 
 ifdef::VK_EXT_filter_cubic[]
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \begin{bmatrix}
 w_{i_0}\phantom{,} w_{i_1}\phantom{,} w_{i_2}\phantom{,} w_{i_3}
@@ -2787,7 +2726,7 @@ w_{k_0}\phantom{,} w_{k_1}\phantom{,} w_{k_2}\phantom{,} w_{k_3}
 -1 &  \phantom{-}3 & -3 &  \phantom{-}1
 \end{bmatrix}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_QCOM_filter_cubic_weights[]
 Zero Tangent Cardinal weights specified by
@@ -2795,7 +2734,7 @@ ename:VK_CUBIC_FILTER_WEIGHTS_ZERO_TANGENT_CARDINAL_QCOM are derived from
 the fractions computed earlier.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \begin{bmatrix}
 w_{i_0}\phantom{,} w_{i_1}\phantom{,} w_{i_2}\phantom{,} w_{i_3}
@@ -2839,13 +2778,13 @@ w_{k_0}\phantom{,} w_{k_1}\phantom{,} w_{k_2}\phantom{,} w_{k_3}
 -2 &  \phantom{-}2 & -2 &  \phantom{-}1
 \end{bmatrix}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 B-Spline weights specified by ename:VK_CUBIC_FILTER_WEIGHTS_B_SPLINE_QCOM
 are derived from the fractions computed earlier.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \begin{bmatrix}
 w_{i_0}\phantom{,} w_{i_1}\phantom{,} w_{i_2}\phantom{,} w_{i_3}
@@ -2889,14 +2828,14 @@ w_{k_0}\phantom{,} w_{k_1}\phantom{,} w_{k_2}\phantom{,} w_{k_3}
 -1 &  \phantom{-}3 & -3 &  \phantom{-}1
 \end{bmatrix}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 Mitchell-Netravali weights specified by
 ename:VK_CUBIC_FILTER_WEIGHTS_MITCHELL_NETRAVALI_QCOM are derived from the
 fractions computed earlier.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \begin{bmatrix}
 w_{i_0}\phantom{,} w_{i_1}\phantom{,} w_{i_2}\phantom{,} w_{i_3}
@@ -2940,7 +2879,7 @@ w_{k_0}\phantom{,} w_{k_1}\phantom{,} w_{k_2}\phantom{,} w_{k_3}
 -7 &  \phantom{-}21 & -21 &  \phantom{-}7
 \end{bmatrix}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 endif::VK_QCOM_filter_cubic_weights[]
 
@@ -2960,13 +2899,13 @@ endif::VK_QCOM_filter_cubic_clamp[]
 , a weighted average is computed:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{3D} &= \sum_{k=j_0}^{k_3}\sum_{j=j_0}^{j_3}\sum_{i=i_0}^{i_3}(w_{i})(w_{j})(w_{k})\tau_{ijk} \\
 \tau_{2D} &= \sum_{j=j_0}^{j_3}\sum_{i=i_0}^{i_3}(w_{i})(w_{j})\tau_{ij} \\
 \tau_{1D} &= \sum_{i=i_0}^{i_3}(w_{i})\tau_{i}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 However, if the reduction mode is ename:VK_SAMPLER_REDUCTION_MODE_MIN or
@@ -3005,12 +2944,12 @@ weights.
 The linear weights are derived from the fraction computed earlier:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 w_{hi} &= (1-\delta) \\
 w_{lo} &= (\delta)   \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifndef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 The values of multiple mipmap levels together with their linear weights, are
@@ -3030,11 +2969,11 @@ computed:
 endif::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau &= (w_{hi})\tau[hi]+(w_{lo})\tau[lo]
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 However, if the reduction mode is ename:VK_SAMPLER_REDUCTION_MODE_MIN or
@@ -3062,7 +3001,6 @@ In addition, implementations should: consider pname:minLod and pname:maxLod
 of the sampler.
 
 [NOTE]
-.Note
 ====
 For historical reasons, vendor implementations of anisotropic filtering
 interpret these sampler parameters in different ways, particularly in corner
@@ -3085,7 +3023,7 @@ The sum [eq]#{tau}~2Daniso~# is defined using the single isotropic
 [eq]#{tau}~2D~(u,v)# at level [eq]#d#.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{2Daniso} & =
      \frac{1}{N}\sum_{i=1}^{N}
@@ -3102,7 +3040,7 @@ The sum [eq]#{tau}~2Daniso~# is defined using the single isotropic
      \right )},
      & \text{when}\  \rho_{y} \geq \rho_{x}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 ifdef::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
 When slink:VkSamplerReductionModeCreateInfo::pname:reductionMode is set to
@@ -3195,11 +3133,11 @@ In the mask, the texel group with local group coordinates
 latexmath:[(lgx,lgy)] is considered covered if and only if
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 0 \neq ((mask.x + (mask.y << 32)) \text{ \& } (1 << (lgy \times 8 + lgx)))
 \end{aligned}
-+++++++++++++++++++
+++++
 
 where:
 
@@ -3210,7 +3148,7 @@ The local group with coordinates latexmath:[(lgx,lgy)] in the mask is
 considered covered if and only if the texel filtering operation would access
 one or more texels latexmath:[\tau_{ij}] in the returned mip level where:
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 i0 & =
   \begin{cases}
@@ -3225,7 +3163,7 @@ j0 & =
   \end{cases} \\
 j1 & = j0 + gran.y - 1
 \end{aligned}
-+++++++++++++++++++
+++++
 and
 
   * latexmath:[i0 \leq i \leq i1] and latexmath:[j0 \leq j \leq j1];
@@ -3240,12 +3178,14 @@ by code:OpImageSampleFootprintNV indicates whether each texel group in a
 accessed during texel filtering.
 In the mask, the texel group with local group coordinates
 latexmath:[(lgx,lgy,lgz)], is considered covered if and only if:
+
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 0 \neq ((mask.x + (mask.y << 32)) \text{ \& } (1 << (lgz \times 16 + lgy \times 4 + lgx)))
 \end{aligned}
-+++++++++++++++++++
+++++
+
 where:
 
   * latexmath:[0 \leq lgx < 4], latexmath:[0 \leq lgy < 4], and latexmath:[0
@@ -3255,8 +3195,9 @@ where:
 The local group with coordinates latexmath:[(lgx,lgy,lgz)] in the mask is
 considered covered if and only if the texel filtering operation would access
 one or more texels latexmath:[\tau_{ijk}] in the returned mip level where:
+
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 i0 & =
   \begin{cases}
@@ -3277,7 +3218,8 @@ k0 & =
   \end{cases} \\
 k1 & = k0 + gran.z - 1
 \end{aligned}
-+++++++++++++++++++
+++++
+
 and
 
   * latexmath:[i0 \leq i \leq i1], latexmath:[j0 \leq j \leq j1],
@@ -3318,8 +3260,8 @@ The SPIR-V instruction code:OpImageWeightedSampleQCOM specifies a texture
 sampling operation involving two images: the _sampled image_ and the _weight
 image_.
 It is similar to bilinear filtering except more than 2x2 texels may
-participate in the filter and the filter weights are user-specified rather
-than computed by fixed-function hardware.
+participate in the filter and the filter weights are application-specified
+rather than computed by fixed-function hardware.
 The weight image view defines a 2D kernel weights used during sampling.
 
 The code:OpImageWeightedSampleQCOM support normalized or unnormalized texel
@@ -3389,7 +3331,7 @@ The width and height of the view's subresource range must: be less than or
 equal to
 slink:VkPhysicalDeviceImageProcessingPropertiesQCOM::pname:maxWeightFilterDimension.
 The layers are stored in horizontal phase major order.
-Expressed as a formula, the layer index for a each filter phase is computed
+Expressed as a formula, the layer index for each filter phase is computed
 as:
 
 [source,c]
@@ -3488,12 +3430,13 @@ The 2D unnormalized texel coordinates latexmath:[(u,v)] are transformed by
 latexmath:[filterCenter] to specify coordinates latexmath:[i_{0}, j_{0}].
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_{0} &= \left\lfloor u - filterCenter_{x} \right\rfloor \\[1em]
 j_{0} &= \left\lfloor v - filterCenter_{y} \right\rfloor
 \end{aligned}
-++++++++++++++++++++++++
+++++
+
 where latexmath:[filterCenter] is specified by
 slink:VkImageViewSampleWeightCreateInfoQCOM::pname:filterCenter.
 
@@ -3513,14 +3456,14 @@ filterHeight)] of pairs of latexmath:[(i,j)] and latexmath:[(k,l)]
 coordinates respectively.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \{i_q\}_{q=0}^{q=filterWidth-1} \quad &= i_{0} + q  \\[1em]
 \{j_q\}_{q=0}^{q=filterHeight-1} \quad &= j_{0} + q \\[1em]
 \{k_q\}_{q=0}^{q=filterWidth-1} \quad &= q  \\[1em]
 \{l_q\}_{q=0}^{q=filterHeight-1} \quad &= q
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where latexmath:[filterWidth] and latexmath:[filterHeight] are specified by
 slink:VkImageViewSampleWeightCreateInfoQCOM::pname:filterSize.
@@ -3537,14 +3480,14 @@ The phase index latexmath:[\psi] is computed from the fraction bits of the
 unnormalized 2D texel coordinates:
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 phaseCount_{h} = phaseCount_{v} &= \sqrt{numPhases}  \\[1em]
 hPhase &= \left\lfloor\mathbin{frac}\left( u \right) \times phaseCount_{h} \right\rfloor  \\[1em]
 vPhase &= \left\lfloor\mathbin{frac}\left( v \right) \times phaseCount_{v} \right\rfloor  \\[1em]
 \psi &= \left(vPhase \times phaseCount_{h}\right) + hPhase
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where the number of fraction bits retained is
 latexmath:[\mathbin{log2}\left( numPhases \right)] specified by
@@ -3558,7 +3501,7 @@ image latexmath:[w(k,l,\psi)] .
 
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 w(k,l,\psi) &=
   \begin{cases}
@@ -3566,7 +3509,7 @@ w(k,l,\psi) &=
     weight_{h} \times weight_{v}                           & \text{for 1D array view (separable filter) } \\
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 If latexmath:[w] is a 2D array view, then non-separable filtering is
 specified, and integer coordinates latexmath:[(k,l)] are used to select
@@ -3578,7 +3521,7 @@ latexmath:[(weight_{h})] and vertical weight latexmath:[(weight_{v})] texels
 from layer 0 and layer 1 of latexmath:[(w)] respectively.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 k_{packed} &= \left(phaseCount_{h} \times 4 \times \left\lfloor k / 4 \right\rfloor\right) + \left(hPhase \times 4\right) + \left(k \mathbin{\%} 4\right)  \\[1em]
 l_{packed}& = \left(phaseCount_{v} \times 4 \times \left\lfloor l / 4 \right\rfloor\right) + \left(vPhase  \times 4\right) + \left(l \mathbin{\%} 4\right) \\[1em]
@@ -3586,20 +3529,19 @@ weight_{h} &= w_{k_{packed}}[0]  & \text{(horizontal weights packed in layer 0)}
 weight_{v}  &= w_{l_{packed}}[1]  & \text{(vertical weights packed in layer 1)}
 
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 Where latexmath:[\mathbin{\%}] refers to the integer modulo operator.
 
 The values of multiple texels, together with their weights, are combined to
 produce a filtered value.
 
-
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{weightSampling} &= \sum_{{j=j_0} \atop {l=l_0}}^{j_{blockHeight-1} \atop {l_{blockHeight-1}}}\quad \sum_{{i=i_0}\atop {k=k_0}}^{i_{blockWidth-1} \atop {k_{blockWidth-1}}}w(k,l,\psi)\tau_{ij} \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 When slink:VkSamplerReductionModeCreateInfo::pname:reductionMode is set to
 ename:VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE, the above summation is
@@ -3692,14 +3634,14 @@ latexmath:[(i_{0}, j_{0})] and the reference block latexmath:[(k_{0},
 l_{0})].
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_{0} &= u  \\[1em]
 j_{0} &= v  \\[1em]
 k_{0} &= s  \\[1em]
 l_{0} &= t
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 For the target block, a set of neighboring integer texel coordinates are
 generated.
@@ -3709,12 +3651,12 @@ latexmath:[j_{blockHeight-1}].
 The set is of size latexmath:[blockWidth \times blockHeight].
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \{i_q\}_{q=0}^{q=blockWidth-1} \quad &= i_{0} + q  \\[1em]
 \{j_q\}_{q=0}^{q=blockHeight-1} \quad &= j_{0} + q
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where latexmath:[blockWidth] and latexmath:[blockHeight] is specified by the
 code:blockSize operand.
@@ -3728,12 +3670,12 @@ Similarly for the reference block, a set of neighboring integer texel
 coordinates are generated.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \{k_q\}_{q=0}^{q=blockWidth-1} \quad &= k_{0} + q  \\[1em]
 \{l_q\}_{q=0}^{q=blockHeight-1} \quad &= l_{0} + q
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 Each reference texel coordinate latexmath:[(k,l)] in the set must: not fail
 <<textures-integer-coordinate-validation,integer texel coordinate
@@ -3751,20 +3693,20 @@ compute a difference metric.
 The code:opTextureBlockMatchSAD computes the sum of absolute differences.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{SAD} &= \sum_{{j=j_0} \atop {l=l_0}}^{{j_{blockHeight-1}} \atop {l_{blockHeight-1}}} \quad\sum_{{i=i_0} \atop {k=k_0}}^{{i_{blockWidth-1}} \atop {k_{blockWidth-1}}}|\upsilon_{kl}-\tau_{ij}| \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 The code:opImageBlockMatchSSD computes the sum of the squared differences.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{SSD} &= \sum_{{j=j_0} \atop {l=l_0}}^{{j_{blockHeight-1}} \atop {l_{blockHeight-1}}} \quad\sum_{{i=i_0} \atop {k=k_0}}^{{i_{blockWidth-1}} \atop {k_{blockWidth-1}}}|\upsilon_{kl}-\tau_{ij}|^2 \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 When slink:VkSamplerReductionModeCreateInfo::pname:reductionMode is set to
 ename:VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE, the above summation is
@@ -3968,12 +3910,12 @@ latexmath:[boxSize] to specify integer texel coordinates latexmath:[(i_{0},
 j_{0})] of the bottom left texel for the filter.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 i_{0} &= \left\lfloor u - \frac{boxWidth}{2} \right\rfloor \\[1em]
 j_{0} &= \left\lfloor v - \frac{boxHeight}{2} \right\rfloor
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where latexmath:[boxWidth] and latexmath:[boxHeight] are specified by the
 code:(x,y) components of the code:boxSize operand.
@@ -3983,7 +3925,7 @@ computed from the fractional portion of the latexmath:[(u,v)] coordinates
 and the latexmath:[boxSize].
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 startFracU &= \mathbin{frac}\left(u - \frac{boxWidth}{2} \right) \\[1em]
 startFracV &= \mathbin{frac}\left(v - \frac{boxHeight}{2} \right) \\[1em]
@@ -3992,7 +3934,7 @@ endFracV &= \mathbin{frac}\left( startFracV + boxHeight \right) \\[1em]
 filterWidth &= \left\lceil startFracU + boxWidth \right\rceil  \\[1em]
 filterHeight &= \left\lceil startFracV + boxHeight \right\rceil
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 where the number of fraction bits retained by latexmath:[frac()] is
 specified by sname:VkPhysicalDeviceLimits::pname:subTexelPrecisionBits.
@@ -4005,12 +3947,12 @@ top-left coordinate of this set.
 The set is of size latexmath:[(filterWidth \times filterHeight)].
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \{i_q\}_{q=0}^{q=filterWidth-1} \quad &= i_{0} + q  \\[1em]
 \{j_q\}_{q=0}^{q=filterHeight-1} \quad &= j_{0} + q
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 Each of the generated integer coordinates latexmath:[({i_q}, {j_q})] is
 transformed by <<textures-wrapping-operation, texture wrapping operation>>,
@@ -4029,7 +3971,7 @@ Texels partially covered by the box will have will have a reduced weights
 proportional to the coverage.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 horizWeight_{i} &=
   \begin{cases}
@@ -4038,10 +3980,10 @@ horizWeight_{i} &=
     \left(1\right),                     & \text{otherwise} \\
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 vertWeight_{j} &=
   \begin{cases}
@@ -4050,18 +3992,18 @@ vertWeight_{j} &=
      \left(1\right),                    & \text{otherwise}  \\
   \end{cases}
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 
 The values of multiple texels, together with their horizontal and vertical
 weights, are combined to produce a box filtered value.
 
 [latexmath]
-++++++++++++++++++++++++
+++++
 \begin{aligned}
 \tau_{boxFilter} &= \frac{1}{boxHeight \times boxWidth} \sum_{j=j_0}^{j_{filterHeight-1}}\quad\sum_{i=i_0}^{i_{filterWidth-1}}(horizWeight_i)(vertWeight_j)\tau_{ij} \\
 \end{aligned}
-++++++++++++++++++++++++
+++++
 
 When slink:VkSamplerReductionModeCreateInfo::pname:reductionMode is set to
 ename:VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE, the above summation is
@@ -4131,7 +4073,7 @@ ifdef::VK_EXT_robustness2[and the descriptor is not null,]
 then the value returned is undefined:.
 
 
-=== Lod Query
+=== LOD Query
 
 code:OpImageQueryLod returns the Lod parameters that would be used in an
 image operation with the given image and coordinates.
@@ -4143,6 +4085,6 @@ ifdef::VK_EXT_robustness2[Otherwise, the]
 ifndef::VK_EXT_robustness2[The]
 steps described in this chapter are performed as if for
 code:OpImageSampleImplicitLod, up to <<textures-lod-and-scale-factor>>.
-The return value is the vector [eq]#({lambda}', d~l~)#.
+The return value is the vector [eq]#({lambda}', d~l~ - level~base~)#.
 These values may: be subject to implementation-specific maxima and minima
 for very large, out-of-range values.

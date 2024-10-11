@@ -132,7 +132,6 @@ A primary moving to any other state does not affect the state of a secondary
 recorded in it.
 
 [NOTE]
-.Note
 ====
 Resetting or freeing a primary command buffer removes the lifecycle linkage
 to all secondary command buffers that were recorded into it.
@@ -316,7 +315,6 @@ Two command buffers will consume the same amount of pool memory if:
   * the order of the commands is the same.
 
 [NOTE]
-.Note
 ====
 The rules for identically defined objects apply recursively, implying for
 example that if the command buffers are created in different devices that
@@ -447,7 +445,6 @@ the system.
 Command buffers allocated from the pool are not affected by the command.
 
 [NOTE]
-.Note
 ====
 This command provides applications with some control over the internal
 memory allocations used by command pools.
@@ -619,6 +616,7 @@ include::{generated}/validity/protos/vkDestroyCommandPool.adoc[]
 
 endif::VKSC_VERSION_1_0[]
 
+
 [[commandbuffer-allocation]]
 == Command Buffer Allocation and Management
 
@@ -648,13 +646,11 @@ command, set all entries of the pname:pCommandBuffers array to `NULL` and
 return the error.
 
 [NOTE]
-.Note
 ====
 Filling pname:pCommandBuffers with `NULL` values on failure is an exception
 to the default error behavior that output parameters will have undefined:
 contents.
 ====
-
 endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
 
 When command buffers are first allocated, they are in the
@@ -1093,7 +1089,6 @@ include::{generated}/api/structs/VkCommandBufferInheritanceInfo.adoc[]
     It can: be dlink:VK_NULL_HANDLE if the framebuffer is not known.
 +
 [NOTE]
-.Note
 ====
 Specifying the exact framebuffer that the secondary command buffer will be
 executed with may: result in better performance at command buffer execution
@@ -1157,7 +1152,6 @@ include::{generated}/validity/structs/VkCommandBufferInheritanceInfo.adoc[]
 --
 
 [NOTE]
-.Note
 ====
 On some implementations, not using the
 ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT bit enables command
@@ -1173,6 +1167,20 @@ behaving as if fname:vkResetCommandBuffer had been called with
 ename:VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT not set.
 After the implicit reset, pname:commandBuffer is moved to the
 <<commandbuffers-lifecycle, recording state>>.
+
+ifdef::VK_NV_command_buffer_inheritance[]
+If the <<features-commandBufferInheritance,pname:commandBufferInheritance>>
+feature is enabled, all graphics and compute state including bound pipeline
+state, bound shader objects, bound vertex and index buffers, bound
+descriptor sets and push constants, and all previously set dynamic state is
+inherited by the secondary command buffer from the primary or secondary
+command buffer that executes it.
+Furthermore, all of the state set by this secondary command buffer is
+inherited back to the primary or secondard command buffer that executes it.
+If the <<features-commandBufferInheritance,pname:commandBufferInheritance>>
+feature is not enabled there is a limited amount of inheritance of state
+into the secondary command buffer as specified below.
+endif::VK_NV_command_buffer_inheritance[]
 
 ifdef::VK_EXT_conditional_rendering[]
 [open,refpage='VkCommandBufferInheritanceConditionalRenderingInfoEXT',desc='Structure specifying command buffer inheritance information',type='structs']
@@ -1316,7 +1324,6 @@ state, except that the viewport and scissor count may: be set by binding a
 graphics pipeline that does not specify this state as dynamic.
 
 [NOTE]
-.Note
 ====
 Due to this restriction, applications should: ensure either all or none of
 the graphics pipelines bound in this secondary command buffer use dynamic
@@ -1353,7 +1360,6 @@ multiple values (e.g. multiple viewports).
     the actual inherited state.
 
 [NOTE]
-.Note
 ====
 There is no support for inheriting dynamic state from a secondary command
 buffer executed as part of a different `vkCmdExecuteCommands` command.
@@ -1593,7 +1599,6 @@ standard do not adhere to the capabilities of the video compression standard
 or the implementation.
 
 [NOTE]
-.Note
 ====
 Applications should: not rely on the
 ename:VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR error being returned by any
@@ -1605,9 +1610,10 @@ endif::VK_KHR_video_encode_queue[]
 ifdef::VKSC_VERSION_1_0[]
 If recording a command would exceed the amount of command pool memory
 reserved by
-slink:VkCommandPoolMemoryReservationCreateInfo::pname:commandPoolReservedSize,
-the implementation may: report a ename:VK_FAULT_TYPE_COMMAND_BUFFER_FULL
-fault.
+slink:VkCommandPoolMemoryReservationCreateInfo::pname:commandPoolReservedSize
+or the maximum supported command buffer size reported in
+slink:VkPhysicalDeviceVulkanSC10Properties::pname:maxCommandBufferSize, the
+implementation may: report a ename:VK_FAULT_TYPE_COMMAND_BUFFER_FULL fault.
 The command buffer remains in the <<commandbuffers-lifecycle, recording
 state>> until fname:vkEndCommandBuffer is called.
 When fname:vkEndCommandBuffer is called on a command buffer for which the
@@ -1664,7 +1670,6 @@ queue for execution.
 == Command Buffer Submission
 
 [NOTE]
-.Note
 ====
 Submission can be a high overhead operation, and applications should:
 attempt to batch work together into as few calls to fname:vkQueueSubmit
@@ -2081,7 +2086,8 @@ endif::VK_KHR_device_group_creation,VK_VERSION_1_1[]
 ifdef::VK_ARM_render_pass_striped[]
   * [[VUID-VkCommandBufferSubmitInfo-commandBuffer-09445]]
     If any render pass instance in pname:commandBuffer was recorded with a
-    slink:VkRenderPassStripeBeginInfoARM structure in its pNext chain, a
+    slink:VkRenderPassStripeBeginInfoARM structure in its pNext chain and
+    did not specify the ename:VK_RENDERING_RESUMING_BIT flag, a
     slink:VkRenderPassStripeSubmitInfoARM must: be included in the
     pname:pNext chain
   * [[VUID-VkCommandBufferSubmitInfo-pNext-09446]]
@@ -2090,7 +2096,8 @@ ifdef::VK_ARM_render_pass_striped[]
     slink:VkRenderPassStripeSubmitInfoARM::pname:stripeSemaphoreInfoCount
     must: be equal to the sum of the
     slink:VkRenderPassStripeBeginInfoARM::pname:stripeInfoCount parameters
-    provided to render pass instances recorded in pname:commandBuffer
+    provided to render pass instances recorded in pname:commandBuffer that
+    did not specify the ename:VK_RENDERING_RESUMING_BIT flag
 endif::VK_ARM_render_pass_striped[]
 ****
 
@@ -2128,6 +2135,12 @@ In a render pass instance that has multiview enabled, the stripe includes
 all views in the view mask.
 In a render pass instance with pname:layerCount greater than 1, the stripe
 includes all layers.
+
+Render pass instances that specify the ename:VK_RENDERING_RESUMING_BIT will
+not have any elements of pname:pStripeSemaphoreInfos mapped to them.
+Instead, for suspending and resuming render pass instances, this mapping is
+done for the first suspending render pass instance, and the per-stripe
+semaphores are only signaled for the last resuming render pass instance.
 
 .Valid Usage
 ****
@@ -2545,7 +2558,6 @@ in the pname:pWaitSemaphoreValues or pname:pSignalSemaphoreValues entry.
 
 ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
 [NOTE]
-.Note
 ====
 As the introduction of the external semaphore handle type
 ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT predates that of
@@ -2793,7 +2805,6 @@ Events signaled by the host must: be signaled before the command buffer
 waits on those events.
 
 [NOTE]
-.Note
 ====
 The ability for commands to wait on the host to set an events was originally
 added to allow low-latency updates to resources between host and device.
@@ -2873,12 +2884,22 @@ endif::VK_EXT_nested_command_buffer[]
     slink:VkCommandBufferInheritanceInfo::pname:framebuffer not equal to
     dlink:VK_NULL_HANDLE, that sname:VkFramebuffer must: match the
     sname:VkFramebuffer used in the current render pass instance
-  * [[VUID-vkCmdExecuteCommands-contents-06018]]
+  * [[VUID-vkCmdExecuteCommands-contents-09680]]
     If fname:vkCmdExecuteCommands is being called within a render pass
-    instance begun with flink:vkCmdBeginRenderPass, its pname:contents
-    parameter must: have been set to
+    instance begun with flink:vkCmdBeginRenderPass, and
+    flink:vkCmdNextSubpass has not been called in the current render pass
+    instance, the pname:contents parameter of flink:vkCmdBeginRenderPass
+    must: have been set to
     ename:VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
 ifdef::VK_EXT_nested_command_buffer[, or ename:VK_SUBPASS_CONTENTS_INLINE_AND_SECONDARY_COMMAND_BUFFERS_EXT]
+  * [[VUID-vkCmdExecuteCommands-None-09681]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance begun with flink:vkCmdBeginRenderPass, and
+    flink:vkCmdNextSubpass has been called in the current render pass
+    instance, the pname:contents parameter of the last call to
+    flink:vkCmdNextSubpass must: have been set to
+    ename:VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
+ifdef::VK_EXT_nested_command_buffer,VK_KHR_maintenance7[, or ename:VK_SUBPASS_CONTENTS_INLINE_AND_SECONDARY_COMMAND_BUFFERS_KHR]
   * [[VUID-vkCmdExecuteCommands-pCommandBuffers-06019]]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRenderPass, each element of
@@ -3269,6 +3290,7 @@ endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
 include::{generated}/validity/protos/vkCmdExecuteCommands.adoc[]
 --
 
+
 ifdef::VK_EXT_nested_command_buffer[]
 [[commandbuffers-nested]]
 == Nested Command Buffers
@@ -3324,6 +3346,7 @@ This requirement applies recursively, down to the most nested command buffer
 and up to the command buffer where the render pass was originally begun.
 
 endif::VK_EXT_nested_command_buffer[]
+
 
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
 [[commandbuffers-devicemask]]

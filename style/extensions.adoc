@@ -12,7 +12,6 @@ It is concerned with processes and registration, while fine-grained naming
 conventions are included in the <<naming,API Naming Conventions chapter>>.
 
 [NOTE]
-.Note
 ====
 The mechanism and process of specifying extensions is subject to change, as
 we receive feedback from authors and further requirements of documentation
@@ -93,12 +92,11 @@ These names are used in a variety of places:
   * When specifying extensions and layers to enable in the API.
   * As a preprocessor symbol in the `vulkan_*.h` header files indicating
     that an extension interface is defined at compile time.
-  * To control building the Vulkan Specification from asciidoctor source
+  * To control building the Vulkan Specification from asciidoc source
     containing multiple versions and extensions, by explicitly enabling
     their inclusion.
 
 [NOTE]
-.Note
 ====
 Published extensions are documented as part of the default branch (`main`)
 of the <<vulkan-docs,KhronosGroup/Vulkan-Docs>> project.
@@ -176,7 +174,6 @@ Khronos has registered some author IDs for specific uses:
     retroactively ratifying selected `EXT` extensions.
 
 [NOTE]
-.Note
 ====
 The `KHX` author ID was used for _experimental_ extensions, as described in
 the "`Layers & Extensions`" appendix of the <<vulkan-spec,Vulkan API
@@ -238,7 +235,6 @@ VK_LAYER_invalid_3dxcl_www
 ----
 
 [NOTE]
-.Note
 ====
 To avoid linking to a nonexistent domain, the reserved TLD `.invalid` is
 used in the example above.
@@ -321,7 +317,7 @@ Khronos vendor IDs are reserved in a similar fashion to
 While vendor IDs are not directly related to API extensions, the reservation
 process is similar, and so is described in this section.
 
-To reserve an Khronos vendor ID, you must first have a Khronos author ID.
+To reserve a Khronos vendor ID, you must first have a Khronos author ID.
 Propose a merge request against <<extensions-api-registry,`vk.xml`>> in the
 default branch.
 The merge must define a new enumerant by adding an `<enum>` tag to the
@@ -338,7 +334,6 @@ effort to develop an implementation of a Khronos API and require one for
 that purpose.
 
 [NOTE]
-.Note
 ====
 Other Khronos APIs such as OpenCL also utilize vendor IDs and share the
 Khronos vendor ID space.
@@ -400,7 +395,7 @@ extension number assignment prior to extension publication:
     Changes to both the specification source, and to `vk.xml` will be
     needed.
   ** Extension changes to the specification source must be protected by
-     asciidoctor conditionals as described in the
+     asciidoc conditionals as described in the
      <<extensions-documenting,Documenting Extensions>> section.
   ** Changes to `vk.xml` must define the extension interfaces in the
      `<extension>` block, and must also change the `supported` attribute
@@ -428,10 +423,10 @@ extension number assignment prior to extension publication:
 
 API versions and extensions are documented as modifications to the Vulkan
 specification.
-Changes specific to a version or extension are protected by asciidoctor
+Changes specific to a version or extension are protected by asciidoc
 conditionals.
 The changes are only visible in generated documentation when the
-Specification is built with an asciidoctor attribute of that name defined.
+Specification is built with an asciidoc attribute of that name defined.
 Khronos publishes three forms of the Vulkan Specification: the core API
 (e.g. versions 1.x) only; core API with all registered `KHR` and `EXT`
 extensions; and core API with all registered extensions.
@@ -440,10 +435,10 @@ extensions; and core API with all registered extensions.
 [[extensions-documenting-extensions]]
 === Changes for New Extensions
 
-If an new extension, or a related group of them is of sufficient scope to
+If a new extension, or a related group of them is of sufficient scope to
 require a new chapter of the specification, localize such changes into a
-small number of asciidoctor include files located under a subdirectory with
-the name of the extension.
+small number of asciidoc include files located under a subdirectory with the
+name of the extension.
 An example can be found in `chapters/VK_KHR_surface/wsi.adoc`.
 Most extensions are not entirely self-contained, and also require changes in
 existing parts of the specification to document new interactions.
@@ -454,7 +449,6 @@ defining the extension interfaces themselves, for purposes such as
 introducing new return codes or extending structures to existing APIs.
 
 [NOTE]
-.Note
 ====
 We do not yet fully document an example of including a new version or
 extension.
@@ -482,7 +476,7 @@ Changes for extensions include (but may not be limited to) the following:
      removed as required).
   ** When creating references to the extension appendix from elsewhere in
      the Specification, use the custom macro `apiext:`, instead of an
-     explicit asciidoctor link.
+     explicit asciidoc pass:[link:] macro.
      This allows more easily checking for invalid extensions, and changing
      the link target for generated reference pages and other alternate
      output forms.
@@ -497,7 +491,6 @@ Do not use this (old) form: `<<VK_KHR_shader_float_controls>>`.
 ----
 
 [NOTE]
-.Note
 ====
 If you are converting an old branch with extension references in it to use
 the `apiext:` macro, you can use this shell script:
@@ -508,8 +501,8 @@ sed -i -E 's/`?<<(VK_[A-Za-z0-9_]*)>>`?/`apiext:\1`/g' chapters/{*.adoc,*/*.adoc
 ----
 ====
 --
-  * In the preamble to the appendix, start with an asciidoctor `include` of
-    the automatically generated meta information.
+  * In the preamble to the appendix, start with an asciidoc `include` of the
+    automatically generated meta information.
     This information includes the extension name string, type, number,
     revision, and contact information from `vk.xml`.
   * Following the `include`, add an *Other Extension Metadata* subsection
@@ -544,8 +537,8 @@ sed -i -E 's/`?<<(VK_[A-Za-z0-9_]*)>>`?/`apiext:\1`/g' chapters/{*.adoc,*/*.adoc
     For example, see `appendices/VK_EXT_descriptor_indexing.adoc for
     language used when promoting to Vulkan core, with some features made
     optional in the promoted version.
-  * Next, add an asciidoctor `include` of the automatically generated
-    interface information.
+  * Next, add an asciidoc `include` of the automatically generated interface
+    information.
     This information includes API entities defined by the extension in
     `vk.xml`, such as new commands, structures, enumerants, and so on.
   * Following the `include`, add subsections describing interface
@@ -583,7 +576,7 @@ sed -i -E 's/`?<<(VK_[A-Za-z0-9_]*)>>`?/`apiext:\1`/g' chapters/{*.adoc,*/*.adoc
 ----
   * In every other place where the extension alters the behavior of the core
     Specification, make such changes and protect the modifications with the
-    same asciidoctor conditionals.
+    same asciidoc conditionals.
     For example, `VK_KHR_surface` adds new error codes to Vulkan.
     These are added to `chapters/fundamentals.adoc` in the "`Return Codes`"
     section as follows:
@@ -596,8 +589,8 @@ sed -i -E 's/`?<<(VK_[A-Za-z0-9_]*)>>`?/`apiext:\1`/g' chapters/{*.adoc,*/*.adoc
 \include::{chapters}/VK_KHR_surface/VkResultErrorDescriptions_surface.adoc[]
 \endif::VK_KHR_surface[]
 ----
-  * If two extensions interact, the asciidoctor conditionals must be
-    carefully structured so as to properly document the interactions if the
+  * If two extensions interact, the asciidoc conditionals must be carefully
+    structured so as to properly document the interactions if the
     specification is built with both extensions.
     Asciidoc conditionals allow
     link:{docguide}/directives/ifdef-ifndef/#checking-multiple-attributes[AND
@@ -690,7 +683,7 @@ the version too:
 ----
 
 When writing language dependent on the interaction of multiple extensions,
-asciidoctor conditional syntax is very restricted and only supports a single
+asciidoc conditional syntax is very restricted and only supports a single
 level of logical AND (`+`) or OR (`,`) operators.
 For example, if a section of text only applies when one extensions is
 enabled and another is not, the following markup will not work:
@@ -725,7 +718,6 @@ When creating a new version of the core API, such as Vulkan 1.1, changes are
 done similarly to extensions, with the following differences:
 
 [NOTE]
-.Note
 ====
 This list is being developed in conjunction with the Vulkan 1.1
 Specification, is probably incomplete, and is subject to change.
@@ -753,7 +745,7 @@ Group.
     other specification source files.
     Other changes and additions are included inline in existing chapters.
   * All changes that are specific to the new version must be protected by
-    the asciidoctor conditional (e.g. the version name).
+    the asciidoc conditional (e.g. the version name).
     For example, in the case of Vulkan 1.1:
 +
 [source,asciidoc]
@@ -809,7 +801,6 @@ another extension whose range is infringed on, or from the Khronos Registrar
 if the values do not belong to any extension's range).
 
 [NOTE]
-.Note
 ====
 Typically, extensions use a unique offset for each enumeration constant they
 add, yielding 1000 distinct token values per extension.
@@ -887,7 +878,6 @@ compilers.
 This is enforced by the generator scripts.
 
 [NOTE]
-.Note
 ====
 Because of the way in which extension bitmask values are assigned inside the
 XML `<extension>` tag, it is not always obvious what the next free bit in a
@@ -913,7 +903,6 @@ If that usage is not actually supported by one or the other bitmask type,
 the bit should still be reserved, but commented out in the XML.
 
 [NOTE]
-.Note
 ====
 The existing reservation mechanism used for in-development extensions does
 not work well for non-disabled extensions.
@@ -965,7 +954,6 @@ extensions must define two additional tokens.
     the <<vulkan-spec,Vulkan API Specification>>.
 
 [NOTE]
-.Note
 ====
 Any changes requiring the addition or removal of a type or command should be
 done by creating a new extension.
@@ -974,7 +962,6 @@ dependency information on the original extension.
 ====
 
 [NOTE]
-.Note
 ====
 When the Debug Report extension (VK_EXT_debug_report) was recently updated
 to include the enum values of VK_DEBUG_REPORT_OBJECT_TYPE_DISPLAY_KHR_EXT
@@ -1056,7 +1043,6 @@ See the "`Window System-Specific Header Control (Informative)`" section of
 the Vulkan Specification for more details.
 
 [NOTE]
-.Note
 ====
 Based on feedback from implementors, Khronos expects the Android, Linux, and
 Windows Vulkan SDKs to include our header files, and export the supported
@@ -1081,7 +1067,6 @@ that function without needing to call one of the ftext:vkGet*ProcAddr
 commands.
 
 [NOTE]
-.Note
 ====
 The Vulkan API loader for Android, Linux, and Windows exports functions for
 all core Vulkan API commands, and for a set of WSI extension commands that
@@ -1132,7 +1117,6 @@ deterministic results, it must define that ordering and expected behavior as
 part of its specification and valid usage statements.
 
 [NOTE]
-.Note
 ====
 Specific ordering requirements in a pname:pNext chain are strongly
 discouraged.

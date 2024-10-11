@@ -134,6 +134,7 @@ micromaps and the displacement micromap update flag is not set the
 application must: provide the original micromap to the update operation.
 endif::VK_NV_displacement_micromap[]
 
+
 [[acceleration-structure-inactive-prims]]
 === Inactive Primitives and Instances
 
@@ -326,7 +327,6 @@ ordering or synchronization implied between any of the individual
 acceleration structure builds.
 
 [NOTE]
-.Note
 ====
 This means that an application cannot: build a top-level acceleration
 structure in the same flink:vkCmdBuildAccelerationStructuresKHR call as the
@@ -416,7 +416,7 @@ include::{generated}/api/protos/vkCmdBuildAccelerationStructuresIndirectKHR.adoc
     command for each geometry.
 
 Accesses to acceleration structures, scratch buffers, vertex buffers, index
-buffers, and instance buffers must be synchronized as with
+buffers, and instance buffers must: be synchronized as with
 <<acceleration-structure-scratch,vkCmdBuildAccelerationStructuresKHR>>.
 
 Accesses to any element of pname:pIndirectDeviceAddresses must: be
@@ -754,7 +754,6 @@ include::{generated}/api/structs/VkAccelerationStructureGeometryTrianglesDataKHR
     defined.
 
 [NOTE]
-.Note
 ====
 Unlike the stride for vertex buffers in
 slink:VkVertexInputBindingDescription for graphics pipelines which must not
@@ -1134,7 +1133,7 @@ endif::VK_NV_ray_tracing[]
 
   * pname:transform is a slink:VkTransformMatrixKHR structure describing a
     transformation to be applied to the acceleration structure.
-  * pname:instanceCustomIndex is a 24-bit user-specified index value
+  * pname:instanceCustomIndex is a 24-bit application-specified index value
     accessible to ray shaders in the code:InstanceCustomIndexKHR built-in.
   * pname:mask is an 8-bit visibility mask for the geometry.
     The instance may: only be hit if `Cull Mask & instance.mask != 0`
@@ -1252,7 +1251,6 @@ include::{generated}/api/structs/VkAccelerationStructureMotionInstanceNV.adoc[]
     containing motion instance data for this instance.
 
 [NOTE]
-.Note
 ====
 If writing this other than with a standard C compiler, note that the final
 structure should be 152 bytes in size.
@@ -1321,7 +1319,7 @@ include::{generated}/api/structs/VkAccelerationStructureMatrixMotionInstanceNV.a
     transformation to be applied to the acceleration structure at time 0.
   * pname:transformT1 is a slink:VkTransformMatrixKHR structure describing a
     transformation to be applied to the acceleration structure at time 1.
-  * pname:instanceCustomIndex is a 24-bit user-specified index value
+  * pname:instanceCustomIndex is a 24-bit application-specified index value
     accessible to ray shaders in the code:InstanceCustomIndexKHR built-in.
   * pname:mask is an 8-bit visibility mask for the geometry.
     The instance may: only be hit if `Cull Mask & instance.mask != 0`
@@ -1380,7 +1378,7 @@ include::{generated}/api/structs/VkAccelerationStructureSRTMotionInstanceNV.adoc
     transformation to be applied to the acceleration structure at time 0.
   * pname:transformT1 is a slink:VkSRTDataNV structure describing a
     transformation to be applied to the acceleration structure at time 1.
-  * pname:instanceCustomIndex is a 24-bit user-specified index value
+  * pname:instanceCustomIndex is a 24-bit application-specified index value
     accessible to ray shaders in the code:InstanceCustomIndexKHR built-in.
   * pname:mask is an 8-bit visibility mask for the geometry.
     The instance may: only be hit if `Cull Mask & instance.mask != 0`
@@ -1458,7 +1456,7 @@ usually used to define the pivot point of the following rotation.
 This matrix is constructed from the parameters above by:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 S =
 \left(
     \begin{matrix}
@@ -1467,7 +1465,7 @@ S =
         0  & 0  & sz & pvz
     \end{matrix}
 \right)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 The rotation quaternion is defined as:
 
@@ -1487,7 +1485,7 @@ Finally, the transform has a translation T constructed from the parameters
 above by:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 T =
 \left(
     \begin{matrix}
@@ -1496,7 +1494,7 @@ T =
         0 & 0 & 1 & tz
     \end{matrix}
 \right)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 The effective derived transform is then given by
 
@@ -1509,7 +1507,7 @@ endif::VK_NV_ray_tracing_motion_blur[]
 ifdef::VK_KHR_acceleration_structure[]
 [open,refpage='VkAccelerationStructureBuildRangeInfoKHR',desc='Structure specifying build offsets and counts for acceleration structure builds',type='structs']
 --
-:refpage: VkAccelerationStructureBuildOffsetInfoKHR
+:refpage: VkAccelerationStructureBuildRangeInfoKHR
 
 sname:VkAccelerationStructureBuildRangeInfoKHR is defined as:
 
@@ -2174,7 +2172,6 @@ include::{generated}/api/structs/VkAccelerationStructureVersionInfoKHR.adoc[]
     structure as defined in flink:vkCmdCopyAccelerationStructureToMemoryKHR
 
 [NOTE]
-.Note
 ====
 pname:pVersionData is a _pointer_ to an array of 2{times}ename:VK_UUID_SIZE
 code:uint8_t values instead of two ename:VK_UUID_SIZE arrays as the expected
@@ -2235,7 +2232,6 @@ using the host commands.
 
 
 [NOTE]
-.Note
 ====
 The flink:vkBuildAccelerationStructuresKHR and
 flink:vkCmdBuildAccelerationStructuresKHR may: use different algorithms, and
@@ -2253,7 +2249,6 @@ flink:vkCopyAccelerationStructureToMemoryKHR.
 ====
 
 [NOTE]
-.Note
 ====
 For efficient execution, acceleration structures manipulated using these
 commands should always be bound to host cached memory, as the implementation
@@ -2298,7 +2293,6 @@ ordering or synchronization implied between any of the individual
 acceleration structure builds.
 
 [NOTE]
-.Note
 ====
 This means that an application cannot: build a top-level acceleration
 structure in the same flink:vkBuildAccelerationStructuresKHR call as the
@@ -2582,8 +2576,8 @@ include::{generated}/api/protos/vkWriteAccelerationStructuresPropertiesKHR.adoc[
     be queried.
   * pname:dataSize is the size in bytes of the buffer pointed to by
     pname:pData.
-  * pname:pData is a pointer to a user-allocated buffer where the results
-    will be written.
+  * pname:pData is a pointer to an application-allocated buffer where the
+    results will be written.
   * pname:stride is the stride in bytes between results for individual
     queries within pname:pData.
 

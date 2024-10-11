@@ -43,9 +43,9 @@ include::{generated}/api/protos/vkEnumeratePhysicalDevices.adoc[]
 If pname:pPhysicalDevices is `NULL`, then the number of physical devices
 available is returned in pname:pPhysicalDeviceCount.
 Otherwise, pname:pPhysicalDeviceCount must: point to a variable set by the
-user to the number of elements in the pname:pPhysicalDevices array, and on
-return the variable is overwritten with the number of handles actually
-written to pname:pPhysicalDevices.
+application to the number of elements in the pname:pPhysicalDevices array,
+and on return the variable is overwritten with the number of handles
+actually written to pname:pPhysicalDevices.
 If pname:pPhysicalDeviceCount is less than the number of physical devices
 available, at most pname:pPhysicalDeviceCount structures will be written,
 and ename:VK_INCOMPLETE will be returned instead of ename:VK_SUCCESS, to
@@ -98,7 +98,6 @@ include::{generated}/api/structs/VkPhysicalDeviceProperties.adoc[]
 
 ifdef::VK_VERSION_1_1[]
 [NOTE]
-.Note
 ====
 The value of pname:apiVersion may: be different than the version returned by
 flink:vkEnumerateInstanceVersion; either higher or lower.
@@ -113,7 +112,6 @@ with a slink:VkPhysicalDevice and its children.
 endif::VK_VERSION_1_1[]
 
 [NOTE]
-.Note
 ====
 The encoding of pname:driverVersion is implementation-defined.
 It may: not use the same encoding as pname:apiVersion.
@@ -132,7 +130,6 @@ applications to adapt to device characteristics that are not adequately
 exposed by other Vulkan queries.
 
 [NOTE]
-.Note
 ====
 These may: include performance profiles, hardware errata, or other
 characteristics.
@@ -143,7 +140,6 @@ most salient characteristics of the underlying implementation of the
 slink:VkPhysicalDevice being queried.
 
 [NOTE]
-.Note
 ====
 For example, in the case of a discrete GPU implementation, this should: be
 the GPU chipset vendor.
@@ -174,7 +170,6 @@ version and any major configuration options (for example, core count in the
 case of multicore devices).
 
 [NOTE]
-.Note
 ====
 The same device ID should: be used for all physical implementations of that
 device version and configuration.
@@ -193,7 +188,6 @@ slink:VkPhysicalDeviceProperties::pname:vendorID are:
 include::{generated}/api/enums/VkVendorId.adoc[]
 
 [NOTE]
-.Note
 ====
 Khronos vendor IDs may be allocated by vendors at any time.
 Only the latest canonical versions of this Specification, of the
@@ -307,31 +301,13 @@ include::{generated}/api/structs/VkPhysicalDeviceVulkan11Properties.adoc[]
 
 :anchor-prefix:
 include::{chapters}/devsandqueues.adoc[tag=VK_KHR_external_memory_capabilities-properties]
-  * [[{anchor-prefix}limits-subgroup-size]] pname:subgroupSize is the
-    default number of invocations in each subgroup.
-    pname:subgroupSize is at least 1 if any of the physical device's queues
-    support ename:VK_QUEUE_GRAPHICS_BIT or ename:VK_QUEUE_COMPUTE_BIT.
-    pname:subgroupSize is a power-of-two.
-  * [[{anchor-prefix}limits-subgroupSupportedStages]]
-    pname:subgroupSupportedStages is a bitfield of
-    elink:VkShaderStageFlagBits describing the shader stages that
-    <<shaders-group-operations, group operations>> with
-    <<shaders-scope-subgroup, subgroup scope>> are supported in.
-    pname:subgroupSupportedStages will have the
-    ename:VK_SHADER_STAGE_COMPUTE_BIT bit set if any of the physical
-    device's queues support ename:VK_QUEUE_COMPUTE_BIT.
-  * pname:subgroupSupportedOperations is a bitmask of
-    elink:VkSubgroupFeatureFlagBits specifying the sets of
-    <<shaders-group-operations, group operations>> with
-    <<shaders-scope-subgroup, subgroup scope>> supported on this device.
-    pname:subgroupSupportedOperations will have the
-    ename:VK_SUBGROUP_FEATURE_BASIC_BIT bit set if any of the physical
-    device's queues support ename:VK_QUEUE_GRAPHICS_BIT or
-    ename:VK_QUEUE_COMPUTE_BIT.
-  * [[{anchor-prefix}limits-subgroupQuadOperationsInAllStages]]
-    pname:subgroupQuadOperationsInAllStages is a boolean specifying whether
-    <<shaders-quad-operations,quad group operations>> are available in all
-    stages, or are restricted to fragment and compute stages.
+
+// These members have different names in VkPhysicalDeviceSubgroupProperties
+:supportedStages: subgroupSupportedStages
+:supportedOperations: subgroupSupportedOperations
+:quadOperationsInAllStages: subgroupQuadOperationsInAllStages
+
+include::{chapters}/limits.adoc[tag=VK_KHR_subgroup-properties]
 include::{chapters}/limits.adoc[tag=VK_KHR_maintenance2-properties]
 include::{chapters}/limits.adoc[tag=VK_KHR_multiview-properties]
 include::{chapters}/limits.adoc[tag=VK_KHR_protected_memory-properties]
@@ -349,6 +325,17 @@ slink:VkPhysicalDevicePointClippingProperties,
 slink:VkPhysicalDeviceMultiviewProperties,
 slink:VkPhysicalDeviceProtectedMemoryProperties, and
 slink:VkPhysicalDeviceMaintenance3Properties.
+
+[NOTE]
+====
+The pname:subgroupSupportedStages, pname:subgroupSupportedOperations, and
+pname:subgroupQuadOperationsInAllStages members of this structure correspond
+respectively to the
+slink:VkPhysicalDeviceSubgroupProperties::pname:supportedStages,
+slink:VkPhysicalDeviceSubgroupProperties::pname:supportedOperations, and
+slink:VkPhysicalDeviceSubgroupProperties::pname:quadOperationsInAllStages
+members, but add the `subgroup` prefix to the member name.
+====
 
 include::{generated}/validity/structs/VkPhysicalDeviceVulkan11Properties.adoc[]
 --
@@ -473,7 +460,6 @@ include::{generated}/api/structs/VkPhysicalDeviceVulkanSC10Properties.adoc[]
     a command buffer's current memory usage to this limit.
 
 [NOTE]
-.Note
 ====
 Implementations that do not have a fixed upper bound on the number of
 command buffers that may: be allocated from a command pool can: report
@@ -615,7 +601,6 @@ corresponding to pname:physicalDevice.
 Otherwise, pname:deviceNodeMask must: be `1`.
 
 [NOTE]
-.Note
 ====
 Although they have identical descriptions,
 slink:VkPhysicalDeviceIDProperties::pname:deviceUUID may differ from
@@ -649,7 +634,6 @@ Some possible inputs to such a computation are:
 
 
 [NOTE]
-.Note
 ====
 While slink:VkPhysicalDeviceIDProperties::pname:deviceUUID is specified to
 remain consistent across driver versions and system reboots, it is not
@@ -753,7 +737,6 @@ include::{generated}/api/enums/VkDriverIdKHR.adoc[]
 endif::VK_KHR_driver_properties[]
 
 [NOTE]
-.Note
 ====
 Khronos driver IDs may be allocated by vendors at any time.
 There may be multiple driver IDs for the same vendor, representing different
@@ -1052,7 +1035,6 @@ a physical device.
 
 [[devsandqueues-integer-dot-product-accelerated]]
 [NOTE]
-.Note
 ====
 A dot product operation is deemed accelerated if its implementation provides
 a performance advantage over application-provided code composed from
@@ -1251,9 +1233,10 @@ If pname:pQueueFamilyProperties is `NULL`, then the number of queue families
 available is returned in pname:pQueueFamilyPropertyCount.
 Implementations must: support at least one queue family.
 Otherwise, pname:pQueueFamilyPropertyCount must: point to a variable set by
-the user to the number of elements in the pname:pQueueFamilyProperties
-array, and on return the variable is overwritten with the number of
-structures actually written to pname:pQueueFamilyProperties.
+the application to the number of elements in the
+pname:pQueueFamilyProperties array, and on return the variable is
+overwritten with the number of structures actually written to
+pname:pQueueFamilyProperties.
 If pname:pQueueFamilyPropertyCount is less than the number of queue families
 available, at most pname:pQueueFamilyPropertyCount structures will be
 written.
@@ -1401,7 +1384,6 @@ graphics operations, compute operations, and protected memory operations.
 endif::VK_VERSION_1_1[]
 
 [NOTE]
-.Note
 ====
 All commands that are allowed on a queue that supports transfer operations
 are also allowed on a queue that supports either graphics or compute
@@ -1510,7 +1492,6 @@ The valid elements of pname:priorities must: be a continuous sequence of
 elink:VkQueueGlobalPriorityKHR enums in the ascending order.
 
 [NOTE]
-.Note
 ====
 For example, returning pname:priorityCount as 3 with supported
 pname:priorities as ename:VK_QUEUE_GLOBAL_PRIORITY_LOW_KHR,
@@ -1633,7 +1614,6 @@ For two physical devices to be in the same device group, they must: support
 identical extensions, features, and properties.
 
 [NOTE]
-.Note
 ====
 Physical devices in the same device group must: be so similar because there
 are no rules for how different features/properties would interact.
@@ -1669,7 +1649,7 @@ endif::VK_KHR_device_group_creation[]
 If pname:pPhysicalDeviceGroupProperties is `NULL`, then the number of device
 groups available is returned in pname:pPhysicalDeviceGroupCount.
 Otherwise, pname:pPhysicalDeviceGroupCount must: point to a variable set by
-the user to the number of elements in the
+the application to the number of elements in the
 pname:pPhysicalDeviceGroupProperties array, and on return the variable is
 overwritten with the number of structures actually written to
 pname:pPhysicalDeviceGroupProperties.
@@ -2353,7 +2333,6 @@ The callback must: be called only once by the implementation when a
 elink:VkDeviceMemoryReportEventTypeEXT event occurs.
 
 [NOTE]
-.Note
 ====
 The callback could be called from a background thread other than the thread
 calling the Vulkan commands.
@@ -2450,7 +2429,6 @@ types.
 endif::implementation-guide[]
 
 [NOTE]
-.Note
 ====
 This structure should only be considered valid during the lifetime of the
 triggered callback.
@@ -2524,6 +2502,36 @@ endif::VK_EXT_private_data[]
 include::{generated}/validity/structs/VkDevicePrivateDataCreateInfo.adoc[]
 --
 endif::VK_VERSION_1_3,VK_EXT_private_data[]
+
+ifdef::VK_KHR_pipeline_binary[]
+[open,refpage='VkDevicePipelineBinaryInternalCacheControlKHR',desc='Structure specifying parameter to disable the internal pipeline cache',type='structs']
+--
+To disable the implementation's internal pipeline cache, add a
+slink:VkDevicePipelineBinaryInternalCacheControlKHR structure to the
+pname:pNext chain of the slink:VkDeviceCreateInfo structure.
+
+include::{generated}/api/structs/VkDevicePipelineBinaryInternalCacheControlKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:disableInternalCache specifies whether or not to disable the
+    implementation's internal pipeline cache.
+
+If the sname:VkDeviceCreateInfo::pname:pNext chain does not include this
+structure, then pname:disableInternalCache defaults to ename:VK_FALSE.
+
+.Valid Usage
+****
+  * [[VUID-VkDevicePipelineBinaryInternalCacheControlKHR-disableInternalCache-09602]]
+    If
+    slink:VkPhysicalDevicePipelineBinaryPropertiesKHR::pname:pipelineBinaryInternalCacheControl
+    is ename:VK_FALSE, pname:disableInternalCache must: be ename:VK_FALSE
+****
+
+include::{generated}/validity/structs/VkDevicePipelineBinaryInternalCacheControlKHR.adoc[]
+--
+endif::VK_KHR_pipeline_binary[]
 
 ifdef::VKSC_VERSION_1_0[]
 
@@ -2804,6 +2812,7 @@ structure to the pname:pNext chain of the slink:VkDeviceCreateInfo
 structure.
 endif::VK_ARM_scheduling_controls[]
 
+
 [[devsandqueues-use]]
 === Device Use
 
@@ -2835,7 +2844,6 @@ cause resources and backing memory to become undefined:.
 
 ifdef::VKSC_VERSION_1_0[]
 [NOTE]
-.Note
 ====
 <<fault-handling>> can be used by the implementation to provide more
 information on the cause of a device becoming _lost_.
@@ -2845,7 +2853,6 @@ of the device lost.
 endif::VKSC_VERSION_1_0[]
 
 [NOTE]
-.Note
 ====
 Typical reasons for device loss will include things like execution timing
 out (to prevent denial of service), power management events, platform
@@ -2873,13 +2880,13 @@ successfully created from that physical device, it must: be in the non-lost
 state.
 
 [NOTE]
-.Note
 ====
 Whilst logical device loss may: be recoverable, in the case of physical
 device loss, it is unlikely that an application will be able to recover
 unless additional, unaffected physical devices exist on the system.
-The error is largely informational and intended only to inform the user that
-a platform issue has occurred, and should: be investigated further.
+The error is largely informational and intended only to inform the
+application that a platform issue has occurred, and should: be investigated
+further.
 For example, underlying hardware may: have developed a fault or become
 physically disconnected from the rest of the system.
 In many cases, physical device loss may: cause other more serious issues
@@ -2931,7 +2938,6 @@ ename:VK_ERROR_DEVICE_LOST within finite time.
 endif::VK_KHR_maintenance5[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_memory[]
-
 The content of any external memory objects that have been exported from or
 imported to a lost device become undefined:.
 Objects on other logical devices or in other APIs which are associated with
@@ -2941,11 +2947,9 @@ The layout of subresources of images on other logical devices that are bound
 to sname:VkDeviceMemory objects associated with the same underlying memory
 resources as external memory objects on the lost device becomes
 ename:VK_IMAGE_LAYOUT_UNDEFINED.
-
 endif::VK_VERSION_1_1,VK_KHR_external_memory[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_external_semaphore[]
-
 The state of sname:VkSemaphore objects on other logical devices created by
 <<synchronization-semaphores-importing,importing a semaphore payload>> with
 temporary permanence which was exported from the lost device is undefined:.
@@ -2958,17 +2962,7 @@ operations on such semaphores behave as defined in
 <<synchronization-semaphores-waiting-state,Semaphore State Requirements For
 Wait Operations>> for external semaphores not in a valid state for a wait
 operation.
-
 endif::VK_VERSION_1_1,VK_KHR_external_semaphore[]
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-TODO (piman) - I do not think we are very clear about what "`in-use by the
-device`" means.
-====
-endif::editing-notes[]
 
 
 [[devsandqueues-destruction]]
@@ -2992,7 +2986,6 @@ the first parameter of the corresponding ftext:vkCreate* or
 ftext:vkAllocate* command.
 
 [NOTE]
-.Note
 ====
 The lifetime of each of these objects is bound by the lifetime of the
 sname:VkDevice object.
@@ -3057,7 +3050,6 @@ Grouping of queue families within a physical device is
 implementation-dependent.
 
 [NOTE]
-.Note
 ====
 The general expectation is that a physical device groups all queues of
 matching capabilities into a single family.
@@ -3112,7 +3104,7 @@ endif::VK_VERSION_1_1[]
     to create in the queue family indicated by pname:queueFamilyIndex, and
     with the behavior specified by pname:flags.
   * pname:pQueuePriorities is a pointer to an array of pname:queueCount
-    normalized floating point values, specifying priorities of work that
+    normalized floating-point values, specifying priorities of work that
     will be submitted to each created queue.
     See <<devsandqueues-priority,Queue Priority>> for more information.
 
@@ -3385,7 +3377,6 @@ pname:flags value from this structure as that used at device creation time
 in a slink:VkDeviceQueueCreateInfo structure.
 
 [NOTE]
-.Note
 ====
 Normally, if you create both protected-capable and non-protected-capable
 queues with the same family, they are treated as separate lists of queues
@@ -3474,7 +3465,7 @@ See the <<resources-sharing,Resource Sharing>> section for details.
 
 Each queue is assigned a priority, as set in the
 slink:VkDeviceQueueCreateInfo structures when creating the device.
-The priority of each queue is a normalized floating point value between 0.0
+The priority of each queue is a normalized floating-point value between 0.0
 and 1.0, which is then translated to a discrete priority level by the
 implementation.
 Higher values indicate a higher priority, with 0.0 being the lowest priority
@@ -3552,6 +3543,7 @@ See the <<synchronization,Synchronization and Cache Control>> chapter for
 how this synchronization is accomplished.
 
 endif::VKSC_VERSION_1_0[]
+
 
 [[devsandqueues-queuedestruction]]
 === Queue Destruction

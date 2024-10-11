@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -i
+#!/usr/bin/env python3 -i
 #
 # Copyright 2013-2024 The Khronos Group Inc.
 #
@@ -58,9 +58,9 @@ class VulkanConventions(ConventionsBase):
             if version == '1.0':
                 return 'Vulkan SC 1.0'
             else:
-                return f'<<versions-sc-{version}, Version SC {version}>>'
+                return f'<<versions-sc-{version}, Vulkan SC Version {version}>>'
         else:
-            return f'<<versions-{version}, Version {version}>>'
+            return f'<<versions-{version}, Vulkan Version {version}>>'
 
     def formatExtension(self, name):
         """Mark up an extension name as a link in the spec."""

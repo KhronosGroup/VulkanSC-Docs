@@ -50,21 +50,25 @@ A _shader call_ is an instruction which may: cause execution to continue
 elsewhere by creating one or more invocations that execute a different
 shader stage.
 
-The shader call instructions are:
+The following table lists all shader call instructions and which stages each
+one can: directly call.
 
-  * code:OpTraceRayKHR which may: invoke intersection, any-hit, closest hit,
-    or miss shaders,
+[options="header"]
+|====
+| Instruction | Intersection | Any-Hit | Closest Hit | Miss | Callable
+| code:OpTraceRayKHR |X|X|X|X|
 ifdef::VK_NV_ray_tracing_motion_blur[]
-  * code:OpTraceRayMotionNV which may: invoke intersection, any-hit, closest
-    hit, or miss shaders,
+| code:OpTraceRayMotionNV |X|X|X|X|
 endif::VK_NV_ray_tracing_motion_blur[]
-  * code:OpReportIntersectionKHR which may: invoke any-hit shaders, and
-  * code:OpExecuteCallableKHR which will invoke a callable shader.
+| code:OpReportIntersectionKHR | |X| | |
+| code:OpExecuteCallableKHR | | | | |X
 ifdef::VK_NV_ray_tracing_invocation_reorder[]
-  * code:OpHitObjectTraceRayNV, code:OpHitObjectTraceRayMotionNV, and
-    code:OpHitObjectExecuteShaderNV which may: invoke intersection, any-hit,
-    closest hit, miss, or callable shaders.
+| code:OpHitObjectTraceRayNV |X|X| | |
+| code:OpHitObjectTraceRayMotionNV |X|X| | |
+| code:OpHitObjectExecuteShaderNV | | |X|X|
 endif::VK_NV_ray_tracing_invocation_reorder[]
+|====
+
 
 ifdef::VK_VERSION_1_1[]
 The invocations created by shader call instructions are grouped into
@@ -142,7 +146,6 @@ Similarly, the application must: use code:Volatile semantics on any
 code:RayTmaxKHR decorated code:Builtin used in an intersection shader.
 
 [NOTE]
-.Note
 ====
 <<shaders-group-operations,Subgroup operations>> are permitted in the
 programmable ray tracing shader stages.
@@ -589,8 +592,8 @@ include::{generated}/api/structs/VkTraceRaysIndirectCommand2KHR.adoc[]
 The members of sname:VkTraceRaysIndirectCommand2KHR have the same meaning as
 the similarly named parameters of flink:vkCmdTraceRaysKHR.
 
-Indirect shader binding table buffer parameters must satisfy the same memory
-alignment and binding requirements as their counterparts in
+Indirect shader binding table buffer parameters must: satisfy the same
+memory alignment and binding requirements as their counterparts in
 flink:vkCmdTraceRaysIndirectKHR and flink:vkCmdTraceRaysKHR.
 
 .Valid Usage
@@ -668,7 +671,6 @@ ename:VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR
 ename:VK_ACCESS_SHADER_READ_BIT.
 
 [NOTE]
-.Note
 ====
 Because different shader record buffers can be associated with the same
 shader, a shader variable with code:ShaderRecordBufferKHR storage class will
@@ -919,7 +921,6 @@ account any application specific knowledge about the properties of the call
 chains.
 
 [NOTE]
-.Note
 ====
 For example, if an application has two types of closest hit and miss shaders
 that it can use but the first level of rays will only use the first kind
@@ -956,6 +957,7 @@ shader group handles to those in the capture phase, allowing capture/replay
 tools to reuse previously recorded shader binding table buffer contents or
 to obtain the same handles by calling
 flink:vkGetRayTracingCaptureReplayShaderGroupHandlesKHR again.
+
 
 ifdef::VK_NV_ray_tracing_validation[]
 [[ray-tracing-validation]]

@@ -131,7 +131,7 @@ which are sourced from the same attribute, and if used, are either filled
 with the corresponding component from the input format (if present), or the
 default value.
 
-When a vertex shader input variable declared using a 32-bit floating point
+When a vertex shader input variable declared using a 32-bit floating-point
 matrix type is assigned a code:Location _i_, its values are taken from
 consecutive input attributes starting with the corresponding
 sname:VkVertexInputAttributeDescription::pname:location.
@@ -237,6 +237,7 @@ code:Component words do not overlap.
 If multiple variables share the same code:Location slot, they must: all have
 the same SPIR-V floating-point component type or all have the same width
 scalar type components.
+
 
 [[fxvertex-input]]
 == Vertex Input Description
@@ -743,7 +744,6 @@ fname:vkCmdBindVertexBuffers2 to set the stride.
 endif::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
 
 [NOTE]
-.Note
 ====
 Unlike the static state to set the same, pname:pStrides must be between 0
 and the maximum extent of the attributes in the binding.
@@ -943,7 +943,7 @@ ifdef::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
   ** flink:vkCmdSetVertexInputEXT::pname:pVertexBindingDescriptions->stride
 endif::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
-  ** flink:vkCmdBindVertexBuffers2EXT::pname:pStride, if not code:NULL
+  ** flink:vkCmdBindVertexBuffers2EXT::pname:pStride, if not `NULL`
 endif::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
 
 [source,c]

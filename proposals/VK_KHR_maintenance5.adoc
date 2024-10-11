@@ -20,12 +20,12 @@ The following is a list of issues considered in this proposal:
   * Add a A1B5G5R5 format (corresponding to `GL_UNSIGNED_SHORT_1_5_5_5_REV`)
   * Allow vkGetPhysicalDeviceFormatProperties with unknown formats
   * Add a vkGetRenderAreaGranularity equivalent for dynamic rendering
-  * Require vkGetDeviceProcAddr to return NULL for functions beyond app version
+  * Require vkGetDeviceProcAddr to return NULL for functions beyond application version
   * Index buffer range specification
   * Add a property to indicate multisample coverage operations are performed after sample counting in EarlyFragmentTests mode
   * Add VK_REMAINING_ARRAY_LAYERS support to VkImageSubresourceLayers.layerCount
   * Allow VK_WHOLE_SIZE for pSizes argument of vkCmdBindVertexBuffers2
-  * Add support for a new vkGetDeviceImageSubresourceLayout to allow a vkGetImageSubresourceLayout query without having to create a dummy image
+  * Add support for a new vkGetDeviceImageSubresourceLayout to allow a vkGetImageSubresourceLayout query without having to create a placeholder image
   * Ensure we have a reliable/deterministic way to detect device loss
   * We are running out of spare bits in various FlagBits
   * Add a property to indicate sample mask test operations are performed after sample counting in EarlyFragmentTests mode
@@ -60,7 +60,7 @@ In order to query a format's support, applications must first query the relevant
 
 Some tile-based GPUs can benefit from providing an optimal render area granularity as the basis for a performance hint.
 
-=== vkGetDeviceProcAddr to return NULL for functions beyond app version
+=== vkGetDeviceProcAddr to return NULL for functions beyond application version
 
 Existing implementations have different behavior when returning function pointers from `vkGetDeviceProcAddr()`
 for supported core functions of versions greater than the version requested by the application.
@@ -83,14 +83,14 @@ Some hardware performs sample counting after multisample coverage operations whe
 
 `pSizes` in `vkCmdBindVertexBuffers2` unintentionally does not support `VK_WHOLE_SIZE`.
 
-=== vkGetImageSubresourceLayout query without having to create a dummy image
+=== vkGetImageSubresourceLayout query without having to create a placeholder image
 
 There is a potential implementation overhead when querying the subresource layout of an image due to object creation.  This overhead could be reduced by a function that works in a similar way to `vkGetDeviceImageMemoryRequirements()` which uses the image creation properties, rather than an image object, to perform the query.
 
 === Reliable/deterministic way to detect device loss
 
-All existing entrypoints that are capable of returning
-ename:VK_ERROR_DEVICE_LOST have some form of exemption or
+All existing entry points that are capable of returning
+`VK_ERROR_DEVICE_LOST` have some form of exemption or
 special-case allowing for other return values to be returned even when a device
 is irrecoverably lost. These exemptions are all necessary due to the
 asynchronous nature of device-loss detection, but this makes it difficult for
@@ -191,7 +191,7 @@ void vkGetRenderingAreaGranularityKHR(
     VkExtent2D*                                 pGranularity);
 ----
 
-=== vkGetDeviceProcAddr to return NULL for functions beyond app version
+=== vkGetDeviceProcAddr to return NULL for functions beyond application version
 
 The specification has been changed to require `vkGetDeviceProcAddr()` to return `NULL` for supported core functions beyond the version requested by the application.
 
@@ -221,7 +221,7 @@ Support for using `VK_REMAINING_ARRAY_LAYERS` as the `layerCount` member of `VkI
 
 Support for using `VK_WHOLE_SIZE` in the `pSizes` parameter of `vkCmdBindVertexBuffers2` is added.
 
-=== vkGetImageSubresourceLayout query without having to create a dummy image
+=== vkGetImageSubresourceLayout query without having to create a placeholder image
 
 A new `vkGetDeviceImageSubresourceLayoutKHR` function provides the ability to query the subresource layout for an image without requiring an image object, and a KHR version of `vkGetImageSubresourceLayout2EXT`:
 
@@ -264,12 +264,12 @@ VKAPI_ATTR void VKAPI_CALL vkGetImageSubresourceLayout2KHR(
 
 === Reliable/deterministic way to detect device loss
 
-Following device-loss, entrypoints that may return `VK_ERROR_DEVICE_LOST` do so
+Following device-loss, entry points that may return `VK_ERROR_DEVICE_LOST` do so
 in a more consistent manner.
 
 === Lack of available flag bits
 
-Two new flags words are added, along with structures to use them: 
+Two new flags words are added, along with structures to use them:
 
 * `VkPipelineCreateFlagBits2KHR` and `VkPipelineCreateFlags2CreateInfoKHR`
 * `VkBufferUsageFlagBits2KHR` and `VkBufferUsageFlags2CreateInfoKHR`

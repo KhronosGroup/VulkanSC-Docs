@@ -29,7 +29,7 @@ include::{generated}/interfaces/VK_EXT_swapchain_colorspace.adoc[]
 color spaces?
 
 *RESOLVED*: Pixel format is independent of color space (though some color
-spaces really want / need floating point color components to be useful).
+spaces really want / need floating-point color components to be useful).
 Therefore, do not plan on documenting what formats support which color
 spaces.
 An application can: call flink:vkGetPhysicalDeviceSurfaceFormatsKHR to query
@@ -60,3 +60,7 @@ described by separate extension.
   ** Clarify color space transfer function usage.
   ** Refer to normative definitions in the Data Format Specification.
   ** Clarify DCI-P3 and Display P3 usage.
+
+  * Revision 5, 2024-03-16 (Zehui Lin)
+  ** Fix interchanged concepts of EOTF and OETF.
+  ** Clarify that the presentation engine can accept the color spaces.

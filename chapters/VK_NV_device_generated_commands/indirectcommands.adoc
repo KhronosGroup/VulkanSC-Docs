@@ -103,7 +103,6 @@ sname:VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV::pname:minIndirectComm
 whichever is lower.
 
 [NOTE]
-.Note
 ====
 A pname:minIndirectCommandsBufferOffsetAlignment of 4 allows
 basetype:VkDeviceAddress to be packed as code:uvec2 with scalar layout
@@ -199,8 +198,8 @@ include::{generated}/api/enums/VkIndirectCommandsLayoutUsageFlagBitsNV.adoc[]
     set to ename:VK_TRUE.
   * ename:VK_INDIRECT_COMMANDS_LAYOUT_USAGE_INDEXED_SEQUENCES_BIT_NV
     specifies that the input data for the sequences is not implicitly
-    indexed from 0..sequencesUsed but a user provided sname:VkBuffer
-    encoding the index is provided.
+    indexed from 0..sequencesUsed, but an application-provided
+    sname:VkBuffer encoding the index is provided.
   * ename:VK_INDIRECT_COMMANDS_LAYOUT_USAGE_UNORDERED_SEQUENCES_BIT_NV
     specifies that the processing of sequences can: happen at an
     implementation-dependent order, which is not: guaranteed to be coherent
@@ -344,7 +343,7 @@ include::{generated}/api/structs/VkBindIndexBufferIndirectCommandNV.adoc[]
   * pname:indexType is a elink:VkIndexType value specifying how indices are
     treated.
     Instead of the Vulkan enum values, a custom `uint32_t` value can: be
-    mapped to an elink:VkIndexType by specifying the
+    mapped to elink:VkIndexType by specifying the
     sname:VkIndirectCommandsLayoutTokenNV::pname:pIndexTypes and
     sname:VkIndirectCommandsLayoutTokenNV::pname:pIndexTypeValues arrays.
 
@@ -460,6 +459,7 @@ include::{generated}/api/structs/VkBindPipelineIndirectCommandNV.adoc[]
 
 include::{generated}/validity/structs/VkBindPipelineIndirectCommandNV.adoc[]
 --
+
 
 === Tokenized Command Processing
 

@@ -30,7 +30,8 @@ include::{generated}/api/structs/VkValidationFeaturesEXT.adoc[]
     If the pname:pEnabledValidationFeatures array contains
     ename:VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT,
     then it must: also contain
-    ename:VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT
+    ename:VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT or
+    ename:VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT
   * [[VUID-VkValidationFeaturesEXT-pEnabledValidationFeatures-02968]]
     If the pname:pEnabledValidationFeatures array contains
     ename:VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT, then it must: not
@@ -91,7 +92,12 @@ include::{generated}/api/enums/VkValidationFeatureDisableEXT.adoc[]
   * ename:VK_VALIDATION_FEATURE_DISABLE_ALL_EXT specifies that all
     validation checks are disabled.
   * ename:VK_VALIDATION_FEATURE_DISABLE_SHADERS_EXT specifies that shader
-    validation is disabled.
+    validation, both runtime and standalone, is disabled.
+    This validation occurs inside
+ifdef::VK_EXT_shader_object[]
+    slink:VkShaderCreateInfoEXT and
+endif::VK_EXT_shader_object[]
+    slink:VkShaderModuleCreateInfo.
     This feature is enabled by default.
   * ename:VK_VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT specifies that
     thread safety validation is disabled.
@@ -105,8 +111,8 @@ include::{generated}/api/enums/VkValidationFeatureDisableEXT.adoc[]
   * ename:VK_VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT specifies that core
     validation checks are disabled.
     This feature is enabled by default.
-    If this feature is disabled, the shader validation and GPU-assisted
-    validation features are also disabled.
+    If this feature is disabled,
+    ename:VK_VALIDATION_FEATURE_DISABLE_SHADERS_EXT is implied.
   * ename:VK_VALIDATION_FEATURE_DISABLE_UNIQUE_HANDLES_EXT specifies that
     protection against duplicate non-dispatchable object handles is
     disabled.
@@ -118,7 +124,6 @@ include::{generated}/api/enums/VkValidationFeatureDisableEXT.adoc[]
 --
 
 [NOTE]
-.Note
 ====
 Disabling checks such as parameter validation and object lifetime validation
 prevents the reporting of error conditions that can cause other validation
@@ -129,7 +134,6 @@ always revalidate them.
 
 ifdef::VK_EXT_validation_flags[]
 [NOTE]
-.Note
 ====
 The `apiext:VK_EXT_validation_features` extension subsumes all the
 functionality provided in the `apiext:VK_EXT_validation_flags` extension.

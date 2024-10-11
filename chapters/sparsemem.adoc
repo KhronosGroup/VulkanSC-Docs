@@ -231,7 +231,6 @@ starts on a sparse block boundary and has dimensions that are integer
 multiples of the corresponding dimensions of the sparse image block.
 
 [NOTE]
-.Note
 ====
 Applications can: use these types of images to control LOD based on total
 memory consumption.
@@ -358,7 +357,6 @@ layers will share a single mip tail region.
 image::{images}/sparseimage_alignedmipsize.svg[align="center",title="Sparse Image with Aligned Mip Size",opts="{imageopts}"]
 
 [NOTE]
-.Note
 ====
 The mip tail regions are presented here in 2D arrays simply for figure size
 reasons.
@@ -378,7 +376,6 @@ block basis.
 image::{images}/sparseimage_alignedmipsize_singlemiptail.svg[align="center",title="Sparse Image with Aligned Mip Size and Single Mip Tail",opts="{imageopts}"]
 
 [NOTE]
-.Note
 ====
 The mip tail region is presented here in a 2D array simply for figure size
 reasons.
@@ -407,7 +404,6 @@ etext:BC5) thus the dimensions of the standard sparse image block shapes
 apply in terms of compressed texel blocks.
 
 [NOTE]
-.Note
 ====
 For block-compressed formats, the dimensions of a sparse image block in
 terms of texels can: be calculated by multiplying the sparse image block
@@ -493,7 +489,6 @@ See the figure below:
 image::{images}/sparseimage_multiaspect.svg[align="center",title="Multiple Aspect Sparse Image",opts="{imageopts}"]
 
 [NOTE]
-.Note
 ====
 The mip tail regions are presented here in 2D arrays simply for figure size
 reasons.
@@ -569,7 +564,6 @@ aliasing rules>>.
 In this case memory cannot: be accessed in a data consistent fashion.
 
 [NOTE]
-.Note
 ====
 Enabling sparse resource memory aliasing can: be a way to lower physical
 memory use, but it may: reduce performance on some implementations.
@@ -642,16 +636,6 @@ sname:VkSparseImageOpaqueMemoryBindInfo.
 This operation must: be supported for all sparse images, even ones created
 with ename:VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT.
 
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-@ntrevett suggested expanding the NOTE tag below to encompass everything
-from "`The cost is...`" in the first bullet point through the current note.
-TBD.
-====
-endif::editing-notes[]
-
   * If the holes are included in the size, this bind function becomes very
     easy.
     In most cases the pname:resourceOffset is simply a device virtual
@@ -666,7 +650,6 @@ endif::editing-notes[]
     intended to be mapped.
 
 [NOTE]
-.Note
 ====
 If the application always uses sname:VkSparseImageMemoryBindInfo to bind
 memory for the non-tail mip levels, any holes that are present in the
@@ -706,6 +689,7 @@ implementation to derive the correct device virtual address.
 ****
 endif::implementation-guide[]
 endif::VKSC_VERSION_1_0[]
+
 
 [[sparsememory-resourceapi]]
 == Sparse Resource API
@@ -856,12 +840,11 @@ ifdef::hidden[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]
 
-
 include::{generated}/validity/structs/VkPhysicalDeviceSparseProperties.adoc[]
 --
 
-ifndef::VKSC_VERSION_1_0[]
 
+ifndef::VKSC_VERSION_1_0[]
 [[sparsememory-format-props]]
 === Sparse Image Format Properties
 
@@ -946,10 +929,10 @@ include::{generated}/api/protos/vkGetPhysicalDeviceSparseImageFormatProperties.a
 
 If pname:pProperties is `NULL`, then the number of sparse format properties
 available is returned in pname:pPropertyCount.
-Otherwise, pname:pPropertyCount must: point to a variable set by the user to
-the number of elements in the pname:pProperties array, and on return the
-variable is overwritten with the number of structures actually written to
-pname:pProperties.
+Otherwise, pname:pPropertyCount must: point to a variable set by the
+application to the number of elements in the pname:pProperties array, and on
+return the variable is overwritten with the number of structures actually
+written to pname:pProperties.
 If pname:pPropertyCount is less than the number of sparse format properties
 available, at most pname:pPropertyCount structures will be written.
 
@@ -1091,7 +1074,6 @@ See flink:vkCreateBuffer and flink:vkCreateImage for details of the resource
 creation APIs.
 
 [NOTE]
-.Note
 ====
 Specifying ename:VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT or
 ename:VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT requires specifying
@@ -1190,9 +1172,10 @@ If pname:pSparseMemoryRequirements is `NULL`, then the number of sparse
 memory requirements available is returned in
 pname:pSparseMemoryRequirementCount.
 Otherwise, pname:pSparseMemoryRequirementCount must: point to a variable set
-by the user to the number of elements in the pname:pSparseMemoryRequirements
-array, and on return the variable is overwritten with the number of
-structures actually written to pname:pSparseMemoryRequirements.
+by the application to the number of elements in the
+pname:pSparseMemoryRequirements array, and on return the variable is
+overwritten with the number of structures actually written to
+pname:pSparseMemoryRequirements.
 If pname:pSparseMemoryRequirementCount is less than the number of sparse
 memory requirements available, at most pname:pSparseMemoryRequirementCount
 structures will be written.
@@ -1202,7 +1185,6 @@ then pname:pSparseMemoryRequirementCount will be set to zero and
 pname:pSparseMemoryRequirements will not be written to.
 
 [NOTE]
-.Note
 ====
 It is legal for an implementation to report a larger value in
 sname:VkMemoryRequirements::pname:size than would be obtained by adding
@@ -1326,16 +1308,13 @@ On the other hand, sparse resources can: be bound to memory non-contiguously
 and these bindings can: be altered during the lifetime of the resource.
 
 ifndef::VKSC_VERSION_1_0[]
-
 [NOTE]
-.Note
 ====
 It is important to note that freeing a sname:VkDeviceMemory object with
 fname:vkFreeMemory will not cause resources (or resource regions) bound to
 the memory object to become unbound.
 Applications must: not access resources bound to memory that has been freed.
 ====
-
 endif::VKSC_VERSION_1_0[]
 
 Sparse memory bindings execute on a queue that includes the
@@ -1347,7 +1326,6 @@ Applications can: access other ranges of the same resource while a bind
 operation is executing.
 
 [NOTE]
-.Note
 ====
 Implementations must: provide a guarantee that simultaneously binding sparse
 blocks while another queue accesses those same sparse blocks via a sparse
@@ -1542,6 +1520,36 @@ include::{generated}/api/structs/VkSparseImageOpaqueMemoryBindInfo.adoc[]
   * pname:pBinds is a pointer to an array of slink:VkSparseMemoryBind
     structures.
 
+[NOTE]
+====
+This structure is normally used to bind memory to fully-resident sparse
+images or for mip tail regions of partially resident images.
+However, it can: also be used to bind memory for the entire binding range of
+partially resident images.
+
+If the pname:pBinds[i].flags of an element _i_ of pname:pBinds does not
+contain ename:VK_SPARSE_MEMORY_BIND_METADATA_BIT, the pname:resourceOffset
+is in the range [eq]#[0, slink:VkMemoryRequirements::pname:size)#, This
+range includes data from all aspects of the image, including metadata.
+For most implementations this will probably mean that the
+pname:resourceOffset is a simple device address offset within the resource.
+It is possible for an application to bind a range of memory that includes
+both resource data and metadata.
+However, the application would not know what part of the image the memory is
+used for, or if any range is being used for metadata.
+
+If the pname:pBinds[i].flags of an element _i_ of pname:pBinds contains
+ename:VK_SPARSE_MEMORY_BIND_METADATA_BIT, the binding range specified must:
+be within the mip tail region of the metadata aspect.
+In this case the pname:resourceOffset is not required: to be a simple device
+address offset within the resource.
+However, it _is_ defined to be within [eq]#[pname:imageMipTailOffset,
+pname:imageMipTailOffset {plus} pname:imageMipTailSize)# for the metadata
+aspect.
+See slink:VkSparseMemoryBind for the full constraints on binding region with
+this flag present.
+====
+
 .Valid Usage
 ****
   * [[VUID-VkSparseImageOpaqueMemoryBindInfo-pBinds-01103]]
@@ -1553,47 +1561,6 @@ include::{generated}/api/structs/VkSparseImageOpaqueMemoryBindInfo.adoc[]
 
 include::{generated}/validity/structs/VkSparseImageOpaqueMemoryBindInfo.adoc[]
 --
-
-[NOTE]
-.Note
-====
-This operation is normally used to bind memory to fully-resident sparse
-images or for mip tail regions of partially resident images.
-However, it can: also be used to bind memory for the entire binding range of
-partially resident images.
-
-In case pname:flags does not contain
-ename:VK_SPARSE_MEMORY_BIND_METADATA_BIT, the pname:resourceOffset is in the
-range [eq]#[0, slink:VkMemoryRequirements::pname:size)#, This range includes
-data from all aspects of the image, including metadata.
-For most implementations this will probably mean that the
-pname:resourceOffset is a simple device address offset within the resource.
-It is possible for an application to bind a range of memory that includes
-both resource data and metadata.
-However, the application would not know what part of the image the memory is
-used for, or if any range is being used for metadata.
-
-When pname:flags contains ename:VK_SPARSE_MEMORY_BIND_METADATA_BIT, the
-binding range specified must: be within the mip tail region of the metadata
-aspect.
-In this case the pname:resourceOffset is not required: to be a simple device
-address offset within the resource.
-However, it _is_ defined to be within [eq]#[pname:imageMipTailOffset,
-pname:imageMipTailOffset {plus} pname:imageMipTailSize)# for the metadata
-aspect.
-See slink:VkSparseMemoryBind for the full constraints on binding region with
-this flag present.
-====
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-(Jon) The preceding NOTE refers to pname:flags, which is presumably a
-reference to slink:VkSparseMemoryBind above, even though that is not
-contextually clear.
-====
-endif::editing-notes[]
 
 [open,refpage='VkSparseImageMemoryBindInfo',desc='Structure specifying sparse image memory bind information',type='structs']
 --

@@ -9,7 +9,7 @@ The ray traversal process identifies and handles intersections between a ray
 and geometries in an acceleration structure.
 
 Ray traversal cannot be started by a Vulkan API command directly - a shader
-must execute
+must: execute
 ifdef::VK_KHR_ray_query[code:OpRayQueryProceedKHR]
 ifdef::VK_KHR_ray_query+VK_KHR_ray_tracing_pipeline[or]
 ifdef::VK_KHR_ray_tracing_pipeline[a <<glossary-pipeline-trace-ray, pipeline trace ray>> instruction]
@@ -32,14 +32,13 @@ Once tracing begins, rays are first tested against instances in a top-level
 acceleration structure.
 A ray that intersects an instance will be transformed into the space of the
 instance to continue traversal within that instance; therefore the transform
-matrix stored in the instance must be invertible.
+matrix stored in the instance must: be invertible.
 
 In case multiple instances are intersected by a ray, the ray transformation
 into the space of the instance is invariant under the order in which these
 instances are encountered in the top-level acceleration structure.
 
 [NOTE]
-.Note
 ====
 Applying multiple forward and reverse transforms to a ray to transition from
 one instance to another could result in accumulated errors.
@@ -59,7 +58,7 @@ space #~as~# to ray space #~r~# according to the ray origin and direction as
 follows:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 \left(
     \begin{array}{c}
         x_{r} \\
@@ -81,14 +80,14 @@ follows:
         z_{as} - o_z
     \end{array}
 \right)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 latexmath:[\mathbf{a}] is the axis of rotation from the unnormalized ray
 direction vector latexmath:[\mathbf{d}] to the axis vector
 latexmath:[\mathbf{k}]:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 \mathbf{a} = \begin{cases}
     \frac{\mathbf{d} \times \mathbf{k}}{|| \mathbf{d} \times \mathbf{k} ||} & \mathrm{if}\; || \mathbf{d} \times \mathbf{k} || \ne 0 \\
     \left(\begin{array}{c}
@@ -98,24 +97,24 @@ latexmath:[\mathbf{k}]:
     \end{array}
     \right) & \mathrm{if}\; || \mathbf{d} \times \mathbf{k} || = 0 \\
   \end{cases}
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 latexmath:[\mathit{s}] and latexmath:[\mathit{c}] are the sine and cosine of
 the angle of rotation about latexmath:[\mathbf{a}] from
 latexmath:[\mathbf{d}] to latexmath:[\mathbf{k}]:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 \begin{aligned}
 c      &= {{\mathbf{d} \cdot \mathbf{k}}\over{||\mathbf{d}||}} \\
 s      &= \sqrt{1 - c^2}
 \end{aligned}
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 latexmath:[\mathbf{k}] is the unit vector:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 \mathbf{k} = \left(
     \begin{array}{c}
         0 \\
@@ -123,7 +122,7 @@ latexmath:[\mathbf{k}] is the unit vector:
         -1
     \end{array}
 \right)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 latexmath:[\mathbf{o}] and latexmath:[\mathbf{d}] are the ray origin and
 unnormalized direction, respectively; the vector described by [eq]#x~as~#,
@@ -137,14 +136,14 @@ For any primitive that has within its bounds a position
 latexmath:[\mathbf{xyz_{as}}] such that
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 \begin{aligned}
              x_r &= 0 \\
              y_r &= 0 \\
 t_\mathit{min} \lt {-{z_r}\over{||\mathbf{d}||}}  &\lt t_\mathit{max}  & \text{if the primitive is a triangle,} \\
 t_\mathit{min} \leq {-{z_r}\over{||\mathbf{d}||}} &\leq t_\mathit{max} & \text{otherwise} \\
 \end{aligned}
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 (where latexmath:[t = {-{z_r}\over{||\mathbf{d}||}}]), an intersection
 candidate exists.
@@ -156,7 +155,6 @@ AABB primitive bounds consist of all points within an implementation-defined
 bound which includes the specified box.
 
 [NOTE]
-.Note
 ====
 The bounds of the AABB including all points internal to the bound implies
 that a ray started within the AABB will hit that AABB.
@@ -166,14 +164,13 @@ that a ray started within the AABB will hit that AABB.
 image::{images}/ray_intersection_candidate.svg[align="center",title="Ray intersection candidate",opts="{imageopts}"]
 
 The determination of this condition is performed in an implementation
-specific manner, and may: be performed with floating point operations.
+specific manner, and may: be performed with floating-point operations.
 Due to the complexity and number of operations involved, inaccuracies are
 expected, particularly as the scale of values involved begins to diverge.
 Implementations should: take efforts to maintain as much precision as
 possible.
 
 [NOTE]
-.Note
 ====
 One very common case is when geometries are close to each other at some
 distance from the origin in acceleration structure space, where an effect
@@ -207,7 +204,7 @@ where the above condition is met are made available to future shading.
 ifdef::VK_KHR_ray_tracing_pipeline[]
 If the ray was traced with a <<glossary-pipeline-trace-ray, pipeline trace
 ray>> instruction, these values are available as a vector of 2 32-bit
-floating point values in the code:HitAttributeKHR storage class.
+floating-point values in the code:HitAttributeKHR storage class.
 endif::VK_KHR_ray_tracing_pipeline[]
 
 Once an intersection candidate is determined, it proceeds through the
@@ -320,11 +317,11 @@ coordinates.
 One way to compute this area is:
 
 [latexmath]
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 a = -{1 \over 2}\sum_{i=0}^{n-1}
       x_r^i y_r^{i \oplus 1} -
       x_r^{i \oplus 1} y_r^i
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++
 
 where latexmath:[x_r^i] and latexmath:[y_r^i] are the [eq]#x# and [eq]#y#
 <<ray-intersection-candidate-determination,ray space coordinates>> of the
@@ -341,7 +338,6 @@ Additionally, if [eq]#a# is 0, the intersection candidate is treated as not
 intersecting with any face, irrespective of the sign.
 
 [NOTE]
-.Note
 ====
 In a left-handed coordinate system, an intersection will be with the front
 face of a triangle if the vertices of the triangle, as defined in index
@@ -453,6 +449,7 @@ is dropped, and no further processing occurs.
 The code:OpaqueKHR, code:NoOpaqueKHR, code:CullOpaqueKHR, and
 code:CullNoOpaqueKHR `Ray Flags` are mutually exclusive.
 
+
 ifdef::VK_EXT_opacity_micromap[]
 [[ray-opacity-micromap]]
 === Ray Opacity Micromap
@@ -479,7 +476,6 @@ nearest vertex 2.
 image::{images}/micromap-subd.svg[align="center",title="Example ordering for micromap data",align="center",opts="{imageopts}"]
 
 [NOTE]
-.Note
 ====
 This encoding is spatially coherent, purely hierarchical, and allows a
 bit-parallel conversion between barycentric address and index values.
@@ -519,7 +515,6 @@ a two bit value at the index derived above.
 | 3 |   | ename:VK_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE_EXT      | Y | Opaque
 | 3 |   | ename:VK_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE_EXT      | N | Non-opaque
 |====
-
 
 endif::VK_EXT_opacity_micromap[]
 

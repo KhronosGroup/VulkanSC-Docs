@@ -29,7 +29,7 @@ Use of these extensions is guarded by preprocessor symbols as defined in the
 <<boilerplate-wsi-header,Window System-Specific Header Control>> appendix.
 
 In order for an application to be compiled to use WSI with a given platform,
-it must either:
+it must: either:
 
   * `#define` the appropriate preprocessor symbol prior to including the
     `{full_header}` header file, or
@@ -63,7 +63,6 @@ handles of other Vulkan objects.
 
 ifdef::implementation-guide[]
 [NOTE]
-.Note
 ====
 On certain platforms, the Vulkan loader and ICDs may: have conventions that
 treat the handle as a pointer to a structure containing the
@@ -76,17 +75,6 @@ sname:VkSurfaceKHR objects.
 ====
 endif::implementation-guide[]
 --
-
-ifdef::editing-notes[]
-[NOTE]
-.editing-note
-====
-TODO: Consider replacing the above note editing note with a pointer to the
-loader specification, when it exists.
-However, the information is not relevant to users of the API nor does it
-affect conformance of a Vulkan implementation.
-====
-endif::editing-notes[]
 
 ifdef::VK_KHR_android_surface[]
 include::{chapters}/VK_KHR_android_surface/platformCreateSurface_android.adoc[]
@@ -299,7 +287,6 @@ The resulting capabilities can: be obtained with the queries listed below in
 this section.
 
 [NOTE]
-.Note
 ====
 In addition to the surface capabilities as obtained by surface queries
 below, swapchain images are also subject to ordinary image creation limits
@@ -410,7 +397,6 @@ endif::VK_KHR_shared_presentable_image[]
 
 ifdef::VK_KHR_shared_presentable_image[]
 [NOTE]
-.Note
 ====
 Supported usage flags of a presentable image when using
 ename:VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR or
@@ -421,7 +407,6 @@ slink:VkSharedPresentSurfaceCapabilitiesKHR::pname:sharedPresentSupportedUsageFl
 endif::VK_KHR_shared_presentable_image[]
 
 [NOTE]
-.Note
 ====
 Formulas such as [eq]#min(N, pname:maxImageCount)# are not correct, since
 pname:maxImageCount may: be zero.
@@ -613,7 +598,6 @@ include::{generated}/api/structs/VkSurfaceFullScreenExclusiveWin32InfoEXT.adoc[]
     to create the surface with.
 
 [NOTE]
-.Note
 ====
 If pname:hmonitor is invalidated (e.g. the monitor is unplugged) during the
 lifetime of a swapchain created with this structure, operations on that
@@ -621,7 +605,6 @@ swapchain will return ename:VK_ERROR_OUT_OF_DATE_KHR.
 ====
 
 [NOTE]
-.Note
 ====
 It is the responsibility of the application to change the display settings
 of the targeted Win32 display using the appropriate platform APIs.
@@ -849,7 +832,6 @@ The per-present mode image counts may: be less-than or greater-than the
 image counts returned when sname:VkSurfacePresentModeEXT is not provided.
 
 [NOTE]
-.Note
 ====
 If slink:VkSwapchainPresentModesCreateInfoEXT is provided to swapchain
 creation, the requirements for forward progress may be less strict.
@@ -900,10 +882,10 @@ include::{generated}/api/structs/VkSurfacePresentModeCompatibilityEXT.adoc[]
 If pname:pPresentModes is `NULL`, then the number of present modes that are
 compatible with the one specified in slink:VkSurfacePresentModeEXT is
 returned in pname:presentModeCount.
-Otherwise, pname:presentModeCount must be set by the user to the number of
-elements in the pname:pPresentModes array, and on return the variable is
-overwritten with the number of values actually written to
-pname:pPresentModes.
+Otherwise, pname:presentModeCount must: point to a variable set by the
+application to the number of elements in the pname:pPresentModes array, and
+on return the variable is overwritten with the number of values actually
+written to pname:pPresentModes.
 If the value of pname:presentModeCount is less than the number of compatible
 present modes that are supported, at most pname:presentModeCount values will
 be written to pname:pPresentModes.
@@ -1134,9 +1116,9 @@ If pname:pSurfaceFormats is `NULL`, then the number of format pairs
 supported for the given pname:surface is returned in
 pname:pSurfaceFormatCount.
 Otherwise, pname:pSurfaceFormatCount must: point to a variable set by the
-user to the number of elements in the pname:pSurfaceFormats array, and on
-return the variable is overwritten with the number of structures actually
-written to pname:pSurfaceFormats.
+application to the number of elements in the pname:pSurfaceFormats array,
+and on return the variable is overwritten with the number of structures
+actually written to pname:pSurfaceFormats.
 If the value of pname:pSurfaceFormatCount is less than the number of format
 pairs supported, at most pname:pSurfaceFormatCount structures will be
 written, and ename:VK_INCOMPLETE will be returned instead of
@@ -1215,9 +1197,9 @@ If pname:pSurfaceFormats is `NULL`, then the number of format tuples
 supported for the given pname:surface is returned in
 pname:pSurfaceFormatCount.
 Otherwise, pname:pSurfaceFormatCount must: point to a variable set by the
-user to the number of elements in the pname:pSurfaceFormats array, and on
-return the variable is overwritten with the number of structures actually
-written to pname:pSurfaceFormats.
+application to the number of elements in the pname:pSurfaceFormats array,
+and on return the variable is overwritten with the number of structures
+actually written to pname:pSurfaceFormats.
 If the value of pname:pSurfaceFormatCount is less than the number of format
 tuples supported, at most pname:pSurfaceFormatCount structures will be
 written, and ename:VK_INCOMPLETE will be returned instead of
@@ -1279,52 +1261,55 @@ While the pname:format of a presentable image refers to the encoding of each
 pixel, the pname:colorSpace determines how the presentation engine
 interprets the pixel values.
 A color space in this document refers to a specific color space (defined by
-the chromaticities of its primaries and a white point in CIE Lab), and a
-transfer function that is applied before storing or transmitting color data
-in the given color space.
+the chromaticities of its primaries and a white point in CIE Lab), and
+transfer functions indicating the mapping between the image data and the
+colorimetry with respect to the given color space.
 
 [open,refpage='VkColorSpaceKHR',desc='Supported color space of the presentation engine',type='enums']
 --
 Possible values of slink:VkSurfaceFormatKHR::pname:colorSpace, specifying
-supported color spaces of a presentation engine, are:
+the color spaces that a presentation engine can accept, are:
 
 include::{generated}/api/enums/VkColorSpaceKHR.adoc[]
 
-  * ename:VK_COLOR_SPACE_SRGB_NONLINEAR_KHR specifies support for the sRGB
-    color space.
+  * ename:VK_COLOR_SPACE_SRGB_NONLINEAR_KHR specifies support for the images
+    in sRGB color space, encoded according to the sRGB specification.
 ifdef::VK_EXT_swapchain_colorspace[]
   * ename:VK_COLOR_SPACE_DISPLAY_P3_NONLINEAR_EXT specifies support for the
-    Display-P3 color space to be displayed using an sRGB-like EOTF (defined
-    below).
+    images in Display-P3 color space, encoded using a Display-P3 transfer
+    function.
   * ename:VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT specifies support for the
-    extended sRGB color space to be displayed using a linear EOTF.
+    images in extended sRGB color space, encoded using a linear transfer
+    function.
   * ename:VK_COLOR_SPACE_EXTENDED_SRGB_NONLINEAR_EXT specifies support for
-    the extended sRGB color space to be displayed using an sRGB EOTF.
+    the images in extended sRGB color space, encoded according to the scRGB
+    specification.
   * ename:VK_COLOR_SPACE_DISPLAY_P3_LINEAR_EXT specifies support for the
-    Display-P3 color space to be displayed using a linear EOTF.
+    images in Display-P3 color space, encoded using a linear transfer
+    function.
   * ename:VK_COLOR_SPACE_DCI_P3_NONLINEAR_EXT specifies support for the
-    DCI-P3 color space to be displayed using the DCI-P3 EOTF.
+    images in DCI-P3 color space, encoded according to the DCI-P3
+    specification.
     Note that values in such an image are interpreted as XYZ encoded color
     data by the presentation engine.
-  * ename:VK_COLOR_SPACE_BT709_LINEAR_EXT specifies support for the BT709
-    color space to be displayed using a linear EOTF.
-  * ename:VK_COLOR_SPACE_BT709_NONLINEAR_EXT specifies support for the BT709
-    color space to be displayed using the SMPTE 170M EOTF.
-  * ename:VK_COLOR_SPACE_BT2020_LINEAR_EXT specifies support for the BT2020
-    color space to be displayed using a linear EOTF.
-  * ename:VK_COLOR_SPACE_HDR10_ST2084_EXT specifies support for the HDR10
-    (BT2020 color) space to be displayed using the SMPTE ST2084 Perceptual
-    Quantizer (PQ) EOTF.
-  * ename:VK_COLOR_SPACE_DOLBYVISION_EXT specifies support for the Dolby
-    Vision (BT2020 color space), proprietary encoding, to be displayed using
-    the SMPTE ST2084 EOTF.
-  * ename:VK_COLOR_SPACE_HDR10_HLG_EXT specifies support for the HDR10
-    (BT2020 color space) to be displayed using the Hybrid Log Gamma (HLG)
-    EOTF.
-  * ename:VK_COLOR_SPACE_ADOBERGB_LINEAR_EXT specifies support for the
-    AdobeRGB color space to be displayed using a linear EOTF.
+  * ename:VK_COLOR_SPACE_BT709_LINEAR_EXT specifies support for the images
+    in BT709 color space, encoded using a linear transfer function.
+  * ename:VK_COLOR_SPACE_BT709_NONLINEAR_EXT specifies support for the
+    images in BT709 color space, encoded according to the BT709
+    specification.
+  * ename:VK_COLOR_SPACE_BT2020_LINEAR_EXT specifies support for the images
+    in BT2020 color space, encoded using a linear transfer function.
+  * ename:VK_COLOR_SPACE_HDR10_ST2084_EXT specifies support for the images
+    in HDR10 (BT2020) color space, encoded according to SMPTE ST2084
+    Perceptual Quantizer (PQ) specification.
+  * ename:VK_COLOR_SPACE_HDR10_HLG_EXT specifies support for the images in
+    HDR10 (BT2020) color space, encoded according to the Hybrid Log Gamma
+    (HLG) specification.
+  * ename:VK_COLOR_SPACE_ADOBERGB_LINEAR_EXT specifies support for images in
+    Adobe RGB color space, encoded using a linear transfer function.
   * ename:VK_COLOR_SPACE_ADOBERGB_NONLINEAR_EXT specifies support for the
-    AdobeRGB color space to be displayed using the Gamma 2.2 EOTF.
+    images in Adobe RGB color space, encoded according to the Adobe RGB
+    specification (approximately Gamma 2.2).
   * ename:VK_COLOR_SPACE_PASS_THROUGH_EXT specifies that color components
     are used "`as is`".
     This is intended to allow applications to supply data for color spaces
@@ -1342,13 +1327,14 @@ ifdef::hidden[]
   * elink:VkColorSpaceKHR (deprecated aliases)
   ** etext:VK_COLORSPACE_SRGB_NONLINEAR_KHR <<SCID-8>>
   ** etext:VK_COLOR_SPACE_DCI_P3_LINEAR_EXT <<SCID-8>>
+  * elink:VkColorSpaceKHR (not well-defined)
+  ** ename:VK_COLOR_SPACE_DOLBYVISION_EXT <<SCID-8>>
 // end::scremoved[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]
 
 ifndef::VKSC_VERSION_1_0[]
 [NOTE]
-.Note
 ====
 In the initial release of the `apiext:VK_KHR_surface` and
 `apiext:VK_KHR_swapchain` extensions, the token
@@ -1361,7 +1347,6 @@ The older enum is still available for backwards compatibility.
 ====
 
 [NOTE]
-.Note
 ====
 In older versions of this extension
 ename:VK_COLOR_SPACE_DISPLAY_P3_LINEAR_EXT was misnamed
@@ -1372,20 +1357,38 @@ The old name is deprecated but is maintained for backwards compatibility.
 endif::VKSC_VERSION_1_0[]
 
 [NOTE]
+====
+In older versions of the `apiext:VK_EXT_swapchain_colorspace` extension,
+ename:VK_COLOR_SPACE_DOLBYVISION_EXT was exposed.
+The intent was to indicate the presentation engine shall decode an image
+using the SMPTE ST 2084 Perceptual Quantizer (PQ) EOTF, and then apply a
+proprietary OOTF to process the image.
+However, Dolby Vision profile 8.4 describes an encoding using the Hybrid Log
+Gamma (HLG) OETF, and there is no swapchain extension for signaling Dolby
+Vision metadata to be used by a proprietary OOTF.
+This enum is deprecated but is maintained for backwards compatibility.
+====
+
+[NOTE]
 .Note
 ====
 For a traditional "`Linear`" or non-gamma transfer function color space use
 ename:VK_COLOR_SPACE_PASS_THROUGH_EXT.
 ====
 
-The color components of non-linear color space swapchain images must: have
-had the appropriate transfer function applied.
-The color space selected for the swapchain image will not affect the
-processing of data written into the image by the implementation.
-Vulkan requires that all implementations support the sRGB transfer function
-by use of an SRGB pixel format.
-Other transfer functions, such as SMPTE 170M or SMPTE2084, can: be performed
-by the application shader.
+The presentation engine interprets the pixel values of the R, G, and B
+components as having been encoded using an appropriate transfer function.
+Applications should: ensure that the appropriate transfer function has been
+applied.
+<<textures-output-format-conversion, Textures Output Format Conversion>>
+requires that all implementations implicitly apply the sRGB EOTF^-1^ on R,
+G, and B components when shaders write to an sRGB pixel format image, which
+is useful for sRGB color spaces.
+For sRGB color spaces with other pixel formats, or other non-linear color
+spaces, applications can: apply the transfer function explicitly in a
+shader.
+The A channel is always interpreted as linearly encoded.
+
 This extension defines enums for elink:VkColorSpaceKHR that correspond to
 the following color spaces:
 
@@ -1396,13 +1399,12 @@ the following color spaces:
 | Name           | Red Primary  | Green Primary | Blue Primary | White-point          | Transfer function
 | DCI-P3         | 1.000, 0.000 | 0.000, 1.000  | 0.000, 0.000 | 0.3333, 0.3333       | DCI P3
 | Display-P3     | 0.680, 0.320 | 0.265, 0.690  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | Display-P3
-| BT709          | 0.640, 0.330 | 0.300, 0.600  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | ITU (SMPTE 170M)
+| BT709          | 0.640, 0.330 | 0.300, 0.600  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | BT709
 | sRGB           | 0.640, 0.330 | 0.300, 0.600  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | sRGB
-| extended sRGB  | 0.640, 0.330 | 0.300, 0.600  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | extended sRGB
+| extended sRGB  | 0.640, 0.330 | 0.300, 0.600  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | scRGB
 | HDR10_ST2084   | 0.708, 0.292 | 0.170, 0.797  | 0.131, 0.046 | 0.3127, 0.3290 (D65) | ST2084 PQ
-| DOLBYVISION    | 0.708, 0.292 | 0.170, 0.797  | 0.131, 0.046 | 0.3127, 0.3290 (D65) | ST2084 PQ
 | HDR10_HLG      | 0.708, 0.292 | 0.170, 0.797  | 0.131, 0.046 | 0.3127, 0.3290 (D65) | HLG
-| AdobeRGB       | 0.640, 0.330 | 0.210, 0.710  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | AdobeRGB
+| Adobe RGB      | 0.640, 0.330 | 0.210, 0.710  | 0.150, 0.060 | 0.3127, 0.3290 (D65) | Adobe RGB
 |====
 
 The transfer functions are described in the "`Transfer Functions`" chapter
@@ -1411,7 +1413,7 @@ of the <<data-format,Khronos Data Format Specification>>.
 Except Display-P3 OETF, which is:
 
 [latexmath]
-+++++++++++++++++++
+++++
 \begin{aligned}
 E & =
   \begin{cases}
@@ -1419,13 +1421,12 @@ E & =
     12.92 \times L                       & \text{for}\  0 \leq L < 0.0030186
   \end{cases}
 \end{aligned}
-+++++++++++++++++++
+++++
 
 where [eq]#L# is the linear value of a color component and [eq]#E# is the
 encoded value (as stored in the image in memory).
 
 [NOTE]
-.Note
 ====
 For most uses, the sRGB OETF is equivalent.
 ====
@@ -1456,10 +1457,10 @@ include::{generated}/api/protos/vkGetPhysicalDeviceSurfacePresentModesKHR.adoc[]
 If pname:pPresentModes is `NULL`, then the number of presentation modes
 supported for the given pname:surface is returned in
 pname:pPresentModeCount.
-Otherwise, pname:pPresentModeCount must: point to a variable set by the user
-to the number of elements in the pname:pPresentModes array, and on return
-the variable is overwritten with the number of values actually written to
-pname:pPresentModes.
+Otherwise, pname:pPresentModeCount must: point to a variable set by the
+application to the number of elements in the pname:pPresentModes array, and
+on return the variable is overwritten with the number of values actually
+written to pname:pPresentModes.
 If the value of pname:pPresentModeCount is less than the number of
 presentation modes supported, at most pname:pPresentModeCount values will be
 written, and ename:VK_INCOMPLETE will be returned instead of
@@ -1617,7 +1618,6 @@ mode, and can be determined as per the table below:
 endif::VK_KHR_shared_presentable_image[]
 
 [NOTE]
-.Note
 ====
 For reference, the mode indicated by ename:VK_PRESENT_MODE_FIFO_KHR is
 equivalent to the behavior of {wgl|glX|egl}SwapBuffers with a swap interval
@@ -1626,6 +1626,7 @@ equivalent to the behavior of {wgl|glX}SwapBuffers with a swap interval of
 -1 (from the {WGL|GLX}_EXT_swap_control_tear extensions).
 ====
 --
+
 
 ifdef::VK_EXT_full_screen_exclusive[]
 == Full Screen Exclusive Control
@@ -1688,7 +1689,6 @@ include::{generated}/api/protos/vkReleaseFullScreenExclusiveModeEXT.adoc[]
     from.
 
 [NOTE]
-.Note
 ====
 Applications will not be able to present to pname:swapchain after this call
 until exclusive full-screen access is reacquired.
@@ -1893,9 +1893,10 @@ include::{generated}/api/protos/vkGetPhysicalDevicePresentRectanglesKHR.adoc[]
 
 If pname:pRects is `NULL`, then the number of rectangles used when
 presenting the given pname:surface is returned in pname:pRectCount.
-Otherwise, pname:pRectCount must: point to a variable set by the user to the
-number of elements in the pname:pRects array, and on return the variable is
-overwritten with the number of structures actually written to pname:pRects.
+Otherwise, pname:pRectCount must: point to a variable set by the application
+to the number of elements in the pname:pRects array, and on return the
+variable is overwritten with the number of structures actually written to
+pname:pRects.
 If the value of pname:pRectCount is less than the number of rectangles, at
 most pname:pRectCount structures will be written, and ename:VK_INCOMPLETE
 will be returned instead of ename:VK_SUCCESS, to indicate that not all the
@@ -1926,7 +1927,16 @@ include::{chapters}/VK_KHR_present_wait/present_wait.adoc[]
 endif::VK_KHR_present_wait[]
 
 include::{chapters}/VK_KHR_swapchain/wsi.adoc[]
+
+ifdef::VK_EXT_hdr_metadata[]
+include::{chapters}/VK_EXT_hdr_metadata.adoc[]
+endif::VK_EXT_hdr_metadata[]
+
 endif::VK_KHR_swapchain[]
+
+ifdef::VK_AMD_anti_lag,VK_NV_low_latency2[]
+include::{chapters}/VK_KHR_swapchain/lag_control.adoc[]
+endif::VK_AMD_anti_lag,VK_NV_low_latency2[]
 
 ifdef::VK_NV_present_barrier[]
 include::{chapters}/VK_NV_present_barrier/present_barrier.adoc[]

@@ -82,6 +82,7 @@ allchecks: check-copyright-dates \
     check-links \
     check-consistency \
     check-undefined \
+    check-custom-macros \
     check-txtfiles \
     $(CHECK_XREFS)
 
@@ -138,12 +139,12 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 286
+PATCHVERSION = 295
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 15
+SCPATCHVERSION = 16
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
@@ -292,10 +293,11 @@ INTERFACEDEPEND = $(INTERFACEPATH)/timeMarker
 SPIRVCAPDEPEND = $(SPIRVCAPPATH)/timeMarker
 FORMATSDEPEND = $(FORMATSPATH)/timeMarker
 SYNCDEPEND = $(SYNCPATH)/timeMarker
+REQSDEPEND = $(GENERATED)/featurerequirements.adoc
 RUBYDEPEND     = $(RBAPIMAP)
 ATTRIBFILE     = $(GENERATED)/specattribs.adoc
 # All generated dependencies
-GENDEPENDS     = $(APIDEPEND) $(VALIDITYDEPEND) $(HOSTSYNCDEPEND) $(METADEPEND) $(INTERFACEDEPEND) $(SPIRVCAPDEPEND) $(FORMATSDEPEND) $(SYNCDEPEND) $(RUBYDEPEND) $(ATTRIBFILE)
+GENDEPENDS     = $(APIDEPEND) $(VALIDITYDEPEND) $(HOSTSYNCDEPEND) $(METADEPEND) $(INTERFACEDEPEND) $(SPIRVCAPDEPEND) $(FORMATSDEPEND) $(SYNCDEPEND) $(REQSDEPEND) $(RUBYDEPEND) $(ATTRIBFILE)
 # All non-format-specific dependencies
 COMMONDOCS     = $(SPECFILES) $(GENDEPENDS)
 
@@ -437,7 +439,7 @@ reflow:
 # 'ci-allchecks' targets or individually.
 
 # Look for disallowed contractions
-CHECK_CONTRACTIONS = git grep -i -F -f $(ROOTDIR)/config/CI/contractions | egrep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
+CHECK_CONTRACTIONS = git grep -n -i -F -f $(ROOTDIR)/config/CI/contractions | egrep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
 check-contractions:
 	if test `$(CHECK_CONTRACTIONS) | wc -l` != 0 ; then \
 	    echo "Contractions found that are not allowed:" ; \
@@ -453,11 +455,13 @@ check-duplicates:
 	    exit 1 ; \
 	fi
 
-# Look for typos and suggest fixes
-CODESPELL = codespell --config $(ROOTDIR)/config/CI/codespellrc -S '*.js' -S './antora*/*' -S 'ERRS*,*.pdf,*.html'
+# Look for typos and unpreferred terms, and suggest fixes.
+# Harder to detect (e.g. case-sensitive) typos are handled in the
+# check-writing target below.
+CODESPELL = codespell --config $(ROOTDIR)/config/CI/codespellrc
 check-spelling:
 	if ! $(CODESPELL) > /dev/null ; then \
-	    echo "Found probable misspellings. Corrections can be added to config/CI/codespell-allowed:" ; \
+	    echo "Found probable misspellings. Corrections can be added to config/CI/codespell-allowed, or files excluded in config/CI/codespellrc if there is no other option:" ; \
 	    $(CODESPELL) ; \
 	    exit 1 ; \
 	fi
@@ -465,7 +469,7 @@ check-spelling:
 # Look for old or unpreferred language in specification language.
 # This mostly helps when we make global changes that also need to be
 # made in outstanding extension branches for new text.
-CHECK_WRITING = git grep -E -f $(ROOTDIR)/config/CI/writing $(SPECDIR)/registry.adoc $(SPECDIR)/vkspec.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices
+CHECK_WRITING = git grep -n -E -f $(ROOTDIR)/config/CI/writing $(SPECDIR)/registry.adoc $(SPECDIR)/vkspec.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices
 check-writing:
 	if test `$(CHECK_WRITING) | wc -l` != 0 ; then \
 	    echo "Found old style writing. Please refer to the style guide or similar language in current main branch for fixes:" ; \
@@ -474,7 +478,7 @@ check-writing:
 	fi
 
 # Look for bullet list items not preceded by exactly two spaces, per styleguide
-CHECK_BULLETS = git grep -E '^( |   +)[-*]+ ' $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style $(SPECDIR)/[a-z]*.adoc
+CHECK_BULLETS = git grep -n -E '^( |   +)[-*]+ ' $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style $(SPECDIR)/[a-z]*.adoc
 check-bullets:
 	if test `$(CHECK_BULLETS) | wc -l` != 0 ; then \
 	    echo "Bullet list item found not preceded by exactly two spaces:" ; \
@@ -508,22 +512,32 @@ check-links:
 check-consistency:
 	$(PYTHON) $(SCRIPTS)/xml_consistency.py
 
-# Looks for untagged use of 'undefined' in spec sources
+# Look for untagged use of 'undefined' in spec sources
 check-undefined:
 	$(SCRIPTS)/ci/check_undefined
 
-# Look for '.txt' files, which should almost all be .adoc now
-CHECK_TXTFILES = find . -name '*.txt' | egrep -v -E -f $(ROOTDIR)/config/CI/txt-files-allowed
+# Look for use of custom macros in the proposals and other
+# non-Specification document (except for the ChangeLog*.adoc) markup
+CHECK_CUSTOM_MACROS = git grep -n -E -f $(ROOTDIR)/config/CI/custom-macros [A-Z][A-Z]*.adoc proposals/
+check-custom-macros:
+	if test `$(CHECK_CUSTOM_MACROS) | wc -l` != 0 ; then \
+	    echo "Found use of specification macros in proposal or repository metadocumentation, where they are not allowed. Please use straight asciidoc markup like *must* for fixes:" ; \
+	    $(CHECK_CUSTOM_MACROS) ; \
+	    exit 1 ; \
+	fi
+
+# Look for '.txt' and '.asciidoc' files, which should almost all be .adoc now
+CHECK_TXTFILES = find . -name '*.txt' -o -name '*.asciidoc' | egrep -v -E -f $(ROOTDIR)/config/CI/txt-files-allowed
 check-txtfiles:
 	if test `$(CHECK_TXTFILES) | wc -l` != 0 ; then \
-	    echo "*.txt files found that are not allowed (use .adoc):" ; \
+	    echo "*.txt and/or .asciidoc files found that are not allowed (use .adoc):" ; \
 	    $(CHECK_TXTFILES) ; \
 	    exit 1 ; \
 	fi
 
 # Check for valid xrefs in the output html
 check-xrefs: $(HTMLDIR)/vkspec.html
-	$(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
+	$(PYTHON) $(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
 
 # Clean generated and output files
 
@@ -557,6 +571,7 @@ CLEAN_GEN_PATHS = \
     $(JSAPIMAP) \
     $(PYAPIMAP) \
     $(RBAPIMAP) \
+    $(REQSDEPEND) \
     $(ATTRIBFILE)
 
 clean_generated:
@@ -735,6 +750,12 @@ interfaceinc: $(INTERFACEPATH)/timeMarker
 $(INTERFACEDEPEND): $(VKXML) $(GENVK)
 	$(QUIET)$(MKDIR) $(INTERFACEPATH)
 	$(QUIET)$(PYTHON) $(GENVK) $(GENVKOPTS) -o $(INTERFACEPATH) interfaceinc
+
+requirementsinc: $(REQSDEPEND)
+
+$(REQSDEPEND): $(VKXML) $(GENVK)
+	$(QUIET)$(MKDIR) $(GENERATED)
+	$(QUIET)$(PYTHON) $(GENVK) $(GENVKOPTS) -o $(GENERATED) requirementsinc
 
 # This generates a single file, so SPIRVCAPDEPEND is the full path to
 # the file, rather than to a timeMarker in the same directory.

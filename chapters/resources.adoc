@@ -150,9 +150,9 @@ include::{generated}/api/structs/VkBufferCreateInfo.adoc[]
     ename:VK_SHARING_MODE_CONCURRENT.
 
 ifdef::VK_KHR_maintenance5[]
-If a slink:VkBufferUsageFlags2CreateInfoKHR structure is present in the
-pname:pNext chain, slink:VkBufferUsageFlags2CreateInfoKHR::pname:usage from
-that structure is used instead of pname:usage from this structure.
+If the pname:pNext chain includes a slink:VkBufferUsageFlags2CreateInfoKHR
+structure, slink:VkBufferUsageFlags2CreateInfoKHR::pname:usage from that
+structure is used instead of pname:usage from this structure.
 endif::VK_KHR_maintenance5[]
 
 .Valid Usage
@@ -789,7 +789,6 @@ include::{generated}/api/structs/VkExternalMemoryBufferCreateInfoKHR.adoc[]
 endif::VK_KHR_external_memory[]
 
 [NOTE]
-.Note
 ====
 A sname:VkExternalMemoryBufferCreateInfo structure with a non-zero
 pname:handleTypes field must be included in the creation parameters for a
@@ -843,7 +842,6 @@ implementation-provided addresses in the same process, to reduce the
 likelihood of ename:VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS errors.
 
 [NOTE]
-.Note
 ====
 The expected usage for this is that a trace capture/replay tool will add the
 ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT flag to all buffers
@@ -1191,6 +1189,7 @@ endif::VKSC_VERSION_1_0[]
 include::{generated}/validity/protos/vkDestroyBufferView.adoc[]
 --
 
+
 [[resources-buffer-view-format-features]]
 === Buffer View Format Features
 
@@ -1211,6 +1210,7 @@ ifdef::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
     calling flink:vkGetPhysicalDeviceFormatProperties2 on the same
     pname:format as slink:VkBufferViewCreateInfo::pname:format.
 endif::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
+
 
 [[resources-images]]
 == Images
@@ -1417,7 +1417,6 @@ endif::VK_EXT_host_image_copy[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_maintenance2[]
 [NOTE]
-.Note
 ====
 For images created without ename:VK_IMAGE_CREATE_EXTENDED_USAGE_BIT a
 pname:usage bit is valid if it is supported for the format the image is
@@ -1898,13 +1897,13 @@ ifndef::VK_QCOM_fragment_density_map_offset[]
 endif::VK_QCOM_fragment_density_map_offset[]
 ifdef::VK_QCOM_fragment_density_map_offset[]
   * [[VUID-VkImageCreateInfo-fragmentDensityMapOffset-06514]]
-    If the <<features-fragmentDensityMapOffsets,
+    If the <<features-fragmentDensityMapOffset,
     pname:fragmentDensityMapOffset>> feature is not enabled and pname:usage
     includes ename:VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
     pname:extent.width must: be less than or equal to
     latexmath:[\left\lceil{\frac{maxFramebufferWidth}{minFragmentDensityTexelSize_{width}}}\right\rceil]
   * [[VUID-VkImageCreateInfo-fragmentDensityMapOffset-06515]]
-    If the <<features-fragmentDensityMapOffsets,
+    If the <<features-fragmentDensityMapOffset,
     pname:fragmentDensityMapOffset>> feature is not enabled and pname:usage
     includes ename:VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
     pname:extent.height must: be less than or equal to
@@ -2322,7 +2321,8 @@ endif::VK_KHR_portability_subset[]
 ifdef::VK_VERSION_1_2,VK_KHR_image_format_list[]
   * [[VUID-VkImageCreateInfo-pNext-06722]]
     If a slink:VkImageFormatListCreateInfo structure was included in the
-    pname:pNext chain and
+    pname:pNext chain and pname:format is not a
+    <<formats-requiring-sampler-ycbcr-conversion,multi-planar>> format and
     slink:VkImageFormatListCreateInfo::pname:viewFormatCount is not zero,
     then each format in
     slink:VkImageFormatListCreateInfo::pname:pViewFormats must: either be
@@ -2330,6 +2330,15 @@ ifdef::VK_VERSION_1_2,VK_KHR_image_format_list[]
     <<formats-compatibility,compatibility table>> or, if pname:flags
     contains ename:VK_IMAGE_CREATE_BLOCK_TEXEL_VIEW_COMPATIBLE_BIT, be an
     uncompressed format that is size-compatible with pname:format
+  * [[VUID-VkImageCreateInfo-pNext-10062]]
+    If a slink:VkImageFormatListCreateInfo structure was included in the
+    pname:pNext chain and pname:format is a
+    <<formats-requiring-sampler-ycbcr-conversion,multi-planar>> format and
+    pname:flags contains ename:VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT and
+    slink:VkImageFormatListCreateInfo::pname:viewFormatCount is not zero,
+    then each format in
+    slink:VkImageFormatListCreateInfo::pname:pViewFormats must: be
+    compatible with the ename:VkFormat for the plane of the image format
   * [[VUID-VkImageCreateInfo-flags-04738]]
     If pname:flags does not contain ename:VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT
     and the pname:pNext chain includes a slink:VkImageFormatListCreateInfo
@@ -2616,7 +2625,6 @@ include::{generated}/api/structs/VkDedicatedAllocationImageCreateInfoNV.adoc[]
     dedicated allocation bound to it.
 
 [NOTE]
-.Note
 ====
 Using a dedicated allocation for color and depth/stencil attachments or
 other large images may: improve performance on some devices.
@@ -2653,7 +2661,6 @@ include::{generated}/api/structs/VkExternalMemoryImageCreateInfoKHR.adoc[]
 endif::VK_KHR_external_memory[]
 
 [NOTE]
-.Note
 ====
 A sname:VkExternalMemoryImageCreateInfo structure with a non-zero
 pname:handleTypes field must be included in the creation parameters for an
@@ -2984,7 +2991,6 @@ texels in the same block.
 include::{generated}/validity/structs/VkImageCompressionControlEXT.adoc[]
 
 [NOTE]
-.Note
 ====
 Some combinations of compression properties may not be supported.
 For example, some implementations may not support different fixed-rate
@@ -3020,7 +3026,6 @@ member of the pname:pFixedRateFlags array specifies the allowed compression
 rates for the image's etext:i^th^ plane.
 
 [NOTE]
-.Note
 ====
 If ename:VK_IMAGE_COMPRESSION_DISABLED_EXT is included in
 slink:VkImageCompressionControlEXT::pname:flags, both lossless and
@@ -3108,7 +3113,6 @@ slink:VkImageCompressionControlEXT::pname:pFixedRateFlags for a plane,
 implementations should: apply the lowest allowed bitrate that is supported.
 
 [NOTE]
-.Note
 ====
 The choice of "`bits per component`" terminology was chosen so that the same
 compression rate describes the same degree of compression applied to formats
@@ -3136,7 +3140,6 @@ pname:pNext chain of the slink:VkImageFormatProperties2 structure in a call
 to flink:vkGetPhysicalDeviceImageFormatProperties2.
 
 [NOTE]
-.Note
 ====
 Since fixed-rate compression is disabled by default, the
 slink:VkImageCompressionPropertiesEXT structure passed to
@@ -3550,7 +3553,6 @@ ifdef::VK_KHR_video_maintenance1[]
     question.
 +
 [NOTE]
-.Note
 ====
 This enables exchanging video picture data without additional copies or
 conversions when used as:
@@ -3902,7 +3904,6 @@ slink:VkSubresourceLayout2KHR::pname:subresourceLayout will have undefined:
 values in this case.
 
 [NOTE]
-.Note
 ====
 Structures chained from slink:VkImageSubresource2KHR::pname:pNext will also
 be updated when pname:tiling is equal to ename:VK_IMAGE_TILING_OPTIMAL.
@@ -4358,7 +4359,6 @@ given image subresource can: only be in different layouts if the
 feature is enabled.
 
 [NOTE]
-.Note
 ====
 Each layout may: offer optimal performance for a specific usage of image
 memory.
@@ -4840,13 +4840,12 @@ ename:VK_IMAGE_ASPECT_COLOR_BIT when used as a framebuffer attachment.
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
 [NOTE]
-.Note
 ====
 Values intended to be used with one view format may: not be exactly
 preserved when written or read through a different format.
 For example, an integer value that happens to have the bit pattern of a
-floating point denorm or NaN may: be flushed or canonicalized when written
-or read through a view with a floating point format.
+floating-point denorm or NaN may: be flushed or canonicalized when written
+or read through a view with a floating-point format.
 Similarly, a value written through a signed normalized format that has a bit
 pattern exactly equal to [eq]#-2^b^# may: be changed to [eq]#-2^b^ {plus} 1#
 as described in <<fundamentals-fixedfpconv,Conversion from Normalized
@@ -5072,7 +5071,7 @@ endif::VK_KHR_video_maintenance1[]
 ifdef::VK_ANDROID_external_format_resolve[]
     and any of the following is true:
   ** the <<features-externalFormatResolve, pname:externalFormatResolve>>
-    feature is not enabled
+     feature is not enabled
   ** the <<limits-nullColorAttachmentWithExternalFormatResolve,
      pname:nullColorAttachmentWithExternalFormatResolve>> property is
      ename:VK_FALSE
@@ -5082,9 +5081,9 @@ endif::VK_ANDROID_external_format_resolve[]
 
 +
 then the image view's <<resources-image-view-format-features,format
-    features>> must: contain at least one of
-    ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT or
-    ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+features>> must: contain at least one of
+ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT or
+ename:VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
 ifdef::VK_NV_linear_color_attachment[]
     or ename:VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV
 endif::VK_NV_linear_color_attachment[]
@@ -6670,7 +6669,6 @@ flink:vkCmdCopyAccelerationStructureKHR, and
 flink:vkCopyAccelerationStructureKHR.
 
 [NOTE]
-.Note
 ====
 The expected usage for a trace capture/replay tool is that it will serialize
 and later deserialize the acceleration structure data using acceleration
@@ -6685,7 +6683,6 @@ ename:VK_COPY_ACCELERATION_STRUCTURE_MODE_DESERIALIZE_KHR during replay.
 ====
 
 [NOTE]
-.Note
 ====
 Memory does not need to be bound to the underlying buffer when
 flink:vkCreateAccelerationStructureKHR is called.
@@ -6753,7 +6750,6 @@ same process, to reduce the likelihood of
 ename:VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS_KHR errors.
 
 [NOTE]
-.Note
 ====
 The expected usage for this is that a trace capture/replay tool will add the
 ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT flag to all buffers
@@ -6782,7 +6778,6 @@ elink:VkAccelerationStructureTypeKHR other than
 ename:VK_ACCELERATION_STRUCTURE_TYPE_GENERIC_KHR.
 
 [NOTE]
-.Note
 ====
 ename:VK_ACCELERATION_STRUCTURE_TYPE_GENERIC_KHR is intended to be used by
 API translation layers.
@@ -7195,12 +7190,22 @@ ifdef::VK_NV_displacement_micromap[]
 endif::VK_NV_displacement_micromap[]
 
 [NOTE]
-.Note
 ====
 ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR and
 ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_COMPACTION_BIT_KHR may: take
 more time and memory than a normal build, and so should: only be used when
 those features are needed.
+====
+
+[NOTE]
+====
+ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR and
+ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_COMPACTION_BIT_KHR are allowed
+to be used together.
+In that case, the result of the compaction copy is used as the source of a
+build with pname:mode of
+ename:VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR to perform the
+compacted update.
 ====
 --
 
@@ -7699,7 +7704,7 @@ include::{generated}/validity/structs/VkBindAccelerationStructureMemoryInfoNV.ad
 :refpage: vkGetAccelerationStructureHandleNV
 
 To allow constructing geometry instances with device code if desired, we
-need to be able to query a opaque handle for an acceleration structure.
+need to be able to query an opaque handle for an acceleration structure.
 This handle is a value of 8 bytes.
 To get this handle, call:
 
@@ -7710,8 +7715,8 @@ include::{generated}/api/protos/vkGetAccelerationStructureHandleNV.adoc[]
   * pname:accelerationStructure is the acceleration structure.
   * pname:dataSize is the size in bytes of the buffer pointed to by
     pname:pData.
-  * pname:pData is a pointer to a user-allocated buffer where the results
-    will be written.
+  * pname:pData is a pointer to an application-allocated buffer where the
+    results will be written.
 
 .Valid Usage
 ****
@@ -7729,7 +7734,7 @@ include::{generated}/validity/protos/vkGetAccelerationStructureHandleNV.adoc[]
 endif::VK_NV_ray_tracing[]
 
 ifdef::VK_KHR_acceleration_structure[]
-[open,refpage='vkGetAccelerationStructureDeviceAddressKHR',desc='Query an address of a acceleration structure',type='protos']
+[open,refpage='vkGetAccelerationStructureDeviceAddressKHR',desc='Query an address of an acceleration structure',type='protos']
 --
 :refpage: vkGetAccelerationStructureDeviceAddressKHR
 
@@ -7767,7 +7772,6 @@ creation.
 The returned address must: be aligned to 256 bytes.
 
 [NOTE]
-.Note
 ====
 The acceleration structure device address may: be different from the buffer
 device address corresponding to the acceleration structure's start offset in
@@ -7866,7 +7870,6 @@ flink:vkBuildMicromapsEXT, flink:vkCmdCopyMicromapEXT, and
 flink:vkCopyMicromapEXT.
 
 [NOTE]
-.Note
 ====
 The expected usage for a trace capture/replay tool is that it will serialize
 and later deserialize the micromap data using micromap copy commands.
@@ -7938,7 +7941,6 @@ reduce the likelihood of ename:VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS_KHR
 errors.
 
 [NOTE]
-.Note
 ====
 The expected usage for this is that a trace capture/replay tool will add the
 ename:VK_BUFFER_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT flag to all buffers
@@ -8218,7 +8220,6 @@ When a resource is used in a descriptor set, each physical device interprets
 the descriptor according to its own instance's binding to memory.
 
 [NOTE]
-.Note
 ====
 There are no new copy commands to transfer data between physical devices.
 Instead, an application can: create a resource with a peer mapping and use
@@ -8423,7 +8424,11 @@ endif::VK_VERSION_1_3,VK_KHR_maintenance4[]
   * For images created with a color format, the pname:memoryTypeBits member
     is identical for all sname:VkImage objects created with the same
     combination of values for the pname:tiling member, the
-    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT bit of the pname:flags member,
+    ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT bit
+ifdef::VK_VERSION_1_1[]
+    and ename:VK_IMAGE_CREATE_PROTECTED_BIT bit
+endif::VK_VERSION_1_1[]
+    of the pname:flags member,
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
     the ename:VK_IMAGE_CREATE_SPLIT_INSTANCE_BIND_REGIONS_BIT bit of the
     pname:flags member,
@@ -8443,8 +8448,11 @@ endif::VK_VERSION_1_1,VK_KHR_external_memory[]
   * For images created with a depth/stencil format, the pname:memoryTypeBits
     member is identical for all sname:VkImage objects created with the same
     combination of values for the pname:format member, the pname:tiling
-    member, the ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT bit of the
-    pname:flags member,
+    member, the ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT bit
+ifdef::VK_VERSION_1_1[]
+    and ename:VK_IMAGE_CREATE_PROTECTED_BIT bit
+endif::VK_VERSION_1_1[]
+    of the pname:flags member,
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
     the ename:VK_IMAGE_CREATE_SPLIT_INSTANCE_BIND_REGIONS_BIT bit of the
     pname:flags member,
@@ -8474,7 +8482,6 @@ endif::VK_VERSION_1_1,VK_KHR_external_memory[]
     ename:VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT bit set.
 +
 [NOTE]
-.Note
 ====
 The implication of this requirement is that lazily allocated memory is
 disallowed for buffers in all cases.
@@ -8487,7 +8494,6 @@ disallowed for buffers in all cases.
     slink:VkImageCreateInfo and its pname:pNext chain.
 +
 [NOTE]
-.Note
 ====
 This, however, does not imply that they interpret the contents of the bound
 memory identically with each other.
@@ -9057,7 +9063,6 @@ the elink:VkResult returned by this command must: be the return value of any
 one of the memory binding operations which did not return ename:VK_SUCCESS.
 
 [NOTE]
-.Note
 ====
 If the fname:vkBindBufferMemory2 command failed,
 ifdef::VK_KHR_maintenance6[]
@@ -9311,7 +9316,6 @@ the elink:VkResult returned by this command must: be the return value of any
 one of the memory binding operations which did not return ename:VK_SUCCESS.
 
 [NOTE]
-.Note
 ====
 If the fname:vkBindImageMemory2 command failed,
 ifdef::VK_KHR_maintenance6[]
@@ -9749,7 +9753,6 @@ Implementations which do not impose a granularity restriction may: report a
 pname:bufferImageGranularity value of one.
 
 [NOTE]
-.Note
 ====
 Despite its name, pname:bufferImageGranularity is really a granularity
 between "`linear`" and "`non-linear`" resources.
@@ -9811,7 +9814,6 @@ include::{generated}/api/enums/VkSharingMode.adoc[]
     supported.
 
 [NOTE]
-.Note
 ====
 ename:VK_SHARING_MODE_CONCURRENT may: result in lower performance access to
 the buffer or image than ename:VK_SHARING_MODE_EXCLUSIVE.
@@ -9829,7 +9831,6 @@ the memory contents of a range or image subresource accessible to a
 different queue family.
 
 [NOTE]
-.Note
 ====
 Images still require a <<resources-image-layouts, layout transition>> from
 ename:VK_IMAGE_LAYOUT_UNDEFINED or ename:VK_IMAGE_LAYOUT_PREINITIALIZED
@@ -9913,7 +9914,6 @@ ename:VK_IMAGE_LAYOUT_UNDEFINED and binding it to the same region of
 external memory as the existing images.
 
 [NOTE]
-.Note
 ====
 Because layout transitions apply to all identical images aliasing the same
 region of external memory, the actual layout of the memory backing a new
@@ -9961,7 +9961,6 @@ Applications can: alias memory, but use of multiple aliases is subject to
 several constraints.
 
 [NOTE]
-.Note
 ====
 Memory aliasing can: be useful to reduce the total device memory footprint
 of an application, if some large resources are used for disjoint periods of
@@ -10081,7 +10080,6 @@ render pass must: declare the attachments using the
 follow the other rules listed in that section.
 
 [NOTE]
-.Note
 ====
 Memory recycled via an application suballocator (i.e. without freeing and
 reallocating the memory objects) is not substantially different from memory
@@ -10090,6 +10088,7 @@ However, a suballocator usually waits on a fence before recycling a region
 of memory, and signaling a fence involves sufficient implicit dependencies
 to satisfy all the above requirements.
 ====
+
 
 [[resources-memory-overlap]]
 === Resource Memory Overlap
@@ -10104,13 +10103,13 @@ Transfer commands only access memory locations specified by the range of the
 transfer command.
 
 [NOTE]
-.Note
 ====
 The intent is that buffers (or linear images) can be accessed concurrently,
 even when they share cache lines, but otherwise do not access the same
 memory range.
 The concept of a device cache line size is not exposed in the memory model.
 ====
+
 
 ifdef::VK_FUCHSIA_buffer_collection[]
 [[resources-buffer-collection-fuchsia]]
@@ -10156,6 +10155,7 @@ include::{generated}/api/handles/VkBufferCollectionFUCHSIA.adoc[]
 
 
 === Platform Initialization for Buffer Collections
+
 To initialize a buffer collection on Fuchsia:
 
   * Connect to the Sysmem service to initialize a Sysmem allocator
@@ -10227,7 +10227,7 @@ Buffer collections can be established for slink:VkImage allocations or
 slink:VkBuffer allocations.
 
 
-==== Set Image-based Buffer Collection Constraints
+==== Set Image-Based Buffer Collection Constraints
 
 [open,refpage='vkSetBufferCollectionImageConstraintsFUCHSIA',desc='Set image-based constraints for a buffer collection',type='protos']
 --
@@ -10462,7 +10462,7 @@ include::{generated}/validity/structs/VkSysmemColorSpaceFUCHSIA.adoc[]
 --
 
 
-==== Set Buffer-based Buffer Collection Constraints
+==== Set Buffer-Based Buffer Collection Constraints
 
 [open,refpage='vkSetBufferCollectionBufferConstraintsFUCHSIA',desc='Set buffer-based constraints for a buffer collection',type='protos']
 --
@@ -10619,7 +10619,7 @@ The value of pname:sysmemColorSpaceIndex will be an index to one of the
 color spaces provided in the
 slink:VkImageFormatConstraintsInfoFUCHSIA::pname:pColorSpaces array.
 
-The implementation must have pname:formatFeatures with all bits set that
+The implementation must: have pname:formatFeatures with all bits set that
 were set in
 slink:VkImageFormatConstraintsInfoFUCHSIA::pname:requiredFormatFeatures, by
 the call to flink:vkSetBufferCollectionImageConstraintsFUCHSIA, at
