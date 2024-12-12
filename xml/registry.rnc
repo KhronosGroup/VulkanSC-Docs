@@ -70,6 +70,8 @@ Types = element types {
 
 # <type> defines a single type. It is usually a C typedef but
 # may contain arbitrary C code.
+# The attributes are more fully described in the registry schema document.
+#
 #   name - name of this type, if not present in the <name> tag
 #   api - matches a <feature> api attribute, if present
 #   alias - name of a type this type aliases
@@ -116,6 +118,10 @@ Types = element types {
 #           or a latex equation (prefixed with 'latexmath:')
 #       altlen - if len has latexmath equations, this contains equivalent C99
 #                expressions separated by commas.
+#       stride - if the member is an array, stride specifies the name of
+#           another member containing the byte stride between consecutive
+#           elements in the array. The array is assumed to be tightly packed
+#           if omitted.
 #       deprecated - denotes that this member is deprecated, and why.
 #           Valid values: 'ignored', 'true'.
 #       externsync - denotes that the member should be externally synchronized
@@ -135,6 +141,11 @@ Types = element types {
 #           a uint64_t value. Specifies the name of another member which is
 #           a VkObjectType or VkDebugReportObjectTypeEXT value specifying
 #           the type of object the handle references.
+#       featurelink - only applicable for members representing a Boolean API
+#           feature. Specifies that the feature has a link in the
+#           specification that does not match the name of the feature.
+#           Typically for features in extensions that were later promoted but
+#           with changes.
 #   <comment> - containing arbitrary text (unused)
 #
 # *** There is a problem here: I am not sure how to represent the <type>
@@ -154,7 +165,7 @@ Type = element type {
     attribute parent { TypeName } ? ,
     attribute returnedonly { text } ? ,
     attribute structextends { text } ? ,
-    attribute allowduplicate { text } ? ,
+    attribute allowduplicate { StringBool } ? ,
     attribute objtypeenum { text } ? ,
     Comment ? ,
     (
@@ -176,6 +187,7 @@ Type = element type {
                 attribute api { text } ? ,
                 attribute len { text } ? ,
                 attribute altlen { text } ? ,
+                attribute stride { text } ? ,
                 attribute externsync { text } ? ,
                 attribute optional { text } ? ,
                 attribute selector { text } ? ,
@@ -185,6 +197,7 @@ Type = element type {
                 attribute limittype { text } ? ,
                 attribute objecttype { text } ? ,
                 attribute deprecated { text } ? ,
+                attribute featurelink { text } ? ,
                 mixed {
                     element type { TypeName } ? ,
                     element name { text } ? ,
@@ -298,6 +311,9 @@ Commands = element commands {
 # <command> defines a single command
 #
 # There are two forms of the tag.
+# The attributes are more fully described in the registry schema document.
+# The "prefix" and "suffix" attributes are currently present only in the
+# OpenCL XML registry, where they are currently unused.
 #
 # Either form may have an 'api' attribute
 #   api - matches a <feature> api attribute, if present
@@ -306,9 +322,6 @@ Commands = element commands {
 # It defines a command alias.
 #
 # The second form fully defines a command, and has the following structure:
-# The possible attributes are not described in this comment block yet, but
-# are in registry.html. The "prefix" and "suffix" attributes are currently
-# present only in the OpenCL XML registry, where they are currently unused.
 #
 #   <proto> is the C function prototype, including the return type
 #   <param> are function parameters, in order
@@ -319,6 +332,10 @@ Commands = element commands {
 #           or a latex equation (prefixed with 'latexmath:')
 #     altlen - if len has latexmath equations, this contains equivalent C99
 #              expressions separated by commas.
+#     stride - if the member is an array, stride specifies the name of
+#         another parameter containing the byte stride between consecutive
+#         elements in the array. The array is assumed to be tightly packed
+#         if omitted.
 #     externsync - denotes that the member should be externally synchronized
 #         when accessed by Vulkan
 #     optional - whether this value can be omitted by providing NULL (for
@@ -336,9 +353,6 @@ Commands = element commands {
 #         placeholders. Specifies a comma-separated list of structures which
 #         may be passed in place of the parameter, or anywhere in the pNext
 #         chain of the parameter.
-#     stride - if the member is an array, stride specifies the name of
-#         another member containing the byte stride between consecutive
-#         elements in the array. Is assumed tightly packed if omitted.
 #     <type> is a <type> name, if present
 #     <name> is the function / parameter name, if present (normally should
 #         be, except for void parameters).
@@ -377,13 +391,13 @@ Command = element command {
             attribute api { text } ? ,
             attribute len { text } ? ,
             attribute altlen { text } ? ,
+            attribute stride { text } ? ,
             attribute externsync { text } ? ,
             attribute optional { text } ? ,
             attribute selector { text } ? ,
             attribute noautovalidity { text } ? ,
             attribute objecttype { text } ? ,
             attribute validstructs { text } ? ,
-            attribute stride { text } ? ,
             mixed {
                 element type { TypeName } ? ,
                 element name { text } ?
@@ -414,6 +428,9 @@ Command = element command {
 #   sortorder - order relative to other features, default 0
 #   <require> / <remove> contains features to require or remove in
 #                        this version
+#     depends - as a require tag the depends tag may additionally
+#               include named feature booleans in C-style as
+#               "VkStructName::featureBooleanName"
 #     profile - only require/remove when generated profile matches
 #     comment - descriptive text with no semantic meaning
 Feature = element feature {
@@ -486,6 +503,8 @@ Extensions = element extensions {
 #       a special purpose of the extension. Tokens may include 'cadsupport',
 #       'd3demulation', 'devtools', 'debugging', and 'glemulation'. Others
 #       may be added in the future.
+#   nofeatures - contains "true" if this extension has no <feature> tags
+#       or "false" if it does have them. Defaults to "false".
 # In addition, <require> / <remove> tags also support an api attribute:
 #     api - only require/remove these features for the matching API.
 #       Not a regular expression.
@@ -504,8 +523,9 @@ Extension = element extension {
     attribute promotedto { text } ? ,
     attribute deprecatedby { text } ? ,
     attribute obsoletedby { text } ? ,
-    attribute provisional { text } ? ,
+    attribute provisional { StringBool } ? ,
     attribute specialuse { text } ? ,
+    attribute nofeatures { StringBool } ? ,
     Comment ? ,
     (
         element require {
@@ -815,6 +835,8 @@ Enable = element enable {
 # of features to require or remove.
 #   <type> / <enum> / <command> / <feature> all have attributes
 #     name - feature name which must match
+# The Name of a feature element may be a comma separated list to indicate
+# that any one of the named features must be supported
 InterfaceElement =
     element type {
         Name ,
@@ -848,6 +870,9 @@ TypeSuffix = text
 # StringGroup is a regular expression with an implicit
 #   '^(' and ')$' bracketing it.
 StringGroup = text
+
+# StringBool is "true" or "false"
+StringBool = text
 
 # Repeatedly used attributes
 ProfileName = attribute profile { text }

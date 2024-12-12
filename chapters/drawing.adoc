@@ -337,7 +337,7 @@ include::{generated}/validity/protos/vkCmdSetPrimitiveTopology.adoc[]
 The primitive topologies are grouped into the following topology classes:
 
 [[topology-classes]]
-.Topology classes
+.Topology Classes
 [options="header"]
 |===
 | Topology Class  | Primitive Topology
@@ -1272,10 +1272,6 @@ similarly named parameters of flink:vkCmdDraw.
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/draw_instance_common.adoc[]
-  * [[VUID-VkDrawIndirectCommand-None-00500]]
-    For a given vertex buffer binding, any attribute data fetched must: be
-    entirely contained within the corresponding vertex buffer binding, as
-    described in <<fxvertex-input>>
   * [[VUID-VkDrawIndirectCommand-firstInstance-00501]]
     If the <<features-drawIndirectFirstInstance,
     pname:drawIndirectFirstInstance>> feature is not enabled,
@@ -1343,15 +1339,6 @@ include::{chapters}/commonvalidity/draw_indirect_count_common.adoc[]
   * [[VUID-vkCmdDrawIndirectCount-maxDrawCount-03111]]
     If pname:maxDrawCount is greater than or equal to `1`,
     [eq]#(pname:stride {times} (pname:maxDrawCount - 1) {plus} pname:offset
-    {plus} sizeof(sname:VkDrawIndirectCommand))# must: be less than or equal
-    to the size of pname:buffer
-  * [[VUID-vkCmdDrawIndirectCount-countBuffer-03121]]
-    If the count stored in pname:countBuffer is equal to `1`,
-    [eq]#(pname:offset {plus} sizeof(sname:VkDrawIndirectCommand))# must: be
-    less than or equal to the size of pname:buffer
-  * [[VUID-vkCmdDrawIndirectCount-countBuffer-03122]]
-    If the count stored in pname:countBuffer is greater than `1`,
-    [eq]#(pname:stride {times} (pname:drawCount - 1) {plus} pname:offset
     {plus} sizeof(sname:VkDrawIndirectCommand))# must: be less than or equal
     to the size of pname:buffer
 ****
@@ -1435,10 +1422,6 @@ the similarly named parameters of flink:vkCmdDrawIndexed.
 ****
 include::{chapters}/commonvalidity/draw_instance_common.adoc[]
 include::{chapters}/commonvalidity/draw_index_binding.adoc[]
-  * [[VUID-VkDrawIndexedIndirectCommand-None-00552]]
-    For a given vertex buffer binding, any attribute data fetched must: be
-    entirely contained within the corresponding vertex buffer binding, as
-    described in <<fxvertex-input>>
   * [[VUID-VkDrawIndexedIndirectCommand-firstInstance-00554]]
     If the <<features-drawIndirectFirstInstance,
     pname:drawIndirectFirstInstance>> feature is not enabled,
@@ -1507,15 +1490,6 @@ include::{chapters}/commonvalidity/draw_indexed_common.adoc[]
   * [[VUID-vkCmdDrawIndexedIndirectCount-maxDrawCount-03143]]
     If pname:maxDrawCount is greater than or equal to `1`,
     [eq]#(pname:stride {times} (pname:maxDrawCount - 1) {plus} pname:offset
-    {plus} sizeof(sname:VkDrawIndexedIndirectCommand))# must: be less than
-    or equal to the size of pname:buffer
-  * [[VUID-vkCmdDrawIndexedIndirectCount-countBuffer-03153]]
-    If count stored in pname:countBuffer is equal to `1`, [eq]#(pname:offset
-    {plus} sizeof(sname:VkDrawIndexedIndirectCommand))# must: be less than
-    or equal to the size of pname:buffer
-  * [[VUID-vkCmdDrawIndexedIndirectCount-countBuffer-03154]]
-    If count stored in pname:countBuffer is greater than `1`,
-    [eq]#(pname:stride {times} (pname:drawCount - 1) {plus} pname:offset
     {plus} sizeof(sname:VkDrawIndexedIndirectCommand))# must: be less than
     or equal to the size of pname:buffer
 ****

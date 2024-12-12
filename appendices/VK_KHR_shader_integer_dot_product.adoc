@@ -41,20 +41,22 @@ include::{generated}/interfaces/VK_KHR_shader_integer_dot_product.adoc[]
 
 === Promotion to Vulkan 1.3
 
-Functionality in this extension is included in core Vulkan 1.3, with the KHR
+Vulkan APIs in this extension are included in core Vulkan 1.3, with the KHR
 suffix omitted.
-The original type, enum and command names are still available as aliases of
-the core functionality.
+External interactions defined by this extension, such as SPIR-V token names,
+retain their original names.
+The original Vulkan API names are still available as aliases of the core
+functionality.
 
 === New SPIR-V Capabilities
 
-  * <<spirvenv-capabilities-table-DotProductInputAllKHR,
+  * <<spirvenv-capabilities-table-DotProductInputAll,
     code:DotProductInputAllKHR>>
-  * <<spirvenv-capabilities-table-DotProductInput4x8BitKHR,
+  * <<spirvenv-capabilities-table-DotProductInput4x8Bit,
     code:DotProductInput4x8BitKHR>>
-  * <<spirvenv-capabilities-table-DotProductInput4x8BitPackedKHR,
+  * <<spirvenv-capabilities-table-DotProductInput4x8BitPacked,
     code:DotProductInput4x8BitPackedKHR>>
-  * <<spirvenv-capabilities-table-DotProductKHR, code:DotProductKHR>>
+  * <<spirvenv-capabilities-table-DotProduct, code:DotProductKHR>>
 
 === Version History
 

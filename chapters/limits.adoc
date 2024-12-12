@@ -110,7 +110,7 @@ flink:vkGetPhysicalDeviceProperties.
     granularity, in bytes, at which buffer or linear image resources, and
     optimal image resources can: be bound to adjacent offsets in the same
     sname:VkDeviceMemory object without aliasing.
-    See <<resources-bufferimagegranularity,Buffer-Image Granularity>> for
+    See <<resources-bufferimagegranularity, Buffer-Image Granularity>> for
     more details.
   * [[limits-sparseAddressSpaceSize]] pname:sparseAddressSpaceSize is the
     total amount of address space available, in bytes, for sparse memory
@@ -587,8 +587,8 @@ range.
     slink:VkBufferViewCreateInfo structure for texel buffers.
     The value must: be a power of two.
 ifdef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
-    If <<features-texelBufferAlignment, pname:texelBufferAlignment>> is
-    enabled, this limit is equivalent to the maximum of the
+    If the <<features-texelBufferAlignment, pname:texelBufferAlignment>>
+    feature is enabled, this limit is equivalent to the maximum of the
     <<limits-uniformTexelBufferOffsetAlignmentBytes,
     pname:uniformTexelBufferOffsetAlignmentBytes>> and
     <<limits-storageTexelBufferOffsetAlignmentBytes,
@@ -599,8 +599,8 @@ ifdef::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
     pname:storageTexelBufferOffsetSingleTexelAlignment>> and
     <<limits-uniformTexelBufferOffsetSingleTexelAlignment,
     pname:uniformTexelBufferOffsetSingleTexelAlignment>>.
-    If <<features-texelBufferAlignment, pname:texelBufferAlignment>> is not
-    enabled,
+    If the <<features-texelBufferAlignment, pname:texelBufferAlignment>>
+    feature is not enabled,
 endif::VK_VERSION_1_3,VK_EXT_texel_buffer_alignment[]
     slink:VkBufferViewCreateInfo::pname:offset must: be a multiple of this
     value.
@@ -736,7 +736,7 @@ endif::VK_VERSION_1_2,VK_KHR_create_renderpass2[]
     code:SampleMask built-in decoration.
   * [[limits-timestampComputeAndGraphics]] pname:timestampComputeAndGraphics
     specifies support for timestamps on all graphics and compute queues.
-    If this limit is set to ename:VK_TRUE, all queues that advertise the
+    If this limit is ename:VK_TRUE, all queues that advertise the
     ename:VK_QUEUE_GRAPHICS_BIT or ename:VK_QUEUE_COMPUTE_BIT in the
     sname:VkQueueFamilyProperties::pname:queueFlags support
     sname:VkQueueFamilyProperties::pname:timestampValidBits of at least 36.
@@ -1311,8 +1311,8 @@ include::{chapters}/limits.adoc[tag=limits_desc]
 If pname:supportedOperations includes <<features-subgroup-quad,
 ename:VK_SUBGROUP_FEATURE_QUAD_BIT>>,
 ifdef::VK_KHR_shader_subgroup_uniform_control_flow[]
-or <<features-shaderSubgroupUniformControlFlow,
-pname:shaderSubgroupUniformControlFlow>> is enabled,
+or the <<features-shaderSubgroupUniformControlFlow,
+pname:shaderSubgroupUniformControlFlow>> feature is enabled,
 endif::VK_KHR_shader_subgroup_uniform_control_flow[]
 pname:subgroupSize must: be greater than or equal to 4.
 
@@ -1325,14 +1325,15 @@ endif::VK_KHR_shader_quad_control[]
 ifdef::VK_KHR_shader_subgroup_rotate[]
 If apiext:VK_KHR_shader_subgroup_rotate is supported, and the implementation
 advertises support with a slink:VkExtensionProperties::pname:specVersion
-greater than or equal to 2, and <<features-shaderSubgroupRotate,
-pname:shaderSubgroupRotate>> is supported,
+greater than or equal to 2, and the <<features-shaderSubgroupRotate,
+pname:shaderSubgroupRotate>> feature is supported,
 ename:VK_SUBGROUP_FEATURE_ROTATE_BIT_KHR must: be returned in
 pname:supportedOperations.
 If apiext:VK_KHR_shader_subgroup_rotate is supported, and the implementation
 advertises support with a slink:VkExtensionProperties::pname:specVersion
-greater than or equal to 2, and <<features-shaderSubgroupRotateClustered,
-pname:shaderSubgroupRotateClustered>> is supported,
+greater than or equal to 2, and the
+<<features-shaderSubgroupRotateClustered,
+pname:shaderSubgroupRotateClustered>> feature is supported,
 ename:VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT_KHR must: be returned in
 pname:supportedOperations.
 
@@ -3014,7 +3015,7 @@ include::{generated}/api/structs/VkPhysicalDeviceTransformFeedbackPropertiesEXT.
     shaders declared with the code:GeometryStreams capability.
     If the implementation does not support
     sname:VkPhysicalDeviceTransformFeedbackFeaturesEXT::pname:geometryStreams
-    then pname:maxTransformFeedbackStreams must: be set to `1`.
+    then pname:maxTransformFeedbackStreams must: be `1`.
   * [[limits-maxTransformFeedbackBuffers]] pname:maxTransformFeedbackBuffers
     is the maximum number of transform feedback buffers that can be bound
     for capturing shader outputs from the last
@@ -3309,6 +3310,39 @@ include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrixPropertie
 --
 endif::VK_KHR_cooperative_matrix[]
 
+ifdef::VK_NV_cooperative_matrix2[]
+[open,refpage='VkPhysicalDeviceCooperativeMatrix2PropertiesNV',desc='Structure describing cooperative matrix properties supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceCooperativeMatrix2PropertiesNV structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceCooperativeMatrix2PropertiesNV.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[limits-cooperativeMatrixWorkgroupScopeMaxWorkgroupSize]]
+    pname:cooperativeMatrixWorkgroupScopeMaxWorkgroupSize is the maximum
+    number of invocations in a workgroup when the module uses
+    code:OpTypeCooperativeMatrixKHR with code:Scope equal to code:Workgroup.
+  * [[limits-cooperativeMatrixFlexibleDimensionsMaxDimension]]
+    pname:cooperativeMatrixFlexibleDimensionsMaxDimension is the maximum
+    supported dimension for cooperative matrix types when the
+    <<features-cooperativeMatrixFlexibleDimensions,pname:cooperativeMatrixFlexibleDimensions>>
+    feature is enabled.
+  * [[limits-cooperativeMatrixWorkgroupScopeReservedSharedMemory]]
+    pname:cooperativeMatrixWorkgroupScopeReservedSharedMemory is the number
+    of bytes of shared memory reserved for the implementation when the
+    module uses code:OpTypeCooperativeMatrixKHR with code:Scope equal to
+    code:Workgroup.
+
+:refpage: VkPhysicalDeviceCooperativeMatrix2PropertiesNV
+include::{chapters}/limits.adoc[tag=limits_desc]
+
+include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrix2PropertiesNV.adoc[]
+--
+endif::VK_NV_cooperative_matrix2[]
+
 ifdef::VK_NV_shader_sm_builtins[]
 [open,refpage='VkPhysicalDeviceShaderSMBuiltinsPropertiesNV',desc='Structure describing shader SM Builtins properties supported by an implementation',type='structs']
 --
@@ -3528,6 +3562,76 @@ include::{generated}/validity/structs/VkPhysicalDeviceDeviceGeneratedCommandsPro
 --
 
 endif::VK_NV_device_generated_commands[]
+
+ifdef::VK_EXT_device_generated_commands[]
+[open,refpage='VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT',desc='Structure describing push descriptor limits that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[limits-maxIndirectPipelineCount]] pname:maxIndirectPipelineCount is
+    the maximum number of pipelines passed to
+    flink:vkCreateIndirectExecutionSetEXT.
+ifdef::VK_EXT_shader_object[]
+  * [[limits-maxIndirectShaderObjectCount]]
+    pname:maxIndirectShaderObjectCount is the maximum number of shader
+    objects passed to flink:vkCreateIndirectExecutionSetEXT.
+    If this value is zero, binding shader objects indirectly is not
+    supported.
+endif::VK_EXT_shader_object[]
+  * [[limits-maxIndirectSequenceCount]] pname:maxIndirectSequenceCount is
+    the maximum number of sequences in slink:VkGeneratedCommandsInfoEXT and
+    in slink:VkGeneratedCommandsMemoryRequirementsInfoEXT.
+  * [[limits-maxIndirectCommandsTokenCount]]
+    pname:maxIndirectCommandsTokenCount is the maximum number of tokens in
+    slink:VkIndirectCommandsLayoutCreateInfoEXT.
+  * [[limits-maxIndirectCommandsTokenOffset]]
+    pname:maxIndirectCommandsTokenOffset is the maximum offset in
+    slink:VkIndirectCommandsLayoutTokenEXT.
+  * [[limits-maxIndirectCommandsIndirectStride]]
+    pname:maxIndirectCommandsIndirectStride is the maximum stream stride in
+    slink:VkIndirectCommandsLayoutCreateInfoEXT.
+  * [[limits-supportedIndirectCommandsInputModes]]
+    pname:supportedIndirectCommandsInputModes indicates the supported input
+    modes.
+  * [[limits-supportedIndirectCommandsShaderStages]]
+    pname:supportedIndirectCommandsShaderStages indicates the stages which
+    can: be used to generate indirect commands.
+    Implementations are required to support, at minimum:
+    ename:VK_SHADER_STAGE_VERTEX_BIT, ename:VK_SHADER_STAGE_FRAGMENT_BIT,
+    ename:VK_SHADER_STAGE_COMPUTE_BIT.
+  * [[limits-supportedIndirectCommandsShaderStagesPipelineBinding]]
+    pname:supportedIndirectCommandsShaderStagesPipelineBinding indicates the
+    stages which can: be used within indirect execution sets for indirectly
+    binding shader stages using pipelines.
+ifdef::VK_EXT_shader_object[]
+  * [[limits-supportedIndirectCommandsShaderStagesShaderBinding]]
+    pname:supportedIndirectCommandsShaderStagesShaderBinding indicates the
+    stages which can: be used within indirect execution sets for indirectly
+    binding shader stages using shader objects.
+endif::VK_EXT_shader_object[]
+  * [[limits-deviceGeneratedCommandsTransformFeedback]]
+    pname:deviceGeneratedCommandsTransformFeedback indicates whether the
+    implementation supports interactions with
+    `apiext:VK_EXT_transform_feedback` for pipelines not created with
+    ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_EXT.
+  * [[limits-deviceGeneratedCommandsMultiDrawIndirectCount]]
+    pname:deviceGeneratedCommandsMultiDrawIndirectCount indicates whether
+    the implementation supports COUNT variants of multi-draw indirect
+    tokens.
+
+:refpage: VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT
+include::{chapters}/limits.adoc[tag=limits_desc]
+
+include::{generated}/validity/structs/VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT.adoc[]
+--
+
+endif::VK_EXT_device_generated_commands[]
 
 ifdef::VK_KHR_portability_subset[]
 [open,refpage='VkPhysicalDevicePortabilitySubsetPropertiesKHR',desc='Structure describing additional properties supported by a portable implementation',type='structs']
@@ -3892,14 +3996,17 @@ endif::VK_VERSION_1_3,VK_KHR_synchronization2[]
     pname:descriptorBufferOffsetAlignment indicates the required: alignment
     in bytes when setting offsets into the descriptor buffer.
   * [[limits-maxDescriptorBufferBindings]] pname:maxDescriptorBufferBindings
-    indicates the maximum sum total number of descriptor buffers and
-    embedded immutable sampler sets that can: be bound.
+    indicates the maximum number of descriptor buffer bindings.
   * [[limits-maxResourceDescriptorBufferBindings]]
     pname:maxResourceDescriptorBufferBindings indicates the maximum number
-    of resource descriptor buffers that can: be bound.
+    of descriptor buffer bindings with
+    ename:VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT that can: be
+    used.
   * [[limits-maxSamplerDescriptorBufferBindings]]
     pname:maxSamplerDescriptorBufferBindings indicates the maximum number of
-    sampler descriptor buffers that can: be bound.
+    descriptor buffer bindings with
+    ename:VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT that can: be
+    used.
   * [[limits-maxEmbeddedImmutableSamplerBindings]]
     pname:maxEmbeddedImmutableSamplerBindings indicates the maximum number
     of embedded immutable sampler sets that can: be bound.
@@ -4012,9 +4119,9 @@ endif::VK_VALVE_mutable_descriptor_type[]
 
 ifdef::VK_EXT_pipeline_robustness[]
 As there is no way to request robust and non-robust descriptors separately,
-or specify robust/non-robust descriptors in the set layout, if
-<<features-robustBufferAccess, pname:robustBufferAccess>> is enabled then
-robust descriptors are always used.
+or specify robust/non-robust descriptors in the set layout, if the
+<<features-robustBufferAccess, pname:robustBufferAccess>> feature is enabled
+then robust descriptors are always used.
 endif::VK_EXT_pipeline_robustness[]
 
 :refpage: VkPhysicalDeviceDescriptorBufferPropertiesEXT
@@ -4494,9 +4601,9 @@ sname:VkPhysicalDeviceRayTracingInvocationReorderPropertiesNV are:
 
 include::{generated}/api/enums/VkRayTracingInvocationReorderModeNV.adoc[]
 
-  * ename:VK_RAY_TRACING_INVOCATION_REORDER_MODE_NONE_NV indicates that the
+  * ename:VK_RAY_TRACING_INVOCATION_REORDER_MODE_NONE_NV specifies that the
     implementation is likely to not reorder at reorder calls.
-  * ename:VK_RAY_TRACING_INVOCATION_REORDER_MODE_REORDER_NV indicates that
+  * ename:VK_RAY_TRACING_INVOCATION_REORDER_MODE_REORDER_NV specifies that
     the implementation is likely to reorder at reorder calls.
 --
 
@@ -4664,6 +4771,13 @@ structure describe the following limits:
     pname:executionGraphDispatchAddressAlignment specifies the alignment of
     non-scratch basetype:VkDeviceAddress arguments consumed by graph
     dispatch commands.
+  * [[limits-maxExecutionGraphWorkgroupCount]]
+    pname:maxExecutionGraphWorkgroupCount[3] is the maximum number of local
+    workgroups that a shader can: be dispatched with in X, Y, and Z
+    dimensions, respectively.
+  * [[limits-maxExecutionGraphWorkgroups]] pname:maxExecutionGraphWorkgroups
+    is the total number of local workgroups that a shader can: be dispatched
+    with.
 
 :refpage: VkPhysicalDeviceShaderEnqueuePropertiesAMDX
 include::{chapters}/limits.adoc[tag=limits_desc]
@@ -4947,6 +5061,8 @@ endif::VK_MESA_image_alignment_control[]
 [[limits-minmax]]
 == Limit Requirements
 
+[open,refpage='Required_Limits',desc='Vulkan required limit tables',type='freeform',anchor='limits-minmax']
+--
 The following table specifies the required: minimum/maximum for all Vulkan
 graphics implementations.
 Where a limit corresponds to a fine-grained device feature which is
@@ -5373,7 +5489,13 @@ ifdef::VK_AMDX_shader_enqueue[]
 | code:uint32_t                 | pname:maxExecutionGraphShaderPayloadSize                  | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
 | code:uint32_t                 | pname:maxExecutionGraphShaderPayloadCount                 | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
 | code:uint32_t                 | pname:executionGraphDispatchAddressAlignment              | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
+| code:uint32_t                 | pname:maxExecutionGraphVertexBufferBindings               | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
+| 3 {times} code:uint32_t       | pname:maxExecutionGraphWorkgroupCount                     | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
+| code:uint32_t                 | pname:maxExecutionGraphWorkgroups                         | `<<features-shaderEnqueue,pname:shaderEnqueue>>`
 endif::VK_AMDX_shader_enqueue[]
+ifdef::VK_EXT_device_generated_commands[]
+| code:uint32_t                 | pname:maxIndirectShaderObjectCount              | `<<features-shaderObject,pname:shaderObject>>`
+endif::VK_EXT_device_generated_commands[]
 ifdef::VK_NV_extended_sparse_address_space[]
 | basetype:VkDeviceSize         | pname:extendedSparseAddressSpaceSize                      | pname:sparseBinding, `<<features-extendedSparseAddressSpace, pname:extendedSparseAddressSpace>>`
 endif::VK_NV_extended_sparse_address_space[]
@@ -5389,6 +5511,11 @@ ifdef::VK_KHR_maintenance7[]
 | code:uint32_t                 | pname:maxDescriptorSetUpdateAfterBindTotalStorageBuffersDynamic   | `<<features-maintenance7, pname:maintenance7>>`
 | code:uint32_t                 | pname:maxDescriptorSetUpdateAfterBindTotalBuffersDynamic          | `<<features-maintenance7, pname:maintenance7>>`
 endif::VK_KHR_maintenance7[]
+ifdef::VK_NV_cooperative_matrix2[]
+| code:uint32_t                 | pname:cooperativeMatrixWorkgroupScopeMaxWorkgroupSize             | `<<features-cooperativeMatrixWorkgroupScope, pname:cooperativeMatrixWorkgroupScope>>`
+| code:uint32_t                 | pname:cooperativeMatrixFlexibleDimensionsMaxDimension             | `<<features-cooperativeMatrixFlexibleDimensions, pname:cooperativeMatrixFlexibleDimensions>>`
+| code:uint32_t                 | pname:cooperativeMatrixWorkgroupScopeReservedSharedMemory         | `<<features-cooperativeMatrixWorkgroupScope, pname:cooperativeMatrixWorkgroupScope>>`
+endif::VK_NV_cooperative_matrix2[]
 |====
 
 [[limits-required]]
@@ -5727,15 +5854,32 @@ ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 ifdef::VK_NV_device_generated_commands[]
 | pname:maxGraphicsShaderGroupCount               | - | 2^12^   | min
-| pname:maxIndirectSequenceCount                  | - | 2^20^   | min
-| pname:maxIndirectCommandsTokenCount             | - | 16     | min
-| pname:maxIndirectCommandsStreamCount            | - | 16     | min
-| pname:maxIndirectCommandsTokenOffset            | - | 2047   | min
+| pname:maxIndirectCommandsStreamCount +  (for NV extension)                              | - | 2^12^    | min
 | pname:maxIndirectCommandsStreamStride           | - | 2048   | min
+| pname:minIndirectCommandsBufferOffsetAlignment  | - | 256    | max
 | pname:minSequencesCountBufferOffsetAlignment    | - | 256    | max
 | pname:minSequencesIndexBufferOffsetAlignment    | - | 256    | max
-| pname:minIndirectCommandsBufferOffsetAlignment  | - | 256    | max
 endif::VK_NV_device_generated_commands[]
+ifdef::VK_NV_device_generated_commands,VK_EXT_device_generated_commands[]
+| pname:maxIndirectSequenceCount                  | - | 2^20^   | min
+| pname:maxIndirectCommandsTokenCount             | - | 16     | min
+| pname:maxIndirectCommandsTokenOffset            | - | 2047   | min
+endif::VK_NV_device_generated_commands,VK_EXT_device_generated_commands[]
+ifdef::VK_EXT_device_generated_commands[]
+| pname:maxIndirectPipelineCount                  | - | 2^12^   | min
+| pname:deviceGeneratedCommandsTransformFeedback  | - | false   | implementation-dependent
+| pname:deviceGeneratedCommandsMultiDrawIndirectCount  | - | false   | implementation-dependent
+ifdef::VK_EXT_shader_object[]
+| pname:maxIndirectShaderObjectCount              | 0 | 2^12^   | implementation-dependent
+endif::VK_EXT_shader_object[]
+| pname:maxIndirectCommandsIndirectStride           | - | 2048   | min
+| pname:supportedIndirectCommandsInputModes | - | ename:VK_INDIRECT_COMMANDS_INPUT_MODE_VULKAN_INDEX_BUFFER_EXT | min
+| pname:supportedIndirectCommandsShaderStages     | - | (ename:VK_SHADER_STAGE_COMPUTE_BIT \| ename:VK_SHADER_STAGE_VERTEX_BIT \| ename:VK_SHADER_STAGE_FRAGMENT_BIT) | min
+| pname:supportedIndirectCommandsShaderStagesPipelineBinding     | - | 0 | min
+ifdef::VK_EXT_shader_object[]
+| pname:supportedIndirectCommandsShaderStagesShaderBinding     | - | 0 | min
+endif::VK_EXT_shader_object[]
+endif::VK_EXT_device_generated_commands[]
 ifdef::VK_EXT_custom_border_color[]
 | pname:maxCustomBorderColorSamplers              | - | 32    | min
 endif::VK_EXT_custom_border_color[]
@@ -5867,6 +6011,9 @@ ifdef::VK_AMDX_shader_enqueue[]
 | pname:maxExecutionGraphShaderPayloadSize                  |   -   | 32768   | min
 | pname:maxExecutionGraphShaderPayloadCount                 |   -   | 256     | min
 | pname:executionGraphDispatchAddressAlignment              |   -   | 4       | max
+| pname:maxExecutionGraphVertexBufferBindings               |   -   | 1024    | min
+| pname:maxExecutionGraphWorkgroupCount                     |   -   | (65535,65535,65535) | min
+| pname:maxExecutionGraphWorkgroups                         |   -   | 2^24^-1 | min
 endif::VK_AMDX_shader_enqueue[]
 ifdef::VK_NV_extended_sparse_address_space[]
 | pname:extendedSparseAddressSpaceSize                      |   0   | pname:sparseAddressSpaceSize | min
@@ -5884,6 +6031,11 @@ endif::VK_MESA_image_alignment_control[]
 ifdef::VK_KHR_maintenance7[]
 | pname:separateDepthStencilAttachmentAccess | false | - | implementation-dependent
 endif::VK_KHR_maintenance7[]
+ifdef::VK_NV_cooperative_matrix2[]
+| pname:cooperativeMatrixWorkgroupScopeMaxWorkgroupSize                      |   -   | [eq]#subgroupSize {times} 2#                 | min
+| pname:cooperativeMatrixFlexibleDimensionsMaxDimension                      |   -   | 256                                          | min
+| pname:cooperativeMatrixWorkgroupScopeReservedSharedMemory                  |   -   | [eq]#pname:maxComputeSharedMemorySize / 2#   | max
+endif::VK_NV_cooperative_matrix2[]
 |====
 
 1::
@@ -5972,6 +6124,7 @@ ifdef::VK_EXT_descriptor_buffer[]
      pname:inputAttachmentDescriptorSize, and
      pname:accelerationStructureDescriptorSize.
 endif::VK_EXT_descriptor_buffer[]
+--
 
 
 ifdef::VK_EXT_sample_locations[]
@@ -6103,4 +6256,5 @@ profile must: satisfy the following additional limit requirements:
 | pname:maxColorAttachments                                     | 8             | min
 | pname:maxBoundDescriptorSets                                  | 7             | min
 |====
+
 endif::VK_VERSION_1_3[]

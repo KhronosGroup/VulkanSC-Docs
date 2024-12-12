@@ -38,7 +38,7 @@ attribute number using the code:location layout qualifier.
 The code:Component layout qualifier associates components of a vertex shader
 input variable with components of a vertex input attribute.
 
-.GLSL example
+.GLSL Example
 [source,glsl]
 ----
 // Assign location M to variableName
@@ -55,7 +55,7 @@ variable with components of a vertex input attribute.
 The code:Location and code:Component decorations are specified via the
 code:OpDecorate instruction.
 
-.SPIR-V example
+.SPIR-V Example
 [source,spirv]
 ----
                ...
@@ -109,8 +109,18 @@ pname:storageInputOutput16>>, vertex shader input variables can: have a
 width of 16 bits.
 endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
 
+ifdef::VK_EXT_vertex_attribute_robustness[]
+In all the following component assignment specifications, if
+<<features-vertexAttributeRobustness, pname:vertexAttributeRobustness>> is
+enabled and there is no
+sname:VkVertexInputAttributeDescription::pname:location specified for the
+shader vertex attribute code:Location being read, the value (0,0,0,0) or
+(0,0,0,1) is used for each of the equivalent (x,y,z,w) components consumed
+entries as specified below.
+endif::VK_EXT_vertex_attribute_robustness[]
+
 [[fxvertex-attrib-components]]
-.Input attribute components accessed by 16-bit and 32-bit input variables
+.Input Attribute Components Accessed By 16-Bit and 32-Bit Input Variables
 [width="65%",cols="<5,<3,<3",options="header"]
 |====
 | 16-bit or 32-bit data type | code:Component decoration | Components consumed
@@ -143,7 +153,7 @@ vector.
 The code:Component decoration must: not be used with matrix types.
 
 [[fxvertex-attrib-matrix]]
-.Input attributes accessed by 32-bit input matrix variables
+.Input Attributes Accessed by 32-Bit Input Matrix Variables
 [width="100%",cols="<10%,<24%,<21%,<45%",options="header"]
 |====
 | Data type     | Column vector type        | Locations consumed    | Components consumed
@@ -175,7 +185,7 @@ Input variables must: not use more components than provided by the
 attribute.
 
 [[fxvertex-attrib-double]]
-.Input attribute locations and components accessed by 64-bit input variables
+.Input Attribute Locations and Components Accessed by 64-Bit Input Variables
 [width="100%",cols="<18%,^12%,<25%,^14%,^18%,<13%",options="header"]
 |====
 ^.^| Input format | Locations consumed
@@ -442,6 +452,11 @@ then flink:vkCmdBindVertexBuffers2 can be used instead of
 fname:vkCmdSetVertexInputEXT to dynamically set the stride.
 endif::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
 
+The vertex attribute description for any location in the range
+[eq]#[0,sname:VkPhysicalDeviceLimits::pname:maxVertexInputAttributes)# not
+specified in the pname:pVertexAttributeDescriptions array becomes
+undefined:.
+
 .Valid Usage
 ****
 ifdef::VK_EXT_shader_object[]
@@ -502,7 +517,7 @@ include::{generated}/api/structs/VkVertexInputBindingDescription2EXT.adoc[]
 ifdef::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
   * pname:divisor is the number of successive instances that will use the
     same value of the vertex attribute when instanced rendering is enabled.
-    This member can: be set to a value other than `1` if the
+    This member can: be a value other than `1` if the
     <<features-vertexAttributeInstanceRateDivisor,
     pname:vertexAttributeInstanceRateDivisor>> feature is enabled.
     For example, if the divisor is N, the same vertex attribute will be
@@ -518,7 +533,7 @@ ifdef::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
     instances.
 endif::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
 ifndef::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
-  * pname:divisor must: be set to `1`
+  * pname:divisor must: be `1`
 endif::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
 
 .Valid Usage
@@ -879,10 +894,12 @@ then the divisor has a logical default value of 1.
     pname:binding must: be less than
     slink:VkPhysicalDeviceLimits::pname:maxVertexInputBindings
   * [[VUID-VkVertexInputBindingDivisorDescriptionKHR-vertexAttributeInstanceRateZeroDivisor-02228]]
-    If the pname:vertexAttributeInstanceRateZeroDivisor feature is not
-    enabled, pname:divisor must: not be `0`
+    If the <<features-vertexAttributeInstanceRateZeroDivisor,
+    pname:vertexAttributeInstanceRateZeroDivisor>> feature is not enabled,
+    pname:divisor must: not be `0`
   * [[VUID-VkVertexInputBindingDivisorDescriptionKHR-vertexAttributeInstanceRateDivisor-02229]]
-    If the pname:vertexAttributeInstanceRateDivisor feature is not enabled,
+    If the <<features-vertexAttributeInstanceRateDivisor,
+    pname:vertexAttributeInstanceRateDivisor>> feature is not enabled,
     pname:divisor must: be `1`
   * [[VUID-VkVertexInputBindingDivisorDescriptionKHR-divisor-01870]]
     pname:divisor must: be a value between `0` and
@@ -917,8 +934,8 @@ code:instanceIndex is calculated as follows:
     pname:vertexOffset for fname:vkCmdDrawIndexed), and let
     code:instanceIndex be the instance number of the draw (a value between
     pname:firstInstance and pname:firstInstance+pname:instanceCount).
-  * Let code:offset be an array of offsets into the currently bound vertex
-    buffers specified during fname:vkCmdBindVertexBuffers
+  * Let code:offset be an array of offsets into the bound vertex buffers
+    specified during fname:vkCmdBindVertexBuffers
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state[or fname:vkCmdBindVertexBuffers2]
     with pname:pOffsets.
 ifdef::VK_EXT_vertex_attribute_divisor,VK_KHR_vertex_attribute_divisor[]
@@ -943,7 +960,7 @@ ifdef::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
   ** flink:vkCmdSetVertexInputEXT::pname:pVertexBindingDescriptions->stride
 endif::VK_EXT_vertex_input_dynamic_state,VK_EXT_shader_object[]
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
-  ** flink:vkCmdBindVertexBuffers2EXT::pname:pStride, if not `NULL`
+  ** flink:vkCmdBindVertexBuffers2::pname:pStride, if not `NULL`
 endif::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
 
 [source,c]
@@ -980,17 +997,18 @@ The input variable in the shader must: be declared as a 64-bit data type if
 and only if pname:format is a 64-bit data type.
 If
 ifdef::VK_EXT_legacy_vertex_attributes[]
-either pname:format is a 64-bit format or <<features-legacyVertexAttributes,
-pname:legacyVertexAttributes>> is not enabled, and
+either pname:format is a 64-bit format or the
+<<features-legacyVertexAttributes, pname:legacyVertexAttributes>> feature is
+not enabled, and
 endif::VK_EXT_legacy_vertex_attributes[]
 pname:format is a packed format, `attribAddress` must: be a multiple of the
 size in bytes of the whole attribute data type as described in
 <<formats-packed,Packed Formats>>.
 Otherwise,
 ifdef::VK_EXT_legacy_vertex_attributes[]
-if either pname:format is a 64-bit format or
-<<features-legacyVertexAttributes, pname:legacyVertexAttributes>> is not
-enabled,
+if either pname:format is a 64-bit format or the
+<<features-legacyVertexAttributes, pname:legacyVertexAttributes>> feature is
+not enabled,
 endif::VK_EXT_legacy_vertex_attributes[]
 `attribAddress` must: be a multiple of the size in bytes of the component
 type indicated by pname:format (see <<formats,Formats>>).

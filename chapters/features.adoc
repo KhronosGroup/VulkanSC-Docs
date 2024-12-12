@@ -18,11 +18,13 @@ endif::hidden[]
 [[features]]
 = Features
 
-_Features_ describe functionality which is not supported on all
-implementations.
-Features are properties of the physical device.
-Features are optional:, and must: be explicitly enabled before use.
-Support for features is reported and enabled on a per-feature basis.
+_Features_ advertise additional functionality which can: be enabled in the
+API.
+If a feature is _supported_ by a physical device, it must: be _enabled_ when
+creating a slink:VkDevice in order to use its associated functionality with
+that slink:VkDevice.
+If a feature is _unsupported_, that functionality cannot: be used with that
+slink:VkDevice.
 
 ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 [NOTE]
@@ -111,9 +113,9 @@ The fine-grained features are enabled by passing a pointer to the
 sname:VkPhysicalDeviceFeatures structure via the pname:pEnabledFeatures
 member of the slink:VkDeviceCreateInfo structure that is passed into the
 fname:vkCreateDevice call.
-If a member of pname:pEnabledFeatures is set to ename:VK_TRUE or
-ename:VK_FALSE, then the device will be created with the indicated feature
-enabled or disabled, respectively.
+If a member of pname:pEnabledFeatures is ename:VK_TRUE or ename:VK_FALSE,
+then the device will be created with the indicated feature enabled or
+disabled, respectively.
 ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 Features can: also be enabled by using the slink:VkPhysicalDeviceFeatures2
 structure.
@@ -161,8 +163,11 @@ endif::VK_KHR_get_physical_device_properties2[]
 
 Each structure in pname:pFeatures and its pname:pNext chain contains members
 corresponding to fine-grained features.
-fname:vkGetPhysicalDeviceFeatures2 writes each member to a boolean value
-indicating whether that feature is supported.
+Each structure in pname:pFeatures and its pname:pNext chain contains
+basetype:VkBool32 members corresponding to fine-grained features.
+Each such member is returned with a ename:VK_TRUE value indicating that
+feature is supported on this physical device, or a ename:VK_FALSE value
+indicating it is unsupported.
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceFeatures2.adoc[]
 --
@@ -189,8 +194,8 @@ The pname:pNext chain of this structure is used to extend the structure with
 features defined by extensions.
 This structure can: be used in flink:vkGetPhysicalDeviceFeatures2 or can: be
 included in the pname:pNext chain of a slink:VkDeviceCreateInfo structure,
-in which case it controls which features are enabled on the device in lieu
-of pname:pEnabledFeatures.
+in which case it controls which features are enabled in lieu of
+pname:pEnabledFeatures.
 
 include::{generated}/validity/structs/VkPhysicalDeviceFeatures2.adoc[]
 --
@@ -230,7 +235,7 @@ ifdef::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[
       bounds-checked.
 endif::VK_VERSION_1_2,VK_EXT_buffer_device_address,VK_KHR_buffer_device_address[]
 ifdef::VK_NV_cooperative_matrix[]
-  *** If the <<features-cooperativeMatrixRobustBufferAccess-NV,
+  *** If the <<features-cooperativeMatrixRobustBufferAccessNV,
       sname:VkPhysicalDeviceCooperativeMatrixFeaturesNV::pname:cooperativeMatrixRobustBufferAccess>>
       feature is not enabled, then accesses using
       code:OpCooperativeMatrixLoadNV and code:OpCooperativeMatrixStoreNV
@@ -254,8 +259,8 @@ used.
 
   *** If
 ifdef::VK_EXT_robustness2[]
-      <<features-robustBufferAccess2, pname:robustBufferAccess2>> is not
-      enabled and
+      the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+      feature is not enabled and
 endif::VK_EXT_robustness2[]
       any buffer access is determined to be out of bounds, then any other
       access of the same type (load, store, or atomic) to the same buffer
@@ -276,8 +281,8 @@ ifdef::VK_EXT_robustness2[]
 endif::VK_EXT_robustness2[]
   ** Out-of-bounds buffer loads will return any of the following values:
 ifdef::VK_EXT_robustness2[]
-  *** If the access is to a uniform buffer and
-      <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
+  *** If the access is to a uniform buffer and the
+      <<features-robustBufferAccess2, pname:robustBufferAccess2>> feature is
       enabled, loads of offsets between the end of the descriptor range and
       the end of the descriptor range rounded up to a multiple of
       <<limits-robustUniformBufferAccessSizeAlignment,
@@ -288,8 +293,8 @@ ifdef::VK_EXT_robustness2[]
       <<limits-robustUniformBufferAccessSizeAlignment,
       pname:robustUniformBufferAccessSizeAlignment>> bytes must: return zero
       values.
-  *** If the access is to a storage buffer and
-      <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
+  *** If the access is to a storage buffer and the
+      <<features-robustBufferAccess2, pname:robustBufferAccess2>> feature is
       enabled, loads of offsets between the end of the descriptor range and
       the end of the descriptor range rounded up to a multiple of
       <<limits-robustStorageBufferAccessSizeAlignment,
@@ -308,12 +313,12 @@ ifdef::VK_EXT_robustness2[]
   *** Non-atomic accesses to storage buffers that are a multiple of 32 bits
       may: be decomposed into 32-bit accesses that are individually
       bounds-checked.
-  *** If the access is to an index buffer and
-      <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
+  *** If the access is to an index buffer and the
+      <<features-robustBufferAccess2, pname:robustBufferAccess2>> feature is
       enabled, zero values must: be returned.
   *** If the access is to a uniform texel buffer or storage texel buffer and
-      <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
-      enabled, zero values must: be returned, and then
+      the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+      feature is enabled, zero values must: be returned, and then
       <<textures-conversion-to-rgba,Conversion to RGBA>> is applied based on
       the buffer view's format.
 endif::VK_EXT_robustness2[]
@@ -329,18 +334,18 @@ endif::VK_EXT_robustness2[]
   ** Out-of-bounds writes may: modify values within the memory range(s)
      bound to the buffer, but must: not modify any other memory.
 ifdef::VK_EXT_robustness2[]
-  *** If <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
-      enabled, out of bounds writes must: not modify any memory.
+  *** If the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+      feature is enabled, out of bounds writes must: not modify any memory.
 endif::VK_EXT_robustness2[]
   ** Out-of-bounds atomics may: modify values within the memory range(s)
      bound to the buffer, but must: not modify any other memory, and return
      an undefined: value.
 ifdef::VK_EXT_robustness2[]
-  *** If <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
-      enabled, out of bounds atomics must: not modify any memory, and return
-      an undefined: value.
-  ** If <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
-     disabled, vertex
+  *** If the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+      feature is enabled, out of bounds atomics must: not modify any memory,
+      and return an undefined: value.
+  ** If the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+     feature is not enabled, vertex
 endif::VK_EXT_robustness2[]
 ifndef::VK_EXT_robustness2[]
   ** Vertex
@@ -367,11 +372,11 @@ binding for that vertex shader invocation are considered out of bounds.
        attribute.
   **** Zero values, or [eq]#(0,0,0,x)# vectors, as described above.
 ifdef::VK_EXT_robustness2[]
-  ** If <<features-robustBufferAccess2, pname:robustBufferAccess2>> is
-     enabled, vertex input attributes are considered out of bounds if the
-     offset of the attribute in the bound vertex buffer range plus the size
-     of the attribute is greater than the byte size of the memory range
-     bound to the vertex buffer binding.
+  ** If the <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+     feature is enabled, vertex input attributes are considered out of
+     bounds if the offset of the attribute in the bound vertex buffer range
+     plus the size of the attribute is greater than the byte size of the
+     memory range bound to the vertex buffer binding.
   *** If a vertex input attribute is out of bounds, the
       <<fxvertex-input-extraction,raw data>> extracted are zero values, and
       missing G, B, or A components are <<fxvertex-input-extraction,filled
@@ -428,7 +433,7 @@ endif::VK_EXT_pipeline_robustness[]
     <<primsrast-sampleshading,Sample Shading>> and multisample interpolation
     are supported.
     If this feature is not enabled, the pname:sampleShadingEnable member of
-    the slink:VkPipelineMultisampleStateCreateInfo structure must: be set to
+    the slink:VkPipelineMultisampleStateCreateInfo structure must: be
     ename:VK_FALSE and the pname:minSampleShading member is ignored.
     This also specifies whether shader modules can: declare the
     code:SampleRateShading capability.
@@ -443,7 +448,7 @@ endif::VK_EXT_pipeline_robustness[]
   * [[features-logicOp]] pname:logicOp specifies whether logic operations
     are supported.
     If this feature is not enabled, the pname:logicOpEnable member of the
-    slink:VkPipelineColorBlendStateCreateInfo structure must: be set to
+    slink:VkPipelineColorBlendStateCreateInfo structure must: be
     ename:VK_FALSE, and the pname:logicOp member is ignored.
   * [[features-multiDrawIndirect]] pname:multiDrawIndirect specifies whether
     multiple draw indirect is supported.
@@ -471,10 +476,10 @@ endif::VK_EXT_pipeline_robustness[]
   * [[features-depthBiasClamp]] pname:depthBiasClamp specifies whether depth
     bias clamping is supported.
     If this feature is not enabled, the pname:depthBiasClamp member of the
-    slink:VkPipelineRasterizationStateCreateInfo structure must: be set to
-    0.0 unless the ename:VK_DYNAMIC_STATE_DEPTH_BIAS dynamic state is
-    enabled, in which case the pname:depthBiasClamp parameter to
-    flink:vkCmdSetDepthBias must: be set to 0.0.
+    slink:VkPipelineRasterizationStateCreateInfo structure must: be 0.0
+    unless the ename:VK_DYNAMIC_STATE_DEPTH_BIAS dynamic state is enabled,
+    in which case the pname:depthBiasClamp parameter to
+    flink:vkCmdSetDepthBias must: be 0.0.
   * [[features-fillModeNonSolid]] pname:fillModeNonSolid specifies whether
     point and wireframe fill modes are supported.
     If this feature is not enabled, the ename:VK_POLYGON_MODE_POINT and
@@ -493,10 +498,10 @@ endif::VK_EXT_pipeline_robustness[]
   * [[features-wideLines]] pname:wideLines specifies whether lines with
     width other than 1.0 are supported.
     If this feature is not enabled, the pname:lineWidth member of the
-    slink:VkPipelineRasterizationStateCreateInfo structure must: be set to
-    1.0 unless the ename:VK_DYNAMIC_STATE_LINE_WIDTH dynamic state is
-    enabled, in which case the pname:lineWidth parameter to
-    flink:vkCmdSetLineWidth must: be set to 1.0.
+    slink:VkPipelineRasterizationStateCreateInfo structure must: be 1.0
+    unless the ename:VK_DYNAMIC_STATE_LINE_WIDTH dynamic state is enabled,
+    in which case the pname:lineWidth parameter to flink:vkCmdSetLineWidth
+    must: be 1.0.
     When this feature is supported, the range and granularity of supported
     line widths are indicated by the pname:lineWidthRange and
     pname:lineWidthGranularity members of the sname:VkPhysicalDeviceLimits
@@ -521,18 +526,18 @@ endif::VK_EXT_pipeline_robustness[]
     than one viewport is supported.
     If this feature is not enabled:
   ** The pname:viewportCount and pname:scissorCount members of the
-     slink:VkPipelineViewportStateCreateInfo structure must: be set to 1.
+     slink:VkPipelineViewportStateCreateInfo structure must: be 1.
   ** The pname:firstViewport and pname:viewportCount parameters to the
-     flink:vkCmdSetViewport command must: be set to 0 and 1, respectively.
+     flink:vkCmdSetViewport command must: be 0 and 1, respectively.
   ** The pname:firstScissor and pname:scissorCount parameters to the
-     flink:vkCmdSetScissor command must: be set to 0 and 1, respectively.
+     flink:vkCmdSetScissor command must: be 0 and 1, respectively.
 ifdef::VK_NV_scissor_exclusive[]
   ** The pname:exclusiveScissorCount member of the
      slink:VkPipelineViewportExclusiveScissorStateCreateInfoNV structure
-     must: be set to 0 or 1.
+     must: be 0 or 1.
   ** The pname:firstExclusiveScissor and pname:exclusiveScissorCount
-     parameters to the flink:vkCmdSetExclusiveScissorNV command must: be set
-     to 0 and 1, respectively.
+     parameters to the flink:vkCmdSetExclusiveScissorNV command must: be 0
+     and 1, respectively.
 endif::VK_NV_scissor_exclusive[]
   * [[features-samplerAnisotropy]] pname:samplerAnisotropy specifies whether
     anisotropic filtering is supported.
@@ -1074,9 +1079,8 @@ include::{chapters}/features.adoc[tag=VK_KHR_shader_float16_int8-features]
     whether the implementation supports the minimum set of descriptor
     indexing features as described in the <<features-requirements, Feature
     Requirements>> section.
-    Enabling the pname:descriptorIndexing member when flink:vkCreateDevice
-    is called does not imply the other minimum descriptor indexing features
-    are also enabled.
+    Enabling this feature when flink:vkCreateDevice is called does not imply
+    the other minimum descriptor indexing features are also enabled.
     Those other descriptor indexing features must: be enabled individually
     as needed by the application.
 include::{chapters}/features.adoc[tag=VK_EXT_descriptor_indexing-features]
@@ -1096,7 +1100,7 @@ include::{chapters}/features.adoc[tag=VK_KHR_shader_subgroup_extended_types-feat
 include::{chapters}/features.adoc[tag=VK_KHR_separate_depth_stencil_layouts-features]
 include::{chapters}/features.adoc[tag=VK_EXT_host_query_reset-features]
 include::{chapters}/features.adoc[tag=VK_KHR_timeline_semaphore-features]
-include::{chapters}/features.adoc[tag=VK_EXT_buffer_device_address-features]
+include::{chapters}/features.adoc[tag=VK_KHR_buffer_device_address-features]
 include::{chapters}/features.adoc[tag=VK_KHR_vulkan_memory_model-features]
   * [[features-shaderOutputViewportIndex]] pname:shaderOutputViewportIndex
     indicates whether the implementation supports the
@@ -1911,23 +1915,13 @@ This structure describes the following features:
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-ifdef::VK_EXT_mesh_shader[]
-  * pname:taskShader specifies whether task shaders are supported.
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-  * [[{vuprefix}features-taskShader]] pname:taskShader specifies whether
-    task shaders are supported.
-endif::VK_EXT_mesh_shader[]
+  * [[features-taskShaderNV]] pname:taskShader specifies whether task
+    shaders are supported.
     If this feature is not enabled, the ename:VK_SHADER_STAGE_TASK_BIT_NV
     and ename:VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV enum values must: not be
     used.
-ifdef::VK_EXT_mesh_shader[]
-  * pname:meshShader specifies whether mesh shaders are supported.
-endif::VK_EXT_mesh_shader[]
-ifndef::VK_EXT_mesh_shader[]
-  * [[{vuprefix}features-meshShader]] pname:meshShader specifies whether
-    mesh shaders are supported.
-endif::VK_EXT_mesh_shader[]
+  * [[features-meshShaderNV]] pname:meshShader specifies whether mesh
+    shaders are supported.
     If this feature is not enabled, the ename:VK_SHADER_STAGE_MESH_BIT_NV
     and ename:VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV enum values must: not be
     used.
@@ -1960,14 +1954,14 @@ include::{generated}/api/structs/VkPhysicalDeviceMeshShaderFeaturesEXT.adoc[]
     and ename:VK_PIPELINE_STAGE_MESH_SHADER_BIT_EXT enum values must: not be
     used.
 ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
-  * [[features-multiview-mesh]] pname:multiviewMeshShader specifies whether
-    the implementation supports <<features-multiview, pname:multiview>>
-    rendering within a render pass, with mesh shaders.
+  * [[features-multiviewMeshShader]] pname:multiviewMeshShader specifies
+    whether the implementation supports <<features-multiview,
+    pname:multiview>> rendering within a render pass, with mesh shaders.
     If this feature is not enabled, then a pipeline compiled against a
     subpass with a non-zero view mask must: not include a mesh shader.
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
 ifdef::VK_KHR_fragment_shading_rate[]
-  * [[features-primitiveFragmentShadingRate-mesh]]
+  * [[features-primitiveFragmentShadingRateMeshShader]]
     pname:primitiveFragmentShadingRateMeshShader indicates that the
     implementation supports the <<primsrast-fragment-shading-rate-primitive,
     primitive fragment shading rate>> in mesh shaders.
@@ -2512,7 +2506,7 @@ This structure describes the following feature:
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * [[features-cornersampledimage]] pname:cornerSampledImage specifies
+  * [[features-cornerSampledImage]] pname:cornerSampledImage specifies
     whether images can be created with a
     slink:VkImageCreateInfo::pname:flags containing
     ename:VK_IMAGE_CREATE_CORNER_SAMPLED_BIT_NV.
@@ -2863,7 +2857,7 @@ This structure describes the following feature:
     pipeline state.
     Otherwise depth clipping is only enabled when
     slink:VkPipelineRasterizationStateCreateInfo::pname:depthClampEnable is
-    set to ename:VK_FALSE.
+    ename:VK_FALSE.
 
 :refpage: VkPhysicalDeviceDepthClipEnableFeaturesEXT
 include::{chapters}/features.adoc[tag=features]
@@ -2918,7 +2912,7 @@ This structure describes the following features:
 // Must have preceding whitespace
 ifdef::VK_VERSION_1_2[:anchor-prefix: extension-]
 ifndef::VK_VERSION_1_2[:anchor-prefix:]
-// tag::VK_EXT_buffer_device_address-features[]
+// tag::VK_KHR_buffer_device_address-features[]
   * [[{anchor-prefix}features-bufferDeviceAddress]]
     pname:bufferDeviceAddress indicates that the implementation supports
     accessing buffer memory in shaders as storage buffers via an address
@@ -2951,7 +2945,7 @@ ifdef::VK_KHR_acceleration_structure[]
 endif::VK_KHR_acceleration_structure[]
     addresses must: not be queried on a logical device created with more
     than one physical device.
-// end::VK_EXT_buffer_device_address-features[]
+// end::VK_KHR_buffer_device_address-features[]
 
 [NOTE]
 ====
@@ -2994,8 +2988,9 @@ This structure describes the following features:
     replay.
   * [[features-bufferDeviceAddressMultiDeviceEXT]]
     pname:bufferDeviceAddressMultiDevice indicates that the implementation
-    supports the pname:bufferDeviceAddress feature for logical devices
-    created with multiple physical devices.
+    supports the <<features-bufferDeviceAddressEXT,
+    pname:bufferDeviceAddress>> feature for logical devices created with
+    multiple physical devices.
     If this feature is not supported, buffer addresses must: not be queried
     on a logical device created with more than one physical device.
 
@@ -3126,10 +3121,10 @@ This structure describes the following features:
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * [[features-cooperativeMatrix-NV]] pname:cooperativeMatrix indicates that
+  * [[features-cooperativeMatrixNV]] pname:cooperativeMatrix indicates that
     the implementation supports the code:CooperativeMatrixNV SPIR-V
     capability.
-  * [[features-cooperativeMatrixRobustBufferAccess-NV]]
+  * [[features-cooperativeMatrixRobustBufferAccessNV]]
     pname:cooperativeMatrixRobustBufferAccess indicates that the
     implementation supports robust buffer access for SPIR-V
     code:OpCooperativeMatrixLoadNV and code:OpCooperativeMatrixStoreNV
@@ -3170,6 +3165,61 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrixFeaturesKHR.adoc[]
 --
 endif::VK_KHR_cooperative_matrix[]
+
+ifdef::VK_NV_cooperative_matrix2[]
+[open,refpage='VkPhysicalDeviceCooperativeMatrix2FeaturesNV',desc='Structure describing cooperative matrix features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceCooperativeMatrix2FeaturesNV structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDeviceCooperativeMatrix2FeaturesNV.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-cooperativeMatrixWorkgroupScope]]
+    pname:cooperativeMatrixWorkgroupScope indicates that the implementation
+    supports workgroup scope cooperative matrices.
+  * [[features-cooperativeMatrixFlexibleDimensions]]
+    pname:cooperativeMatrixFlexibleDimensions indicates that the
+    implementation supports cooperative matrix sizes that are a multiple of
+    the granularity advertised in
+    slink:VkCooperativeMatrixFlexibleDimensionsPropertiesNV.
+  * [[features-cooperativeMatrixReductions]]
+    pname:cooperativeMatrixReductions indicates that the implementation
+    supports the code:CooperativeMatrixReductionsNV SPIR-V capability.
+    This allows performing (row, column, 2x2, or all element) reductions on
+    matrices.
+  * [[features-cooperativeMatrixConversions]]
+    pname:cooperativeMatrixConversions indicates that the implementation
+    supports the code:CooperativeMatrixConversionsNV SPIR-V capability.
+    This allows converting accumulator matrices to A or B matrices.
+  * [[features-cooperativeMatrixPerElementOperations]]
+    pname:cooperativeMatrixPerElementOperations indicates that the
+    implementation supports the code:CooperativeMatrixPerElementOperationsNV
+    SPIR-V capability.
+    This allows performing element-wise operations on matrix elements using
+    a callback function.
+  * [[features-cooperativeMatrixTensorAddressing]]
+    pname:cooperativeMatrixTensorAddressing indicates that the
+    implementation supports the code:TensorAddressingNV and
+    code:CooperativeMatrixTensorAddressingNV SPIR-V capabilities.
+    This allows using tensor layout and tensor view types for matrix loads
+    and stores.
+  * [[features-cooperativeMatrixBlockLoads]]
+    pname:cooperativeMatrixBlockLoads indicates that the implementation
+    supports the code:CooperativeMatrixBlockLoadsNV SPIR-V capability.
+    This allows setting block size for loads and using a callback function
+    to decode block elements.
+
+:refpage: VkPhysicalDeviceCooperativeMatrix2FeaturesNV
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrix2FeaturesNV.adoc[]
+--
+endif::VK_NV_cooperative_matrix2[]
 
 ifdef::VK_EXT_ycbcr_image_arrays[]
 [open,refpage='VkPhysicalDeviceYcbcrImageArraysFeaturesEXT',desc='Structure describing extended {YCbCr} image creation features that can be supported by an implementation',type='structs']
@@ -3377,21 +3427,21 @@ describe the following features:
     supported for import and/or export.
   * [[features-sciSyncImport]] pname:sciSyncImport indicates whether
     stext:NvSciSyncObj import functionality is supported.
-    If pname:sciSyncImport is set to ename:VK_TRUE, slink:VkFence and/or
+    If pname:sciSyncImport is ename:VK_TRUE, slink:VkFence and/or
     slink:VkSemaphore support importing stext:NvSciSyncObj from
     applications.
     In this case, the application is responsible for the resource management
     of the stext:NvSciSyncObj.
   * [[features-sciSyncExport]] pname:sciSyncExport indicates whether
     stext:NvSciSyncObj export functionality is supported.
-    If pname:sciSyncExport is set to ename:VK_TRUE, slink:VkFence and/or
+    If pname:sciSyncExport is ename:VK_TRUE, slink:VkFence and/or
     slink:VkSemaphore support exporting stext:NvSciSyncObj created by the
     driver to applications.
     In this case, the driver is responsible for the resource management of
     the stext:NvSciSyncObj.
 
 [[features-externalscisync-table]]
-.Functionality supported for NvSciSync features
+.Functionality Supported for NvSciSync Features
 |=====
 | Features           | pname:sciSyncImport | pname:sciSyncExport | Always supported^1^
 | pname:sciSyncFence
@@ -3447,20 +3497,20 @@ structure describe the following features:
     of the stext:NvSciSyncObj.
   * [[features-sciSyncImport2]] pname:sciSyncImport indicates whether
     stext:NvSciSyncObj import functionality is supported.
-    If pname:sciSyncImport is set to ename:VK_TRUE, slink:VkFence and/or
+    If pname:sciSyncImport is ename:VK_TRUE, slink:VkFence and/or
     slink:VkSemaphore support importing stext:NvSciSyncObj from
     applications.
     In this case, the application is responsible for the resource management
     of the stext:NvSciSyncObj.
   * [[features-sciSyncExport2]] pname:sciSyncExport indicates whether
     stext:NvSciSyncObj export functionality is supported.
-    If pname:sciSyncExport is set to ename:VK_TRUE, slink:VkFence supports
+    If pname:sciSyncExport is ename:VK_TRUE, slink:VkFence supports
     exporting stext:NvSciSyncObj created by the driver to applications.
     In this case, the driver is responsible for the resource management of
     the stext:NvSciSyncObj.
 
 [[features-externalscisync2-table]]
-.Functionality supported for NvSciSync features
+.Functionality Supported for NvSciSync Features
 |=====
 | Features           | pname:sciSyncImport | pname:sciSyncExport | Always supported^1^
 | pname:sciSyncFence
@@ -3508,20 +3558,19 @@ structure describe the following features:
 
   * [[features-sciBufImport]] pname:sciBufImport indicates whether
     stext:NvSciBufObj import functionality is supported.
-    If pname:sciBufImport is set to ename:VK_TRUE, slink:VkDeviceMemory
-    supports importing stext:NvSciBufObj from applications.
+    If pname:sciBufImport is ename:VK_TRUE, slink:VkDeviceMemory supports
+    importing stext:NvSciBufObj from applications.
     In this case, the application is responsible for the resource management
     of the stext:NvSciBufObj.
   * [[features-sciBufExport]] pname:sciBufExport indicates whether
     stext:NvSciBufObj export functionality is supported.
-    If pname:sciBufExport is set to ename:VK_TRUE, slink:VkDeviceMemory
-    supports exporting stext:NvSciBufObj created by the driver to
-    applications.
+    If pname:sciBufExport is ename:VK_TRUE, slink:VkDeviceMemory supports
+    exporting stext:NvSciBufObj created by the driver to applications.
     In this case, the driver is responsible for the resource management of
     the stext:NvSciBufObj.
 
 [[features-externalscibuf-table]]
-.Functionality supported for NvSciBuf features
+.Functionality Supported for NvSciBuf Features
 |=====
 | Features            | Functionality
 | pname:sciBufImport  | slink:VkImportMemorySciBufInfoNV, flink:vkGetPhysicalDeviceExternalMemorySciBufPropertiesNV
@@ -3561,14 +3610,13 @@ describe the following features:
 
   * [[features-screenBufferImport]] pname:screenBufferImport indicates
     whether QNX Screen buffer import functionality is supported.
-    If pname:screenBufferImport is set to ename:VK_TRUE,
-    slink:VkDeviceMemory supports importing code:_screen_buffer from
-    applications.
+    If pname:screenBufferImport is ename:VK_TRUE, slink:VkDeviceMemory
+    supports importing code:_screen_buffer from applications.
     In this case, the application is responsible for the resource management
     of the code:_screen_buffer.
 
 [[features-externalscreenbuffer-table]]
-.Functionality supported for QNX Screen Buffer features
+.Functionality Supported for QNX Screen Buffer Features
 |=====
 | Features            | Functionality
 | pname:screenBufferImport  | slink:VkImportScreenBufferInfoQNX
@@ -4215,6 +4263,38 @@ include::{generated}/validity/structs/VkPhysicalDeviceRayTracingMaintenance1Feat
 --
 endif::VK_KHR_ray_tracing_maintenance1[]
 
+ifdef::VK_KHR_video_encode_quantization_map[]
+[open,refpage='VkPhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR',desc='Structure describing the video encode quantization map features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-videoEncodeQuantizationMap]] pname:videoEncodeQuantizationMap
+    indicates that the implementation supports
+    <<encode-quantization-map,video encode quantization maps>>.
++
+[NOTE]
+====
+Support for pname:videoEncodeQuantizationMap does not indicate that all
+video encode profiles support quantization maps.
+Support for quantization maps for any specific video encode profile is
+subject to video-profile-specific capabilities.
+====
+
+:refpage: VkPhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR.adoc[]
+--
+endif::VK_KHR_video_encode_quantization_map[]
+
 ifdef::VK_KHR_video_maintenance1[]
 [open,refpage='VkPhysicalDeviceVideoMaintenance1FeaturesKHR',desc='Structure describing the video maintenance features that can be supported by an implementation',type='structs']
 --
@@ -4243,6 +4323,28 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceVideoMaintenance1FeaturesKHR.adoc[]
 --
 endif::VK_KHR_video_maintenance1[]
+
+ifdef::VK_KHR_video_encode_av1[]
+[open,refpage='VkPhysicalDeviceVideoEncodeAV1FeaturesKHR',desc='Structure describing the video encode AV1 features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceVideoEncodeAV1FeaturesKHR structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceVideoEncodeAV1FeaturesKHR.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-videoEncodeAV1]] pname:videoEncodeAV1 indicates that the
+    implementation supports <<encode-av1,AV1 encode operations>>.
+
+:refpage: VkPhysicalDeviceVideoEncodeAV1FeaturesKHR
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceVideoEncodeAV1FeaturesKHR.adoc[]
+--
+endif::VK_KHR_video_encode_av1[]
 
 ifdef::VK_EXT_extended_dynamic_state[]
 [open,refpage='VkPhysicalDeviceExtendedDynamicStateFeaturesEXT',desc='Structure describing what extended dynamic state can be used',type='structs']
@@ -4471,7 +4573,7 @@ This structure describes the following feature:
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * [[features-deviceGeneratedCommands]] pname:deviceGeneratedCommands
+  * [[features-deviceGeneratedCommandsNV]] pname:deviceGeneratedCommands
     indicates whether the implementation supports functionality to generate
     commands on the device.
     See <<device-generated-commands,Device-Generated Commands>>.
@@ -4518,6 +4620,36 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV.adoc[]
 --
 endif::VK_NV_device_generated_commands_compute[]
+
+ifdef::VK_EXT_device_generated_commands[]
+[open,refpage='VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT',desc='Structure describing the device-generated compute features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-deviceGeneratedCommands]] pname:deviceGeneratedCommands
+    indicates whether the implementation supports functionality to generate
+    commands on the device.
+  * [[features-dynamicGeneratedPipelineLayout]]
+    pname:dynamicGeneratedPipelineLayout indicates the implementation allows
+    the pname:pipelineLayout member of
+    slink:VkIndirectCommandsLayoutCreateInfoEXT to be dlink:VK_NULL_HANDLE
+    and slink:VkPipelineLayoutCreateInfo can: be chained off those
+    structures' pname:pNext instead.
+
+:refpage: VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT.adoc[]
+--
+endif::VK_EXT_device_generated_commands[]
 
 ifdef::VK_NV_device_diagnostics_config[]
 [open,refpage='VkPhysicalDeviceDiagnosticsConfigFeaturesNV',desc='Structure describing the device-generated diagnostic configuration features that can be supported by an implementation',type='structs']
@@ -5009,13 +5141,13 @@ This structure describes the following features:
     whether this implementation supports
     <<tessellation-isoline-tessellation, isoline output>> from the
     <<tessellation>> stage of a graphics pipeline.
-    This member is only meaningful if <<features-tessellationShader,
-    pname:tessellationShader>> are supported.
+    This member is only meaningful if the <<features-tessellationShader,
+    pname:tessellationShader>> feature is supported.
   * [[features-tessellationPointMode]] pname:tessellationPointMode indicates
     whether this implementation supports <<tessellation-point-mode, point
     output>> from the <<tessellation>> stage of a graphics pipeline.
-    This member is only meaningful if <<features-tessellationShader,
-    pname:tessellationShader>> are supported.
+    This member is only meaningful if the <<features-tessellationShader,
+    pname:tessellationShader>> feature is supported.
   * [[features-triangleFans]] pname:triangleFans indicates whether this
     implementation supports <<drawing-triangle-fans>> primitive topology.
   * [[features-vertexAttributeAccessBeyondStride]]
@@ -5193,6 +5325,31 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceDepthClipControlFeaturesEXT.adoc[]
 --
 endif::VK_EXT_depth_clip_control[]
+
+ifdef::VK_EXT_depth_clamp_control[]
+[open,refpage='VkPhysicalDeviceDepthClampControlFeaturesEXT',desc='Structure describing additional depth clamp control supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceDepthClampControlFeaturesEXT structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDeviceDepthClampControlFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-depthClampControl]] pname:depthClampControl indicates that
+    the implementation supports setting
+    slink:VkPipelineViewportDepthClampControlCreateInfoEXT::pname:depthClampMode
+    to ename:VK_DEPTH_CLAMP_MODE_USER_DEFINED_RANGE_EXT.
+
+:refpage: VkPhysicalDeviceDepthClampControlFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceDepthClampControlFeaturesEXT.adoc[]
+--
+endif::VK_EXT_depth_clamp_control[]
 
 ifdef::VK_KHR_workgroup_memory_explicit_layout[]
 [open,refpage='VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR',desc='Structure describing the workgroup storage explicit layout features that can be supported by an implementation',type='structs']
@@ -6248,12 +6405,13 @@ This structure describes the following feature:
 
 [NOTE]
 ====
-Enabling <<features-pipelineRobustness, pname:pipelineRobustness>> may, on
-some platforms, incur a minor performance cost when
-<<features-robustBufferAccess, pname:robustBufferAccess>> is disabled, even
-for pipelines which do not make use of any robustness features.
-If robustness is not needed, <<features-pipelineRobustness,
-pname:pipelineRobustness>> should not be enabled by an application.
+Enabling the <<features-pipelineRobustness, pname:pipelineRobustness>>
+feature may, on some platforms, incur a minor performance cost when the
+<<features-robustBufferAccess, pname:robustBufferAccess>> feature is not
+enabled, even for pipelines which do not make use of any robustness
+features.
+If robustness is not needed, the <<features-pipelineRobustness,
+pname:pipelineRobustness>> feature should not be enabled by an application.
 ====
 
 :refpage: VkPhysicalDevicePipelineRobustnessFeaturesEXT
@@ -7125,6 +7283,28 @@ include::{generated}/validity/structs/VkPhysicalDeviceSwapchainMaintenance1Featu
 --
 endif::VK_EXT_swapchain_maintenance1[]
 
+ifdef::VK_EXT_present_mode_fifo_latest_ready[]
+[open,refpage='VkPhysicalDevicePresentModeFifoLatestReadyFeaturesEXT',desc='Structure describing support for VK_PRESENT_MODE_FIFO_LATEST_READY_EXT',type='structs']
+--
+The sname:VkPhysicalDevicePresentModeFifoLatestReadyFeaturesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDevicePresentModeFifoLatestReadyFeaturesEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-presentModeFifoLatestReady]] pname:presentModeFifoLatestReady
+    specifies whether the implementation supports the
+    ename:VK_PRESENT_MODE_FIFO_LATEST_READY_EXT present mode.
+
+:refpage: VkPhysicalDevicePresentModeFifoLatestReadyFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDevicePresentModeFifoLatestReadyFeaturesEXT.adoc[]
+--
+endif::VK_EXT_present_mode_fifo_latest_ready[]
+
 ifdef::VK_EXT_dynamic_rendering_unused_attachments[]
 [open,refpage='VkPhysicalDeviceDynamicRenderingUnusedAttachmentsFeaturesEXT',desc='Structure describing the dynamic rendering unused attachment features that can be supported by an implementation',type='structs']
 --
@@ -7259,7 +7439,7 @@ include::{generated}/api/structs/VkPhysicalDeviceMultiviewPerViewRenderAreasFeat
 
 This structure describes the following features:
 
-  * [[features-multiview-per-view-render-areas]]
+  * [[features-multiviewPerViewRenderAreas]]
     pname:multiviewPerViewRenderAreas indicates that the implementation
     supports multiview per-view render areas.
 
@@ -7319,6 +7499,27 @@ include::{generated}/validity/structs/VkPhysicalDeviceClusterCullingShaderVrsFea
 
 endif::VK_HUAWEI_cluster_culling_shader[]
 
+ifdef::VK_HUAWEI_hdr_vivid[]
+
+[open,refpage='VkPhysicalDeviceHdrVividFeaturesHUAWEI',desc='Structure describing whether HDR Vivid metadata is supported',type='structs']
+--
+The sname:VkPhysicalDeviceHdrVividFeaturesHUAWEI structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceHdrVividFeaturesHUAWEI.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-hdrVivid]] pname:hdrVivid specifies whether HDR Vivid
+    metadata is supported.
+
+:refpage: VkPhysicalDeviceHdrVividFeaturesHUAWEI
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceHdrVividFeaturesHUAWEI.adoc[]
+--
+
+endif::VK_HUAWEI_hdr_vivid[]
 
 ifdef::VK_AMDX_shader_enqueue[]
 [open,refpage='VkPhysicalDeviceShaderEnqueueFeaturesAMDX',desc='Structure describing whether shader enqueue within execution graphs are supported by the implementation',type='structs']
@@ -7331,6 +7532,9 @@ This structure describes the following feature:
 
   * [[features-shaderEnqueue]] pname:shaderEnqueue indicates whether the
     implementation supports <<executiongraphs,execution graphs>>.
+  * [[features-shaderMeshEnqueue]] pname:shaderMeshEnqueue indicates whether
+    the implementation supports <<executiongraphs-meshnodes,mesh nodes in
+    execution graphs>>.
 
 :refpage: VkPhysicalDeviceShaderEnqueueFeaturesAMDX
 include::{chapters}/features.adoc[tag=features]
@@ -7348,8 +7552,8 @@ include::{generated}/api/structs/VkPhysicalDeviceCubicClampFeaturesQCOM.adoc[]
 
 This structure describes the following features:
 
-  * [[features-filter-cubic-range-clamp]] pname:cubicRangeClamp indicates
-    that the implementation supports cubic filtering in combination with a
+  * [[features-cubicRangeClamp]] pname:cubicRangeClamp indicates that the
+    implementation supports cubic filtering in combination with a
     <<textures-texel-range-clamp,texel range clamp>>.
 
 :refpage: VkPhysicalDeviceCubicClampFeaturesQCOM
@@ -7390,7 +7594,7 @@ include::{generated}/api/structs/VkPhysicalDeviceCubicWeightsFeaturesQCOM.adoc[]
 
 This structure describes the following feature:
 
-  * [[features-filter-cubic-weight-selection]] pname:selectableCubicWeights
+  * [[features-selectableCubicWeights]] pname:selectableCubicWeights
     indicates that the implementation supports the selection of filter cubic
     weights.
 
@@ -7866,6 +8070,30 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderRelaxedExtendedInstr
 --
 endif::VK_KHR_shader_relaxed_extended_instruction[]
 
+ifdef::VK_EXT_vertex_attribute_robustness[]
+[open,refpage='VkPhysicalDeviceVertexAttributeRobustnessFeaturesEXT',desc='Structure describing whether the vertex attribute robustness feature is supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceVertexAttributeRobustnessFeaturesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceVertexAttributeRobustnessFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-vertexAttributeRobustness]] pname:vertexAttributeRobustness
+    indicates that vertex shaders can: read vertex attribute locations that
+    have no vertex attribute description and the value returned is (0,0,0,0)
+    or (0,0,0,1).
+
+:refpage: VkPhysicalDeviceVertexAttributeRobustnessFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceVertexAttributeRobustnessFeaturesEXT.adoc[]
+--
+endif::VK_EXT_vertex_attribute_robustness[]
 
 [[features-requirements]]
 == Feature Requirements
@@ -7873,152 +8101,14 @@ endif::VK_KHR_shader_relaxed_extended_instruction[]
 All Vulkan graphics implementations must: support the following features:
 
 include::{generated}/featurerequirements.adoc[]
-ifdef::VK_VERSION_1_2,VK_KHR_8bit_storage[]
-  * <<features-storageBuffer8BitAccess, pname:storageBuffer8BitAccess>>, if
-    <<features-uniformAndStorageBuffer8BitAccess,
-    pname:uniformAndStorageBuffer8BitAccess>> is enabled.
-endif::VK_VERSION_1_2,VK_KHR_8bit_storage[]
-ifdef::VK_VERSION_1_2[]
-  * If the <<features-descriptorIndexing, pname:descriptorIndexing>> feature
-    is supported:
-  ** <<features-shaderSampledImageArrayDynamicIndexing,
-     pname:shaderSampledImageArrayDynamicIndexing>>
-  ** <<features-shaderStorageBufferArrayDynamicIndexing,
-     pname:shaderStorageBufferArrayDynamicIndexing>>
-  ** <<features-shaderUniformTexelBufferArrayDynamicIndexing,
-     pname:shaderUniformTexelBufferArrayDynamicIndexing>>
-  ** <<features-shaderStorageTexelBufferArrayDynamicIndexing,
-     pname:shaderStorageTexelBufferArrayDynamicIndexing>>
-  ** <<features-shaderSampledImageArrayNonUniformIndexing,
-     pname:shaderSampledImageArrayNonUniformIndexing>>
-  ** <<features-shaderStorageBufferArrayNonUniformIndexing,
-     pname:shaderStorageBufferArrayNonUniformIndexing>>
-  ** <<features-shaderUniformTexelBufferArrayNonUniformIndexing,
-     pname:shaderUniformTexelBufferArrayNonUniformIndexing>>
-  ** <<features-descriptorBindingSampledImageUpdateAfterBind,
-     pname:descriptorBindingSampledImageUpdateAfterBind>>
-  ** <<features-descriptorBindingStorageImageUpdateAfterBind,
-     pname:descriptorBindingStorageImageUpdateAfterBind>>
-  ** <<features-descriptorBindingStorageBufferUpdateAfterBind,
-     pname:descriptorBindingStorageBufferUpdateAfterBind>> (see also
-     <<limits-robustBufferAccessUpdateAfterBind,
-     pname:robustBufferAccessUpdateAfterBind>>)
-  ** <<features-descriptorBindingUniformTexelBufferUpdateAfterBind,
-     pname:descriptorBindingUniformTexelBufferUpdateAfterBind>> (see also
-     <<limits-robustBufferAccessUpdateAfterBind,
-     pname:robustBufferAccessUpdateAfterBind>>)
-  ** <<features-descriptorBindingStorageTexelBufferUpdateAfterBind,
-     pname:descriptorBindingStorageTexelBufferUpdateAfterBind>> (see also
-     <<limits-robustBufferAccessUpdateAfterBind,
-     pname:robustBufferAccessUpdateAfterBind>>)
-  ** <<features-descriptorBindingUpdateUnusedWhilePending,
-     pname:descriptorBindingUpdateUnusedWhilePending>>
-  ** <<features-descriptorBindingPartiallyBound,
-     pname:descriptorBindingPartiallyBound>>
-  ** <<features-runtimeDescriptorArray, pname:runtimeDescriptorArray>>
-ifdef::VK_VERSION_1_3[]
-  ** <<features-descriptorBindingInlineUniformBlockUpdateAfterBind,
-     pname:descriptorBindingInlineUniformBlockUpdateAfterBind>>, if Vulkan
-     1.3 or `apiext:VK_EXT_inline_uniform_block` is supported
-endif::VK_VERSION_1_3[]
-endif::VK_VERSION_1_2[]
-ifdef::VK_VERSION_1_2,VK_KHR_shader_atomic_int64[]
-  * <<features-shaderInt64, pname:shaderInt64>>, if the
-    <<features-shaderSharedInt64Atomics, pname:shaderSharedInt64Atomics>> or
-    <<features-shaderBufferInt64Atomics, pname:shaderBufferInt64Atomics>>
-    features are supported.
-endif::VK_VERSION_1_2,VK_KHR_shader_atomic_int64[]
-ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-  * <<features-storageBuffer16BitAccess, pname:storageBuffer16BitAccess>>,
-    if <<features-uniformAndStorageBuffer16BitAccess,
-    pname:uniformAndStorageBuffer16BitAccess>> is enabled.
-endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-ifdef::VK_EXT_shader_atomic_float[]
-  * <<features-shaderImageFloat32Atomics, pname:shaderImageFloat32Atomics>>,
-    if the <<features-sparseImageFloat32Atomics,
-    pname:sparseImageFloat32Atomics>> feature is supported.
-  * <<features-shaderImageFloat32AtomicAdd,
-    pname:shaderImageFloat32AtomicAdd>>, if the
-    <<features-sparseImageFloat32AtomicAdd,
-    pname:sparseImageFloat32AtomicAdd>> feature is supported.
-endif::VK_EXT_shader_atomic_float[]
-ifdef::VK_EXT_shader_atomic_float2[]
-  * <<features-shaderImageFloat32AtomicMinMax,
-    pname:shaderImageFloat32AtomicMinMax>>, if the
-    <<features-sparseImageFloat32AtomicMinMax,
-    pname:sparseImageFloat32AtomicMinMax>> feature is supported.
-endif::VK_EXT_shader_atomic_float2[]
 ifdef::VK_EXT_mesh_shader+VK_KHR_fragment_shading_rate[]
-  * <<features-primitiveFragmentShadingRate,
-    pname:primitiveFragmentShadingRate>> if
-    <<features-primitiveFragmentShadingRate-mesh,
+  * `apiext:VK_KHR_fragment_shading_rate` if
+    <<features-primitiveFragmentShadingRateMeshShader,
     pname:primitiveFragmentShadingRateMeshShader>> feature is supported.
 endif::VK_EXT_mesh_shader+VK_KHR_fragment_shading_rate[]
-ifdef::VK_EXT_fragment_shader_interlock[]
-  * <<features-fragmentShaderSampleInterlock,
-    pname:fragmentShaderSampleInterlock>> or
-    <<features-fragmentShaderPixelInterlock,
-    pname:fragmentShaderPixelInterlock>> or
-    <<features-fragmentShaderShadingRateInterlock,
-    pname:fragmentShaderShadingRateInterlock>>, if the
-    `apiext:VK_EXT_fragment_shader_interlock` extension is supported.
-endif::VK_EXT_fragment_shader_interlock[]
-ifdef::VK_KHR_line_rasterization[]
-  * <<features-rectangularLines, pname:rectangularLines>> or
-    <<features-bresenhamLines, pname:bresenhamLines>> or
-    <<features-smoothLines, pname:smoothLines>> or
-    <<features-stippledRectangularLines, pname:stippledRectangularLines>> or
-    <<features-stippledBresenhamLines, pname:stippledBresenhamLines>> or
-    <<features-stippledSmoothLines, pname:stippledSmoothLines>>, if the
-    `apiext:VK_KHR_line_rasterization` extension is supported.
-endif::VK_KHR_line_rasterization[]
-ifdef::VK_EXT_line_rasterization[]
-  * <<features-rectangularLines, pname:rectangularLines>> or
-    <<features-bresenhamLines, pname:bresenhamLines>> or
-    <<features-smoothLines, pname:smoothLines>> or
-    <<features-stippledRectangularLines, pname:stippledRectangularLines>> or
-    <<features-stippledBresenhamLines, pname:stippledBresenhamLines>> or
-    <<features-stippledSmoothLines, pname:stippledSmoothLines>>, if the
-    `apiext:VK_EXT_line_rasterization` extension is supported.
-endif::VK_EXT_line_rasterization[]
-ifdef::VK_NV_external_sci_sync[]
-  * Either <<features-sciSyncFence, pname:sciSyncFence>> or
-    <<features-sciSyncSemaphore, pname:sciSyncSemaphore>>, and either
-    <<features-sciSyncImport, pname:sciSyncImport>> or
-    <<features-sciSyncExport, pname:sciSyncExport>>, if the
-    `apiext:VK_NV_external_sci_sync` extension is supported.
-endif::VK_NV_external_sci_sync[]
-ifdef::VK_NV_external_sci_sync2[]
-  * Either <<features-sciSyncFence2, pname:sciSyncFence>> or
-    <<features-sciSyncSemaphore2, pname:sciSyncSemaphore2>>, and either
-    <<features-sciSyncImport2, pname:sciSyncImport>> or
-    <<features-sciSyncExport2, pname:sciSyncExport>>, if the
-    `apiext:VK_NV_external_sci_sync2` extension is supported.
-endif::VK_NV_external_sci_sync2[]
-ifdef::VK_NV_external_memory_sci_buf[]
-  * Either <<features-sciBufImport, pname:sciBufImport>> or
-    <<features-sciBufExport, pname:sciBufExport>>, if the
-    `apiext:VK_NV_external_memory_sci_buf` extension is supported.
-endif::VK_NV_external_memory_sci_buf[]
 ifdef::VK_EXT_extended_dynamic_state3[]
-  * <<features-tessellationShader, pname:tessellationShader>>, if the
-    <<features-extendedDynamicState3TessellationDomainOrigin,
-    pname:extendedDynamicState3TessellationDomainOrigin>> feature is
-    supported.
-  * <<features-depthClamp, pname:depthClamp>>, if the
-    <<features-extendedDynamicState3DepthClampEnable,
-    pname:extendedDynamicState3DepthClampEnable>> feature is supported.
-  * <<features-fillModeNonSolid, pname:fillModeNonSolid>>, if the
-    <<features-extendedDynamicState3PolygonMode,
-    pname:extendedDynamicState3PolygonMode>> feature is supported.
-  * <<features-alphaToOne, pname:alphaToOne>>, if the
-    <<features-extendedDynamicState3AlphaToOneEnable,
-    pname:extendedDynamicState3AlphaToOneEnable>> feature is supported.
-  * <<features-logicOp, pname:logicOp>>, if the
-    <<features-extendedDynamicState3LogicOpEnable,
-    pname:extendedDynamicState3LogicOpEnable>> feature is supported.
 ifdef::VK_EXT_transform_feedback[]
-  * <<features-geometryStreams, pname:geometryStreams>>, if the
+  * `apiext:VK_EXT_transform_feedback`, if the
     <<features-extendedDynamicState3RasterizationStream,
     pname:extendedDynamicState3RasterizationStream>> feature is supported.
 endif::VK_EXT_transform_feedback[]
@@ -8043,7 +8133,7 @@ ifdef::VK_EXT_blend_operation_advanced[]
     pname:extendedDynamicState3ColorBlendAdvanced>> feature is supported.
 endif::VK_EXT_blend_operation_advanced[]
 ifdef::VK_EXT_provoking_vertex[]
-  * <<features-provokingVertexLast, pname:provokingVertexLast>>, if the
+  * `apiext:VK_EXT_provoking_vertex`, if the
     <<features-extendedDynamicState3ProvokingVertexMode,
     pname:extendedDynamicState3ProvokingVertexMode>> feature is supported.
 endif::VK_EXT_provoking_vertex[]
@@ -8056,7 +8146,7 @@ ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
     pname:extendedDynamicState3LineStippleEnable>> feature is supported.
 endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 ifdef::VK_EXT_depth_clip_control[]
-  * <<features-depthClipControl, pname:depthClipControl>>, if the
+  * `apiext:VK_EXT_depth_clip_control`, if the
     <<features-extendedDynamicState3DepthClipNegativeOneToOne,
     pname:extendedDynamicState3DepthClipNegativeOneToOne>> feature is
     supported.
@@ -8096,34 +8186,23 @@ ifdef::VK_NV_framebuffer_mixed_samples[]
     supported.
 endif::VK_NV_framebuffer_mixed_samples[]
 ifdef::VK_NV_coverage_reduction_mode[]
-  * <<features-coverageReductionMode, pname:coverageReductionMode>>, if the
+  * `apiext:VK_NV_coverage_reduction_mode`, if the
     <<features-extendedDynamicState3CoverageReductionMode,
     pname:extendedDynamicState3CoverageReductionMode>> feature is supported.
 endif::VK_NV_coverage_reduction_mode[]
 ifdef::VK_NV_representative_fragment_test[]
-  * <<features-representativeFragmentTest,
-    pname:representativeFragmentTest>>, if the
+  * `apiext:VK_NV_representative_fragment_test`, if the
     <<features-extendedDynamicState3RepresentativeFragmentTestEnable,
     pname:extendedDynamicState3RepresentativeFragmentTestEnable>> feature is
     supported.
 endif::VK_NV_representative_fragment_test[]
 ifdef::VK_NV_shading_rate_image[]
-  * <<features-shadingRateImage, pname:shadingRateImage>>, if the
+  * `apiext:VK_NV_shading_rate_image`, if the
     <<features-extendedDynamicState3ShadingRateImageEnable,
     pname:extendedDynamicState3ShadingRateImageEnable>> feature is
     supported.
 endif::VK_NV_shading_rate_image[]
 endif::VK_EXT_extended_dynamic_state3[]
-ifdef::VK_KHR_shader_float16_int8[]
-  * Either <<features-shaderFloat16,pname:shaderFloat16>> or
-    <<features-shaderInt8,pname:shaderInt8>> if
-    `apiext:VK_KHR_shader_float16_int8` is supported.
-endif::VK_KHR_shader_float16_int8[]
-ifdef::VK_KHR_compute_shader_derivatives[]
-  * <<features-computeDerivativeGroupLinear,
-    pname:computeDerivativeGroupLinear>>, if the
-    `apiext:VK_KHR_compute_shader_derivatives` extension is supported.
-endif::VK_KHR_compute_shader_derivatives[]
 
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]

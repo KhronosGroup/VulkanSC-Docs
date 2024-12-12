@@ -77,9 +77,9 @@ than the limitations for code:usage2 and code:flags2, for all values of
 pname:format, pname:type, and pname:tiling.
 
 ifdef::VK_EXT_host_image_copy[]
-If `apiext:VK_EXT_host_image_copy` is supported, pname:usage includes
-ename:VK_IMAGE_USAGE_SAMPLED_BIT, and pname:flags does not include either of
-ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT,
+If the `apiext:VK_EXT_host_image_copy` extension is supported, pname:usage
+includes ename:VK_IMAGE_USAGE_SAMPLED_BIT, and pname:flags does not include
+either of ename:VK_IMAGE_CREATE_SPARSE_BINDING_BIT,
 ename:VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT, or
 ename:VK_IMAGE_CREATE_SPARSE_ALIASED_BIT, then the result of calls to
 fname:vkGetPhysicalDeviceImageFormatProperties with identical parameters
@@ -536,7 +536,7 @@ underlying physical device and/or the same driver version, as defined in the
 following table:
 
 [[external-memory-handle-types-compatibility]]
-.External memory handle types compatibility
+.External Memory Handle Types Compatibility
 |====
 | Handle type | sname:VkPhysicalDeviceIDProperties{wbro}::pname:driverUUID | sname:VkPhysicalDeviceIDProperties{wbro}::pname:deviceUUID
 | ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT | Must match | Must match
@@ -1065,8 +1065,8 @@ fname:vkGetPhysicalDeviceImageFormatProperties returns a bitmask of
 elink:VkSampleCountFlagBits in pname:sampleCounts specifying the supported
 sample counts for the image parameters.
 
-pname:sampleCounts will be set to ename:VK_SAMPLE_COUNT_1_BIT if at least
-one of the following conditions is true:
+pname:sampleCounts will be ename:VK_SAMPLE_COUNT_1_BIT if at least one of
+the following conditions is true:
 
   * pname:tiling is ename:VK_IMAGE_TILING_LINEAR
   * pname:type is not ename:VK_IMAGE_TYPE_2D
@@ -1429,7 +1429,7 @@ underlying physical device and/or the same driver version, as defined in the
 following table:
 
 [[external-semaphore-handle-types-compatibility]]
-.External semaphore handle types compatibility
+.External Semaphore Handle Types Compatibility
 |====
 | Handle type | sname:VkPhysicalDeviceIDProperties{wbro}::pname:driverUUID | sname:VkPhysicalDeviceIDProperties{wbro}::pname:deviceUUID
 | ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT | Must match | Must match
@@ -1486,7 +1486,7 @@ endif::VK_KHR_external_semaphore_capabilities[]
 
 If pname:handleType is not supported by the implementation, then
 slink:VkExternalSemaphoreProperties::pname:externalSemaphoreFeatures will be
-set to zero.
+zero.
 
 include::{generated}/validity/structs/VkExternalSemaphoreProperties.adoc[]
 --
@@ -1660,7 +1660,7 @@ underlying physical device and/or the same driver version, as defined in the
 following table:
 
 [[external-fence-handle-types-compatibility]]
-.External fence handle types compatibility
+.External Fence Handle Types Compatibility
 |====
 | Handle type | sname:VkPhysicalDeviceIDProperties{wbro}::pname:driverUUID | sname:VkPhysicalDeviceIDProperties{wbro}::pname:deviceUUID
 | ename:VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT | Must match | Must match
@@ -1712,8 +1712,7 @@ endif::VK_KHR_external_fence_capabilities[]
     pname:handleType.
 
 If pname:handleType is not supported by the implementation, then
-slink:VkExternalFenceProperties::pname:externalFenceFeatures will be set to
-zero.
+slink:VkExternalFenceProperties::pname:externalFenceFeatures will be zero.
 
 include::{generated}/validity/structs/VkExternalFenceProperties.adoc[]
 --

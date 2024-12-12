@@ -182,7 +182,7 @@ endif::VK_EXT_extended_dynamic_state3[]
   * pname:sampleShadingEnable can: be used to enable
     <<primsrast-sampleshading,Sample Shading>>.
   * pname:minSampleShading specifies a minimum fraction of sample shading if
-    pname:sampleShadingEnable is set to ename:VK_TRUE.
+    pname:sampleShadingEnable is ename:VK_TRUE.
   * pname:pSampleMask is a pointer to an array of basetype:VkSampleMask
     values used in the <<fragops-samplemask,sample mask test>>.
   * pname:alphaToCoverageEnable controls whether a temporary coverage value
@@ -669,9 +669,9 @@ framebuffer location [eq]#(x,y)# and the fragment size [eq]#(f~w~,f~h~)#:
   {empty}:: [eq]#p~y~ = y % f~h~#
   {empty}:: [eq]#p = p~x~ + (p~y~ {times} f~w~)#
 
-The table below illustrates the pixel index for multi-pixel fragments:
+The tables below illustrate the pixel index for multi-pixel fragments:
 
-.Pixel indices - 1 wide
+.Pixel Indices - 1 Wide
 [align="center"]
 |====
 | 1x1 | 1x2 | 1x4
@@ -681,7 +681,7 @@ The table below illustrates the pixel index for multi-pixel fragments:
 .>| image:{images}/pixel_index_1x4.svg[pdfwidth=90pt,align="center",opts="{imageopts}"]
 |====
 
-.Pixel indices - 2 wide
+.Pixel Indices - 2 Wide
 [align="center"]
 |====
 | 2x1 | 2x2 | 2x4
@@ -691,7 +691,7 @@ The table below illustrates the pixel index for multi-pixel fragments:
 .>| image:{images}/pixel_index_2x4.svg[pdfwidth=90pt,align="center",opts="{imageopts}"]
 |====
 
-.Pixel indices - 4 wide
+.Pixel Indices - 4 Wide
 [align="center"]
 |====
 | 4x1 | 4x2 | 4x4
@@ -724,7 +724,8 @@ fragment.
 
 <<<
 
-.Standard sample locations
+[[standard-sample-locations]]
+.Standard Sample Locations
 [options="header",align="center"]
 |====
 | Sample count 2+| Sample Locations
@@ -1197,20 +1198,20 @@ the currently active pipeline.
 .Valid Usage
 ****
   * [[VUID-vkCmdSetFragmentShadingRateKHR-pipelineFragmentShadingRate-04507]]
-    If <<features-pipelineFragmentShadingRate,
-    pname:pipelineFragmentShadingRate>> is not enabled,
+    If the <<features-pipelineFragmentShadingRate,
+    pname:pipelineFragmentShadingRate>> feature is not enabled,
     pname:pFragmentSize->width must: be `1`
   * [[VUID-vkCmdSetFragmentShadingRateKHR-pipelineFragmentShadingRate-04508]]
-    If <<features-pipelineFragmentShadingRate,
-    pname:pipelineFragmentShadingRate>> is not enabled,
+    If the <<features-pipelineFragmentShadingRate,
+    pname:pipelineFragmentShadingRate>> feature is not enabled,
     pname:pFragmentSize->height must: be `1`
   * [[VUID-vkCmdSetFragmentShadingRateKHR-pipelineFragmentShadingRate-04509]]
-    One of <<features-pipelineFragmentShadingRate,
+    One of the <<features-pipelineFragmentShadingRate,
     pname:pipelineFragmentShadingRate>>,
     <<features-primitiveFragmentShadingRate,
     pname:primitiveFragmentShadingRate>>, or
     <<features-attachmentFragmentShadingRate,
-    pname:attachmentFragmentShadingRate>> must: be enabled
+    pname:attachmentFragmentShadingRate>> features must: be enabled
   * [[VUID-vkCmdSetFragmentShadingRateKHR-primitiveFragmentShadingRate-04510]]
     If the <<features-primitiveFragmentShadingRate,
     pname:primitiveFragmentShadingRate>> feature is not enabled,
@@ -1330,7 +1331,7 @@ and render pass transform
 endif::VK_QCOM_render_pass_transform[]
 used by rasterization.
 
-If any of the following conditions are met, [eq]#C~xy~'# must: be set to
+If any of the following conditions are met, [eq]#C~xy~'# is set to
 [eq]#{1,1}# by the implementation:
 
   * If <<primsrast-sampleshading,Sample Shading>> is enabled.
@@ -1442,7 +1443,7 @@ Implementations should: clamp the inputs to the combiner operations
 ifdef::VK_KHR_maintenance6[]
 do so if
 sname:VkPhysicalDeviceMaintenance6PropertiesKHR::pname:fragmentShadingRateClampCombinerInputs
-is set to ename:VK_TRUE.
+is ename:VK_TRUE.
 All implementations must:
 endif::VK_KHR_maintenance6[]
 clamp the result of the second combiner operation.
@@ -1491,9 +1492,9 @@ by the fragment shading rate.
 
 [open,refpage='VkFragmentShadingRateNV',desc='Enumeration with fragment shading rates',type='enums']
 --
-If the pname:fragmentShadingRateEnums feature is enabled, fragment shading
-rates may be specified using the elink:VkFragmentShadingRateNV enumerated
-type defined as:
+If the <<features-fragmentShadingRateEnums, pname:fragmentShadingRateEnums>>
+feature is enabled, fragment shading rates may be specified using the
+elink:VkFragmentShadingRateNV enumerated type defined as:
 
 include::{generated}/api/enums/VkFragmentShadingRateNV.adoc[]
 
@@ -1533,10 +1534,12 @@ ename:VK_FRAGMENT_SHADING_RATE_4_INVOCATIONS_PER_PIXEL_NV,
 ename:VK_FRAGMENT_SHADING_RATE_8_INVOCATIONS_PER_PIXEL_NV, and
 ename:VK_FRAGMENT_SHADING_RATE_16_INVOCATIONS_PER_PIXEL_NV as a pipeline,
 primitive, or attachment shading rate, the
-pname:supersampleFragmentShadingRates feature must: be enabled.
+<<features-supersampleFragmentShadingRates,
+pname:supersampleFragmentShadingRates>> feature must: be enabled.
 To use the shading rate ename:VK_FRAGMENT_SHADING_RATE_NO_INVOCATIONS_NV as
 a pipeline, primitive, or attachment shading rate, the
-pname:noInvocationFragmentShadingRates feature must: be enabled.
+<<features-noInvocationFragmentShadingRates,
+pname:noInvocationFragmentShadingRates>> feature must: be enabled.
 --
 
 When using fragment shading rate enums, the pipeline fragment shading rate
@@ -1647,20 +1650,21 @@ For more information, refer to the
 .Valid Usage
 ****
   * [[VUID-vkCmdSetFragmentShadingRateEnumNV-pipelineFragmentShadingRate-04576]]
-    If <<features-pipelineFragmentShadingRate,
-    pname:pipelineFragmentShadingRate>> is not enabled, pname:shadingRate
-    must: be ename:VK_FRAGMENT_SHADING_RATE_1_INVOCATION_PER_PIXEL_NV
+    If the <<features-pipelineFragmentShadingRate,
+    pname:pipelineFragmentShadingRate>> feature is not enabled,
+    pname:shadingRate must: be
+    ename:VK_FRAGMENT_SHADING_RATE_1_INVOCATION_PER_PIXEL_NV
   * [[VUID-vkCmdSetFragmentShadingRateEnumNV-supersampleFragmentShadingRates-04577]]
-    If <<features-supersampleFragmentShadingRates,
-    pname:supersampleFragmentShadingRates>> is not enabled,
+    If the <<features-supersampleFragmentShadingRates,
+    pname:supersampleFragmentShadingRates>> feature is not enabled,
     pname:shadingRate must: not be
     ename:VK_FRAGMENT_SHADING_RATE_2_INVOCATIONS_PER_PIXEL_NV,
     ename:VK_FRAGMENT_SHADING_RATE_4_INVOCATIONS_PER_PIXEL_NV,
     ename:VK_FRAGMENT_SHADING_RATE_8_INVOCATIONS_PER_PIXEL_NV, or
     ename:VK_FRAGMENT_SHADING_RATE_16_INVOCATIONS_PER_PIXEL_NV
   * [[VUID-vkCmdSetFragmentShadingRateEnumNV-noInvocationFragmentShadingRates-04578]]
-    If <<features-noInvocationFragmentShadingRates,
-    pname:noInvocationFragmentShadingRates>> is not enabled,
+    If the <<features-noInvocationFragmentShadingRates,
+    pname:noInvocationFragmentShadingRates>> feature is not enabled,
     pname:shadingRate must: not be
     ename:VK_FRAGMENT_SHADING_RATE_NO_INVOCATIONS_NV
   * [[VUID-vkCmdSetFragmentShadingRateEnumNV-fragmentShadingRateEnums-04579]]
@@ -1815,8 +1819,8 @@ include::{generated}/api/protos/vkCmdBindShadingRateImageNV.adoc[]
     recorded.
   * pname:imageView is an image view handle specifying the shading rate
     image.
-    pname:imageView may: be set to dlink:VK_NULL_HANDLE, which is equivalent
-    to specifying a view of an image filled with zero values.
+    pname:imageView may: be dlink:VK_NULL_HANDLE, which is equivalent to
+    specifying a view of an image filled with zero values.
   * pname:imageLayout is the layout that the image subresources accessible
     from pname:imageView will be in when the shading rate image is accessed.
 
@@ -2382,7 +2386,7 @@ slink:VkPipelineMultisampleStateCreateInfo::pname:minSampleShading {times}
 slink:VkPipelineMultisampleStateCreateInfo::pname:rasterizationSamples
 {rceil}, 1)# times per fragment.
 If slink:VkPipelineMultisampleStateCreateInfo::pname:sampleShadingEnable is
-set to ename:VK_TRUE, sample shading is enabled.
+ename:VK_TRUE, sample shading is enabled.
 
 If a fragment shader entry point <<shaders-staticuse, statically uses>> an
 input variable decorated with a code:BuiltIn of code:SampleId or
@@ -2418,14 +2422,16 @@ any manner as long as covered samples are all shaded at least once, and each
 invocation that is not a <<shaders-helper-invocations, helper invocation>>
 covers at least one sample.
 
+
 ifdef::VK_NV_fragment_shader_barycentric,VK_KHR_fragment_shader_barycentric[]
 [[primsrast-barycentric]]
 == Barycentric Interpolation
 
-When the pname:fragmentShaderBarycentric feature is enabled, the
-code:PerVertexKHR <<shaders-interpolation-decorations, interpolation
-decoration>> can: be used with fragment shader inputs to indicate that the
-decorated inputs do not have associated data in the fragment.
+When the <<features-fragmentShaderBarycentric,
+pname:fragmentShaderBarycentric>> feature is enabled, the code:PerVertexKHR
+<<shaders-interpolation-decorations, interpolation decoration>> can: be used
+with fragment shader inputs to indicate that the decorated inputs do not
+have associated data in the fragment.
 Such inputs can: only be accessed in a fragment shader using an array index
 whose value (0, 1, or 2) identifies one of the vertices of the primitive
 that produced the fragment.
@@ -2564,8 +2570,9 @@ and clamped to the implementation-dependent point size range
 [eq]#[pname:pointSizeRange[0],pname:pointSizeRange[1]]#.
 The value written to code:PointSize must: be greater than zero.
 ifdef::VK_KHR_maintenance5[]
-If <<features-maintenance5, pname:maintenance5>> is enabled, and a value is
-not written to code:PointSize, the point size takes a default value of 1.0.
+If the <<features-maintenance5, pname:maintenance5>> feature is enabled, and
+a value is not written to code:PointSize, the point size takes a default
+value of 1.0.
 endif::VK_KHR_maintenance5[]
 
 Not all point sizes need be supported, but the size 1.0 must: be supported.
@@ -3639,14 +3646,14 @@ endif::VK_KHR_maintenance5[]
 ifdef::VK_KHR_maintenance5[]
 If
 sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:polygonModePointSize
-is set to ename:VK_TRUE, the point size of the final rasterization of
-polygons is taken from code:PointSize when <<primsrast-polygonmode, polygon
-mode>> is ename:VK_POLYGON_MODE_POINT.
+is ename:VK_TRUE, the point size of the final rasterization of polygons is
+taken from code:PointSize when <<primsrast-polygonmode, polygon mode>> is
+ename:VK_POLYGON_MODE_POINT.
 
 Otherwise, if
 sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:polygonModePointSize
-is set to ename:VK_FALSE, the point size of the final rasterization of
-polygons is 1.0 when <<primsrast-polygonmode, polygon mode>> is
+is ename:VK_FALSE, the point size of the final rasterization of polygons is
+1.0 when <<primsrast-polygonmode, polygon mode>> is
 ename:VK_POLYGON_MODE_POINT.
 endif::VK_KHR_maintenance5[]
 --
@@ -3823,12 +3830,12 @@ If sname:VkDepthBiasRepresentationInfoEXT::pname:depthBiasExact is
 ename:VK_FALSE it
 endif::VK_EXT_depth_bias_control[]
 ifndef::VK_EXT_depth_bias_control[It]
-is the smallest difference in framebuffer coordinate [eq]#z# values that is
+is the smallest difference in a sample's depth [eq]#z~f~# values that is
 guaranteed to remain distinct throughout polygon rasterization and in the
 depth attachment.
 All pairs of fragments generated by the rasterization of two polygons with
-otherwise identical vertices, but [eq]#pname:z~f~# values that differ by
-[eq]#r#, will have distinct depth values.
+otherwise identical vertices, but [eq]#z~f~# values that differ by [eq]#r#,
+will have distinct depth values.
 
 For fixed-point depth attachment representations,
 ifdef::VK_EXT_depth_bias_control[]

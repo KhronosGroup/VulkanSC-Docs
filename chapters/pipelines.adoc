@@ -174,7 +174,7 @@ when creating a group.
 
 When attempting to create many pipelines in a single command, it is possible
 that creation may: fail for a subset of them.
-In this case, the corresponding elements of pname:pPipelines will be set to
+In this case, the corresponding elements of pname:pPipelines will be
 dlink:VK_NULL_HANDLE.
 If creation fails for a pipeline despite valid arguments (for example, due
 to out of memory errors), the elink:VkResult code returned by the pipeline
@@ -186,7 +186,7 @@ ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
 If creation fails for a pipeline that has the
 ename:VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT set in its
 stext:Vk*PipelineCreateInfo, pipelines at an index in the pname:pPipelines
-array greater than or equal to that of the failing pipeline will be set to
+array greater than or equal to that of the failing pipeline will be
 dlink:VK_NULL_HANDLE.
 endif::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
 
@@ -197,7 +197,7 @@ the pname:pPipelines array and destroying every element that is not
 dlink:VK_NULL_HANDLE.
 
 If the entire command fails and no pipelines are created, all elements of
-pname:pPipelines will be set to dlink:VK_NULL_HANDLE.
+pname:pPipelines will be dlink:VK_NULL_HANDLE.
 
 
 [[pipelines-compute]]
@@ -375,7 +375,8 @@ include::{chapters}/commonvalidity/compute_graph_pipeline_create_info_common.ado
 ifdef::VK_KHR_pipeline_library[]
   * [[VUID-VkComputePipelineCreateInfo-shaderEnqueue-09177]]
 ifdef::VK_AMDX_shader_enqueue[]
-    If <<features-shaderEnqueue,pname:shaderEnqueue>> is not enabled,
+    If the <<features-shaderEnqueue,pname:shaderEnqueue>> feature is not
+    enabled,
 endif::VK_AMDX_shader_enqueue[]
     pname:flags must: not include ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR
 ifdef::VK_AMDX_shader_enqueue[]
@@ -542,7 +543,7 @@ endif::VK_HUAWEI_cluster_culling_shader[]
     ename:VK_SHADER_STAGE_ALL
 ifdef::VKSC_VERSION_1_0[]
   * [[VUID-VkPipelineShaderStageCreateInfo-module-05026]]
-    pname:module must: be dlink:VK_NULL_HANDLE.
+    pname:module must: be dlink:VK_NULL_HANDLE
   * [[VUID-VkPipelineShaderStageCreateInfo-pName-05027]]
     If pname:pName is not `NULL`, it must: be the name of an
     code:OpEntryPoint in the SPIR-V shader module used for offline
@@ -693,6 +694,17 @@ ifdef::VK_KHR_cooperative_matrix[]
     <<limits-subgroupSize,pname:subgroupSize>>
 endif::VK_KHR_cooperative_matrix[]
 endif::VK_VERSION_1_3,VK_EXT_subgroup_size_control[]
+ifdef::VK_NV_cooperative_matrix2[]
+  * [[VUID-VkPipelineShaderStageCreateInfo-module-10169]]
+    If pname:module uses the code:OpTypeCooperativeMatrixKHR instruction
+    with a code:Scope equal to code:Workgroup, then the local workgroup size
+    in the X dimension of the pipeline must: be a multiple of
+    <<limits-subgroupSize,pname:subgroupSize>> and the total local workgroup
+    size must: be a power of two multiple of
+    <<limits-subgroupSize,pname:subgroupSize>> and must: be less than or
+    equal to
+    <<limits-cooperativeMatrixWorkgroupScopeMaxWorkgroupSize,cooperativeMatrixWorkgroupScopeMaxWorkgroupSize>>
+endif::VK_NV_cooperative_matrix2[]
 
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-VkPipelineShaderStageCreateInfo-stage-08771]]
@@ -1096,7 +1108,7 @@ include::{generated}/api/enums/VkPipelineRobustnessBufferBehaviorEXT.adoc[]
 
   * ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT_EXT
     specifies that this pipeline stage follows the behavior of robustness
-    features that are enabled on the device that created this pipeline
+    features that are enabled that created this pipeline
   * ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DISABLED_EXT specifies that
     buffer accesses by this pipeline stage to the relevant resource types
     must: not be out of bounds
@@ -1508,8 +1520,9 @@ ifdef::VK_EXT_extended_dynamic_state3[]
     ename:VK_DYNAMIC_STATE_RASTERIZATION_SAMPLES_EXT,
     ename:VK_DYNAMIC_STATE_SAMPLE_MASK_EXT, and
     ename:VK_DYNAMIC_STATE_ALPHA_TO_COVERAGE_ENABLE_EXT dynamic states set,
-    and either <<features-alphaToOne,alphaToOne>> is disabled on the device
-    or ename:VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT is set, in which case
+    and either the <<features-alphaToOne, alphaToOne>> feature is not
+    enabled or ename:VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT is set, in
+    which case
     slink:VkPipelineMultisampleStateCreateInfo::pname:sampleShadingEnable is
     assumed to be ename:VK_FALSE.
 endif::VK_EXT_extended_dynamic_state3[]
@@ -1724,11 +1737,11 @@ endif::VK_KHR_fragment_shading_rate[]
 ifdef::VK_NV_representative_fragment_test[]
   * slink:VkPipelineRepresentativeFragmentTestStateCreateInfoNV
 endif::VK_NV_representative_fragment_test[]
-ifdef::VK_KHR_fragment_shading_rate[]
+ifdef::VK_KHR_dynamic_rendering+VK_KHR_fragment_shading_rate[]
   * Inclusion/omission of the
     ename:VK_PIPELINE_RASTERIZATION_STATE_CREATE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR
     flag
-endif::VK_KHR_fragment_shading_rate[]
+endif::VK_KHR_dynamic_rendering+VK_KHR_fragment_shading_rate[]
 ifdef::VK_EXT_fragment_density_map[]
   * Inclusion/omission of the
     ename:VK_PIPELINE_RASTERIZATION_STATE_CREATE_FRAGMENT_DENSITY_MAP_ATTACHMENT_BIT_EXT
@@ -1744,7 +1757,7 @@ a pipeline specifies
 <<pipelines-graphics-subsets-pre-rasterization,pre-rasterization state>>
 either directly or by including it as a pipeline library and
 endif::VK_EXT_graphics_pipeline_library[]
-pname:rasterizerDiscardEnable is set to ename:VK_FALSE
+pname:rasterizerDiscardEnable is ename:VK_FALSE
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state2[]
 or ename:VK_DYNAMIC_STATE_RASTERIZER_DISCARD_ENABLE is used,
 endif::VK_VERSION_1_3,VK_EXT_extended_dynamic_state2[]
@@ -1804,7 +1817,7 @@ a pipeline specifies
 <<pipelines-graphics-subsets-pre-rasterization,pre-rasterization state>>
 either directly or by including it as a pipeline library and
 endif::VK_EXT_graphics_pipeline_library[]
-pname:rasterizerDiscardEnable is set to ename:VK_FALSE
+pname:rasterizerDiscardEnable is ename:VK_FALSE
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state2[]
 or ename:VK_DYNAMIC_STATE_RASTERIZER_DISCARD_ENABLE is used,
 endif::VK_VERSION_1_3,VK_EXT_extended_dynamic_state2[]
@@ -1883,8 +1896,7 @@ ifdef::VKSC_VERSION_1_0[]
 In Vulkan SC, the pipeline compilation process occurs
 <<pipelines-offline-compilation,offline>> and the pname:pStages are not
 needed at runtime and may: be omitted.
-If omitted, pname:stageCount must: be set to `0` and pname:pStages must: be
-`NULL`.
+If omitted, pname:stageCount must: be `0` and pname:pStages must: be `NULL`.
 If provided, the values must: match the values specified to the offline
 compiler.
 endif::VKSC_VERSION_1_0[]
@@ -2005,12 +2017,13 @@ endif::VK_EXT_extended_dynamic_state3[]
   * [[VUID-VkGraphicsPipelineCreateInfo-TessellationEvaluation-07723]]
     If the pipeline is being created with a code:TessellationEvaluation
     {ExecutionModel}, no code:Geometry {ExecutionModel}, uses the
-    code:PointMode {ExecutionMode}, and
+    code:PointMode {ExecutionMode}, and the
     <<features-shaderTessellationAndGeometryPointSize,
-    pname:shaderTessellationAndGeometryPointSize>> is enabled, a
+    pname:shaderTessellationAndGeometryPointSize>> feature is enabled, a
     code:PointSize decorated variable must: be written to
 ifdef::VK_KHR_maintenance5[]
-    if <<features-maintenance5, pname:maintenance5>> is not enabled
+    if the <<features-maintenance5, pname:maintenance5>> feature is not
+    enabled
 endif::VK_KHR_maintenance5[]
   * [[VUID-VkGraphicsPipelineCreateInfo-topology-08773]]
     If the pipeline is being created with a code:Vertex {ExecutionModel} and
@@ -2025,36 +2038,38 @@ ifdef::VK_EXT_extended_dynamic_state3[]
 endif::VK_EXT_extended_dynamic_state3[]
     a code:PointSize decorated variable must: be written to
 ifdef::VK_KHR_maintenance5[]
-    if <<features-maintenance5, pname:maintenance5>> is not enabled
+    if the <<features-maintenance5, pname:maintenance5>> feature is not
+    enabled
 endif::VK_KHR_maintenance5[]
 ifdef::VK_KHR_maintenance5[]
   * [[VUID-VkGraphicsPipelineCreateInfo-maintenance5-08775]]
-    If <<features-maintenance5, pname:maintenance5>> is enabled and a
-    code:PointSize decorated variable is written to, all execution paths
-    must: write to a code:PointSize decorated variable
+    If the <<features-maintenance5, pname:maintenance5>> feature is enabled
+    and a code:PointSize decorated variable is written to, all execution
+    paths must: write to a code:PointSize decorated variable
 endif::VK_KHR_maintenance5[]
   * [[VUID-VkGraphicsPipelineCreateInfo-TessellationEvaluation-07724]]
     If the pipeline is being created with a code:TessellationEvaluation
     {ExecutionModel}, no code:Geometry {ExecutionModel}, uses the
-    code:PointMode {ExecutionMode}, and
+    code:PointMode {ExecutionMode}, and the
     <<features-shaderTessellationAndGeometryPointSize,
-    pname:shaderTessellationAndGeometryPointSize>> is not enabled, a
+    pname:shaderTessellationAndGeometryPointSize>> feature is not enabled, a
     code:PointSize decorated variable must: not be written to
   * [[VUID-VkGraphicsPipelineCreateInfo-shaderTessellationAndGeometryPointSize-08776]]
     If the pipeline is being created with a code:Geometry {ExecutionModel},
-    uses the code:OutputPoints {ExecutionMode}, and
+    uses the code:OutputPoints {ExecutionMode}, and the
     <<features-shaderTessellationAndGeometryPointSize,
-    pname:shaderTessellationAndGeometryPointSize>> is enabled, a
+    pname:shaderTessellationAndGeometryPointSize>> feature is enabled, a
     code:PointSize decorated variable must: be written to for every vertex
     emitted
 ifdef::VK_KHR_maintenance5[]
-    if <<features-maintenance5, pname:maintenance5>> is not enabled
+    if the <<features-maintenance5, pname:maintenance5>> feature is not
+    enabled
 endif::VK_KHR_maintenance5[]
   * [[VUID-VkGraphicsPipelineCreateInfo-Geometry-07726]]
     If the pipeline is being created with a code:Geometry {ExecutionModel},
-    uses the code:OutputPoints {ExecutionMode}, and
+    uses the code:OutputPoints {ExecutionMode}, and the
     <<features-shaderTessellationAndGeometryPointSize,
-    pname:shaderTessellationAndGeometryPointSize>> is not enabled, a
+    pname:shaderTessellationAndGeometryPointSize>> feature is not enabled, a
     code:PointSize decorated variable must: not be written to
   * [[VUID-VkGraphicsPipelineCreateInfo-pStages-00738]]
     If the pipeline requires <<pipelines-graphics-subsets-pre-rasterization,
@@ -2173,7 +2188,7 @@ ifdef::VK_EXT_extended_dynamic_state3[]
     or any of the ename:VK_DYNAMIC_STATE_RASTERIZATION_SAMPLES_EXT,
     ename:VK_DYNAMIC_STATE_SAMPLE_MASK_EXT, or
     ename:VK_DYNAMIC_STATE_ALPHA_TO_COVERAGE_ENABLE_EXT dynamic states is
-    not set, or <<features-alphaToOne,alphaToOne>> is enabled on the device
+    not set, or the <<features-alphaToOne,alphaToOne>> feature is enabled
     and ename:VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT is not set,
 endif::VK_EXT_extended_dynamic_state3[]
     pname:pMultisampleState must: be a valid pointer to a valid
@@ -2469,7 +2484,12 @@ endif::VK_EXT_discard_rectangles[]
     pname:pVertexInputState must: be a valid pointer to a valid
     slink:VkPipelineVertexInputStateCreateInfo structure
   * [[VUID-VkGraphicsPipelineCreateInfo-Input-07904]]
-    If the pipeline is being created with
+    If
+ifdef::VK_EXT_vertex_attribute_robustness[]
+    <<features-vertexAttributeRobustness, pname:vertexAttributeRobustness>>
+    is not enabled and
+endif::VK_EXT_vertex_attribute_robustness[]
+    the pipeline is being created with
     <<pipelines-graphics-subsets-vertex-input, vertex input state>> and
     pname:pVertexInputState is not dynamic, then all variables with the
     code:Input storage class decorated with code:Location in the code:Vertex
@@ -2588,6 +2608,32 @@ ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
     slink:VkPipelineRasterizationLineStateCreateInfoKHR must: be in the
     range [eq]#[1,256]#
 endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+ifdef::VK_AMDX_shader_enqueue[]
+  * [[VUID-VkGraphicsPipelineCreateInfo-shaderMeshEnqueue-10187]]
+    If the <<features-shaderMeshEnqueue,pname:shaderMeshEnqueue>> feature is
+    not enabled, shaders specified by pname:pStages must: not declare the
+    code:ShaderEnqueueAMDX capability
+  * [[VUID-VkGraphicsPipelineCreateInfo-flags-10188]]
+    If pname:flags does not include
+    ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR, shaders specified by
+    pname:pStages must: not declare the code:ShaderEnqueueAMDX capability
+  * [[VUID-VkGraphicsPipelineCreateInfo-pStages-10189]]
+    If any shader stages in pname:pStages declare the code:ShaderEnqueueAMDX
+    capability, ename:VK_PIPELINE_CREATE_2_EXECUTION_GRAPH_BIT_AMDX and
+    ename:VK_PIPELINE_CREATE_2_LIBRARY_BIT_KHR must: be included in
+    pname:flags
+  * [[VUID-VkGraphicsPipelineCreateInfo-flags-10190]]
+    If ename:VK_PIPELINE_CREATE_2_EXECUTION_GRAPH_BIT_AMDX is included in
+    pname:flags, and the pipeline requires
+    <<pipelines-graphics-subsets-pre-rasterization, pre-rasterization shader
+    state>>, there must: not be a task or vertex shader specified in
+    pname:pStages
+  * [[VUID-VkGraphicsPipelineCreateInfo-flags-10191]]
+    If ename:VK_PIPELINE_CREATE_2_EXECUTION_GRAPH_BIT_AMDX is included in
+    pname:flags, all elements of
+    slink:VkPipelineLibraryCreateInfoKHR::pname:pLibraries must: have been
+    created with ename:VK_PIPELINE_CREATE_2_EXECUTION_GRAPH_BIT_AMDX
+endif::VK_AMDX_shader_enqueue[]
 ifdef::VK_KHR_ray_tracing_pipeline[]
   * [[VUID-VkGraphicsPipelineCreateInfo-flags-03372]]
     pname:flags must: not include
@@ -2713,7 +2759,8 @@ ifdef::VK_NV_device_generated_commands[]
   * [[VUID-VkGraphicsPipelineCreateInfo-flags-02877]]
     If pname:flags includes
     ename:VK_PIPELINE_CREATE_INDIRECT_BINDABLE_BIT_NV, then the
-    <<features-deviceGeneratedCommands, pname:deviceGeneratedCommands>>
+    <<features-deviceGeneratedCommandsNV,
+    sname:VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV::pname:deviceGeneratedCommands>>
     feature must: be enabled
 ifdef::VK_EXT_transform_feedback[]
   * [[VUID-VkGraphicsPipelineCreateInfo-flags-02966]]
@@ -2742,6 +2789,19 @@ endif::VK_EXT_graphics_pipeline_library[]
     slink:VkGraphicsPipelineShaderGroupsCreateInfoNV::pname:groupCount must:
     be greater than `0`
 endif::VK_NV_device_generated_commands[]
+ifdef::VK_EXT_device_generated_commands[]
+  * [[VUID-VkGraphicsPipelineCreateInfo-flags-11000]]
+    If pname:flags includes
+    ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_EXT, then the
+    <<features-deviceGeneratedCommands,
+    sname:VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT::pname:deviceGeneratedCommands>>
+    feature must: be enabled
+  * [[VUID-VkGraphicsPipelineCreateInfo-flags-11001]]
+    If the pipeline requires <<pipelines-graphics-subsets-pre-rasterization,
+    pre-rasterization shader state>> and pname:flags includes
+    ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_EXT, then all stages
+    must: not specify code:Xfb execution mode
+endif::VK_EXT_device_generated_commands[]
 ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
   * [[VUID-VkGraphicsPipelineCreateInfo-pipelineCreationCacheControl-02878]]
     If the <<features-pipelineCreationCacheControl,
@@ -3482,14 +3542,25 @@ ifdef::VK_EXT_graphics_pipeline_library[]
     If the <<features-graphicsPipelineLibrary,
     pname:graphicsPipelineLibrary>> feature is not enabled,
 endif::VK_EXT_graphics_pipeline_library[]
+ifdef::VK_AMDX_shader_enqueue[]
+ifdef::VK_EXT_graphics_pipeline_library[and if]
+ifndef::VK_EXT_graphics_pipeline_library[If]
+    the <<features-shaderMeshEnqueue,pname:shaderMeshEnqueue>> feature is
+    not enabled,
+endif::VK_AMDX_shader_enqueue[]
     pname:flags must: not include ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR
 endif::VK_KHR_pipeline_library[]
 ifdef::VK_EXT_graphics_pipeline_library[]
   * [[VUID-VkGraphicsPipelineCreateInfo-flags-06608]]
-    If the pipeline defines, or includes as libraries, all the state subsets
-    required for a <<pipelines-graphics-subsets-complete, complete graphics
-    pipeline>>, pname:flags must: not include
-    ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR
+    {empty}
+ifdef::VK_AMDX_shader_enqueue[]
+    If the <<features-shaderMeshEnqueue,pname:shaderMeshEnqueue>> feature is
+    not enabled, and
+endif::VK_AMDX_shader_enqueue[]
+ifndef::VK_AMDX_shader_enqueue[If]
+    the pipeline is being created with
+    <<pipelines-graphics-subsets-complete, all possible state subsets>>,
+    pname:flags must: not include ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR
   * [[VUID-VkGraphicsPipelineCreateInfo-flags-06609]]
     If pname:flags includes
     ename:VK_PIPELINE_CREATE_LINK_TIME_OPTIMIZATION_BIT_EXT, pipeline
@@ -3759,7 +3830,7 @@ ifdef::VK_EXT_extended_dynamic_state3[]
     or any of the ename:VK_DYNAMIC_STATE_RASTERIZATION_SAMPLES_EXT,
     ename:VK_DYNAMIC_STATE_SAMPLE_MASK_EXT, or
     ename:VK_DYNAMIC_STATE_ALPHA_TO_COVERAGE_ENABLE_EXT dynamic states is
-    not set, or <<features-alphaToOne,alphaToOne>> is enabled on the device
+    not set, or the <<features-alphaToOne,alphaToOne>> feature is enabled
     and ename:VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT is not set,
 endif::VK_EXT_extended_dynamic_state3[]
     then pname:pMultisampleState must: be a valid pointer to a valid
@@ -3774,7 +3845,7 @@ ifdef::VK_EXT_extended_dynamic_state3[]
     or any of the ename:VK_DYNAMIC_STATE_RASTERIZATION_SAMPLES_EXT,
     ename:VK_DYNAMIC_STATE_SAMPLE_MASK_EXT, or
     ename:VK_DYNAMIC_STATE_ALPHA_TO_COVERAGE_ENABLE_EXT dynamic states is
-    not set, or <<features-alphaToOne,alphaToOne>> is enabled on the device
+    not set, or the <<features-alphaToOne,alphaToOne>> feature is enabled
     and ename:VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT is not set,
 endif::VK_EXT_extended_dynamic_state3[]
     then pname:pMultisampleState must: be a valid pointer to a valid
@@ -4213,21 +4284,21 @@ ifdef::VK_QCOM_multiview_per_view_viewports[]
     pre-rasterization shader state>>, and no element of the
     pname:pDynamicStates member of pname:pDynamicState is
     ename:VK_DYNAMIC_STATE_VIEWPORT or
-    ename:VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT, and if
+    ename:VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT, and if the
     <<features-multiviewPerViewViewports, pname:multiviewPerViewViewports>>
-    is enabled, then the index of the most significant bit in each element
-    of slink:VkRenderPassMultiviewCreateInfo::pname:pViewMasks must: be less
-    than pname:pViewportState->viewportCount
+    feature is enabled, then the index of the most significant bit in each
+    element of slink:VkRenderPassMultiviewCreateInfo::pname:pViewMasks must:
+    be less than pname:pViewportState->viewportCount
   * [[VUID-VkGraphicsPipelineCreateInfo-pDynamicStates-07731]]
     If the pipeline requires <<pipelines-graphics-subsets-pre-rasterization,
     pre-rasterization shader state>>, and no element of the
     pname:pDynamicStates member of pname:pDynamicState is
     ename:VK_DYNAMIC_STATE_SCISSOR or
-    ename:VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT, and if
+    ename:VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT, and if the
     <<features-multiviewPerViewViewports, pname:multiviewPerViewViewports>>
-    is enabled, then the index of the most significant bit in each element
-    of slink:VkRenderPassMultiviewCreateInfo::pname:pViewMasks must: be less
-    than pname:pViewportState->scissorCount
+    feature is enabled, then the index of the most significant bit in each
+    element of slink:VkRenderPassMultiviewCreateInfo::pname:pViewMasks must:
+    be less than pname:pViewportState->scissorCount
 endif::VK_QCOM_multiview_per_view_viewports[]
 ifdef::VK_EXT_shader_tile_image[]
   * [[VUID-VkGraphicsPipelineCreateInfo-pStages-08711]]
@@ -4746,12 +4817,16 @@ ifdef::VK_NV_device_generated_commands[]
   * ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_NV specifies that the
     pipeline can be used in combination with <<device-generated-commands>>.
 endif::VK_NV_device_generated_commands[]
+ifdef::VK_EXT_device_generated_commands[]
+  * ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_EXT specifies that the
+    pipeline can: be used in a sname:VkIndirectExecutionSetEXT.
+endif::VK_EXT_device_generated_commands[]
 ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
   * ename:VK_PIPELINE_CREATE_2_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT_KHR
     specifies that pipeline creation will fail if a compile is required for
     creation of a valid slink:VkPipeline object;
     ename:VK_PIPELINE_COMPILE_REQUIRED will be returned by pipeline
-    creation, and the slink:VkPipeline will be set to dlink:VK_NULL_HANDLE.
+    creation, and the slink:VkPipeline will be dlink:VK_NULL_HANDLE.
   * When creating multiple pipelines,
     ename:VK_PIPELINE_CREATE_2_EARLY_RETURN_ON_FAILURE_BIT_KHR specifies
     that control will be returned to the application if any individual
@@ -4833,6 +4908,10 @@ ifdef::VK_EXT_legacy_dithering[]
     ename:VK_RENDERING_ENABLE_LEGACY_DITHERING_BIT_EXT.
 endif::VK_EXT_legacy_dithering[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+ifdef::VK_AMDX_shader_enqueue[]
+  * ename:VK_PIPELINE_CREATE_2_EXECUTION_GRAPH_BIT_AMDX specifies that the
+    pipeline will be used in an <<executiongraphs, execution graph>>
+endif::VK_AMDX_shader_enqueue[]
 
 It is valid to set both ename:VK_PIPELINE_CREATE_2_ALLOW_DERIVATIVES_BIT_KHR
 and ename:VK_PIPELINE_CREATE_2_DERIVATIVE_BIT_KHR.
@@ -5004,14 +5083,14 @@ ifdef::VK_KHR_ray_tracing_pipeline[]
 endif::VK_KHR_ray_tracing_pipeline[]
 ifdef::VK_NV_device_generated_commands[]
   * ename:VK_PIPELINE_CREATE_INDIRECT_BINDABLE_BIT_NV specifies that the
-    pipeline can be used in combination with <<device-generated-commands>>.
+    pipeline can: be used in combination with <<device-generated-commands>>.
 endif::VK_NV_device_generated_commands[]
 ifdef::VK_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
   * ename:VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT specifies
     that pipeline creation will fail if a compile is required for creation
     of a valid slink:VkPipeline object; ename:VK_PIPELINE_COMPILE_REQUIRED
     will be returned by pipeline creation, and the slink:VkPipeline will be
-    set to dlink:VK_NULL_HANDLE.
+    dlink:VK_NULL_HANDLE.
   * When creating multiple pipelines,
     ename:VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT specifies that
     control will be returned to the application if any individual pipeline
@@ -5023,11 +5102,11 @@ ifdef::VK_NV_ray_tracing_motion_blur[]
     the pipeline is allowed to use code:OpTraceRayMotionNV.
 endif::VK_NV_ray_tracing_motion_blur[]
 ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-ifdef::VK_KHR_fragment_shading_rate[]
+ifdef::VK_KHR_dynamic_rendering+VK_KHR_fragment_shading_rate[]
   * ename:VK_PIPELINE_CREATE_RENDERING_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR
     specifies that the pipeline will be used with a fragment shading rate
     attachment and dynamic rendering.
-endif::VK_KHR_fragment_shading_rate[]
+endif::VK_KHR_dynamic_rendering+VK_KHR_fragment_shading_rate[]
 ifdef::VK_EXT_fragment_density_map[]
   * ename:VK_PIPELINE_CREATE_RENDERING_FRAGMENT_DENSITY_MAP_ATTACHMENT_BIT_EXT
     specifies that the pipeline will be used with a fragment density map
@@ -5666,6 +5745,13 @@ ifdef::VK_EXT_depth_clip_control[]
     and must: be set dynamically with
     flink:vkCmdSetDepthClipNegativeOneToOneEXT before any draw call.
 endif::VK_EXT_depth_clip_control[]
+ifdef::VK_EXT_depth_clamp_control[]
+  * ename:VK_DYNAMIC_STATE_DEPTH_CLAMP_RANGE_EXT specifies that the
+    pname:depthClampMode and pname:pDepthClampRange state in
+    slink:VkPipelineViewportDepthClampControlCreateInfoEXT will be ignored
+    and must: be set dynamically with flink:vkCmdSetDepthClampRangeEXT
+    before any draw call.
+endif::VK_EXT_depth_clamp_control[]
 ifdef::VK_NV_clip_space_w_scaling[]
   * ename:VK_DYNAMIC_STATE_VIEWPORT_W_SCALING_ENABLE_NV specifies that the
     pname:viewportWScalingEnable state in
@@ -5911,7 +5997,8 @@ endif::VK_NV_mesh_shader,VK_EXT_mesh_shader[]
     state to the pipeline currently created except the state that can be
     overridden by slink:VkGraphicsShaderGroupCreateInfoNV
   * [[VUID-VkGraphicsPipelineShaderGroupsCreateInfoNV-deviceGeneratedCommands-02887]]
-    The <<features-deviceGeneratedCommands, pname:deviceGeneratedCommands>>
+    The <<features-deviceGeneratedCommandsNV,
+    sname:VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV::pname:deviceGeneratedCommands>>
     feature must: be enabled
 ****
 
@@ -5961,7 +6048,6 @@ include::{generated}/api/structs/VkGraphicsShaderGroupCreateInfoNV.adoc[]
 include::{generated}/validity/structs/VkGraphicsShaderGroupCreateInfoNV.adoc[]
 --
 endif::VK_NV_device_generated_commands[]
-
 
 ifdef::VK_NV_ray_tracing,VK_KHR_ray_tracing_pipeline[]
 [[pipelines-ray-tracing]]
@@ -6282,6 +6368,11 @@ ifdef::VK_NV_displacement_micromap[]
     pname:flags must: not include
     ename:VK_PIPELINE_CREATE_RAY_TRACING_DISPLACEMENT_MICROMAP_BIT_NV
 endif::VK_NV_displacement_micromap[]
+ifdef::VK_EXT_device_generated_commands[]
+  * [[VUID-VkRayTracingPipelineCreateInfoNV-flags-11008]]
+    pname:flags must: not include
+    ename:VK_PIPELINE_CREATE_2_INDIRECT_BINDABLE_BIT_EXT
+endif::VK_EXT_device_generated_commands[]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -6751,8 +6842,7 @@ endif::VK_KHR_ray_tracing_pipeline[]
 --
 :refpage: VkRayTracingShaderGroupTypeKHR
 
-Possible values of pname:type in sname:VkRayTracingShaderGroupCreateInfoKHR
-are:
+The ename:VkRayTracingShaderGroupTypeKHR enumeration is defined as:
 
 include::{generated}/api/enums/VkRayTracingShaderGroupTypeKHR.adoc[]
 
@@ -6762,17 +6852,17 @@ or the equivalent
 include::{generated}/api/enums/VkRayTracingShaderGroupTypeNV.adoc[]
 endif::VK_NV_ray_tracing[]
 
-  * ename:VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR indicates a shader
-    group with a single ename:VK_SHADER_STAGE_RAYGEN_BIT_KHR,
+  * ename:VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR specifies that a
+    shader group with a single ename:VK_SHADER_STAGE_RAYGEN_BIT_KHR,
     ename:VK_SHADER_STAGE_MISS_BIT_KHR, or
     ename:VK_SHADER_STAGE_CALLABLE_BIT_KHR shader in it.
   * ename:VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR specifies
-    a shader group that only hits triangles and must: not contain an
+    that a shader group that only hits triangles and must: not contain an
     intersection shader, only closest hit and any-hit shaders.
   * ename:VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR
-    specifies a shader group that only intersects with custom geometry and
-    must: contain an intersection shader and may: contain closest hit and
-    any-hit shaders.
+    specifies that a shader group that only intersects with custom geometry
+    and must: contain an intersection shader and may: contain closest hit
+    and any-hit shaders.
 
 [NOTE]
 ====
@@ -6865,9 +6955,18 @@ endif::VK_NV_ray_tracing[]
   * pname:pData is a pointer to an application-allocated buffer where the
     results will be written.
 
+ifdef::VK_NV_ray_tracing[]
+:propertystruct: VkPhysicalDeviceRayTracingPropertiesNV
+endif::VK_NV_ray_tracing[]
+
+ifdef::VK_KHR_ray_tracing_pipeline[]
+:propertystruct: VkPhysicalDeviceRayTracingPipelinePropertiesKHR
+endif::VK_KHR_ray_tracing_pipeline[]
+
 On success, an array of pname:groupCount shader handles will be written to
 pname:pData, with each element being of size
-slink:VkPhysicalDeviceRayTracingPipelinePropertiesKHR::pname:shaderGroupHandleSize.
+slink:{propertystruct}::pname:shaderGroupHandleSize.
+
 
 ifdef::VK_EXT_pipeline_library_group_handles[]
 If pname:pipeline was created with ename:VK_PIPELINE_CREATE_LIBRARY_BIT_KHR
@@ -6892,8 +6991,8 @@ endif::VK_EXT_pipeline_library_group_handles[]
     equal to the number of shader groups in pname:pipeline
   * [[VUID-vkGetRayTracingShaderGroupHandlesKHR-dataSize-02420]]
     pname:dataSize must: be at least
-    [eq]#slink:VkPhysicalDeviceRayTracingPipelinePropertiesKHR::pname:shaderGroupHandleSize
-    {times} pname:groupCount#
+    [eq]#slink:{propertystruct}::pname:shaderGroupHandleSize {times}
+    pname:groupCount#
 ifdef::VK_KHR_pipeline_library[]
   * [[VUID-vkGetRayTracingShaderGroupHandlesKHR-pipeline-07828]]
 ifdef::VK_EXT_pipeline_library_group_handles[]
@@ -7372,7 +7471,7 @@ ifdef::VKSC_VERSION_1_0[]
     ename:VK_PIPELINE_CACHE_CREATE_USE_APPLICATION_STORAGE_BIT
   * [[VUID-VkPipelineCacheCreateInfo-pInitialData-05139]]
     The pipeline cache data pointed to by pname:pInitialData must: not
-    contain any pipelines with duplicate pipeline identifiers.
+    contain any pipelines with duplicate pipeline identifiers
 endif::VKSC_VERSION_1_0[]
 ****
 ifdef::VKSC_VERSION_1_0[]
@@ -8282,8 +8381,8 @@ include::{generated}/api/structs/VkPipelineBinaryHandlesInfoKHR.adoc[]
 
 If pname:pPipelineBinaries is `NULL`, the number of binaries that would be
 created is returned in pname:pipelineBinaryCount.
-Otherwise, pname:pipelineBinaryCount must: be set to the number of entries
-in the pname:pPipelineBinaries array, and on return from
+Otherwise, pname:pipelineBinaryCount must: be the number of entries in the
+pname:pPipelineBinaries array, and on return from
 flink:vkCreatePipelineBinariesKHR pname:pipelineBinaryCount is overwritten
 with the number of handles actually written to pname:pPipelineBinaries.
 If the value of pname:pipelineBinaryCount is less than the number of
@@ -8542,7 +8641,7 @@ include::{generated}/api/protos/vkDestroyPipelineBinaryKHR.adoc[]
 ****
   * [[VUID-vkDestroyPipelineBinaryKHR-pipelineBinary-09614]]
     If sname:VkAllocationCallbacks were provided when pname:pipelineBinary
-    was created, a compatible set of callbacks must: be provided here.
+    was created, a compatible set of callbacks must: be provided here
   * [[VUID-vkDestroyPipelineBinaryKHR-pipelineBinary-09615]]
     If no slink:VkAllocationCallbacks were provided when
     pname:pipelineBinary was created, pname:pAllocator must: be `NULL`
@@ -9085,7 +9184,8 @@ include::{generated}/api/protos/vkCmdBindPipelineShaderGroupNV.adoc[]
     pipeline was created only with the Shader Group from the
     pname:groupIndex information
   * [[VUID-vkCmdBindPipelineShaderGroupNV-deviceGeneratedCommands-02896]]
-    The <<features-deviceGeneratedCommands, pname:deviceGeneratedCommands>>
+    The <<features-deviceGeneratedCommandsNV,
+    sname:VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV::pname:deviceGeneratedCommands>>
     feature must: be enabled
 ****
 
@@ -9169,8 +9269,8 @@ buffer, even if this state is specified as dynamic in the pipeline object.
 ====
 Applications running on Vulkan implementations advertising an
 slink:VkPhysicalDeviceDriverProperties::pname:conformanceVersion less than
-1.3.8.0 should be aware that rebinding the currently bound pipeline object
-may not reapply static state.
+1.3.8.0 should be aware that rebinding the bound pipeline object may not
+reapply static state.
 ====
 
 

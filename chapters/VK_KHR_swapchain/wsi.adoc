@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
+[[wsi-swapchain]]
 == WSI Swapchain
 
 [open,refpage='VkSwapchainKHR',desc='Opaque handle to a swapchain object',type='handles',xrefs='vkQueuePresentKHR']
@@ -317,8 +318,8 @@ endif::VK_EXT_swapchain_maintenance1[]
   * pname:clipped specifies whether the Vulkan implementation is allowed to
     discard rendering operations that affect regions of the surface that are
     not visible.
-  ** If set to ename:VK_TRUE, the presentable images associated with the
-     swapchain may: not own all of their pixels.
+  ** If pname:clipped is ename:VK_TRUE, the presentable images associated
+     with the swapchain may: not own all of their pixels.
      Pixels in the presentable images that correspond to regions of the
      target surface obscured by another window on the desktop, or subject to
      some other clipping mechanism will have undefined: content when read
@@ -328,8 +329,8 @@ endif::VK_EXT_swapchain_maintenance1[]
      Setting ename:VK_TRUE does not guarantee any clipping will occur, but
      allows more efficient presentation methods to be used on some
      platforms.
-  ** If set to ename:VK_FALSE, presentable images associated with the
-     swapchain will own all of the pixels they contain.
+  ** If pname:clipped is ename:VK_FALSE, presentable images associated with
+     the swapchain will own all of the pixels they contain.
 +
 [NOTE]
 ====
@@ -397,6 +398,12 @@ endif::VKSC_VERSION_1_0[]
     the pname:maxImageCount member of the sname:VkSurfaceCapabilitiesKHR
     structure returned by fname:vkGetPhysicalDeviceSurfaceCapabilitiesKHR
     for the surface if the returned pname:maxImageCount is not zero
+ifdef::VK_EXT_swapchain_maintenance1[]
+  * [[VUID-VkSwapchainCreateInfoKHR-swapchainMaintenance1-10155]]
+    If the <<features-swapchainMaintenance1,pname:swapchainMaintenance1>>
+    feature is not enabled, then the pname:pNext chain must: not include a
+    slink:VkSwapchainPresentModesCreateInfoEXT structure
+endif::VK_EXT_swapchain_maintenance1[]
   * [[VUID-VkSwapchainCreateInfoKHR-presentMode-02839]]
 ifdef::VK_KHR_shared_presentable_image[]
     If pname:presentMode is not
@@ -441,6 +448,10 @@ ifdef::VK_EXT_swapchain_maintenance1[]
     members of the sname:VkSurfacePresentScalingCapabilitiesEXT structure
     returned by fname:vkGetPhysicalDeviceSurfaceCapabilities2KHR for the
     surface and pname:presentMode
+  * [[VUID-VkSwapchainCreateInfoKHR-swapchainMaintenance1-10157]]
+    If the <<features-swapchainMaintenance1,pname:swapchainMaintenance1>>
+    feature is not enabled, then pname:flags must: not include
+    ename:VK_SWAPCHAIN_CREATE_DEFERRED_MEMORY_ALLOCATION_BIT_EXT
 endif::VK_EXT_swapchain_maintenance1[]
   * [[VUID-VkSwapchainCreateInfoKHR-imageExtent-01689]]
     pname:imageExtent members pname:width and pname:height must: both be
@@ -451,8 +462,12 @@ endif::VK_EXT_swapchain_maintenance1[]
     sname:VkSurfaceCapabilitiesKHR structure returned by
     fname:vkGetPhysicalDeviceSurfaceCapabilitiesKHR for the surface
   * [[VUID-VkSwapchainCreateInfoKHR-presentMode-01427]]
-    If pname:presentMode is ename:VK_PRESENT_MODE_IMMEDIATE_KHR,
-    ename:VK_PRESENT_MODE_MAILBOX_KHR, ename:VK_PRESENT_MODE_FIFO_KHR or
+    If pname:presentMode is
+ifdef::VK_EXT_present_mode_fifo_latest_ready[]
+    ename:VK_PRESENT_MODE_FIFO_LATEST_READY_EXT,
+endif::VK_EXT_present_mode_fifo_latest_ready[]
+    ename:VK_PRESENT_MODE_IMMEDIATE_KHR, ename:VK_PRESENT_MODE_MAILBOX_KHR,
+    ename:VK_PRESENT_MODE_FIFO_KHR or
     ename:VK_PRESENT_MODE_FIFO_RELAXED_KHR, pname:imageUsage must: be a
     subset of the supported usage flags present in the
     pname:supportedUsageFlags member of the slink:VkSurfaceCapabilitiesKHR
@@ -497,6 +512,13 @@ endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
     pname:presentMode must: be one of the elink:VkPresentModeKHR values
     returned by fname:vkGetPhysicalDeviceSurfacePresentModesKHR for the
     surface
+ifdef::VK_EXT_present_mode_fifo_latest_ready[]
+  * [[VUID-VkSwapchainCreateInfoKHR-presentModeFifoLatestReady-10161]]
+    If the <<features-presentModeFifoLatestReady,
+    pname:presentModeFifoLatestReady>> feature is not enabled,
+    pname:presentMode must: not be
+    ename:VK_PRESENT_MODE_FIFO_LATEST_READY_EXT
+endif::VK_EXT_present_mode_fifo_latest_ready[]
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
   * [[VUID-VkSwapchainCreateInfoKHR-physicalDeviceCount-01429]]
 ifndef::VKSC_VERSION_1_0[]
@@ -945,8 +967,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
   * [[VUID-vkAcquireNextImageKHR-surface-07783]]
     If <<swapchain-acquire-forward-progress,forward progress>> cannot be
     guaranteed for the pname:surface used to create the pname:swapchain
-    member of pname:pAcquireInfo, the pname:timeout member of
-    pname:pAcquireInfo must: not be code:UINT64_MAX
+    member of pname:pAcquireInfo, pname:timeout must: not be code:UINT64_MAX
 ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
   * [[VUID-vkAcquireNextImageKHR-semaphore-03265]]
     pname:semaphore must: have a elink:VkSemaphoreType of
@@ -1182,7 +1203,7 @@ include::{generated}/api/protos/vkAcquireNextImage2KHR.adoc[]
   * pname:device is the device associated with pname:swapchain.
   * pname:pAcquireInfo is a pointer to a slink:VkAcquireNextImageInfoKHR
     structure containing parameters of the acquire.
-  * pname:pImageIndex is a pointer to a code:uint32_t that is set to the
+  * pname:pImageIndex is a pointer to a code:uint32_t value specifying the
     index of the next image to use.
 
 ifdef::VK_EXT_swapchain_maintenance1[]
@@ -1427,6 +1448,12 @@ ifdef::VK_KHR_display_swapchain[]
     surface, all display surfaces referenced that refer to the same display
     must: use the same display mode
 endif::VK_KHR_display_swapchain[]
+ifdef::VK_NV_display_stereo[]
+  * [[VUID-vkQueuePresentKHR-pSwapchains-10285]]
+    If more than one member of pname:pSwapchains was created from a display
+    surface, all display surfaces referenced that refer to the same display
+    must: use the same <<wsi-displaySurfaceStereoType, pname:stereoType>>
+endif::VK_NV_display_stereo[]
   * [[VUID-vkQueuePresentKHR-pWaitSemaphores-01294]]
     When a semaphore wait operation referring to a binary semaphore defined
     by the elements of the pname:pWaitSemaphores member of
@@ -1499,8 +1526,8 @@ ename:VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, there is no need to delay subsequent
 processing, or perform any visibility operations (as flink:vkQueuePresentKHR
 performs automatic visibility operations).
 To achieve this, the pname:dstAccessMask member of the
-slink:VkImageMemoryBarrier should: be set to `0`, and the pname:dstStageMask
-parameter should: be set to ename:VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT.
+slink:VkImageMemoryBarrier should: be `0`, and the pname:dstStageMask
+parameter should: be ename:VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT.
 ====
 
 .Valid Usage
@@ -1523,6 +1550,10 @@ ifdef::VK_KHR_present_id[]
     enabled, each pname:presentIds entry in that structure must: be NULL
 endif::VK_KHR_present_id[]
 ifdef::VK_EXT_swapchain_maintenance1[]
+  * [[VUID-VkPresentInfoKHR-swapchainMaintenance1-10158]]
+    If the <<features-swapchainMaintenance1,pname:swapchainMaintenance1>>
+    feature is not enabled, then the pname:pNext chain must: not include a
+    slink:VkSwapchainPresentFenceInfoEXT structure
   * [[VUID-VkPresentInfoKHR-pSwapchains-09199]]
     If any element of the pname:pSwapchains array has been created with
     slink:VkSwapchainPresentModesCreateInfoEXT, all of the elements of this
@@ -1686,6 +1717,13 @@ in the swapchain becomes undefined:.
 This functionality is useful during swapchain recreation, where acquired
 images from the old swapchain can be released instead of presented.
 ====
+
+.Valid Usage
+****
+  * [[VUID-vkReleaseSwapchainImagesEXT-swapchainMaintenance1-10159]]
+    Feature <<features-swapchainMaintenance1,pname:swapchainMaintenance1>>
+    must: be enabled
+****
 
 include::{generated}/validity/protos/vkReleaseSwapchainImagesEXT.adoc[]
 --

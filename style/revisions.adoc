@@ -5,6 +5,13 @@
 [[revisions]]
 = Revision History
 
+* 2024-11-13 - Add a new <<write-active, Use the Active Voice>> section
+  (internal issue 4085).
+* 2024-10-28 - Add preferred phrasing for describing links to feature
+  descriptions in the <<markup-word-choices, Word Choices>> section
+  (internal issue 4056).
+* 2024-10-14 - Add <<writing-mustbe, Avoid Use of "`set to`" Where
+  Possible>> section (internal issue 3966).
 * 2024-07-03 - remove `\begin{align*}` from the list of
   <<writing-math-latexmath, LaTeX markup that is not supported, after
   updating to KaTeX 0.16.10.

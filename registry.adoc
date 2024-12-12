@@ -642,6 +642,9 @@ The tag:member tag defines the type and name of a structure or union member.
     item count in attr:len list.
     This attribute is intended to support consumers of the XML who need to
     generate validation code from the allowed length.
+  * attr:stride - if the member is an array, stride specifies the name of
+    another member containing the byte stride between consecutive elements
+    in the array. The array is assumed to be tightly packed if omitted.
   * attr:deprecated - optional.
     Indicates that this member has been deprecated.
     Possible values are:
@@ -719,9 +722,10 @@ Explicitly specifying `optional="false"` is not supported, but
     Specifies the name of another member which must be a `VkObjectType` or
     `VkDebugReportObjectTypeEXT` value specifying the type of object the
     handle refers to.
-  * attr:stride - if the member is an array, stride specifies the name of
-    another member containing the byte stride between consecutive elements
-    in the array. Is assumed tightly packed if omitted.
+  * attr:featurelink - only applicable for members representing a Boolean API
+    feature. Specifies that the feature has a link in the specification that
+    does not match the name of the feature. Typically for features in
+    extensions that were later promoted but with changes.
 
 
 ==== Contents of tag:member Tags
@@ -1232,6 +1236,9 @@ and union members.
     item count in attr:len list.
     This attribute is intended to support consumers of the XML who need to
     generate validation code from the allowed length.
+  * attr:stride - if the member is an array, stride specifies the name of
+    another member containing the byte stride between consecutive elements
+    in the array. The array is assumed to be tightly packed if omitted.
   * attr:optional - optional.
     A value of `"true"` specifies that this parameter can be omitted by
     providing `NULL` (for pointers), `VK_NULL_HANDLE` (for handles), or 0
@@ -1525,7 +1532,7 @@ implemented against.
     `'disabled'`.
     Must be either `'device'` or `'instance'`, if present.
   * [[depends-expressions]] attr:depends - optional.
-    String containing a boolean expression of one or more API core version
+    String containing a boolean expression of one or more API core versions
     and extension names.
     The extension requires the expression in the string to be satisfied to
     use any functionality it defines (for instance extensions), or to use
@@ -1618,6 +1625,11 @@ logical AND, and must be replaced by `+` in the `depends` attribute.
      libraries.
   ** 'glemulation' - for support of OpenGL and/or OpenGL ES emulation layers
      or libraries, or applications porting from those APIs.
+  * attr:nofeatures - optional.
+    `"true"` if this extension is intended to not have any
+    <<tag-required-feature, individual tag:feature tags>>, "`false`"
+    otherwise.
+    Defaults to `"false"` if not specified.
   * attr:comment - optional.
     Arbitrary string (unused).
 
@@ -1736,7 +1748,12 @@ These attributes are allowed only for a tag:require tag.
     String containing a boolean expression of one or more API core version
     and extension names.
     The <<depends-expressions, syntax of this string>> is identical to that
-    of the tag:extension attr:depends attribute.
+    of the tag:extension attr:depends attribute, except that feature
+    Booleans may additionally be included using C struct notation (e.g.
+    `VkStructName::parameterName`).
+    Terms which are feature Booleans are true if the corresponding feature
+    is enabled for device level functionality, or simply supported
+    otherwise.
     Interfaces in the tag are only required if the expression is satisfied.
 +
 --
@@ -1945,16 +1962,21 @@ typedef enum VkResult {
 [[tag-required-feature]]
 === Individual Feature Tags
 
-tag:feature specifies a required (or removed) individual feature, as
-described in the "`Features`" chapter of the <<vulkan-spec, Vulkan API
-Specification>>.
+tag:feature specifies a required (or removed) feature, as described in the
+"`Features`" chapter of the <<vulkan-spec, Vulkan API Specification>>.
 The tag has no content, but contains attributes:
 
-  * attr:name - feature name.
-    Name of the feature, and also the name of a member of the corresponding
-    attr:struct structure.
+  * attr:name - feature name(s).
+    Can be a single element or a comma-separated list.
+    Each element is the name of the feature, and also the name of a member of
+    the corresponding attr:struct structure.
+    If multiple elements are present, indicates that at least one of the
+    elements must be supported.
+    Multiple tags should be used to require multiple features.
   * attr:struct - feature structure name.
     Name of the structure queried to determine support for the feature.
+    Must only ever be a single struct name, and all elements of attr:name
+    must be from the same structure.
   * attr:comment - optional.
     Arbitrary string (unused).
 
@@ -1973,9 +1995,8 @@ tags are used at different structural levels.
 [WARNING]
 ====
 Please note that including an individual tag:feature tag in a tag:require block
-with a attr:depends attribute that includes more than one API version or
-extension using logical operators is currently not supported, and an error
-will be generated.
+with a attr:depends attribute that includes parentheses for complex dependencies
+is currently not supported, and an error will be generated.
 This will be fixed in future, as it is intended to be supported, but it was
 not necessary for feature requirements as initially proposed.
 ====
@@ -3308,6 +3329,16 @@ Changes to the `.xml` files and Python scripts are logged in GitHub history.
 [[changelog]]
 = Change Log
 
+  * 2024-11-12 - Add tag:extension attr:nofeatures attribute to identify
+    extensions which are known to not have <<tag-required-feature,
+    individual tag:feature tags>> (internal issue 3946).
+  * 2024-10-14 - Add ability to include features in 'depends' attributes for
+    require blocks, as well as enabling simple lists of or/and dependencies
+  * 2024-09-25 - Add ability to have multiple features as an or'd list of
+    requirements
+  * 2024-09-18 - Support the attr:stride attribute for array pointers in
+    both <<tag-command:param:attr, command tag:param>> and <<tag:type,
+    structure tag:member>> tags (public issue 2435).
   * 2024-08-22 - Add <<tag-required-remove, tag:remove>> attribute
     attr:reasonlink and <<tag-required, tag:required and tag:remove>>
     attribute <<tag-required-feature, tag:feature>>, to support adding
