@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -331,6 +331,12 @@ Cooperative Matrix::
     A SPIR-V type where the storage for and computations performed on the
     matrix are spread across a set of invocations such as a subgroup.
 endif::VK_NV_cooperative_matrix,VK_KHR_cooperative_matrix[]
+
+ifdef::VK_NV_cooperative_vector[]
+Cooperative Vector::
+    A SPIR-V vector type optimized for the evaluation of small neural
+    networks.
+endif::VK_NV_cooperative_vector[]
 
 ifdef::VK_NV_corner_sampled_image[]
 Corner-Sampled Image::
@@ -1535,6 +1541,11 @@ Provoking Vertex::
     This is generally the "`first`" vertex in the primitive, and depends on
     the primitive topology.
 
+ifdef::VK_NV_partitioned_acceleration_structure,VK_KHR_acceleration_structure[]
+PTLAS::
+    <<partitioned-tlas, Partitioned Top Level Acceleration Structures>>
+endif::VK_NV_partitioned_acceleration_structure,VK_KHR_acceleration_structure[]
+
 Push Constants::
     A small bank of values writable via the API and accessible in shaders.
     Push constants allow the application to set values used in shaders
@@ -1546,13 +1557,13 @@ Push Constant Interface::
     statically used by a shader entry point, and which receive values from
     push constant commands.
 
-ifdef::VK_KHR_push_descriptor[]
+ifdef::VK_VERSION_1_4,VK_KHR_push_descriptor[]
 Push Descriptors::
     Descriptors that are written directly into a command buffer rather than
     into a descriptor set.
     Push descriptors allow the application to set descriptors used in
     shaders without allocating or modifying descriptor sets for each update.
-endif::VK_KHR_push_descriptor[]
+endif::VK_VERSION_1_4,VK_KHR_push_descriptor[]
 
 ifdef::VK_VERSION_1_1,VK_KHR_descriptor_update_template[]
 Descriptor Update Template::

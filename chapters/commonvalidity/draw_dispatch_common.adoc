@@ -1,4 +1,4 @@
-// Copyright 2019-2024 The Khronos Group Inc.
+// Copyright 2019-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -51,11 +51,23 @@ endif::VK_VERSION_1_2,VK_EXT_sampler_filter_minmax[]
     ename:VK_TRUE is used to sample a slink:VkImageView as a result of this
     command, then the image view's pname:levelCount and pname:layerCount
     must: be 1
-  * [[VUID-{refpage}-unnormalizedCoordinates-09636]]
+  * [[VUID-{refpage}-None-08609]]
     If a slink:VkSampler created with pname:unnormalizedCoordinates equal to
     ename:VK_TRUE is used to sample a slink:VkImageView as a result of this
     command, then the image view's pname:viewType must: be
     ename:VK_IMAGE_VIEW_TYPE_1D or ename:VK_IMAGE_VIEW_TYPE_2D
+  * [[VUID-{refpage}-None-08610]]
+    If a slink:VkSampler created with pname:unnormalizedCoordinates equal to
+    ename:VK_TRUE is used to sample a slink:VkImageView as a result of this
+    command, then the sampler must: not be used with any of the SPIR-V
+    `OpImageSample*` or `OpImageSparseSample*` instructions with
+    code:ImplicitLod, code:Dref or code:Proj in their name
+  * [[VUID-{refpage}-None-08611]]
+    If a slink:VkSampler created with pname:unnormalizedCoordinates equal to
+    ename:VK_TRUE is used to sample a slink:VkImageView as a result of this
+    command, then the sampler must: not be used with any of the SPIR-V
+    `OpImageSample*` or `OpImageSparseSample*` instructions that includes a
+    LOD bias or any offset values
 ifndef::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
   * [[VUID-{refpage}-aspectMask-06478]]
     If a slink:VkImageView is sampled with
@@ -269,41 +281,6 @@ ifndef::VK_EXT_shader_object[There]
     must: not have been any calls to dynamic state setting commands for any
     state specified statically in the slink:VkPipeline object bound to the
     pipeline bind point used by this command, since that pipeline was bound
-  * [[VUID-{refpage}-None-08609]]
-    If the slink:VkPipeline object bound to the pipeline bind point used by
-    this command
-ifdef::VK_EXT_shader_object[]
-    or any slink:VkShaderEXT bound to a stage corresponding to the pipeline
-    bind point used by this command
-endif::VK_EXT_shader_object[]
-    accesses a slink:VkSampler object that uses unnormalized coordinates,
-    that sampler must: not be used to sample from any slink:VkImage with a
-    slink:VkImageView of the type ename:VK_IMAGE_VIEW_TYPE_3D,
-    ename:VK_IMAGE_VIEW_TYPE_CUBE, ename:VK_IMAGE_VIEW_TYPE_1D_ARRAY,
-    ename:VK_IMAGE_VIEW_TYPE_2D_ARRAY or
-    ename:VK_IMAGE_VIEW_TYPE_CUBE_ARRAY, in any shader stage
-  * [[VUID-{refpage}-None-08610]]
-    If the slink:VkPipeline object bound to the pipeline bind point used by
-    this command
-ifdef::VK_EXT_shader_object[]
-    or any slink:VkShaderEXT bound to a stage corresponding to the pipeline
-    bind point used by this command
-endif::VK_EXT_shader_object[]
-    accesses a slink:VkSampler object that uses unnormalized coordinates,
-    that sampler must: not be used with any of the SPIR-V `OpImageSample*`
-    or `OpImageSparseSample*` instructions with code:ImplicitLod, code:Dref
-    or code:Proj in their name, in any shader stage
-  * [[VUID-{refpage}-None-08611]]
-    If the slink:VkPipeline object bound to the pipeline bind point used by
-    this command
-ifdef::VK_EXT_shader_object[]
-    or any slink:VkShaderEXT bound to a stage corresponding to the pipeline
-    bind point used by this command
-endif::VK_EXT_shader_object[]
-    accesses a slink:VkSampler object that uses unnormalized coordinates,
-    that sampler must: not be used with any of the SPIR-V `OpImageSample*`
-    or `OpImageSparseSample*` instructions that includes a LOD bias or any
-    offset values, in any shader stage
 ifdef::VK_EXT_shader_object[]
   * [[VUID-{refpage}-None-08607]]
     If the <<features-shaderObject, pname:shaderObject>> feature is enabled,
@@ -316,12 +293,12 @@ endif::VK_EXT_shader_object[]
   * [[VUID-{refpage}-uniformBuffers-06935]]
     If any stage of the slink:VkPipeline object bound to the pipeline bind
     point used by this command accesses a uniform buffer,
-ifdef::VK_EXT_pipeline_robustness[]
+ifdef::VK_VERSION_1_4,VK_EXT_pipeline_robustness[]
     and that stage was created without enabling either
-    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT or
-    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT
-    for pname:uniformBuffers,
-endif::VK_EXT_pipeline_robustness[]
+    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS or
+    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2 for
+    pname:uniformBuffers,
+endif::VK_VERSION_1_4,VK_EXT_pipeline_robustness[]
     and the <<features-robustBufferAccess, pname:robustBufferAccess>>
     feature is not enabled, that stage must: not access values outside of
     the range of the buffer as specified in the descriptor set bound to the
@@ -337,12 +314,12 @@ endif::VK_EXT_shader_object[]
   * [[VUID-{refpage}-storageBuffers-06936]]
     If any stage of the slink:VkPipeline object bound to the pipeline bind
     point used by this command accesses a storage buffer,
-ifdef::VK_EXT_pipeline_robustness[]
+ifdef::VK_VERSION_1_4,VK_EXT_pipeline_robustness[]
     and that stage was created without enabling either
-    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT or
-    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT
-    for pname:storageBuffers,
-endif::VK_EXT_pipeline_robustness[]
+    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS or
+    ename:VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2 for
+    pname:storageBuffers,
+endif::VK_VERSION_1_4,VK_EXT_pipeline_robustness[]
     and the <<features-robustBufferAccess, pname:robustBufferAccess>>
     feature is not enabled, that stage must: not access values outside of
     the range of the buffer as specified in the descriptor set bound to the
@@ -386,19 +363,19 @@ endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     match
   * [[VUID-{refpage}-OpImageWrite-08795]]
     If a slink:VkImageView
-ifdef::VK_KHR_maintenance5[]
-    created with a format other than ename:VK_FORMAT_A8_UNORM_KHR
-endif::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+    created with a format other than ename:VK_FORMAT_A8_UNORM
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
     is accessed using code:OpImageWrite as a result of this command, then
     the code:Type of the code:Texel operand of that instruction must: have
     at least as many components as the image view's format
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * [[VUID-{refpage}-OpImageWrite-08796]]
-    If a slink:VkImageView created with the format
-    ename:VK_FORMAT_A8_UNORM_KHR is accessed using code:OpImageWrite as a
-    result of this command, then the code:Type of the code:Texel operand of
-    that instruction must: have four components
-endif::VK_KHR_maintenance5[]
+    If a slink:VkImageView created with the format ename:VK_FORMAT_A8_UNORM
+    is accessed using code:OpImageWrite as a result of this command, then
+    the code:Type of the code:Texel operand of that instruction must: have
+    four components
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * [[VUID-{refpage}-OpImageWrite-04469]]
     If a slink:VkBufferView is accessed using code:OpImageWrite as a result
     of this command, then the code:Type of the code:Texel operand of that
@@ -526,6 +503,6 @@ endif::VK_QCOM_image_processing[]
     ename:VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
     ename:VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, or
     ename:VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT is accessed as a result of
-    this command, the image subresource identified by that descriptor must:
+    this command, all image subresources identified by that descriptor must:
     be in the image layout identified when the descriptor was written
 // Common Valid Usage

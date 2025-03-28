@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -70,14 +70,14 @@ endif::VK_VERSION_1_3,VK_EXT_4444_formats[]
     packed unsigned normalized format that has a 1-bit A component in bit
     15, a 5-bit R component in bits 10..14, a 5-bit G component in bits
     5..9, and a 5-bit B component in bits 0..4.
-ifdef::VK_KHR_maintenance5[]
-  * ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16_KHR specifies a four-component,
-    16-bit packed unsigned normalized format that has a 1-bit A component in
-    bit 15, a 5-bit B component in bits 10..14, a 5-bit G component in bits
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+  * ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16 specifies a four-component, 16-bit
+    packed unsigned normalized format that has a 1-bit A component in bit
+    15, a 5-bit B component in bits 10..14, a 5-bit G component in bits
     5..9, and a 5-bit R component in bits 0..4.
-  * ename:VK_FORMAT_A8_UNORM_KHR specifies a one-component, 8-bit unsigned
+  * ename:VK_FORMAT_A8_UNORM specifies a one-component, 8-bit unsigned
     normalized format that has a single 8-bit A component.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * ename:VK_FORMAT_R8_UNORM specifies a one-component, 8-bit unsigned
     normalized format that has a single 8-bit R component.
   * ename:VK_FORMAT_R8_SNORM specifies a one-component, 8-bit signed
@@ -1304,10 +1304,10 @@ ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 [[formats-compatible-planes]]
 === Compatible Formats of Planes of Multi-Planar Formats
 
-Individual planes of multi-planar formats are size-compatible with
-single-plane color formats if they occupy the same number of bits per texel
-block, and are compatible with those formats if they have the same block
-extent.
+Individual planes of <<formats-multiplanar, multi-planar formats>> are
+size-compatible with single-plane color formats if they occupy the same
+number of bits per texel block, and are compatible with those formats if
+they have the same block extent.
 
 In the following table, individual planes of a _multi-planar_ format are
 compatible with the format listed against the relevant plane index for that
@@ -1327,11 +1327,43 @@ include::{generated}/formats/planeformat.adoc[]
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
 
-[[formats-planes-image-aspect]]
-=== Multi-planar Format Image Aspect
+ifdef::VK_KHR_maintenance8[]
+[[formats-compatible-zs-color]]
+=== Compatible Formats for Depth-Stencil to/from Color Copies
 
-When using elink:VkImageAspectFlagBits to select a plane of a multi-planar
-format, the following are the valid options:
+If the <<features-maintenance8,pname:maintenance8>> feature is enabled,
+individual aspects of depth-stencil formats are size-compatible with certain
+single-component color formats when performing bit-wise copy operations.
+The following is a complete list of all per-aspect format compatibility
+relations by size:
+
+  * 32-bit depth (ename:VK_FORMAT_D32_SFLOAT,
+    ename:VK_FORMAT_D32_SFLOAT_S8_UINT)
+  ** ename:VK_FORMAT_R32_SFLOAT, ename:VK_FORMAT_R32_SINT,
+     ename:VK_FORMAT_R32_UINT
+  * 24-bit depth (ename:VK_FORMAT_X8_D24_UNORM_PACK32,
+    ename:VK_FORMAT_D24_UNORM_S8_UINT)
+  ** ename:VK_FORMAT_R32_SFLOAT, ename:VK_FORMAT_R32_SINT,
+     ename:VK_FORMAT_R32_UINT
+  * 16-bit depth (ename:VK_FORMAT_D16_UNORM,
+    ename:VK_FORMAT_D16_UNORM_S8_UINT)
+  ** ename:VK_FORMAT_R16_SFLOAT, ename:VK_FORMAT_R16_UNORM,
+     ename:VK_FORMAT_R16_SNORM, ename:VK_FORMAT_R16_UINT,
+     ename:VK_FORMAT_R16_SINT
+  * 8-bit stencil (ename:VK_FORMAT_S8_UINT,
+    ename:VK_FORMAT_D16_UNORM_S8_UINT, ename:VK_FORMAT_D24_UNORM_S8_UINT,
+    ename:VK_FORMAT_D32_SFLOAT_S8_UINT)
+  ** ename:VK_FORMAT_R8_UINT, ename:VK_FORMAT_R8_SINT,
+     ename:VK_FORMAT_R8_UNORM, ename:VK_FORMAT_R8_SNORM
+endif::VK_KHR_maintenance8[]
+
+
+[[formats-multiplanar-image-aspect]]
+=== Multi-Planar Format Image Aspect
+
+When using elink:VkImageAspectFlagBits to select a plane of a
+<<formats-multiplanar, multi-planar format>>, the following are the valid
+options:
 
   * Two planes
   ** ename:VK_IMAGE_ASPECT_PLANE_0_BIT
@@ -1414,7 +1446,7 @@ within a region.
 |====
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
-[[formats-planes]]
+[[formats-multiplanar]]
 For _multi-planar_ images, the components in separate _planes_ are separated
 by underscores, and the number of planes is indicated by the addition of a
 etext:_2PLANE or etext:_3PLANE suffix.
@@ -1470,9 +1502,9 @@ endianness.
 ^|B ^|G ^|R 14+>s|etext:VK_FORMAT_B8G8R8_*
 ^|R ^|G ^|B ^|A 13+>s|etext:VK_FORMAT_R8G8B8A8_*
 ^|B ^|G ^|R ^|A 13+>s|etext:VK_FORMAT_B8G8R8A8_*
-ifdef::VK_KHR_maintenance5[]
-^|A 16+>s|ename:VK_FORMAT_A8_UNORM_KHR
-endif::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+^|A 16+>s|ename:VK_FORMAT_A8_UNORM
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ^|G~0~ ^|B ^|G~1~ ^|R 13+>s|ename:VK_FORMAT_G8B8G8R8_422_UNORM
 ^|B ^|G~0~ ^|R ^|G~1~ 13+>s|ename:VK_FORMAT_B8G8R8G8_422_UNORM
@@ -1578,14 +1610,14 @@ endif::VK_VERSION_1_3,VK_EXT_4444_formats[]
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
-ifdef::VK_KHR_maintenance5[]
-16+^h|ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16_KHR
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+16+^h|ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16
 1+^s|A 5+^s|B 5+^s|G 5+^s|R
 ^| ~0~
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
 ^| ~4~ ^| ~3~ ^| ~2~ ^| ~1~ ^| ~0~
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 16+^h|ename:VK_FORMAT_R10X6_UNORM_PACK16
 10+^s|R 6+^s|X
@@ -1682,10 +1714,10 @@ as D24 or D32).
 
 Uncompressed color formats are _compatible_ with each other if they occupy
 the same number of bits per texel block
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 as long as neither or both are alpha formats (e.g.,
-ename:VK_FORMAT_A8_UNORM_KHR)
-endif::VK_KHR_maintenance5[]
+ename:VK_FORMAT_A8_UNORM)
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 .
 Compressed color formats are compatible with each other if the only
 difference between them is the <<formats-numericformat, numeric format>> of
@@ -1710,13 +1742,13 @@ include::{generated}/formats/compatibility.adoc[]
 ==== Size Compatibility
 
 Color formats with the same texel block size are considered
-ifndef::VK_KHR_maintenance5[]
+ifndef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 _size-compatible_.
-endif::VK_KHR_maintenance5[]
-ifdef::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 _size-compatible_ as long as neither or both are alpha formats (e.g.,
-ename:VK_FORMAT_A8_UNORM_KHR).
-endif::VK_KHR_maintenance5[]
+ename:VK_FORMAT_A8_UNORM).
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If two size-compatible formats have different block extents (i.e. for
 compressed formats), then an image with size [eq]#A {times} B {times} C# in
 one format with a block extent of [eq]#a {times} b {times} c# can be
@@ -1749,6 +1781,11 @@ The extent used in these copy operations always matches the source image,
 and is resized to the expectations of the block extents noted above for the
 destination image.
 
+ifdef::VK_KHR_maintenance8[]
+Copy operations between color formats and a depth-stencil are
+size-compatible as defined by <<formats-compatible-zs-color,the list of
+compatible depth-stencil and color formats>>.
+endif::VK_KHR_maintenance8[]
 
 [[formats-properties]]
 == Format Properties
@@ -1799,8 +1836,13 @@ supported, and images of that format cannot be created.
 endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
 ====
 
-If pname:format is a block-compressed format, then pname:bufferFeatures
-must: not support any features for the format.
+If pname:format is block-compressed,
+ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
+<<formats-requiring-sampler-ycbcr-conversion, requires sampler {YCbCr}
+conversion>>,
+endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
+or is a depth/stencil format then pname:bufferFeatures must: not support any
+features for the format.
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 If pname:format is not a multi-plane format then pname:linearTilingFeatures
@@ -2197,8 +2239,7 @@ pname:drmFormatModifier.
 
 An image's _memory planecount_ (as returned by
 pname:drmFormatModifierPlaneCount) is distinct from its _format planecount_
-(in the sense of <<formats-requiring-sampler-ycbcr-conversion,multi-planar>>
-{YCbCr} formats).
+(in the sense of <<formats-multiplanar, multi-planar format>>).
 In tlink:VkImageAspectFlags, each
 `VK_IMAGE_ASPECT_MEMORY_PLANE__{ibit}__BIT_EXT` represents a _memory plane_
 and each `VK_IMAGE_ASPECT_PLANE__{ibit}__BIT` a _format plane_.
@@ -2590,10 +2631,10 @@ ifdef::VK_QCOM_image_processing[]
     image views created with this format can: be sampled in
     <<textures-boxfilter,box filter sampling>> operations.
 endif::VK_QCOM_image_processing[]
-ifdef::VK_EXT_host_image_copy[]
-  * ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT_EXT specifies that an
-    image can: be created with ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT.
-endif::VK_EXT_host_image_copy[]
+ifdef::VK_VERSION_1_4,VK_EXT_host_image_copy[]
+  * ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT specifies that an
+    image can: be created with ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT.
+endif::VK_VERSION_1_4,VK_EXT_host_image_copy[]
 ifdef::VK_KHR_video_encode_quantization_map[]
   * ename:VK_FORMAT_FEATURE_2_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR
     specifies that an image view with this format can: be used as a
@@ -2639,6 +2680,17 @@ ifdef::VK_KHR_acceleration_structure[]
     doing <<host-acceleration-structure, host acceleration structure>>
     builds.
 endif::VK_KHR_acceleration_structure[]
+ifdef::VK_NV_ray_tracing_linear_swept_spheres[]
+  * ename:VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_RADIUS_BUFFER_BIT_NV
+    specifies that the format can: be used as the radius format when
+    creating an <<acceleration-structure,acceleration structure>>
+    (sname:VkAccelerationStructureGeometryLinearSweptSpheresDataNV::pname:radiusFormat
+    or
+    sname:VkAccelerationStructureGeometrySpheresDataNV::pname:radiusFormat).
+    This format can: also be used as the radius format in host memory when
+    doing <<host-acceleration-structure, host acceleration structure>>
+    builds.
+endif::VK_NV_ray_tracing_linear_swept_spheres[]
 ifdef::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
   * ename:VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT specifies that
     buffer views created with this format can: be used as
@@ -2853,9 +2905,9 @@ s| Format
 | ename:VK_FORMAT_R5G5B5A1_UNORM_PACK16      |   |   |   |   |   |   |   |   |   |   |   |   |
 | ename:VK_FORMAT_B5G5R5A1_UNORM_PACK16      |   |   |   |   |   |   |   |   |   |   |   |   |
 | ename:VK_FORMAT_A1R5G5B5_UNORM_PACK16      | {sym1} | {sym1} | {sym1} |   |   | {sym1} | {sym1} | {sym1} |   |   |   |   |
-ifdef::VK_KHR_maintenance5[]
-| ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16_KHR  |   |   |   |   |   |   |   |   |   |   |   |   |
-endif::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+| ename:VK_FORMAT_A1B5G5R5_UNORM_PACK16      |   |   |   |   |   |   |   |   |   |   |   |   |
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 ifdef::VK_VERSION_1_3,VK_EXT_4444_formats[]
 | ename:VK_FORMAT_A4R4G4B4_UNORM_PACK16      | {sym2} | {sym2} | {sym2} |   |   |   |   |   |   |   |   |   |
 | ename:VK_FORMAT_A4B4G4R4_UNORM_PACK16      | {sym3} | {sym3} | {sym3} |   |   |   |   |   |   |   |   |   |
@@ -2917,9 +2969,9 @@ s| Format
 | ename:VK_FORMAT_B8G8R8_UINT                |        |        |        |        |   |        |        |        |   |        |        |   |
 | ename:VK_FORMAT_B8G8R8_SINT                |        |        |        |        |   |        |        |        |   |        |        |   |
 | ename:VK_FORMAT_B8G8R8_SRGB                |        |        |        |        |   |        |        |        |   |        |        |   |
-ifdef::VK_KHR_maintenance5[]
-| ename:VK_FORMAT_A8_UNORM_KHR               |        |        |        |        |   |        |        |        |   |        |        |   |
-endif::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+| ename:VK_FORMAT_A8_UNORM                   |        |        |        |        |   |        |        |        |   |        |        |   |
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 14+| Format features marked with {sym3} must: be supported for
 pname:optimalTilingFeatures if the sname:VkPhysicalDevice supports the
 <<features-shaderStorageImageExtendedFormats,
@@ -3522,6 +3574,16 @@ supported:
   * ename:VK_FORMAT_R16G16B16A16_SNORM
 endif::VK_KHR_acceleration_structure[]
 
+ifdef::VK_NV_ray_tracing_linear_swept_spheres[]
+ename:VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_RADIUS_BUFFER_BIT_NV must:
+be supported in pname:bufferFeatures for the following formats if either of
+the <<features-spheres, pname:spheres>> or <<features-linearSweptSpheres,
+pname:linearSweptSpheres>> feature is supported:
+
+  * ename:VK_FORMAT_R32_SFLOAT
+  * ename:VK_FORMAT_R16_SFLOAT
+endif::VK_NV_ray_tracing_linear_swept_spheres[]
+
 ifdef::VK_KHR_fragment_shading_rate[]
 ename:VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR must: be
 supported for the following formats if the
@@ -3531,14 +3593,14 @@ pname:attachmentFragmentShadingRate>> feature is supported:
   * ename:VK_FORMAT_R8_UINT
 endif::VK_KHR_fragment_shading_rate[]
 
-ifdef::VK_EXT_host_image_copy[]
-If the `apiext:VK_EXT_host_image_copy` extension is supported and
-ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT is supported in
+ifdef::VK_VERSION_1_4,VK_EXT_host_image_copy[]
+If the <<features-hostImageCopy, pname:hostImageCopy>> feature is supported
+and ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT is supported in
 pname:optimalTilingFeatures or pname:linearTilingFeatures for a color
-format, ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT_EXT must: also be
+format, ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT must: also be
 supported in pname:optimalTilingFeatures or pname:linearTilingFeatures
 respectively.
-endif::VK_EXT_host_image_copy[]
+endif::VK_VERSION_1_4,VK_EXT_host_image_copy[]
 
 
 [[formats-without-shader-storage-format]]
@@ -3591,9 +3653,9 @@ formats:
   * ename:VK_FORMAT_R8G8_UINT
   * ename:VK_FORMAT_R16_UINT
   * ename:VK_FORMAT_R8_UINT
-ifdef::VK_KHR_maintenance5[]
-  * ename:VK_FORMAT_A8_UNORM_KHR
-endif::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+  * ename:VK_FORMAT_A8_UNORM
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 
 [NOTE]
 ====

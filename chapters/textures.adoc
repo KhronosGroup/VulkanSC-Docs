@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -866,9 +866,9 @@ endif::VK_EXT_custom_border_color[]
 | Two component color format  | [eq]#[Color~r~,Color~g~]                   = [B~r~,B~g~]#
 | Three component color format| [eq]#[Color~r~,Color~g~,Color~b~]          = [B~r~,B~g~,B~b~]#
 | Four component color format | [eq]#[Color~r~,Color~g~,Color~b~,Color~a~] = [B~r~,B~g~,B~b~,B~a~]#
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 | Single component alpha format | [eq]#[Color~r~,Color~g~,Color~b~, Color~a~] = [0,0,0,B~a~]#
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 |====
 ifdef::VK_EXT_custom_border_color[]
 {sym2} [eq]#S = B~g~# may: be substituted as the replacement method by the
@@ -954,6 +954,13 @@ respectively, in that operation.
 If the image being sampled has an unsigned normalized fixed-point format,
 then [eq]#D~ref~# is clamped to [eq]#[0,1]# before the compare operation.
 
+If the value of pname:magFilter is ename:VK_FILTER_LINEAR, or the value of
+pname:minFilter is ename:VK_FILTER_LINEAR, then [eq]#D# may be computed in
+an implementation-dependent manner which differs from the normal rules of
+linear filtering.
+The resulting value must: be in the range [eq]#[0,1]# and should be
+proportional to, or a weighted average of, the number of comparison passes
+or failures.
 
 [[textures-conversion-to-rgba]]
 === Conversion to RGBA
@@ -972,9 +979,9 @@ based on the image base color:
 | Two component color format  | [eq]#[Color~r~,Color~g~,Color~b~, Color~a~] = [Color~r~,Color~g~,0,one]#
 | Three component color format| [eq]#[Color~r~,Color~g~,Color~b~, Color~a~] = [Color~r~,Color~g~,Color~b~,one]#
 | Four component color format | [eq]#[Color~r~,Color~g~,Color~b~, Color~a~] = [Color~r~,Color~g~,Color~b~,Color~a~]#
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 | One alpha component color format | [eq]#[Color~r~,Color~g~,Color~b~, Color~a~] = [0,0,0,Color~a~]#
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 |====
 
 where [eq]#one = 1.0f# for floating-point formats and depth aspects, and
@@ -1050,17 +1057,17 @@ and the elink:VkComponentSwizzle is not the
 <<resources-image-views-identity-mappings,identity swizzle>> for all
 components, the value of the texel after swizzle is undefined:.
 
-ifndef::VK_KHR_maintenance5[]
+ifndef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If the image view has a depth/stencil format and the
 elink:VkComponentSwizzle is ename:VK_COMPONENT_SWIZZLE_ONE, the value of the
 texel after swizzle is undefined:.
-endif::VK_KHR_maintenance5[]
-ifdef::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If the image view has a depth/stencil format and the
 elink:VkComponentSwizzle is ename:VK_COMPONENT_SWIZZLE_ONE, and
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:depthStencilSwizzleOneSupport
+sname:VkPhysicalDeviceMaintenance5Properties::pname:depthStencilSwizzleOneSupport
 is not ename:VK_TRUE, the value of the texel after swizzle is undefined:.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 
 
 [[textures-sparse-residency]]
@@ -3011,7 +3018,7 @@ of the sampler.
 ====
 For historical reasons, vendor implementations of anisotropic filtering
 interpret these sampler parameters in different ways, particularly in corner
-cases such as pname:magFilter, pname:minFilter of ename:NEAREST or
+cases such as pname:magFilter, pname:minFilter of ename:VK_FILTER_NEAREST or
 pname:maxAnisotropy equal to 1.0.
 Applications should not expect consistent behavior in such cases, and should
 use anisotropic filtering only with parameters which are expected to give a
@@ -3529,10 +3536,10 @@ from layer 0 and layer 1 of latexmath:[(w)] respectively.
 [latexmath]
 ++++
 \begin{aligned}
-k_{packed} &= \left(phaseCount_{h} \times 4 \times \left\lfloor k / 4 \right\rfloor\right) + \left(hPhase \times 4\right) + \left(k \mathbin{\%} 4\right)  \\[1em]
-l_{packed}& = \left(phaseCount_{v} \times 4 \times \left\lfloor l / 4 \right\rfloor\right) + \left(vPhase  \times 4\right) + \left(l \mathbin{\%} 4\right) \\[1em]
-weight_{h} &= w_{k_{packed}}[0]  & \text{(horizontal weights packed in layer 0)}  \\[1em]
-weight_{v}  &= w_{l_{packed}}[1]  & \text{(vertical weights packed in layer 1)}
+k_{packed} & = \left(phaseCount_{h} \times 4 \times \left\lfloor k / 4 \right\rfloor\right) + \left(hPhase \times 4\right) + \left(k \mathbin{\%} 4\right)  \\[1em]
+l_{packed} & = \left(phaseCount_{v} \times 4 \times \left\lfloor l / 4 \right\rfloor\right) + \left(vPhase  \times 4\right) + \left(l \mathbin{\%} 4\right) \\[1em]
+weight_{h} & = w_{k_{packed}}[0]  & \text{(horizontal weights packed in layer 0)}  \\[1em]
+weight_{v} & = w_{l_{packed}}[1]  & \text{(vertical weights packed in layer 1)}
 
 \end{aligned}
 ++++
@@ -4081,7 +4088,7 @@ then the value returned is undefined:.
 
 === LOD Query
 
-code:OpImageQueryLod returns the Lod parameters that would be used in an
+code:OpImageQueryLod returns the LOD parameters that would be used in an
 image operation with the given image and coordinates.
 ifdef::VK_EXT_robustness2[]
 If the descriptor that would be accessed is a null descriptor then

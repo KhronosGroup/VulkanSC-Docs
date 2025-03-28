@@ -1,4 +1,4 @@
-// Copyright 2018-2024 The Khronos Group Inc.
+// Copyright 2018-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -42,6 +42,7 @@ objects (such as slink:VkPhysicalDevice) with a few restrictions:
     sname:VkDevice objects, may: result in the data being changed to the
     most recent version for all sname:VkDevice objects and not just the
     sname:VkDevice used in the most recent API call.
+
 
 [[debugging-object-naming]]
 ==== Object Naming

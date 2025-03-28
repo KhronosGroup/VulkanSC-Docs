@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# Copyright 2023-2024 The Khronos Group Inc.
+# Copyright 2023-2025 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -15,4 +15,5 @@ for build in gen-*; do
   cp -f "$output" "$expectation"
 done
 
-cp -f gen-validusage/out/validation/validusage.json expectations/validusage.json
+## Skip VU generation test until new Antora-centric build component interaction is sorted out
+## cp -f gen-validusage/out/validation/validusage.json expectations/validusage.json

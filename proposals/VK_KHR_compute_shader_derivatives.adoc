@@ -1,4 +1,4 @@
-// Copyright 2024 The Khronos Group Inc.
+// Copyright 2024-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -17,7 +17,7 @@ As that extension already shipped before proposal documents existed, this docume
 retroactively during promotion to KHR.
 
 The changes relative to `VK_NV_compute_shader_derivatives` are the inclusion of optional
-mesh and tash shader support.
+mesh and task shader support.
 
 
 == Problem Statement

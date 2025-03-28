@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -1780,8 +1780,8 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
     The pname:semaphore member of any element of the
     pname:pWaitSemaphoreInfos member of any element of pname:pSubmits
 ifdef::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
-    that was created with a elink:VkSemaphoreTypeKHR of
-    ename:VK_SEMAPHORE_TYPE_BINARY_KHR
+    that was created with a elink:VkSemaphoreType of
+    ename:VK_SEMAPHORE_TYPE_BINARY
 endif::VK_VERSION_1_2,VK_KHR_timeline_semaphore[]
     must: reference a semaphore signal operation that has been submitted for
     execution and any <<synchronization-semaphores-signaling, semaphore
@@ -1921,29 +1921,29 @@ ifdef::VK_VERSION_1_1[]
     element of pname:pCommandBuffers must: not be a protected command buffer
 endif::VK_VERSION_1_1[]
 ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-  * [[VUID-VkSubmitInfo2KHR-commandBuffer-06192]]
+  * [[VUID-VkSubmitInfo2-commandBuffer-06192]]
     If any pname:commandBuffer member of an element of
     pname:pCommandBufferInfos contains any <<renderpass-suspension,resumed
     render pass instances>>, they must: be suspended by a render pass
     instance earlier in submission order within pname:pCommandBufferInfos
-  * [[VUID-VkSubmitInfo2KHR-commandBuffer-06010]]
+  * [[VUID-VkSubmitInfo2-commandBuffer-06010]]
     If any pname:commandBuffer member of an element of
     pname:pCommandBufferInfos contains any <<renderpass-suspension,suspended
     render pass instances>>, they must: be resumed by a render pass instance
     later in submission order within pname:pCommandBufferInfos
-  * [[VUID-VkSubmitInfo2KHR-commandBuffer-06011]]
+  * [[VUID-VkSubmitInfo2-commandBuffer-06011]]
     If any pname:commandBuffer member of an element of
     pname:pCommandBufferInfos contains any <<renderpass-suspension,suspended
     render pass instances>>, there must: be no action or synchronization
     commands between that render pass instance and the render pass instance
     that resumes it
-  * [[VUID-VkSubmitInfo2KHR-commandBuffer-06012]]
+  * [[VUID-VkSubmitInfo2-commandBuffer-06012]]
     If any pname:commandBuffer member of an element of
     pname:pCommandBufferInfos contains any <<renderpass-suspension,suspended
     render pass instances>>, there must: be no render pass instances between
     that render pass instance and the render pass instance that resumes it
 ifdef::VK_EXT_sample_locations[]
-  * [[VUID-VkSubmitInfo2KHR-variableSampleLocations-06013]]
+  * [[VUID-VkSubmitInfo2-variableSampleLocations-06013]]
     If the <<limits-variableSampleLocations, pname:variableSampleLocations>>
     limit is not supported, and any pname:commandBuffer member of an element
     of pname:pCommandBufferInfos contains any <<renderpass-suspension,
@@ -3250,8 +3250,9 @@ ifdef::VK_EXT_nested_command_buffer[]
     feature is enabled
   * [[VUID-vkCmdExecuteCommands-nestedCommandBuffer-09376]]
     If the <<features-nestedCommandBuffer, pname:nestedCommandBuffer>>
-    feature is enabled, the <<glossary, command buffer nesting level>> of
-    each element of pname:pCommandBuffers must: be less than
+    feature is enabled, and pname:commandBuffer is a <<glossary, secondary
+    command buffer>>, the <<glossary, command buffer nesting level>> of each
+    element of pname:pCommandBuffers must: be less than
     <<limits-maxCommandBufferNestingLevel,
     pname:maxCommandBufferNestingLevel>>
   * [[VUID-vkCmdExecuteCommands-nestedCommandBufferRendering-09377]]
@@ -3268,20 +3269,20 @@ ifdef::VK_EXT_nested_command_buffer[]
     ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
 endif::VK_EXT_nested_command_buffer[]
 ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-ifdef::VK_KHR_dynamic_rendering_local_read[]
+ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
   * [[VUID-vkCmdExecuteCommands-pCommandBuffers-09504]]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRendering, the color attachment
-    mapping state specified by slink:VkRenderingAttachmentLocationInfoKHR in
+    mapping state specified by slink:VkRenderingAttachmentLocationInfo in
     the inheritance info of each element of pname:pCommandBuffers and in the
     current state of pname:commandBuffer must: match
   * [[VUID-vkCmdExecuteCommands-pCommandBuffers-09505]]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRendering, the input attachment
-    mapping state specified by slink:VkRenderingInputAttachmentIndexInfoKHR
-    in the inheritance info of each element of pname:pCommandBuffers and in
-    the current state of pname:commandBuffer must: match
-endif::VK_KHR_dynamic_rendering_local_read[]
+    mapping state specified by slink:VkRenderingInputAttachmentIndexInfo in
+    the inheritance info of each element of pname:pCommandBuffers and in the
+    current state of pname:commandBuffer must: match
+endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
 ****
 

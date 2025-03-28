@@ -1,4 +1,4 @@
-// Copyright 2014-2024 The Khronos Group Inc.
+// Copyright 2014-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -687,7 +687,7 @@ slink:VkPhysicalDeviceSurfaceInfo2KHR::pname:surface can: be
 dlink:VK_NULL_HANDLE.
 In that case, the contents of
 slink:VkSurfaceCapabilities2KHR::pname:surfaceCapabilities as well as any
-other struct chained to it will be undefined:.
+other structure chained to it will be undefined:.
 endif::VK_GOOGLE_surfaceless_query[]
 
 include::{generated}/validity/structs/VkSurfaceProtectedCapabilitiesKHR.adoc[]
@@ -1247,8 +1247,8 @@ ifdef::VK_EXT_image_compression_control[]
 ****
   * [[VUID-VkSurfaceFormat2KHR-pNext-06750]]
 ifdef::VK_EXT_image_compression_control_swapchain[]
-    If the <<features-imageCompressionControlSwapchain,
-    pname:imageCompressionControlSwapchain>> feature is not enabled, the
+    If the `apiext:VK_EXT_image_compression_control_swapchain` extension is
+    not supported, the
 endif::VK_EXT_image_compression_control_swapchain[]
 ifndef::VK_EXT_image_compression_control_swapchain[The]
     pname:pNext chain must: not include an
@@ -1374,7 +1374,6 @@ This enum is deprecated but is maintained for backwards compatibility.
 ====
 
 [NOTE]
-.Note
 ====
 For a traditional "`Linear`" or non-gamma transfer function color space use
 ename:VK_COLOR_SPACE_PASS_THROUGH_EXT.
@@ -1968,3 +1967,8 @@ endif::VK_AMD_anti_lag,VK_NV_low_latency2[]
 ifdef::VK_NV_present_barrier[]
 include::{chapters}/VK_NV_present_barrier/present_barrier.adoc[]
 endif::VK_NV_present_barrier[]
+
+ifdef::VK_NV_present_metering[]
+include::{chapters}/VK_NV_present_metering/present_metering.adoc[]
+endif::VK_NV_present_metering[]
+

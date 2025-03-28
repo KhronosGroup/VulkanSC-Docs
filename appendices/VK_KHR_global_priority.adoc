@@ -1,4 +1,4 @@
-// Copyright 2021-2024 The Khronos Group Inc.
+// Copyright 2021-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -50,6 +50,13 @@ process or a different process).
 In this scenario ename:VK_ERROR_INITIALIZATION_FAILED is returned.
 
 include::{generated}/interfaces/VK_KHR_global_priority.adoc[]
+
+=== Promotion to Vulkan 1.4
+
+Functionality in this extension is included in core Vulkan 1.4 with the KHR
+suffix omitted.
+The original type, enum and command names are still available as aliases of
+the core functionality.
 
 === Issues
 

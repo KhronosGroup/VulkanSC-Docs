@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -34,6 +34,10 @@ ifdef::VK_VERSION_1_3[]
 :spirv-versions: 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, and 1.6 versions
 :api-version: 1.3
 endif::VK_VERSION_1_3[]
+ifdef::VK_VERSION_1_4[]
+:spirv-versions: 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, and 1.6 versions
+:api-version: 1.4
+endif::VK_VERSION_1_4[]
 
 A Vulkan {api-version} implementation must: support the {spirv-versions} of
 SPIR-V and the 1.0 version of the SPIR-V Extended Instructions for GLSL.
@@ -242,6 +246,10 @@ or knowledge of runtime information, such as enabled features.
     code:AcquireRelease, or code:SequentiallyConsistent memory semantics
   * [[VUID-{refpage}-OpMemoryBarrier-04733]]
     code:OpMemoryBarrier must: include at least one {StorageClass}
+  * [[VUID-{refpage}-OpControlBarrier-10609]]
+    If the semantics for code:OpControlBarrier includes at least one
+    {StorageClass}, then it must: include one of code:Acquire, code:Release,
+    code:AcquireRelease, or code:SequentiallyConsistent memory semantics
   * [[VUID-{refpage}-OpControlBarrier-04650]]
     If the semantics for code:OpControlBarrier includes one of code:Acquire,
     code:Release, code:AcquireRelease, or code:SequentiallyConsistent memory
@@ -313,9 +321,6 @@ or knowledge of runtime information, such as enabled features.
   * [[VUID-{refpage}-Uniform-06925]]
     Any variable in the code:Uniform {StorageClass} decorated as code:Block
     must: not be stored to or modified
-  * [[VUID-{refpage}-Offset-04663]]
-    Image operand code:Offset must: only be used with code:OpImage*Gather
-    instructions
   * [[VUID-{refpage}-Offset-04865]]
     Any image instruction which uses an code:Offset, code:ConstOffset, or
     code:ConstOffsets image operand, must: only consume a "`Sampled Image`"
@@ -381,12 +386,46 @@ or knowledge of runtime information, such as enabled features.
   * [[VUID-{refpage}-Component-04923]]
     The code:Component decorations value must: not be 1 or 3 for scalar or
     two-component 64-bit data types
-  * [[VUID-{refpage}-Component-04924]]
-    The code:Component decorations must: not be used with any type that is
-    not a scalar or vector, or an array of such a type
   * [[VUID-{refpage}-Component-07703]]
     The code:Component decorations must: not be used for a 64-bit vector
     type with more than two components
+  * [[VUID-{refpage}-Component-10583]]
+    The code:Component decorations must: not be used with any type that is
+    not a scalar, vector, array of scalars or vectors, or an array of arrays
+    of scalars or vectors
+  * [[VUID-{refpage}-Execution-10584]]
+    If the code:Execution code:Model of an entry point is not
+    code:TessellationControl or code:Geometry, its interface definition
+    must: not include any variables in the code:Input storage class
+    decorated with code:Component that are arrays of arrays of scalars or
+    vectors
+  * [[VUID-{refpage}-Execution-10585]]
+    If the code:Execution code:Model of an entry point is not code:MeshNV,
+    its interface definition must: not include any variables in the
+    code:Output storage class decorated with code:Component that are arrays
+    of arrays of scalars or vectors
+  * [[VUID-{refpage}-Output-10586]]
+    Variables in the code:Output storage class in the code:Vertex,
+    code:TessellationControl, code:TessellationEvaluation, or code:Geometry
+    execution model must: not have overlapping code:Component and
+    code:Location decorations as defined by
+    <<interfaces-iointerfaces-locations,Location and Component Assignment>>
+  * [[VUID-{refpage}-Output-10587]]
+    Variables in the code:Output storage class in the code:Fragment
+    execution model must: not have both identical code:Index decorations and
+    overlapping code:Component and code:Location decorations as defined by
+    <<interfaces-iointerfaces-locations,Location and Component Assignment>>
+  * [[VUID-{refpage}-Input-10588]]
+    Variables in the code:Input storage class in the
+    code:TessellationControl, code:TessellationEvaluation, code:Geometry, or
+    code:Fragment execution model must: not have overlapping code:Component
+    and code:Location decorations as defined by
+    <<interfaces-iointerfaces-locations,Location and Component Assignment>>
+  * [[VUID-{refpage}-Input-10604]]
+    Any variable in the code:Input storage class in the code:Fragment
+    execution model must: not have an assigned code:Location shared with
+    another variable with different decorations for code:PerVertexKHR,
+    code:Flat, code:NoPerspective, code:Sample, or code:Centroid
   * [[VUID-{refpage}-Input-09557]]
     The pointers of any code:Input or code:Output
     <<interfaces-iointerfaces-user,Interface user-defined variables>> must:
@@ -805,20 +844,20 @@ ifndef::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
 endif::VK_VERSION_1_3,VK_KHR_format_feature_flags2[]
   * [[VUID-{refpage}-None-09558]]
     {empty}
-ifdef::VK_KHR_dynamic_rendering_local_read[]
+ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
     If the <<features-dynamicRenderingLocalRead,
     pname:dynamicRenderingLocalRead>> feature is not enabled, any
-endif::VK_KHR_dynamic_rendering_local_read[]
-ifndef::VK_KHR_dynamic_rendering_local_read[Any]
+endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
+ifndef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[Any]
     variable created with a "`Type`" of code:OpTypeImage that has a "`Dim`"
     operand of code:SubpassData must: be decorated with
     code:InputAttachmentIndex
-ifdef::VK_KHR_dynamic_rendering_local_read[]
+ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
   * [[VUID-{refpage}-OpTypeImage-09644]]
     Any variable declared as an code:OpTypeArray where the code:Element
     code:Type is an code:OpTypeImage with a "`Dim`" operand of
     code:SubpassData must: be decorated with code:InputAttachmentIndex
-endif::VK_KHR_dynamic_rendering_local_read[]
+endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 ifdef::VK_VERSION_1_3[]
 ifndef::VK_KHR_format_feature_flags2[]
   * [[VUID-{refpage}-apiVersion-07952]]
@@ -1213,7 +1252,7 @@ ifdef::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
     pname:shaderRoundingModeRTZFloat64>> is ename:VK_FALSE, then
     code:RoundingModeRTZ for 64-bit floating-point type must: not be used
 endif::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
-ifdef::VK_KHR_shader_float_controls2[]
+ifdef::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
   * [[VUID-{refpage}-shaderSignedZeroInfNanPreserveFloat16-09559]]
     If <<limits-shaderSignedZeroInfNanPreserveFloat16,
     pname:shaderSignedZeroInfNanPreserveFloat16>> is ename:VK_FALSE then any
@@ -1247,7 +1286,7 @@ ifdef::VK_KHR_shader_float_controls2[]
     code:FPFastMathMode decoration on an instruction with result type or any
     operand type that includes a 64-bit float must: include the code:NSZ,
     code:NotInf, and code:NotNaN flags
-endif::VK_KHR_shader_float_controls2[]
+endif::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
 ifdef::VK_EXT_transform_feedback[]
   * [[VUID-{refpage}-Offset-06308]]
     The code:Offset plus size of the type of each variable, in the output
@@ -1509,11 +1548,6 @@ endif::VK_NV_cooperative_matrix2[]
     instructions must: not be used in shader stages not included in
     slink:VkPhysicalDeviceCooperativeMatrixPropertiesKHR::pname:cooperativeMatrixSupportedStages
 endif::VK_KHR_cooperative_matrix[]
-  * [[VUID-{refpage}-DescriptorSet-06323]]
-    code:DescriptorSet and code:Binding decorations must: obey the
-    constraints on {StorageClass}, type, and descriptor type described in
-    <<interfaces-resources-setandbinding,DescriptorSet and Binding
-    Assignment>>
 ifdef::VK_NV_cooperative_matrix[]
   * [[VUID-{refpage}-OpCooperativeMatrixLoadNV-06324]]
     For code:OpCooperativeMatrixLoadNV and code:OpCooperativeMatrixStoreNV
@@ -1523,6 +1557,73 @@ ifdef::VK_NV_cooperative_matrix[]
     alignment is the number of columns/rows multiplied by the component
     size)
 endif::VK_NV_cooperative_matrix[]
+ifdef::VK_NV_cooperative_vector[]
+  * [[VUID-{refpage}-OpCooperativeVectorMatrixMulNV-10089]]
+    For code:OpCooperativeVectorMatrixMulNV and
+    code:OpCooperativeVectorMatrixMulAddNV, the following must: be satisfied
+    by the same entry in the slink:VkCooperativeVectorPropertiesNV array
+    returned by flink:vkGetPhysicalDeviceCooperativeVectorPropertiesNV:
+  ** The component type of code:Input must: match
+     slink:VkCooperativeVectorPropertiesNV::pname:inputType
+  ** The code:InputInterpretation must: match
+     slink:VkCooperativeVectorPropertiesNV::pname:inputInterpretation
+  ** The code:MatrixInterpretation must: match
+     slink:VkCooperativeVectorPropertiesNV::pname:matrixInterpretation
+  ** For code:OpCooperativeVectorMatrixMulAddNV, the code:BiasInterpretation
+     must: match
+     slink:VkCooperativeVectorPropertiesNV::pname:biasInterpretation
+  ** The code:Result code:Type must: match
+     slink:VkCooperativeVectorPropertiesNV::pname:resultType
+  ** If code:Transpose is true,
+     slink:VkCooperativeVectorPropertiesNV::pname:transpose must: be
+     ename:VK_TRUE
+  * [[VUID-{refpage}-OpCooperativeVectorMatrixMulNV-10090]]
+    For code:OpCooperativeVectorMatrixMulNV and
+    code:OpCooperativeVectorMatrixMulAddNV, if code:MatrixInterpretation is
+    either ename:VK_COMPONENT_TYPE_FLOAT_E4M3_NV or
+    ename:VK_COMPONENT_TYPE_FLOAT_E5M2_NV then code:MemoryLayout must: be
+    either ename:VK_COOPERATIVE_VECTOR_MATRIX_LAYOUT_INFERENCING_OPTIMAL_NV
+    or ename:VK_COOPERATIVE_VECTOR_MATRIX_LAYOUT_TRAINING_OPTIMAL_NV
+  * [[VUID-{refpage}-cooperativeVectorSupportedStages-10091]]
+    code:OpTypeCooperativeVectorNV and code:OpCooperativeVector*
+    instructions must: not be used in shader stages not included in
+    slink:VkPhysicalDeviceCooperativeVectorPropertiesNV::pname:cooperativeVectorSupportedStages
+  * [[VUID-{refpage}-OpCooperativeVectorReduceSumAccumulateNV-10092]]
+    For code:OpCooperativeVectorReduceSumAccumulateNV:
+  ** The component type of code:V must: be either 16- or 32-bit
+     floating-point
+  ** If the component type of code:V is 16-bit floating-point,
+    <<limits-cooperativeVectorTrainingFloat16Accumulation,
+    pname:cooperativeVectorTrainingFloat16Accumulation>> must: be supported
+  ** If the component type of code:V is 32-bit floating-point,
+    <<limits-cooperativeVectorTrainingFloat32Accumulation,
+    pname:cooperativeVectorTrainingFloat32Accumulation>> must: be supported
+  ** The pointer's storage class must: be code:StorageBuffer or
+     code:PhysicalStorageBuffer
+  * [[VUID-{refpage}-OpCooperativeVectorOuterProductAccumulateNV-10093]]
+    For code:OpCooperativeVectorOuterProductAccumulateNV:
+  ** code:MatrixInterpretation must be ename:VK_COMPONENT_TYPE_FLOAT16_KHR
+     or ename:VK_COMPONENT_TYPE_FLOAT32_KHR
+  ** If code:MatrixInterpretation is ename:VK_COMPONENT_TYPE_FLOAT16_KHR,
+    <<limits-cooperativeVectorTrainingFloat16Accumulation,
+    pname:cooperativeVectorTrainingFloat16Accumulation>> must: be supported
+  ** If code:MatrixInterpretation is ename:VK_COMPONENT_TYPE_FLOAT32_KHR,
+    <<limits-cooperativeVectorTrainingFloat32Accumulation,
+    pname:cooperativeVectorTrainingFloat32Accumulation>> must: be supported
+  ** The component types of code:A and code:B must: be 16-bit floating-point
+  ** The matrix layout must: be training-optimal
+  ** The pointer's storage class must: be code:StorageBuffer or
+     code:PhysicalStorageBuffer
+  * [[VUID-{refpage}-maxCooperativeVectorComponents-10094]]
+    code:OpTypeCooperativeVector instructions must: have code:Component
+    code:Count less than or equal to
+    <<limits-maxCooperativeVectorComponents,
+    pname:maxCooperativeVectorComponents>>
+  * [[VUID-{refpage}-OpTypeCooperativeVector-10095]]
+    code:OpTypeCooperativeVector instructions must: have code:Component
+    code:Type that is any supported type reported by
+    flink:vkGetPhysicalDeviceCooperativeVectorPropertiesNV
+endif::VK_NV_cooperative_vector[]
 ifdef::VK_NV_mesh_shader[]
   * [[VUID-{refpage}-MeshNV-07113]]
     For mesh shaders using the code:MeshNV {ExecutionModel} the
@@ -1666,6 +1767,29 @@ ifdef::VK_KHR_cooperative_matrix[]
     alignment is the number of columns/rows multiplied by the component
     size)
 endif::VK_KHR_cooperative_matrix[]
+ifdef::VK_NV_cooperative_vector[]
+  * [[VUID-{refpage}-OpCooperativeVectorMatrixMulNV-10096]]
+    For code:OpCooperativeVectorMatrixMulNV and
+    code:OpCooperativeVectorMatrixMulAddNV instructions using non-optimal
+    layouts, the code:Stride operand must: be aligned to 16 bytes
+  * [[VUID-{refpage}-OpCooperativeVectorMatrixMulNV-10097]]
+    For code:OpCooperativeVectorMatrixMulNV and
+    code:OpCooperativeVectorMatrixMulAddNV instructions, the code:Matrix and
+    code:MatrixOffset must: be aligned to 64 bytes
+  * [[VUID-{refpage}-OpCooperativeVectorMatrixMulAddNV-10098]]
+    For code:OpCooperativeVectorMatrixMulAddNV instructions, the code:Bias
+    and code:BiasOffset must: be aligned to 16 bytes
+  * [[VUID-{refpage}-OpCooperativeVectorLoadNV-10099]]
+    For code:OpCooperativeVectorLoadNV and code:OpCooperativeVectorStoreNV
+    instructions, the code:Pointer and code:Offset must: be aligned to 16
+    bytes
+  * [[VUID-{refpage}-OpCooperativeVectorReduceSumAccumulateNV-10100]]
+    For code:OpCooperativeVectorReduceSumAccumulateNV instructions, the
+    code:Pointer and code:Offset must: be aligned to 16 bytes
+  * [[VUID-{refpage}-OpCooperativeVectorOuterProductAccumulateNV-10101]]
+    For code:OpCooperativeVectorOuterProductAccumulateNV instructions, the
+    code:Pointer and code:Offset must: be aligned to 64 bytes
+endif::VK_NV_cooperative_vector[]
 ifdef::VK_KHR_portability_subset[]
   * [[VUID-{refpage}-shaderSampleRateInterpolationFunctions-06325]]
     If the `apiext:VK_KHR_portability_subset` extension is enabled, and
@@ -2119,6 +2243,15 @@ ifndef::VK_VERSION_1_3,VK_KHR_zero_initialize_workgroup_memory[]
     Any code:OpVariable with code:Workgroup as its {StorageClass} must: not
     have an code:Initializer operand
 endif::VK_VERSION_1_3,VK_KHR_zero_initialize_workgroup_memory[]
+  * [[VUID-{refpage}-Offset-10213]]
+    {empty}
+ifdef::VK_KHR_maintenance8[]
+    If the <<features-maintenance8,pname:maintenance8>> feature is not
+    enabled, image
+endif::VK_KHR_maintenance8[]
+ifndef::VK_KHR_maintenance8[Image]
+    operand code:Offset must: only be used with code:OpImage*Gather
+    instructions
   * [[VUID-{refpage}-OpImage-06376]]
     If an code:OpImage*Gather operation has an image operand of code:Offset,
     code:ConstOffset, or code:ConstOffsets the offset value must: be greater
@@ -2131,12 +2264,16 @@ endif::VK_VERSION_1_3,VK_KHR_zero_initialize_workgroup_memory[]
     pname:maxTexelGatherOffset>>
   * [[VUID-{refpage}-OpImageSample-06435]]
     If an code:OpImageSample* or code:OpImageFetch* operation has an image
-    operand of code:ConstOffset then the offset value must: be greater than
-    or equal to <<limits-minTexelOffset, pname:minTexelOffset>>
+    operand of
+ifdef::VK_KHR_maintenance8[code:Offset or]
+    code:ConstOffset then the offset value must: be greater than or equal to
+    <<limits-minTexelOffset, pname:minTexelOffset>>
   * [[VUID-{refpage}-OpImageSample-06436]]
     If an code:OpImageSample* or code:OpImageFetch* operation has an image
-    operand of code:ConstOffset then the offset value must: be less than or
-    equal to <<limits-maxTexelOffset, pname:maxTexelOffset>>
+    operand of
+ifdef::VK_KHR_maintenance8[code:Offset or]
+    code:ConstOffset then the offset value must: be less than or equal to
+    <<limits-maxTexelOffset, pname:maxTexelOffset>>
   * [[VUID-{refpage}-samples-08725]]
     If an code:OpTypeImage has an code:MS operand 0, its bound image must:
     have been created with slink:VkImageCreateInfo::pname:samples as
@@ -2259,18 +2396,6 @@ endif::VK_QCOM_image_processing[]
     bound to it, either explicitly or implicitly as described by
     <<interfaces-inputattachment, input attachment interface>>
 ifdef::VK_EXT_shader_tile_image[]
-  * [[VUID-{refpage}-shaderTileImageColorReadAccess-08728]]
-    If the <<features-shaderTileImageColorReadAccess,
-    pname:shaderTileImageColorReadAccess>> feature is not enabled,
-    code:OpColorAttachmentReadEXT operation must: not be used
-  * [[VUID-{refpage}-shaderTileImageDepthReadAccess-08729]]
-    If the <<features-shaderTileImageDepthReadAccess,
-    pname:shaderTileImageDepthReadAccess>> feature is not enabled,
-    code:OpDepthAttachmentReadEXT operation must: not be used
-  * [[VUID-{refpage}-shaderTileImageStencilReadAccess-08730]]
-    If the <<features-shaderTileImageStencilReadAccess,
-    pname:shaderTileImageStencilReadAccess>> feature is not enabled,
-    code:OpStencilAttachmentReadEXT operation must: not be used
   * [[VUID-{refpage}-minSampleShading-08731]]
     If <<primsrast-sampleshading, sample shading>> is enabled and
     pname:minSampleShading is 1.0, the code:sample operand of any
@@ -2287,18 +2412,18 @@ endif::VK_EXT_shader_tile_image[]
   * [[VUID-{refpage}-MeshEXT-09218]]
     In mesh shaders using the code:MeshEXT or code:MeshNV {ExecutionModel}
     and the code:OutputPoints {ExecutionMode},
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
     if the <<features-maintenance5, pname:maintenance5>> feature is not
     enabled, and
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
     if the number of output points is greater than 0, a code:PointSize
     decorated variable must: be written to for each output point
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * [[VUID-{refpage}-maintenance5-09190]]
     If the <<features-maintenance5, pname:maintenance5>> feature is enabled
     and a code:PointSize decorated variable is written to, all execution
     paths must: write to a code:PointSize decorated variable
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 ifdef::VK_AMDX_shader_enqueue[]
   * [[VUID-{refpage}-ShaderEnqueueAMDX-09191]]
     The code:ShaderEnqueueAMDX capability must: only be used in shaders with
@@ -2393,13 +2518,13 @@ ifdef::VK_KHR_shader_maximal_reconvergence[]
     an entry point unless the entry point does not execute any
     <<ray-tracing-repack,_invocation repack instructions_>>
 endif::VK_KHR_shader_maximal_reconvergence[]
-ifdef::VK_KHR_shader_subgroup_rotate[]
+ifdef::VK_VERSION_1_4,VK_KHR_shader_subgroup_rotate[]
   * [[VUID-{refpage}-shaderSubgroupRotateClustered-09566]]
     If <<features-shaderSubgroupRotateClustered,
     pname:shaderSubgroupRotateClustered>> is ename:VK_FALSE, then the
     code:ClusterSize operand to code:OpGroupNonUniformRotateKHR must: not be
     used
-endif::VK_KHR_shader_subgroup_rotate[]
+endif::VK_VERSION_1_4,VK_KHR_shader_subgroup_rotate[]
   * [[VUID-{refpage}-protectedNoFault-09645]]
     If <<limits-protectedNoFault, pname:protectedNoFault>> is not supported,
     the {StorageClass} of the code:PhysicalStorageBuffer must: not be used
@@ -2460,7 +2585,7 @@ endif::VK_NV_cooperative_matrix2[]
     code:OpAtomicLoad, code:OpAtomicStore, code:OpAtomicExchange,
     code:OpStore, and code:OpLoad are referred to as _bit-preserving
     operations_.
-ifdef::VK_KHR_shader_float_controls2[]
+ifdef::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
   * The floating-point environment used for an instruction can be determined
     as follows:
   ** If the SPIR-V specifies it explicitly using the code:FPFastMath
@@ -2477,11 +2602,29 @@ ifdef::VK_KHR_shader_float_controls2[]
        of the operands or to the result type.
   **** The operation is not a bit-preserving operation and is not one of
        code:OpFConvert, code:OpFNegate, code:OpFAdd, code:OpFSub,
-       code:OpFMul, code:OpFDiv, code:OpIsNan, or code:OpIsInf.
+       code:OpFMul, code:OpFDiv, code:OpIsNan, code:OpIsInf,
+       code:OpVectorTimesScalar, code:OpMatrixTimesScalar,
+       code:OpVectorTimesMatrix, code:OpMatrixTimesVector,
+       code:OpMatrixTimesMatrix, code:OpOuterProduct, code:OpDot,
+       code:OpFOrdEqual, code:OpFUnordEqual, code:OpFOrdNotEqual,
+       code:OpFUnordNotEqual, code:OpFOrdLessThan, code:OpFUnordLessThan,
+       code:OpFOrdGreaterThan, code:OpFUnordGreaterThan,
+       code:OpFOrdLessThanEqual, code:OpFUnordLessThanEqual,
+       code:OpFOrdGreaterThanEqual, code:OpFUnordGreaterThanEqual,
+       code:OpGroupNonUniformAllEqual,
+ifdef::VK_EXT_shader_subgroup_vote[code:OpSubgroupAllEqualKHR,]
+       code:OpGroupNonUniformFMin, code:OpGroupNonUniformFMax,
+       code:OpAtomicCompareExchange, code:OpAtomicCompareExchangeWeak,
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFAddEXT,]
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFMinEXT,]
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFMaxEXT,]
+       code:OpDPdx, code:OpDPdy, code:OpFwidth, code:OpDPdxFine,
+       code:OpDPdyFine, code:OpFwidthFine, code:OpDPdxCoarse,
+       code:OpDPdyCoarse, or code:OpFwidthCoarse.
   **** The operation is an code:OpLoad from the code:Input {StorageClass} in
        the fragment shader stage.
-endif::VK_KHR_shader_float_controls2[]
-ifndef::VK_KHR_shader_float_controls2[]
+endif::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
+ifndef::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
   * By default, the implementation may: perform optimizations on half,
     single, or double-precision floating-point instructions that ignore sign
     of a zero, or assume that arguments and results are not NaNs or
@@ -2496,9 +2639,26 @@ ifdef::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
   ** The following core SPIR-V instructions must: respect the
      code:SignedZeroInfNanPreserve {ExecutionMode}: code:OpFConvert,
      code:OpFNegate, code:OpFAdd, code:OpFSub, code:OpFMul, code:OpFDiv,
-     code:OpIsNan, and code:OpIsInf.
+     code:OpIsNan, code:OpIsInf, code:OpVectorTimesScalar,
+     code:OpMatrixTimesScalar, code:OpVectorTimesMatrix,
+     code:OpMatrixTimesVector, code:OpMatrixTimesMatrix,
+     code:OpOuterProduct, code:OpDot, code:OpFOrdEqual, code:OpFUnordEqual,
+     code:OpFOrdNotEqual, code:OpFUnordNotEqual, code:OpFOrdLessThan,
+     code:OpFUnordLessThan, code:OpFOrdGreaterThan,
+     code:OpFUnordGreaterThan, code:OpFOrdLessThanEqual,
+     code:OpFUnordLessThanEqual, code:OpFOrdGreaterThanEqual,
+     code:OpFUnordGreaterThanEqual, code:OpGroupNonUniformAllEqual,
+ifdef::VK_EXT_shader_subgroup_vote[code:OpSubgroupAllEqualKHR,]
+     code:OpGroupNonUniformFMin, code:OpGroupNonUniformFMax,
+     code:OpAtomicCompareExchange, code:OpAtomicCompareExchangeWeak,
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFAddEXT,]
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFMinEXT,]
+ifdef::VK_EXT_shader_float_atomic[code:OpAtomicFMaxEXT,]
+     code:OpDPdx, code:OpDPdy, code:OpFwidth, code:OpDPdxFine,
+     code:OpDPdyFine, code:OpFwidthFine, code:OpDPdxCoarse,
+     code:OpDPdyCoarse, and code:OpFwidthCoarse.
 endif::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
-endif::VK_KHR_shader_float_controls2[]
+endif::VK_VERSION_1_4,VK_KHR_shader_float_controls2[]
   * All bit-preserving operations and the following instructions must: not
     flush denormalized values: code:OpConstant, code:OpConstantComposite,
     code:OpSpecConstant, code:OpSpecConstantComposite, and code:OpBitcast.
@@ -2530,9 +2690,16 @@ ifdef::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
      code:OpFSub, code:OpFMul, code:OpFDiv, code:OpFRem, code:OpFMod,
      code:OpVectorTimesScalar, code:OpMatrixTimesScalar,
      code:OpVectorTimesMatrix, code:OpMatrixTimesVector,
-     code:OpMatrixTimesMatrix, code:OpOuterProduct, code:OpDot; and the
-     following extended instructions for GLSL: code:Round, code:RoundEven,
-     code:Trunc, code:FAbs, code:Floor, code:Ceil, code:Fract, code:Radians,
+     code:OpMatrixTimesMatrix, code:OpOuterProduct, code:OpDot,
+     code:OpGroupNonUniformFMin, code:OpGroupNonUniformFMax,
+ifdef::VK_EXT_shader_atomic_float[code:OpAtomicFAddEXT,]
+ifdef::VK_EXT_shader_atomic_float2[code:OpAtomicFMinEXT,]
+ifdef::VK_EXT_shader_atomic_float2[code:OpAtomicFMaxEXT,]
+     code:OpDPdx, code:OpDPdy, code:OpFwidth, code:OpDPdxFine,
+     code:OpDPdyFine code:OpFwidthFine, code:OpDPdxCoarse,
+     code:OpDPdyCoarse, code:OpFwidthCoarse; and the following extended
+     instructions for GLSL: code:Round, code:RoundEven, code:Trunc,
+     code:FAbs, code:Floor, code:Ceil, code:Fract, code:Radians,
      code:Degrees, code:Sin, code:Cos, code:Tan, code:Asin, code:Acos,
      code:Atan, code:Sinh, code:Cosh, code:Tanh, code:Asinh, code:Acosh,
      code:Atanh, code:Atan2, code:Pow, code:Exp, code:Log, code:Exp2,
@@ -2556,11 +2723,19 @@ ifdef::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
 ifdef::VK_EXT_shader_subgroup_vote[]
      code:OpSubgroupAllEqualKHR,
 endif::VK_EXT_shader_subgroup_vote[]
-     code:OpGroupNonUniformAllEqual; and the following extended instructions
-     for GLSL: code:FAbs, code:FSign, code:Radians, code:Degrees, code:FMin,
-     code:FMax, code:FClamp, code:FMix, code:Fma, code:PackHalf2x16,
-     code:PackDouble2x32, code:UnpackHalf2x16, code:UnpackDouble2x32,
-     code:NMin, code:NMax, and code:NClamp.
+     code:OpGroupNonUniformAllEqual, code:OpGroupNonUniformFMin,
+     code:OpGroupNonUniformFMax, code:OpAtomicCompareExchange,
+     code:OpAtomicCompareExchangeWeak,
+ifdef::VK_EXT_shader_atomic_float[code:OpAtomicFAddEXT,]
+ifdef::VK_EXT_shader_atomic_float2[code:OpAtomicFMinEXT,]
+ifdef::VK_EXT_shader_atomic_float2[code:OpAtomicFMaxEXT,]
+     code:OpDPdx, code:OpDPdy, code:OpFwidth, code:OpDPdxFine,
+     code:OpDPdyFine code:OpFwidthFine, code:OpDPdxCoarse,
+     code:OpDPdyCoarse, code:OpFwidthCoarse; and the following extended
+     instructions for GLSL: code:FAbs, code:FSign, code:Radians,
+     code:Degrees, code:FMin, code:FMax, code:FClamp, code:FMix, code:Fma,
+     code:PackHalf2x16, code:PackDouble2x32, code:UnpackHalf2x16,
+     code:UnpackDouble2x32, code:NMin, code:NMax, and code:NClamp.
 endif::VK_VERSION_1_2,VK_KHR_shader_float_controls[]
 
 The precision of double-precision instructions is at least that of single
@@ -2756,6 +2931,8 @@ endif::VK_EXT_shader_subgroup_vote[]
 ifdef::VK_VERSION_1_1[]
 | code:OpGroupNonUniformAllEqual
 2+| Correct result.
+| code:OpGroupNonUniformFMin, code:OpGroupNonUniformFMax
+2+| Correct result.
 endif::VK_VERSION_1_1[]
 | code:OpFDiv(x,y)
  | 2.5 ULP for [eq]#{vert}y{vert} = 0# or [eq]#{vert}y{vert}# in the range [2^-126^, 2^126^].   | 2.5 ULP for [eq]#{vert}y{vert} = 0# or [eq]#{vert}y{vert}# in the range [2^-14^, 2^14^].
@@ -2766,6 +2943,22 @@ endif::VK_VERSION_1_1[]
 | code:OpQuantizeToF16
 2+| Correctly rounded with implementation defined rounding mode.
 | conversions between types
+2+| Correctly rounded.
+| code:OpAtomicCompareExchange, code:OpAtomicCompareExchangeWeak
+2+| Correct result.
+ifdef::VK_EXT_shader_atomic_float[]
+| code:OpAtomicFAddEXT
+2+| Return value correct result, value in memory correctly rounded.
+endif::VK_EXT_shader_atomic_float[]
+ifdef::VK_EXT_shader_atomic_float2[]
+| code:OpAtomicFMinEXT, code:OpAtomicFMaxEXT
+2+| Correct result.
+endif::VK_EXT_shader_atomic_float2[]
+| code:OpDPdx, code:OpDPdy, code:OpFwidth
+2+| Correctly rounded.
+| code:OpDPdxCoarse, code:OpDPdyCoarse, code:OpFwidthCoarse
+2+| Correctly rounded.
+| code:OpDPdxFine, code:OpDPdyFine, code:OpFwidthFine
 2+| Correctly rounded.
 |====
 
@@ -2891,14 +3084,23 @@ above instructions inherit the above errors.
 GLSL.std.450 extended instructions not listed above and not defined in terms
 of the above have undefined: precision.
 
-For the code:OpSRem and code:OpSMod instructions, if either operand is
-negative the result is undefined:.
+ifdef::VK_KHR_maintenance8[]
+If the <<features-maintenance8,pname:maintenance8>> feature is not enabled
+and if
+endif::VK_KHR_maintenance8[]
+ifndef::VK_KHR_maintenance8[If]
+either operand to code:OpSRem and code:OpSMod instructions is negative the
+result is undefined:.
 
 [NOTE]
 ====
 While the code:OpSRem and code:OpSMod instructions are supported by the
-Vulkan environment, they require non-negative values and thus do not enable
-additional functionality beyond what code:OpUMod provides.
+Vulkan environment,
+ifdef::VK_KHR_maintenance8[]
+If the <<features-maintenance8,pname:maintenance8>> feature is not enabled,
+endif::VK_KHR_maintenance8[]
+they require non-negative values and thus do not enable additional
+functionality beyond what code:OpUMod provides.
 ====
 
 ifdef::VK_NV_cooperative_matrix[]
@@ -2911,6 +3113,18 @@ code:OpCooperativeMatrixMulAddKHR performs its operations in an
 implementation-dependent order and internal precision.
 endif::VK_KHR_cooperative_matrix[]
 
+ifdef::VK_NV_cooperative_vector[]
+code:OpCooperativeVectorMatrixMulNV and
+code:OpCooperativeVectorMatrixMulAddNV perform their operations in an
+implementation-dependent order and internal precision.
+
+When pname:inputType is ename:VK_COMPONENT_TYPE_FLOAT16_KHR and
+pname:inputInterpretation is a lower-precision floating-point type (e.g.
+ename:VK_COMPONENT_TYPE_FLOAT_E4M3_NV or
+ename:VK_COMPONENT_TYPE_FLOAT_E5M2_NV), the input vector should: be
+converted to the lower-precision type before performing the matrix-vector
+multiply, but may: keep the full 16 bits of precision.
+endif::VK_NV_cooperative_vector[]
 
 [[spirvenv-image-signedness]]
 == Signedness of SPIR-V Image Accesses

@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -66,16 +66,16 @@ code:PostDepthCoverage execution mode, the <<fragops-samplemask, sample mask
 test>> is instead performed after the <<fragops-depth, depth test>>.
 endif::VK_EXT_post_depth_coverage[]
 
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:earlyFragmentMultisampleCoverageAfterSampleCounting
+sname:VkPhysicalDeviceMaintenance5Properties::pname:earlyFragmentMultisampleCoverageAfterSampleCounting
 is ename:VK_TRUE and there is a <<fragops-shader, fragment shader>> which
 declares the code:EarlyFragmentTests execution mode, <<fragops-shader,
 fragment shading>> and <<fragops-covg, multisample coverage>> operations
 must: be performed after <<fragops-samplecount, sample counting>>.
 
 Otherwise, if
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:earlyFragmentMultisampleCoverageAfterSampleCounting
+sname:VkPhysicalDeviceMaintenance5Properties::pname:earlyFragmentMultisampleCoverageAfterSampleCounting
 is ename:VK_FALSE and there is a <<fragops-shader, fragment shader>> which
 declares the code:EarlyFragmentTests execution mode, <<fragops-shader,
 fragment shading>> and <<fragops-covg, multisample coverage>> operations
@@ -83,28 +83,28 @@ should: instead be performed after <<fragops-samplecount, sample counting>>,
 but may: be performed before <<fragops-samplecount, sample counting>>.
 
 If
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:earlyFragmentSampleMaskTestBeforeSampleCounting
+sname:VkPhysicalDeviceMaintenance5Properties::pname:earlyFragmentSampleMaskTestBeforeSampleCounting
 is ename:VK_TRUE and there is a <<fragops-shader, fragment shader>> which
 declares the code:EarlyFragmentTests execution mode <<fragops-samplemask,
 sample mask test>> operations must: follow the order of fragment operations
 from above.
 
 Otherwise, if
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:earlyFragmentSampleMaskTestBeforeSampleCounting
+sname:VkPhysicalDeviceMaintenance5Properties::pname:earlyFragmentSampleMaskTestBeforeSampleCounting
 is ename:VK_FALSE and there is a <<fragops-shader, fragment shader>> which
 declares the code:EarlyFragmentTests execution mode, <<fragops-samplemask,
 sample mask test>> operations should: follow the order of fragment
 operations from above but may: instead be performed after
 <<fragops-samplecount, sample counting>>.
-endif::VK_KHR_maintenance5[]
-ifndef::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
+ifndef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If there is a <<fragops-shader, fragment shader>> and it declares the
 code:EarlyFragmentTests execution mode, <<fragops-shader,fragment shading>>
 and <<fragops-covg, multisample coverage>> operations should: instead be
 performed after <<fragops-samplecount, sample counting>>, and
 <<fragops-samplemask,sample mask test>> may: instead be performed after
 <<fragops-samplecount, sample counting>>.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 
 ifdef::VK_AMD_shader_early_and_late_fragment_tests[]
 If there is a <<fragops-shader, fragment shader>> which declares the
@@ -252,6 +252,17 @@ If the ename:VK_DYNAMIC_STATE_DISCARD_RECTANGLE_EXT dynamic state is not
 enabled, and this structure is not included in the pname:pNext chain, it is
 equivalent to specifying this structure with a pname:discardRectangleCount
 of `0`.
+If all ename:VK_DYNAMIC_STATE_DISCARD_RECTANGLE_EXT,
+ename:VK_DYNAMIC_STATE_DISCARD_RECTANGLE_ENABLE_EXT, and
+ename:VK_DYNAMIC_STATE_DISCARD_RECTANGLE_MODE_EXT dynamic states are
+enabled, the application can: omit this structure from the pname:pNext chain
+of slink:VkGraphicsPipelineCreateInfo and still use discard rectangles by
+setting all state dynamically.
+In this case fname:vkCmdSetDiscardRectangleEXT must: be called to set the
+discard rectangle for all indices [eq]#[0, pname:maxDiscardRectangles)#
+before drawing with discard rectangles enabled.
+Individual discard rectangles can: be made ineffective by setting their
+slink:VkRect2D::pname:width and slink:VkRect2D::pname:height to zero.
 
 .Valid Usage
 ****
@@ -1083,11 +1094,11 @@ If no fragment shader is active, or if the active fragment shader does not
 include code:SampleMask in its interface, the coverage mask is not modified.
 
 Next, the fragment alpha value and coverage mask are modified based on the
-ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+ifdef::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 line coverage factor if the pname:lineRasterizationMode member of the
 slink:VkPipelineRasterizationStateCreateInfo structure is
-ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_KHR, and the
-endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH, and the
+endif::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 pname:alphaToCoverageEnable and pname:alphaToOneEnable members of the
 slink:VkPipelineMultisampleStateCreateInfo structure.
 
@@ -1180,14 +1191,14 @@ section).
 If that shader output has an integer or unsigned integer type, then these
 operations are skipped.
 
-ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+ifdef::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 If the pname:lineRasterizationMode member of the
 slink:VkPipelineRasterizationStateCreateInfo structure is
-ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_KHR and the fragment
-came from a line segment, then the alpha value is replaced by multiplying it
-by the coverage factor for the fragment computed during
+ename:VK_LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH and the fragment came
+from a line segment, then the alpha value is replaced by multiplying it by
+the coverage factor for the fragment computed during
 <<primsrast-lines-smooth,smooth line rasterization>>.
-endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+endif::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 
 If pname:alphaToCoverageEnable is enabled, a temporary coverage mask is
 generated where each bit is determined by the fragment's alpha value, which
@@ -1557,7 +1568,7 @@ stencil value [eq]#s~g~# according to the write mask [eq]#s~w~# defined by
 pname:writeMask in slink:VkPipelineDepthStencilStateCreateInfo::pname:front
 and slink:VkPipelineDepthStencilStateCreateInfo::pname:back as:
 
-  {empty}:: [eq]#s~a~ = (s~a~ & ¬s~w~) | (s~g~ & s~w~)#
+  {empty}:: [eq]#s~a~ = (s~a~ {land} {lnot}s~w~) {lor} (s~g~ {land} s~w~)#
 
 ifdef::VK_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
 [open,refpage='vkCmdSetStencilTestEnable',desc='Set stencil test enable dynamically for a command buffer',type='protos',alias='vkCmdSetStencilTestEnableEXT']
@@ -1855,9 +1866,9 @@ values of the slink:VkDepthClampRangeEXT structure pointed to by
 pname:pDepthClampRange.
 endif::VK_EXT_depth_clamp_control[]
 
-ifdef::VK_EXT_depth_clamp_zero_one[]
+ifdef::VK_EXT_depth_clamp_zero_one,VK_KHR_depth_clamp_zero_one[]
 If
-slink:VkPhysicalDeviceDepthClampZeroOneFeaturesEXT::pname:depthClampZeroOne
+slink:VkPhysicalDeviceDepthClampZeroOneFeaturesKHR::pname:depthClampZeroOne
 is enabled:
 
 ifdef::VK_EXT_depth_range_unrestricted[]
@@ -1871,10 +1882,10 @@ ifndef::VK_EXT_depth_range_unrestricted[]
 endif::VK_EXT_depth_range_unrestricted[]
 
 Otherwise:
-endif::VK_EXT_depth_clamp_zero_one[]
-ifndef::VK_EXT_depth_clamp_zero_one[]
+endif::VK_EXT_depth_clamp_zero_one,VK_KHR_depth_clamp_zero_one[]
+ifndef::VK_EXT_depth_clamp_zero_one,VK_KHR_depth_clamp_zero_one[]
 Following depth clamping:
-endif::VK_EXT_depth_clamp_zero_one[]
+endif::VK_EXT_depth_clamp_zero_one,VK_KHR_depth_clamp_zero_one[]
 
   * If [eq]#z~f~# is not in the range [eq]#[z~min~, z~max~]#, then
     [eq]#z~f~# is undefined: following this step.

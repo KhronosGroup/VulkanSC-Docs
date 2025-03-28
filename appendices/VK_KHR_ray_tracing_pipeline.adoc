@@ -1,4 +1,4 @@
-// Copyright 2017-2024 The Khronos Group Inc.
+// Copyright 2017-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -177,8 +177,8 @@ and enums are aliased, changed, or removed.
      added pname:libraries, pname:pLibraryInterface, and
      pname:pDynamicState)
   ** slink:VkPhysicalDeviceRayTracingPropertiesNV ->
-     VkPhysicalDeviceRayTracingPropertiesKHR (renamed pname:maxTriangleCount
-     to pname:maxPrimitiveCount, added
+     slink:VkPhysicalDeviceRayTracingPipelinePropertiesKHR (renamed
+     pname:maxTriangleCount to pname:maxPrimitiveCount, added
      pname:shaderGroupHandleCaptureReplaySize)
   ** flink:vkCmdTraceRaysNV -> flink:vkCmdTraceRaysKHR (params to struct)
   ** flink:vkCreateRayTracingPipelinesNV ->
@@ -320,7 +320,7 @@ There are two main reasons for the difference here:
 required dependency, particularly when the "`Feature Requirements`" section
 says it is required to be supported anyhow?
 --
-*RESOLVED*: If the `apiext:VK_KHR_pipeline_library` extensino were a
+*RESOLVED*: If the `apiext:VK_KHR_pipeline_library` extension were a
 required dependency, then every application would need to enable the
 extension whether or not they actually want to use the pipeline library
 functionality.

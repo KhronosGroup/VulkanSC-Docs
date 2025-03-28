@@ -1,6 +1,6 @@
 #!/usr/bin/env python3 -i
 #
-# Copyright 2013-2024 The Khronos Group Inc.
+# Copyright 2013-2025 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -1022,7 +1022,7 @@ class ValidityOutputGenerator(OutputGenerator):
 
         vu = ('The pname:' +
               self.structtype_member_name +
-              ' value of each struct in the pname:' +
+              ' value of each structure in the pname:' +
               self.nextpointer_member_name +
               ' chain must: be unique')
         anchor = (self.conventions.member_used_for_unique_vuid, 'unique')

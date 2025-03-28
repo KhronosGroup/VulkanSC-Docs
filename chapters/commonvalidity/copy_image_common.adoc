@@ -1,4 +1,4 @@
-// Copyright 2020-2024 The Khronos Group Inc.
+// Copyright 2020-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -52,8 +52,7 @@ endif::VK_KHR_shared_presentable_image[]
   * [[VUID-{refpage}-srcImage-01548]]
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     If the elink:VkFormat of each of pname:srcImage and pname:dstImage is
-    not a <<formats-requiring-sampler-ycbcr-conversion,_multi-planar
-    format_>>, the
+    not a <<formats-multiplanar, multi-planar format>>, the
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ifndef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[The]
     elink:VkFormat of each of pname:srcImage and pname:dstImage must: be
@@ -61,8 +60,8 @@ ifndef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[The]
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-{refpage}-None-01549]]
     In a copy to or from a plane of a
-    <<formats-requiring-sampler-ycbcr-conversion,multi-planar image>>, the
-    elink:VkFormat of the image and plane must: be compatible according to
+   <<formats-multiplanar, multi-planar image>>, the elink:VkFormat of the
+    image and plane must: be compatible according to
     <<formats-compatible-planes,the description of compatible planes>> for
     the plane being copied
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
@@ -88,33 +87,67 @@ endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-{refpage}-srcImage-01551]]
     If neither pname:srcImage nor pname:dstImage has a
-    <<formats-requiring-sampler-ycbcr-conversion, multi-planar image
-    format>> then for each element of pname:pRegions,
-    pname:srcSubresource.aspectMask and pname:dstSubresource.aspectMask
-    must: match
+    <<formats-multiplanar, multi-planar format>>
+ifdef::VK_KHR_maintenance8[and the <<features-maintenance8,pname:maintenance8>> feature is not enabled]
+    then for each element of pname:pRegions, pname:srcSubresource.aspectMask
+    and pname:dstSubresource.aspectMask must: match
+ifdef::VK_KHR_maintenance8[]
+  * [[VUID-{refpage}-srcSubresource-10214]]
+    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT,
+    then pname:dstSubresource.aspectMask must: not contain both
+    ename:VK_IMAGE_ASPECT_DEPTH_BIT and ename:VK_IMAGE_ASPECT_STENCIL_BIT
+  * [[VUID-{refpage}-dstSubresource-10215]]
+    If pname:dstSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT,
+    then pname:srSubresource.aspectMask must: not contain both
+    ename:VK_IMAGE_ASPECT_DEPTH_BIT and ename:VK_IMAGE_ASPECT_STENCIL_BIT
+endif::VK_KHR_maintenance8[]
   * [[VUID-{refpage}-srcImage-08713]]
-    If pname:srcImage has a <<formats-requiring-sampler-ycbcr-conversion,
-    multi-planar image format>>, then for each element of pname:pRegions,
-    pname:srcSubresource.aspectMask must: be a single valid
-    <<formats-planes-image-aspect,multi-planar aspect mask>> bit
+    If pname:srcImage has a <<formats-multiplanar, multi-planar format>>,
+    then for each element of pname:pRegions, pname:srcSubresource.aspectMask
+    must: be a single valid <<formats-multiplanar-image-aspect,multi-planar
+    aspect mask>> bit
   * [[VUID-{refpage}-dstImage-08714]]
-    If pname:dstImage has a <<formats-requiring-sampler-ycbcr-conversion,
-    multi-planar image format>>, then for each element of pname:pRegions,
-    pname:dstSubresource.aspectMask must: be a single valid
-    <<formats-planes-image-aspect,multi-planar aspect mask>> bit
+    If pname:dstImage has a <<formats-multiplanar, multi-planar format>>,
+    then for each element of pname:pRegions, pname:dstSubresource.aspectMask
+    must: be a single valid <<formats-multiplanar-image-aspect,multi-planar
+    aspect mask>> bit
   * [[VUID-{refpage}-srcImage-01556]]
-    If pname:srcImage has a
-    <<formats-requiring-sampler-ycbcr-conversion,multi-planar image format>>
-    and the pname:dstImage does not have a multi-planar image format, then
-    for each element of pname:pRegions, pname:dstSubresource.aspectMask
-    must: be ename:VK_IMAGE_ASPECT_COLOR_BIT
+    If pname:srcImage has a <<formats-multiplanar, multi-planar format>> and
+    the pname:dstImage does not have a multi-planar image format, then for
+    each element of pname:pRegions, pname:dstSubresource.aspectMask must: be
+    ename:VK_IMAGE_ASPECT_COLOR_BIT
   * [[VUID-{refpage}-dstImage-01557]]
-    If pname:dstImage has a
-    <<formats-requiring-sampler-ycbcr-conversion,multi-planar image format>>
-    and the pname:srcImage does not have a multi-planar image format, then
-    for each element of pname:pRegions, pname:srcSubresource.aspectMask
-    must: be ename:VK_IMAGE_ASPECT_COLOR_BIT
+    If pname:dstImage has a <<formats-multiplanar, multi-planar format>> and
+    the pname:srcImage does not have a multi-planar image format, then for
+    each element of pname:pRegions, pname:srcSubresource.aspectMask must: be
+    ename:VK_IMAGE_ASPECT_COLOR_BIT
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
+ifdef::VK_KHR_maintenance8[]
+  * [[VUID-{refpage}-srcSubresource-10209]]
+    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT
+    and pname:dstSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT
+    or ename:VK_IMAGE_ASPECT_STENCIL_BIT, then
+    <<features-maintenance8,pname:maintenance8>> must: be enabled
+  * [[VUID-{refpage}-srcSubresource-10210]]
+    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT or
+    ename:VK_IMAGE_ASPECT_STENCIL_BIT and pname:dstSubresource.aspectMask is
+    ename:VK_IMAGE_ASPECT_COLOR_BIT, then
+    <<features-maintenance8,pname:maintenance8>> must: be enabled
+  * [[VUID-{refpage}-srcSubresource-10211]]
+    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT
+    and pname:dstSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT
+    or ename:VK_IMAGE_ASPECT_STENCIL_BIT, then the elink:VkFormat values of
+    pname:srcImage and pname:dstImage must: be compatible according to
+    <<formats-compatible-zs-color,the list of compatible depth-stencil and
+    color formats>>
+  * [[VUID-{refpage}-srcSubresource-10212]]
+    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT or
+    ename:VK_IMAGE_ASPECT_STENCIL_BIT and pname:dstSubresource.aspectMask is
+    ename:VK_IMAGE_ASPECT_COLOR_BIT, then the elink:VkFormat values of
+    pname:srcImage and pname:dstImage must: be compatible according to
+    <<formats-compatible-zs-color,the list of compatible depth-stencil and
+    color formats>>
+endif::VK_KHR_maintenance8[]
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-{refpage}-apiVersion-07932]]
     If
@@ -210,22 +243,22 @@ endif::VKSC_VERSION_1_0[]
 ifdef::VK_VERSION_1_1,VK_KHR_maintenance1[]
   * [[VUID-{refpage}-srcImage-07743]]
     If pname:srcImage and pname:dstImage have a different elink:VkImageType,
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
     and the <<features-maintenance5, pname:maintenance5>> feature is not
     enabled,
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
     one must: be ename:VK_IMAGE_TYPE_3D and the other must: be
     ename:VK_IMAGE_TYPE_2D
   * [[VUID-{refpage}-srcImage-08793]]
     If pname:srcImage and pname:dstImage have the same elink:VkImageType,
     for each element of pname:pRegions,
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
     if neither of the pname:layerCount members of pname:srcSubresource or
     pname:dstSubresource are ename:VK_REMAINING_ARRAY_LAYERS,
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
     the pname:layerCount members of pname:srcSubresource or
     pname:dstSubresource must: match
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * [[VUID-{refpage}-srcImage-08794]]
     If pname:srcImage and pname:dstImage have the same elink:VkImageType,
     and one of the pname:layerCount members of pname:srcSubresource or
@@ -233,7 +266,7 @@ ifdef::VK_KHR_maintenance5[]
     member must: be either ename:VK_REMAINING_ARRAY_LAYERS or equal to the
     pname:arrayLayers member of the slink:VkImageCreateInfo used to create
     the image minus pname:baseArrayLayer
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
   * [[VUID-{refpage}-srcImage-01790]]
     If pname:srcImage and pname:dstImage are both of type
     ename:VK_IMAGE_TYPE_2D, then for each element of pname:pRegions,

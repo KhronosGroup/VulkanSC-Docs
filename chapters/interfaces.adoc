@@ -1,5 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
-//
+// Copyright 2015-2025 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[interfaces]]
@@ -76,7 +75,7 @@ the variable.
 
 
 [[interfaces-iointerfaces-builtin]]
-=== Built-in Interface Block
+=== Built-In Interface Block
 
 Shader <<interfaces-builtin-variables,built-in>> variables meeting the
 following requirements define the _built-in interface block_.
@@ -101,7 +100,7 @@ Built-ins must: not have any code:Location or code:Component decorations.
 
 
 [[interfaces-iointerfaces-user]]
-=== User-defined Variable Interface
+=== User-Defined Variable Interface
 
 The non-built-in variables listed by code:OpEntryPoint with the code:Input
 or code:Output storage class form the _user-defined variable interface_.
@@ -190,82 +189,66 @@ write to a matching output variable, as described above.
 
 
 [[interfaces-iointerfaces-locations]]
-=== Location Assignment
+=== Location and Component Assignment
 
-This section describes code:Location assignments for user-defined variables
-and how many code:Location slots are consumed by a given user-variable type.
-<<interfaces-iointerfaces-matching, As mentioned above>>, some inputs and
-outputs have an additional level of arrayness relative to other shader
-inputs and outputs.
-This outer array level is removed from the type before considering how many
-code:Location slots the type consumes.
+<<interfaces-iointerfaces-user,User-defined variables>> in interfaces
+between shader stages in the graphics pipeline consume a unique set of
+code:Location and code:Component values.
 
-The code:Location value specifies an interface slot comprised of a 32-bit
-four-component vector conveyed between stages.
-The code:Component specifies <<interfaces-iointerfaces-components, word
-components>> within these vector code:Location slots.
-Only types with widths of
-ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-16,
-endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-32 or 64 are supported in shader interfaces.
-
-Inputs and outputs of the following types consume a single interface
-code:Location:
+Available space for user-defined interface variables is partitioned into a
+number of 32-bit four-component vectors, each identified by a code:Location
+value.
+Each individual 32-bit component of a vector is then further identified by a
+code:Component value.
 
 ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-  * 16-bit scalar and vector types, and
+16-bit scalar or vector values consume one code:Component slot per 16-bit
+component and must: be specified within a single code:Location.
 endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-  * 32-bit scalar and vector types, and
-  * 64-bit scalar and 2-component vector types.
+32-bit scalar or vector values consume one code:Component slot per 32-bit
+component and must: be specified within a single code:Location.
+64-bit scalar or vector values consume two consecutive code:Component slots
+per 64-bit component from up to two consecutive code:Location slots.
 
-64-bit three- and four-component vectors consume two consecutive
-code:Location slots.
+For any shader interface variable where <<interfaces-iointerfaces-matching,
+one level of the array is disregarded for type matching>>, the outer array
+level is also disregarded when assigning code:Location slots.
 
-If a declared input or output is an array of size _n_ and each element takes
-_m_ code:Location slots, it will be assigned _m_ {times} _n_ consecutive
-code:Location slots starting with the specified code:Location.
+An array of size [eq]#n# with elements consuming [eq]#l# code:Location slots
+each will consume [eq]#l {times} n# code:Location slots.
+Each element of the array will consume all four code:Component slots in each
+code:Location slot.
 
-If the declared input or output is an _n_ {times} _m_
-ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-16-,
-endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-32- or 64-bit matrix, it will be assigned multiple code:Location slots
-starting with the specified code:Location.
-The number of code:Location slots assigned for each matrix will be the same
-as for an _n_-element array of _m_-component vectors.
+Matrices of size [eq]#n {times} m# are assigned locations identically to
+arrays of size [eq]#n# of vectors of length 4 (consuming all code:Component
+slots) with an identical element type.
 
-An code:OpVariable with a structure type that is not a block must: be
-decorated with a code:Location.
+When an code:OpVariable with a structure type is decorated with a
+code:Location, the members in the structure type must: not be decorated with
+a code:Location.
+The code:OpVariable's members are assigned consecutive locations in
+declaration order, starting from the first member, which is assigned the
+location decoration from the code:OpVariable.
+The code:Location slots consumed by structure members are determined by
+applying the rules above in a depth-first traversal of the instantiated
+members as though the structure or block member were declared as an input or
+output variable of the same type.
 
-When an code:OpVariable with a structure type (either block or non-block) is
-decorated with a code:Location, the members in the structure type must: not
-be decorated with a code:Location.
-The code:OpVariable's members are assigned consecutive code:Location slots
-in declaration order, starting from the first member, which is assigned the
-code:Location decoration from the code:OpVariable.
+An code:OpVariable with a structure type that is not decorated with
+code:Block must: be decorated with a code:Location.
 
-When a block-type code:OpVariable is declared without a code:Location
-decoration, each member in its structure type must: be decorated with a
-code:Location.
+When an code:OpVariable with a structure type decorated with code:Block is
+declared without a code:Location decoration, each member in the structure
+must: be decorated with a code:Location.
 Types nested deeper than the top-level members must: not have code:Location
 decorations.
 
-The code:Location slots consumed by block and structure members are
-determined by applying the rules above in a depth-first traversal of the
-instantiated members as though the structure or block member were declared
-as an input or output variable of the same type.
+Multiple variable declarations in the same storage class must: not have
+overlapping code:Component slots within the same code:Location.
 
-Any two inputs listed as operands on the same code:OpEntryPoint must: not be
-assigned the same code:Location slot and code:Component word, either
-explicitly or implicitly.
-Any two outputs listed as operands on the same code:OpEntryPoint must: not
-be assigned the same code:Location slot and code:Component word, either
-explicitly or implicitly.
-
-The number of input and output code:Location slots available for a shader
-input or output interface is limited, and dependent on the shader stage as
-described in <<interfaces-iointerfaces-limits>>.
+The number of input and output locations available for a shader input or
+output interface depend on the shader stage as described in
+<<interfaces-iointerfaces-limits>>.
 All variables in both the <<interfaces-builtin-variables,built-in interface
 block>> and the <<interfaces-iointerfaces-user,user-defined variable
 interface>> count against these limits.
@@ -304,42 +287,6 @@ endif::VK_HUAWEI_cluster_culling_shader[]
 |====
 
 
-[[interfaces-iointerfaces-components]]
-=== Component Assignment
-
-The code:Component decoration allows the code:Location to be more finely
-specified for scalars and vectors, down to the individual code:Component
-word within a code:Location slot that are consumed.
-The code:Component word within a code:Location are 0, 1, 2, and 3.
-A variable or block member starting at code:Component N will consume
-code:Component words N, N+1, N+2, ...
-up through its size.
-ifdef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-For 16-, and 32-bit types,
-endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-ifndef::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-For single precision types,
-endif::VK_VERSION_1_1,VK_KHR_16bit_storage[]
-it is invalid if this sequence of code:Component words gets larger than 3.
-A scalar 64-bit type will consume two of these code:Component words in
-sequence, and a two-component 64-bit vector type will consume all four
-code:Component words available within a code:Location.
-A three- or four-component 64-bit vector type must: not specify a non-zero
-code:Component decoration.
-A three-component 64-bit vector type will consume all four code:Component
-words of the first code:Location and code:Component 0 and 1 of the second
-code:Location.
-This leaves code:Component 2 and 3 available for other component-qualified
-declarations.
-
-A scalar or two-component 64-bit data type must: not specify a
-code:Component decoration of 1 or 3.
-A code:Component decoration must: not be specified for any type that is not
-a scalar or vector.
-
-A four-component 64-bit data type will consume all four code:Component words
-of the first code:Location and all four code:Component words of the second
-code:Location.
 
 
 [[interfaces-vertexinput]]
@@ -368,6 +315,12 @@ See <<fxvertex-attrib-location>> for details.
 
 All vertex shader inputs declared as above must: have a corresponding
 attribute and binding in the pipeline.
+
+Components and locations are consumed as defined for
+<<interfaces-iointerfaces-locations, Location and Component Assignment>>.
+Multiple <<interfaces-iointerfaces-user,user-defined input variable>>
+declarations must: not have overlapping code:Component slots within the same
+code:Location.
 
 
 [[interfaces-fragmentoutput]]
@@ -400,33 +353,39 @@ the color attachment indicated by
 slink:VkSubpassDescription::pname:pColorAttachments[_i_].
 Values are written to those attachments after passing through the blending
 unit as described in <<framebuffer-blending>>, if enabled.
-Locations are consumed as described in
-<<interfaces-iointerfaces-locations,Location Assignment>>.
 The number of available fragment output code:Location slots is given by the
 pname:maxFragmentOutputAttachments member of the
 sname:VkPhysicalDeviceLimits structure.
 
-ifdef::VK_KHR_dynamic_rendering_local_read[]
+ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 If the
 <<features-dynamicRenderingLocalRead,pname:dynamicRenderingLocalRead>>
 feature is supported, fragment output locations can: be remapped when using
 dynamic rendering.
 
-[open,refpage='vkCmdSetRenderingAttachmentLocationsKHR',desc='Set color attachment location mappings for a command buffer',type='protos']
+[open,refpage='vkCmdSetRenderingAttachmentLocations',desc='Set color attachment location mappings for a command buffer',type='protos',alias='vkCmdSetRenderingAttachmentLocationsKHR']
 --
 To set the fragment output location mappings during rendering, call:
 
+ifdef::VK_VERSION_1_4[]
+include::{generated}/api/protos/vkCmdSetRenderingAttachmentLocations.adoc[]
+endif::VK_VERSION_1_4[]
+
+ifdef::VK_VERSION_1_4+VK_KHR_dynamic_rendering_local_read[or the equivalent command]
+
+ifdef::VK_KHR_dynamic_rendering_local_read[]
 include::{generated}/api/protos/vkCmdSetRenderingAttachmentLocationsKHR.adoc[]
+endif::VK_KHR_dynamic_rendering_local_read[]
 
   * pname:commandBuffer is the command buffer into which the command will be
     recorded.
-  * pname:pLocationInfo is a slink:VkRenderingAttachmentLocationInfoKHR
+  * pname:pLocationInfo is a slink:VkRenderingAttachmentLocationInfo
     structure indicating the new mappings.
 
 This command sets the attachment location mappings for subsequent drawing
 commands, and must: match the mappings provided to the bound pipeline,
 ifdef::VK_EXT_shader_object[if one is bound,]
-which can: be set by chaining slink:VkRenderingAttachmentLocationInfoKHR to
+which can: be set by chaining slink:VkRenderingAttachmentLocationInfo to
 slink:VkGraphicsPipelineCreateInfo.
 
 Until this command is called, mappings in the command buffer state are
@@ -437,26 +396,32 @@ This state is reset whenever flink:vkCmdBeginRendering is called.
 
 .Valid Usage
 ****
-  * [[VUID-vkCmdSetRenderingAttachmentLocationsKHR-dynamicRenderingLocalRead-09509]]
+  * [[VUID-vkCmdSetRenderingAttachmentLocations-dynamicRenderingLocalRead-09509]]
     <<features-dynamicRenderingLocalRead, pname:dynamicRenderingLocalRead>>
     must: be enabled
-  * [[VUID-vkCmdSetRenderingAttachmentLocationsKHR-pLocationInfo-09510]]
+  * [[VUID-vkCmdSetRenderingAttachmentLocations-pLocationInfo-09510]]
     pname:pLocationInfo->colorAttachmentCount must: be equal to the value of
     slink:VkRenderingInfo::pname:colorAttachmentCount used to begin the
     current render pass instance
-  * [[VUID-vkCmdSetRenderingAttachmentLocationsKHR-commandBuffer-09511]]
+  * [[VUID-vkCmdSetRenderingAttachmentLocations-commandBuffer-09511]]
     The current render pass instance must: have been started or resumed by
     flink:vkCmdBeginRendering in this pname:commandBuffer
 ****
 
-include::{generated}/validity/protos/vkCmdSetRenderingAttachmentLocationsKHR.adoc[]
+include::{generated}/validity/protos/vkCmdSetRenderingAttachmentLocations.adoc[]
 --
 
-[open,refpage='VkRenderingAttachmentLocationInfoKHR',desc='Structure specifying attachment locations',type='structs']
+[open,refpage='VkRenderingAttachmentLocationInfo',desc='Structure specifying attachment locations',type='structs',alias='VkRenderingAttachmentLocationInfoKHR']
 --
-The sname:VkRenderingAttachmentLocationInfoKHR structure is defined as:
+The sname:VkRenderingAttachmentLocationInfo structure is defined as:
+
+include::{generated}/api/structs/VkRenderingAttachmentLocationInfo.adoc[]
+
+ifdef::VK_KHR_dynamic_rendering_local_read[]
+or the equivalent
 
 include::{generated}/api/structs/VkRenderingAttachmentLocationInfoKHR.adoc[]
+endif::VK_KHR_dynamic_rendering_local_read[]
 
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
@@ -512,34 +477,34 @@ structure with the following properties:
 
 .Valid Usage
 ****
-  * [[VUID-VkRenderingAttachmentLocationInfoKHR-dynamicRenderingLocalRead-09512]]
+  * [[VUID-VkRenderingAttachmentLocationInfo-dynamicRenderingLocalRead-09512]]
     If the <<features-dynamicRenderingLocalRead,
     pname:dynamicRenderingLocalRead>> feature is not enabled, and
     pname:pColorAttachmentLocations is not `NULL`, each element must: be the
     value of its index within the array
-  * [[VUID-VkRenderingAttachmentLocationInfoKHR-pColorAttachmentLocations-09513]]
+  * [[VUID-VkRenderingAttachmentLocationInfo-pColorAttachmentLocations-09513]]
     Elements of pname:pColorAttachmentLocations that are not
     ename:VK_ATTACHMENT_UNUSED must: each be unique
-  * [[VUID-VkRenderingAttachmentLocationInfoKHR-colorAttachmentCount-09514]]
+  * [[VUID-VkRenderingAttachmentLocationInfo-colorAttachmentCount-09514]]
     pname:colorAttachmentCount must: be less than or equal to
     <<limits-maxColorAttachments,pname:maxColorAttachments>>
-  * [[VUID-VkRenderingAttachmentLocationInfoKHR-pColorAttachmentLocations-09515]]
+  * [[VUID-VkRenderingAttachmentLocationInfo-pColorAttachmentLocations-09515]]
     Each element of pname:pColorAttachmentLocations must: be less than
     <<limits-maxColorAttachments,pname:maxColorAttachments>>
 ****
 
-include::{generated}/validity/structs/VkRenderingAttachmentLocationInfoKHR.adoc[]
+include::{generated}/validity/structs/VkRenderingAttachmentLocationInfo.adoc[]
 --
-endif::VK_KHR_dynamic_rendering_local_read[]
+endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 
 When an active fragment shader invocation finishes, the values of all
 fragment shader outputs are copied out and used as blend inputs or color
 attachments writes.
 If the invocation does not set a value for them, the input values to those
 blending or color attachment writes are undefined:.
+If there is no color attachment indicated by code:Location, the values that
+would have been written to the color attachments are discarded.
 
-Components of the output variables are assigned as described in
-<<interfaces-iointerfaces-components,Component Assignment>>.
 Output code:Component words identified as 0, 1, 2, and 3 will be directed to
 the R, G, B, and A inputs to the blending unit, respectively, or to the
 output attachment if blending is disabled.
@@ -555,9 +520,11 @@ code:Location.
 Outputs identified with an code:Index of one are directed to the second
 input of the corresponding blending unit.
 
-There must: be no output variable which has the same code:Location,
-code:Component, and code:Index as any other, either explicitly declared or
-implied.
+Components and locations are consumed as defined for
+<<interfaces-iointerfaces-locations, Location and Component Assignment>>.
+Output variable declarations must: not consume any of the same
+code:Component slots within the same code:Location and with the same
+code:Index value as any other output variable declaration.
 
 Output values written by a fragment shader must: be declared with either
 code:OpTypeFloat or code:OpTypeInt, and a code:Width of 32.
@@ -588,12 +555,12 @@ The application can: enable dithering to be applied to the color output of a
 subpass, by using the
 ename:VK_SUBPASS_DESCRIPTION_ENABLE_LEGACY_DITHERING_BIT_EXT flag.
 ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 For use in a dynamic render pass, the
 ename:VK_RENDERING_ENABLE_LEGACY_DITHERING_BIT_EXT flag must: be used.
 In that case, the pipelines used must: have been created with
 ename:VK_PIPELINE_CREATE_2_ENABLE_LEGACY_DITHERING_BIT_EXT.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
 
 When dithering is enabled, the implementation may: modify the output color
@@ -693,29 +660,37 @@ The number of available input attachment indices is given by the
 pname:maxPerStageDescriptorInputAttachments member of the
 sname:VkPhysicalDeviceLimits structure.
 
-ifdef::VK_KHR_dynamic_rendering_local_read[]
+ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 When using dynamic rendering with the <<features-dynamicRenderingLocalRead,
 pname:dynamicRenderingLocalRead>> feature enabled, a subpass input variable
 with a code:InputAttachmentIndex decoration of _i_ can be mapped to a color,
 depth, or stencil attachment.
 
-[open,refpage='vkCmdSetRenderingInputAttachmentIndicesKHR',desc='Set input attachment index mappings for a command buffer',type='protos']
+[open,refpage='vkCmdSetRenderingInputAttachmentIndices',desc='Set input attachment index mappings for a command buffer',type='protos',alias='vkCmdSetRenderingInputAttachmentIndicesKHR']
 --
 To set the input attachment index mappings during dynamic rendering, call:
 
+ifdef::VK_VERSION_1_4[]
+include::{generated}/api/protos/vkCmdSetRenderingInputAttachmentIndices.adoc[]
+endif::VK_VERSION_1_4[]
+
+ifdef::VK_VERSION_1_4+VK_KHR_dynamic_rendering_local_read[or the equivalent command]
+
+ifdef::VK_KHR_dynamic_rendering_local_read[]
 include::{generated}/api/protos/vkCmdSetRenderingInputAttachmentIndicesKHR.adoc[]
+endif::VK_KHR_dynamic_rendering_local_read[]
 
   * pname:commandBuffer is the command buffer into which the command will be
     recorded.
   * pname:pInputAttachmentIndexInfo is a
-    slink:VkRenderingInputAttachmentIndexInfoKHR structure indicating the
-    new mappings.
+    slink:VkRenderingInputAttachmentIndexInfo structure indicating the new
+    mappings.
 
 This command sets the input attachment index mappings for subsequent drawing
 commands, and must: match the mappings provided to the bound pipeline,
 ifdef::VK_EXT_shader_object[if one is bound,]
-which can: be set by chaining slink:VkRenderingInputAttachmentIndexInfoKHR
-to slink:VkGraphicsPipelineCreateInfo.
+which can: be set by chaining slink:VkRenderingInputAttachmentIndexInfo to
+slink:VkGraphicsPipelineCreateInfo.
 
 Until this command is called, mappings in the command buffer state are
 treated as each color attachment specified in flink:vkCmdBeginRendering
@@ -726,26 +701,32 @@ This state is reset whenever flink:vkCmdBeginRendering is called.
 
 .Valid Usage
 ****
-  * [[VUID-vkCmdSetRenderingInputAttachmentIndicesKHR-dynamicRenderingLocalRead-09516]]
+  * [[VUID-vkCmdSetRenderingInputAttachmentIndices-dynamicRenderingLocalRead-09516]]
     <<features-dynamicRenderingLocalRead, pname:dynamicRenderingLocalRead>>
     must: be enabled
-  * [[VUID-vkCmdSetRenderingInputAttachmentIndicesKHR-pInputAttachmentIndexInfo-09517]]
+  * [[VUID-vkCmdSetRenderingInputAttachmentIndices-pInputAttachmentIndexInfo-09517]]
     pname:pInputAttachmentIndexInfo->colorAttachmentCount must: be equal to
     the value of slink:VkRenderingInfo::pname:colorAttachmentCount used to
     begin the current render pass instance
-  * [[VUID-vkCmdSetRenderingInputAttachmentIndicesKHR-commandBuffer-09518]]
+  * [[VUID-vkCmdSetRenderingInputAttachmentIndices-commandBuffer-09518]]
     The current render pass instance must: have been started or resumed by
     flink:vkCmdBeginRendering in this pname:commandBuffer
 ****
 
-include::{generated}/validity/protos/vkCmdSetRenderingInputAttachmentIndicesKHR.adoc[]
+include::{generated}/validity/protos/vkCmdSetRenderingInputAttachmentIndices.adoc[]
 --
 
-[open,refpage='VkRenderingInputAttachmentIndexInfoKHR',desc='Structure specifying input attachment indices',type='structs']
+[open,refpage='VkRenderingInputAttachmentIndexInfo',desc='Structure specifying input attachment indices',type='structs',alias='VkRenderingInputAttachmentIndexInfoKHR']
 --
-The sname:VkRenderingInputAttachmentIndexInfoKHR structure is defined as:
+The sname:VkRenderingInputAttachmentIndexInfo structure is defined as:
+
+include::{generated}/api/structs/VkRenderingInputAttachmentIndexInfo.adoc[]
+
+ifdef::VK_KHR_dynamic_rendering_local_read[]
+or the equivalent
 
 include::{generated}/api/structs/VkRenderingInputAttachmentIndexInfoKHR.adoc[]
+endif::VK_KHR_dynamic_rendering_local_read[]
 
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
@@ -811,40 +792,40 @@ structure with the following properties:
 
 .Valid Usage
 ****
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-dynamicRenderingLocalRead-09519]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-dynamicRenderingLocalRead-09519]]
     If the <<features-dynamicRenderingLocalRead,
     pname:dynamicRenderingLocalRead>> feature is not enabled, and
     pname:pColorAttachmentInputIndices is not `NULL`, each element must: be
     ename:VK_ATTACHMENT_UNUSED
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-dynamicRenderingLocalRead-09520]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-dynamicRenderingLocalRead-09520]]
     If the <<features-dynamicRenderingLocalRead,
     pname:dynamicRenderingLocalRead>> feature is not enabled,
     pname:pDepthInputAttachmentIndex must: be a valid pointer to a value of
     ename:VK_ATTACHMENT_UNUSED
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-dynamicRenderingLocalRead-09521]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-dynamicRenderingLocalRead-09521]]
     If the <<features-dynamicRenderingLocalRead,
     pname:dynamicRenderingLocalRead>> feature is not enabled,
     pname:pStencilInputAttachmentIndex must: be a valid pointer to a value
     of ename:VK_ATTACHMENT_UNUSED
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-pColorAttachmentInputIndices-09522]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-pColorAttachmentInputIndices-09522]]
     Elements of pname:pColorAttachmentInputIndices that are not
     ename:VK_ATTACHMENT_UNUSED must: each be unique
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-pColorAttachmentInputIndices-09523]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-pColorAttachmentInputIndices-09523]]
     Elements of pname:pColorAttachmentInputIndices that are not
     ename:VK_ATTACHMENT_UNUSED must: not take the same value as the content
     of pname:pDepthInputAttachmentIndex
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-pColorAttachmentInputIndices-09524]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-pColorAttachmentInputIndices-09524]]
     Elements of pname:pColorAttachmentInputIndices that are not
     ename:VK_ATTACHMENT_UNUSED must: not take the same value as the content
     of pname:pStencilInputAttachmentIndex
-  * [[VUID-VkRenderingInputAttachmentIndexInfoKHR-colorAttachmentCount-09525]]
+  * [[VUID-VkRenderingInputAttachmentIndexInfo-colorAttachmentCount-09525]]
     pname:colorAttachmentCount must: be less than or equal to
     <<limits-maxColorAttachments,pname:maxColorAttachments>>
 ****
 
-include::{generated}/validity/structs/VkRenderingInputAttachmentIndexInfoKHR.adoc[]
+include::{generated}/validity/structs/VkRenderingInputAttachmentIndexInfo.adoc[]
 --
-endif::VK_KHR_dynamic_rendering_local_read[]
+endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 
 Variables identified with the code:InputAttachmentIndex must: only be used
 by a fragment stage.
@@ -1147,8 +1128,7 @@ ifdef::VK_QCOM_image_processing[]
 endif::VK_QCOM_image_processing[]
 
 ifdef::VK_VERSION_1_1[]
-[Note]
-.Note
+[NOTE]
 ====
 Implementations must take care when implementing this if subgroups are not
 necessarily a subset of the invocation group for their hardware (e.g. if
@@ -1501,7 +1481,7 @@ recursively as follows:
     An empty structure has a base alignment equal to the size of the
     smallest scalar type permitted by the capabilities declared in the
     SPIR-V module.
-    (e.g., for a 1 byte aligned empty struct in the code:StorageBuffer
+    (e.g., for a 1 byte aligned empty structure in the code:StorageBuffer
     storage class, code:StorageBuffer8BitAccess or
     code:UniformAndStorageBuffer8BitAccess must: be declared in the SPIR-V
     module.)
@@ -1538,8 +1518,9 @@ endif::VK_VERSION_1_1,VK_KHR_relaxed_block_layout[]
 
 Every member of an code:OpTypeStruct that is required to be explicitly laid
 out must: be aligned according to the first matching rule as follows.
-If the struct is contained in pointer types of multiple storage classes, it
-must: satisfy the requirements for every storage class used to reference it.
+If the structure is contained in pointer types of multiple storage classes,
+it must: satisfy the requirements for every storage class used to reference
+it.
 
 ifdef::VK_VERSION_1_2,VK_EXT_scalar_block_layout[]
   . If the <<features-scalarBlockLayout, pname:scalarBlockLayout>> feature
@@ -1604,8 +1585,8 @@ endif::VK_KHR_ray_tracing_pipeline[]
     pname:scalarBlockLayout>> feature is not enabled.
 endif::VK_VERSION_1_2,VK_EXT_scalar_block_layout[]
 ifdef::VK_KHR_workgroup_memory_explicit_layout[]
-  * The storage class is code:Workgroup, and either the struct member is not
-    part of a code:Block or the
+  * The storage class is code:Workgroup, and either the structure member is
+    not part of a code:Block or the
     <<features-workgroupMemoryExplicitLayoutScalarBlockLayout,
     pname:workgroupMemoryExplicitLayoutScalarBlockLayout>> feature is not
     enabled.
@@ -2221,11 +2202,20 @@ culled, if it is code:false it will not be culled.
     The variable decorated with code:CullPrimitiveEXT must: be declared
     using the code:Output {StorageClass}
   * [[VUID-{refpage}-CullPrimitiveEXT-07036]]
-    The variable decorated with code:CullPrimitiveEXT must: be declared as
-    an array of boolean values
-  * [[VUID-{refpage}-CullPrimitiveEXT-07037]]
-    The size of the array decorated with code:CullPrimitiveEXT must: match
-    the value specified by code:OutputPrimitivesEXT
+    code:CullPrimitiveEXT must: decorate a scalar boolean member of a
+    structure decorated as code:Block, or decorate a variable of type
+    code:OpTypeArray of boolean values.
+  * [[VUID-{refpage}-CullPrimitiveEXT-10589]]
+    If code:CullPrimitiveEXT is declared as an array of boolean values, the
+    size of the array must: match the value specified by
+    code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-CullPrimitiveEXT-10590]]
+    If code:CullPrimitiveEXT decorates a member of a structure, the variable
+    declaration of the containing code:Block type must: have an array size
+    that matches the value specified by code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-CullPrimitiveEXT-10591]]
+    There must be only one declaration of the code:CullPrimitiveEXT
+    associated with a entry point's interface.
   * [[VUID-{refpage}-CullPrimitiveEXT-07038]]
     The variable decorated with code:CullPrimitiveEXT within the
     code:MeshEXT {ExecutionModel} must: also be decorated with the
@@ -3252,11 +3242,24 @@ endif::VK_VERSION_1_2[]
     {ExecutionModel} must: be declared using the code:Input {StorageClass}
   * [[VUID-{refpage}-Layer-04276]]
     The variable decorated with code:Layer must: be declared as a scalar
-    32-bit integer value
+    32-bit integer value for all supported execution models except
+    code:MeshEXT.
   * [[VUID-{refpage}-Layer-07039]]
     The variable decorated with code:Layer within the code:MeshEXT
     {ExecutionModel} must: also be decorated with the code:PerPrimitiveEXT
     decoration
+  * [[VUID-{refpage}-Layer-10592]]
+    code:Layer within the code:MeshEXT {ExecutionModel} must: decorate a
+    scalar 32-bit integer member of a structure decorated as code:Block, or
+    decorate a variable of type code:OpTypeArray of scalar 32-bit integer
+    values.
+  * [[VUID-{refpage}-Layer-10593]]
+    If code:Layer is declared as an array of boolean values, the size of the
+    array must: match the value specified by code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-Layer-10594]]
+    If code:Layer decorates a member of a structure, the variable
+    declaration of the containing code:Block type must: have an array size
+    that matches the value specified by code:OutputPrimitivesEXT
 ****
 --
 
@@ -3635,22 +3638,22 @@ code:PointSize::
 
 Decorating a variable with the code:PointSize built-in decoration will make
 that variable contain the size of point primitives
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 or the final rasterization of polygons if <<primsrast-polygonmode, polygon
 mode>> is ename:VK_POLYGON_MODE_POINT when
-sname:VkPhysicalDeviceMaintenance5PropertiesKHR::pname:polygonModePointSize
-is set to ename:VK_TRUE
-endif::VK_KHR_maintenance5[]
+sname:VkPhysicalDeviceMaintenance5Properties::pname:polygonModePointSize is
+set to ename:VK_TRUE
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 .
 The value written to the variable decorated with code:PointSize by the last
 <<pipelines-graphics-subsets-pre-rasterization,pre-rasterization shader
 stage>> in the pipeline is used as the framebuffer-space size of points
 produced by rasterization.
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If the <<features-maintenance5, pname:maintenance5>> feature is enabled and
 a value is not written to a variable decorated with code:PointSize, a value
 of 1.0 is used as the size of points.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 
 [NOTE]
 ====
@@ -3911,11 +3914,25 @@ SPIR-V has to use code:PrimitiveId.
     {StorageClass}
   * [[VUID-{refpage}-PrimitiveId-04337]]
     The variable decorated with code:PrimitiveId must: be declared as a
-    scalar 32-bit integer value
+    scalar 32-bit integer value for all supported execution models except
+    code:MeshEXT
   * [[VUID-{refpage}-PrimitiveId-07040]]
     The variable decorated with code:PrimitiveId within the code:MeshEXT
     {ExecutionModel} must: also be decorated with the code:PerPrimitiveEXT
     decoration
+  * [[VUID-{refpage}-PrimitiveId-10595]]
+    code:PrimitiveId within the code:MeshEXT {ExecutionModel} must: decorate
+    a scalar 32-bit integer member of a structure decorated as code:Block,
+    or decorate a variable of type code:OpTypeArray of 32-bit integer
+    values.
+  * [[VUID-{refpage}-PrimitiveId-10596]]
+    If code:PrimitiveId is declared as an array of 32-bit integer values,
+    within the code:MeshEXT {ExecutionModel}, size of the array must: match
+    the value specified by code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-PrimitiveId-10597]]
+    If code:PrimitiveId decorates a member of a structure, the variable
+    declaration of the containing code:Block type must: have an array size
+    that matches the value specified by code:OutputPrimitivesEXT
 ****
 --
 
@@ -4118,7 +4135,8 @@ value is undefined: for executions of the shader that take that path.
     declared using the code:Output {StorageClass}
   * [[VUID-{refpage}-PrimitiveShadingRateKHR-04486]]
     The variable decorated with code:PrimitiveShadingRateKHR must: be
-    declared as a scalar 32-bit integer value
+    declared as a scalar 32-bit integer value for all supported execution
+    models except code:MeshEXT
   * [[VUID-{refpage}-PrimitiveShadingRateKHR-04487]]
     The value written to code:PrimitiveShadingRateKHR must: include no more
     than one of code:Vertical2Pixels and code:Vertical4Pixels
@@ -4133,6 +4151,19 @@ value is undefined: for executions of the shader that take that path.
     The variable decorated with code:PrimitiveShadingRateKHR within the
     code:MeshEXT {ExecutionModel} must: also be decorated with the
     code:PerPrimitiveEXT decoration
+  * [[VUID-{refpage}-PrimitiveShadingRateKHR-10598]]
+    code:PrimitiveShadingRateKHR within the code:MeshEXT {ExecutionModel}
+    must: decorate a scalar 32-bit integer member of a structure decorated
+    as code:Block, or decorate a variable of type code:OpTypeArray of 32-bit
+    integer values.
+  * [[VUID-{refpage}-PrimitiveShadingRateKHR-10599]]
+    If code:PrimitiveShadingRateKHR is declared as an array of boolean
+    values, the size of the array must: match the value specified by
+    code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-PrimitiveShadingRateKHR-10600]]
+    If code:PrimitiveShadingRateKHR decorates a member of a structure, the
+    variable declaration of the containing code:Block type must: have an
+    array size that matches the value specified by code:OutputPrimitivesEXT
 ****
 --
 endif::VK_KHR_fragment_shading_rate[]
@@ -5122,11 +5153,24 @@ endif::VK_VERSION_1_2[]
     {ExecutionModel} must: be declared using the code:Input {StorageClass}
   * [[VUID-{refpage}-ViewportIndex-04408]]
     The variable decorated with code:ViewportIndex must: be declared as a
-    scalar 32-bit integer value
+    scalar 32-bit integer value for all supported execution models except
+    code:MeshEXT
   * [[VUID-{refpage}-ViewportIndex-07060]]
     The variable decorated with code:ViewportIndex within the code:MeshEXT
     {ExecutionModel} must: also be decorated with the code:PerPrimitiveEXT
     decoration
+  * [[VUID-{refpage}-ViewportIndex-10601]]
+    code:ViewportIndex within the code:MeshEXT {ExecutionModel} must:
+    decorate a scalar boolean member of a structure decorated as code:Block,
+    or decorate a variable of type code:OpTypeArray of boolean values.
+  * [[VUID-{refpage}-ViewportIndex-10602]]
+    If code:ViewportIndex is declared as an array of boolean values, the
+    size of the array must: match the value specified by
+    code:OutputPrimitivesEXT
+  * [[VUID-{refpage}-ViewportIndex-10603]]
+    If code:ViewportIndex decorates a member of a structure, the variable
+    declaration of the containing code:Block type must: have an array size
+    that matches the value specified by code:OutputPrimitivesEXT
 ****
 --
 
@@ -5457,6 +5501,153 @@ the instance of the current intersection.
 --
 endif::VK_NV_ray_tracing,VK_KHR_ray_tracing_pipeline[]
 
+ifdef::VK_NV_ray_tracing_linear_swept_spheres,VK_KHR_ray_tracing_pipeline[]
+[[interfaces-builtin-variables-hitissphere]]
+[open,refpage='HitIsSphereNV',desc='Indicates if a sphere primitive was hit',type='builtins']
+--
+:refpage: HitIsSphereNV
+
+code:HitIsSphereNV::
+
+A variable decorated with the code:HitIsSphereNV decoration will contain a
+non-zero value if the current ray hit a sphere primitive or zero otherwise.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitIsSphereNV-10513]]
+    The code:HitIsSphereNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitIsSphereNV-10514]]
+    The variable decorated with code:HitIsSphereNV must: be declared using
+    the code:Input {StorageClass}
+  * [[VUID-{refpage}-HitIsSphereNV-10515]]
+    The variable decorated with code:HitIsSphereNV must: be declared as a
+    boolean value
+****
+--
+
+[[interfaces-builtin-variables-hitislss]]
+[open,refpage='HitIsLSSNV',desc='Indicates if a LSS primitive was hit',type='builtins']
+--
+:refpage: HitIsLSSNV
+
+code:HitIsLSSNV::
+
+A variable decorated with the code:HitIsLSSNV decoration will contain a
+non-zero value if the current ray hit a LSS primitive or zero otherwise.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitIsLSSNV-10516]]
+    The code:HitIsLSSNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitIsLSSNV-10517]]
+    The variable decorated with code:HitIsLSSNV must: be declared using the
+    code:Input {StorageClass}
+  * [[VUID-{refpage}-HitIsLSSNV-10518]]
+    The variable decorated with code:HitIsLSSNV must: be declared as a
+    boolean value
+****
+--
+
+[[interfaces-builtin-variables-hitsphereposition]]
+[open,refpage='HitSpherePositionNV',desc='Contains the position of the hit sphere',type='builtins']
+--
+:refpage: HitSpherePositionNV
+
+code:HitSpherePositionNV::
+
+A variable decorated with the code:HitSpherePositionNV decoration will
+contain the position of sphere primitive intersected by current ray.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitSpherePositionNV-10519]]
+    The code:HitSpherePositionNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitSpherePositionNV-10520]]
+    The variable decorated with code:HitSpherePositionNV must: be declared
+    using the code:Input {StorageClass}
+  * [[VUID-{refpage}-HitSpherePositionNV-10521]]
+    The variable decorated with code:HitSpherePositionNV must: be declared
+    as a three-component vector of 32-bit floating-point values
+****
+--
+
+[[interfaces-builtin-variables-hitsphereradius]]
+[open,refpage='HitSphereRadiusNV',desc='Contains the radius of the hit sphere',type='builtins']
+--
+:refpage: HitSphereRadiusNV
+
+code:HitSphereRadiusNV::
+
+A variable decorated with the code:HitSphereRadiusNV decoration will contain
+the radius of sphere primitive intersected by current ray.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitSphereRadiusNV-10522]]
+    The code:HitSphereRadiusNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitSphereRadiusNV-10523]]
+    The variable decorated with code:HitSphereRadiusNV must: be declared
+    using the code:Input {StorageClass}
+  * [[VUID-{refpage}-HitSphereRadiusNV-10524]]
+    The variable decorated with code:HitSphereRadiusNV must: be declared as
+    a scalar 32-bit floating-point value
+****
+--
+
+[[interfaces-builtin-variables-hitlsspositions]]
+[open,refpage='HitLSSPositionsNV',desc='Contains the position of the hit LSS primitive',type='builtins']
+--
+:refpage: HitLSSPositionsNV
+
+code:HitLSSPositionsNV::
+
+A variable decorated with the code:HitLSSPositionsNV decoration will contain
+the position of the LSS primitive intersected by current ray.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitLSSPositionsNV-10525]]
+    The code:HitLSSPositionsNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitLSSPositionsNV-10526]]
+    The variable decorated with code:HitLSSPositionsNV must: be declared
+    using the code:Input {StorageClass}
+  * [[VUID-{refpage}-HitLSSPositionsNV-10527]]
+    The variable decorated with code:HitLSSPositionsNV must: be declared as
+    an array of size two, containing three-component vector of 32-bit
+    floating-point values
+****
+--
+
+[[interfaces-builtin-variables-hitlssradii]]
+[open,refpage='HitLSSRadiiNV',desc='Contains the radii of the hit LSS primitive',type='builtins']
+--
+:refpage: HitLSSRadiiNV
+
+code:HitLSSRadiiNV::
+
+A variable decorated with the code:HitLSSRadiiNV decoration will contain the
+radii of LSS primitive intersected by current ray.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-HitLSSRadiiNV-10528]]
+    The code:HitLSSRadiiNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-HitLSSRadiiNV-10529]]
+    The variable decorated with code:HitLSSRadiiNV must: be declared using
+    the code:Input {StorageClass}
+  * [[VUID-{refpage}-HitLSSRadiiNV-10530]]
+    The variable decorated with code:HitLSSRadiiNV must: be declared as an
+    array of size two, containing 32-bit floating-point values
+****
+--
+endif::VK_NV_ray_tracing_linear_swept_spheres,VK_KHR_ray_tracing_pipeline[]
+
 ifdef::VK_ARM_shader_core_builtins[]
 [[interfaces-builtin-variables-corecountarm]]
 [open,refpage='CoreCountARM',desc='Number of cores on the device',type='builtins']
@@ -5622,3 +5813,30 @@ code:ShaderIndexAMDX execution mode.
 ****
 --
 endif::VK_AMDX_shader_enqueue[]
+
+ifdef::VK_NV_cluster_acceleration_structure,VK_KHR_ray_tracing_pipeline[]
+[[interfaces-builtin-variables-clusteridnv]]
+[open,refpage='ClusterIDNV',desc='Contains the triangle cluster ID of a hit triangle in cluster acceleration structure',type='builtins']
+--
+:refpage: ClusterIDNV
+
+code:ClusterIDNV::
+
+A variable decorated with the code:ClusterIDNV decoration will contain the
+triangle cluster ID of a hit triangle in a cluster acceleration structure if
+the current ray hit a triangle primitive or `-1` otherwise.
+
+.Valid Usage
+****
+  * [[VUID-{refpage}-ClusterIDNV-10531]]
+    The code:ClusterIDNV decoration must: be used only within the
+    code:AnyHitKHR, or code:ClosestHitKHR {ExecutionModel}
+  * [[VUID-{refpage}-ClusterIDNV-10532]]
+    The variable decorated with code:ClusterIDNV must: be declared using the
+    code:Input {StorageClass}
+  * [[VUID-{refpage}-ClusterIDNV-10533]]
+    The variable decorated with code:ClusterIDNV must: be declared as a
+    scalar 32-bit integer value
+****
+--
+endif::VK_NV_cluster_acceleration_structure,VK_KHR_ray_tracing_pipeline[]

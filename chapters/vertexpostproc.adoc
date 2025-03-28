@@ -1,5 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
-//
+// Copyright 2015-2025 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[vertexpostproc]]
@@ -150,7 +149,9 @@ For matrix types, outputs are written as an array of column vectors.
 
 If any component of an output with an assigned transform feedback offset was
 not written to by its shader, the value recorded for that component is
-undefined:.
+undefined:, and the primitives needed and primitives written counts in the
+corresponding ename:VK_QUERY_TYPE_TRANSFORM_FEEDBACK_STREAM_EXT query will
+increment as normal.
 All components of an output variable must: be written at an offset aligned
 to the size of the component.
 The size of each component of an output variable must: be at least 32-bits.
@@ -285,6 +286,14 @@ include::{generated}/api/protos/vkCmdBeginTransformFeedbackEXT.adoc[]
     If the byte offset stored to the counter buffer location was done using
     flink:vkCmdEndTransformFeedbackEXT it can be used to resume transform
     feedback from the previous location.
+    In that case, a pipeline barrier is required between the calls to
+    fname:vkCmdEndTransformFeedbackEXT and
+    fname:vkCmdBeginTransformFeedbackEXT, with
+    ename:VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT as the source and
+    destination stages,
+    ename:VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT as the source
+    access and ename:VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT as
+    the destination access.
     If pname:pCounterBuffers is `NULL`, then transform feedback will start
     capturing vertex data to byte offset zero in all bound transform
     feedback buffers.
@@ -663,8 +672,8 @@ include::{generated}/api/structs/VkPipelineRasterizationProvokingVertexStateCrea
   * pname:provokingVertexMode is a elink:VkProvokingVertexModeEXT value
     selecting the provoking vertex mode.
 
-If this struct is not provided when creating the pipeline, the pipeline will
-use the ename:VK_PROVOKING_VERTEX_MODE_FIRST_VERTEX_EXT mode.
+If this structure is not provided when creating the pipeline, the pipeline
+will use the ename:VK_PROVOKING_VERTEX_MODE_FIRST_VERTEX_EXT mode.
 
 If the <<limits-provokingVertexModePerPipeline,
 pname:provokingVertexModePerPipeline>> limit is ename:VK_FALSE, then all
@@ -1296,11 +1305,11 @@ structure used in pipeline creation.
 [eq]#x~f~# and [eq]#y~f~# have limited precision, where the number of
 fractional bits retained is specified by
 sname:VkPhysicalDeviceLimits::pname:subPixelPrecisionBits.
-ifdef::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+ifdef::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 When rasterizing <<primsrast-lines,line segments>>, the number of fractional
 bits is specified by
-sname:VkPhysicalDeviceLineRasterizationPropertiesKHR::pname:lineSubPixelPrecisionBits.
-endif::VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
+sname:VkPhysicalDeviceLineRasterizationProperties::pname:lineSubPixelPrecisionBits.
+endif::VK_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 
 [open,refpage='VkPipelineViewportStateCreateInfo',desc='Structure specifying parameters of a newly created pipeline viewport state',type='structs']
 --

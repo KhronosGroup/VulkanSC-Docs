@@ -1,4 +1,4 @@
-// Copyright 2015-2024 The Khronos Group Inc.
+// Copyright 2015-2025 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -205,12 +205,18 @@ image to the destination region of the destination image.
 If any of the specified regions in pname:srcImage overlaps in memory with
 any of the specified regions in pname:dstImage, values read from those
 overlapping regions are undefined:.
+If any region accesses a depth aspect in pname:dstImage
+ifdef::VK_EXT_depth_range_unrestricted[]
+and the `apiext:VK_EXT_depth_range_unrestricted` extension is not enabled,
+endif::VK_EXT_depth_range_unrestricted[]
+values copied from pname:srcBuffer outside of the range [eq]#[0,1]# will be
+written as undefined: values to the destination image.
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
-<<formats-requiring-sampler-ycbcr-conversion, Multi-planar images>> can:
-only be copied on a per-plane basis, and the subresources used in each
-region when copying to or from such images must: specify only one plane,
-though different regions can: specify different planes.
+<<formats-multiplanar, Multi-planar images>> can: only be copied on a
+per-plane basis, and the subresources used in each region when copying to or
+from such images must: specify only one plane, though different regions can:
+specify different planes.
 When copying planes of multi-planar images, the format considered is the
 <<formats-compatible-planes, compatible format for that plane>>, rather than
 the format of the multi-planar image.
@@ -232,19 +238,20 @@ ename:VK_IMAGE_TYPE_2D with multiple layers, then each slice is copied to or
 from a different layer; pname:depth slices in the 3D image correspond to
 pname:layerCount layers in the 2D image, with an effective pname:depth of
 `1` used for the 2D image.
-ifndef::VK_KHR_maintenance5[]
+ifndef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 Other combinations of image types are disallowed.
-endif::VK_KHR_maintenance5[]
-ifdef::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
 If the <<features-maintenance5,pname:maintenance5>> feature is enabled, all
 other combinations are allowed and function as if 1D images are 2D images
 with a height of 1.
 Otherwise, other combinations of image types are disallowed.
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
 
 .Valid Usage
 ****
+:regionsparam: pname:pRegions
 include::{chapters}/commonvalidity/copy_image_command_buffer_common.adoc[]
 include::{chapters}/commonvalidity/copy_image_common.adoc[]
 
@@ -313,10 +320,10 @@ ifdef::VK_EXT_image_drm_format_modifier[]
 endif::VK_EXT_image_drm_format_modifier[]
   * [[VUID-VkImageSubresourceLayers-layerCount-09243]]
     {empty}
-ifdef::VK_KHR_maintenance5[]
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
     If the <<features-maintenance5, pname:maintenance5>> feature is not
     enabled,
-endif::VK_KHR_maintenance5[]
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
     pname:layerCount must: not be ename:VK_REMAINING_ARRAY_LAYERS
   * [[VUID-VkImageSubresourceLayers-layerCount-01700]]
     If pname:layerCount is not ename:VK_REMAINING_ARRAY_LAYERS, it must: be
@@ -356,6 +363,7 @@ parameters, allowing them to be more easily extended.
 
 .Valid Usage
 ****
+:regionsparam: pname:pCopyImageInfo->pRegions
 include::{chapters}/commonvalidity/copy_image_command_buffer_common.adoc[]
 ****
 
@@ -467,7 +475,7 @@ accessed, where:
   {empty}:: [eq]#layer# is in the range
             [eq]#[pname:imageSubresource.baseArrayLayer,
             pname:imageSubresource.baseArrayLayer {plus}
-            pname:imageSubresource.layerCount)
+            pname:imageSubresource.layerCount)#
 
 For each [eq]#(x,y,z,layer)# coordinate in the image, bytes in the buffer
 are accessed at offsets in the range [eq]#[texelOffset, texelOffset {plus}
@@ -558,11 +566,10 @@ base image, according to the aspect, as described in the following table:
 
 ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 [[copies-buffers-images-multi-planar]]
-When copying between a buffer and any plane of a
-<<formats-requiring-sampler-ycbcr-conversion, multi-planar image>>,
-addressing calculations are performed using the <<formats-compatible-planes,
-compatible format for that plane>>, rather than the format of the
-multi-planar image.
+When copying between a buffer and any plane of a <<formats-multiplanar,
+multi-planar image>>, addressing calculations are performed using the
+<<formats-compatible-planes, compatible format for that plane>>, rather than
+the format of the multi-planar image.
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
 Each texel block is copied from one resource to the other according to the
@@ -816,8 +823,8 @@ ifdef::VK_QCOM_rotated_copy_commands[]
   * [[VUID-VkCopyBufferToImageInfo2KHR-pRegions-06204]]
     If any element of pname:pRegions contains
     slink:VkCopyCommandTransformInfoQCOM in its pname:pNext chain, then
-    pname:dstImage must: not have a
-    <<formats-requiring-sampler-ycbcr-conversion, multi-planar format>>
+    pname:dstImage must: not have a <<formats-multiplanar, multi-planar
+    format>>
 endif::VK_QCOM_rotated_copy_commands[]
 include::{chapters}/commonvalidity/copy_buffer_to_image_common.adoc[]
 include::{chapters}/commonvalidity/copy_anyimage_to_imageany_common.adoc[]
@@ -940,8 +947,8 @@ ifdef::VK_QCOM_rotated_copy_commands[]
   * [[VUID-VkCopyImageToBufferInfo2KHR-pRegions-06206]]
     If any element of pname:pRegions contains
     slink:VkCopyCommandTransformInfoQCOM in its pname:pNext chain, then
-    pname:srcImage must: not have a
-    <<formats-requiring-sampler-ycbcr-conversion, multi-planar format>>
+    pname:srcImage must: not have a <<formats-multiplanar, multi-planar
+    format>>
 endif::VK_QCOM_rotated_copy_commands[]
 include::{chapters}/commonvalidity/copy_image_to_buffer_common.adoc[]
 include::{chapters}/commonvalidity/copy_anyimage_to_imageany_common.adoc[]
@@ -1063,9 +1070,9 @@ include::{generated}/validity/structs/VkCopyCommandTransformInfoQCOM.adoc[]
 --
 endif::VK_QCOM_rotated_copy_commands[]
 
-ifdef::VK_EXT_host_image_copy[]
+ifdef::VK_VERSION_1_4,VK_EXT_host_image_copy[]
 include::{chapters}/VK_EXT_host_image_copy/copies.adoc[]
-endif::VK_EXT_host_image_copy[]
+endif::VK_VERSION_1_4,VK_EXT_host_image_copy[]
 
 
 ifdef::VK_NV_copy_memory_indirect[]
@@ -1528,8 +1535,8 @@ ifdef::VK_QCOM_rotated_copy_commands[]
   * [[VUID-VkBlitImageInfo2KHR-pRegions-06208]]
     If any element of pname:pRegions contains
     slink:VkCopyCommandTransformInfoQCOM in its pname:pNext chain, then
-    pname:srcImage must: not have a
-    <<formats-requiring-sampler-ycbcr-conversion, multi-planar format>>
+    pname:srcImage must: not have a <<formats-multiplanar, multi-planar
+    format>>
 endif::VK_QCOM_rotated_copy_commands[]
 ifdef::VK_QCOM_filter_cubic_weights[]
   * [[VUID-VkBlitImageInfo2-filter-09204]]
