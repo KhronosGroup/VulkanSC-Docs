@@ -682,8 +682,9 @@ Explicitly specifying `optional="false"` is not supported, but
     If the member is a union, attr:selector identifies another member of the
     struct that is used to select which of that union's members are valid.
   * attr:selection - optional.
-    For a member of a union, attr:selection identifies a value of the
-    attr:selector that indicates this member is valid.
+    For a member of a union, attr:selection identifies one or more
+    comma-separated values of the attr:selector that indicate this member
+    is valid.
   * attr:noautovalidity - prevents automatic validity language being
     generated for the tagged item.
     Only suppresses item-specific validity - parenting issues etc.
@@ -703,8 +704,9 @@ Explicitly specifying `optional="false"` is not supported, but
     member in order to check whether it fits the limit.
     Valid attr:limittype values are:
   ** `"min"` and `"max"` denote minimum and maximum limits.
-     They may also apply to arrays and `VkExtent*D`.
-  ** `"not"` specifies a feature is supported when false.
+     They may also apply to arrays and `VkExtent*D`. For `VkBool32`, if the
+     property is `VK_TRUE`, `"min"` indicates the presence of a requirement,
+     while `"max"` indicates the presence of a capability, respectively.
   ** `"pot"` denotes a value that must be a power of two.
      They may also apply to arrays and `VkExtent*D`.
   ** `"mul"` denotes a value that must be an integer multiple of this limit.
@@ -1101,6 +1103,9 @@ attr:errorcodes should never include `VK_ERROR_UNKNOWN` or
     called by.
     The format of the string is one or more of the terms `"primary"` and
     `"secondary"`, with multiple terms separated by commas (`","`).
+  * attr:allownoqueues - optional.
+    A value of `"true"` specifies that this command can be used in a device
+    with no queues. If not present, the value is assumed to be `"false"`.
   * attr:comment - optional.
     Arbitrary string (unused).
 
@@ -1274,17 +1279,23 @@ Explicitly specifying `optional="false"` is not supported, but
     handle refers to, or the contents of an array a pointer refers to) is
     modified by the command, and is not protected against modification in
     multiple application threads.
-    If only certain members of an object or elements of an array are
-    modified, multiple strings may be provided, separated by commas.
-    Each string describes a member which is modified.
-    For example, the `VkPresentInfoKHR` struct includes attr:externsync
-    attributes for the `pPresentInfo` array indicating that only specific
-    members of each element of the array are modified:
+    If the parameter needs to be externally synchronized under specific
+    conditions, a value of `"maybe"` is used to indicate that the exact rule is
+    specified in the Valid Usage language.
+    If only a certain member of an object or elements of an array are
+    modified, an expression string may be provided, describing the member which
+    is modified.
+    This expression may be prefixed by `maybe:` to indicate conditional
+    external synchronization requirements specified in the Valid Usage
+    language.
+    For example, the `vkSetDebugUtilsObjectNameEXT` command includes attr:externsync
+    attributes for the `pNameInfo` parameter indicating that a specific
+    member of the parameter is externally synchronized:
 +
 --
 [source,xml]
 --------------------------------------
-<param externsync="pPresentInfo-&gt;pWaitSemaphores[],pPresentInfo-&gt;pSwapchains[]">const <type>VkPresentInfoKHR</type>* <name>pPresentInfo</name></param>
+<param externsync="pNameInfo-&gt;objectHandle">const <type>VkDebugUtilsObjectNameInfoEXT</type>* <name>pNameInfo</name></param>
 --------------------------------------
 
 Parameters which do not have an attr:externsync attribute are assumed to not
@@ -1426,10 +1437,10 @@ values are packed integers containing Vulkan core version numbers.
 
 == Contents of tag:feature Tags
 
-Zero or more <<tag-required,tag:require and tag:remove tags>>, in arbitrary
-order.
-Each tag describes a set of interfaces that is respectively required for, or
-removed from, this feature, as described below.
+Zero or more <<tag-required,tag:require, tag:remove, and tag:deprecate
+tags>>, in arbitrary order.
+Each tag describes a set of interfaces that is respectively required for,
+removed from, or deprecated by this feature, as described below.
 
 == Example of a tag:feature Tag
 
@@ -1706,33 +1717,44 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateSharedSwapchainsKHR(
 
 
 [[tag-required]]
-= Required and Removed Interfaces (tag:require and tag:remove Tags)
+= Required, Removed, and Deprecated Interfaces (tag:require, tag:remove, and tag:deprecate Tags)
 
 A tag:require block defines a set of interfaces (types, enumerants and
 commands) 'required' by a tag:feature or tag:extension.
+
 A tag:remove block defines a set of interfaces 'removed' by a tag:feature.
 This is primarily for future profiles of an API which may choose to
 deprecate and/or remove some interfaces.
 Extensions should never remove interfaces, although this usage is allowed by
-the schema).
-Except for the tag name and behavior, the contents of tag:require and
-tag:remove tags are identical.
+the schema.
 
-== Attributes of tag:require and tag:remove Tags
+A tag:deprecate block defines a set of interfaces 'deprecated' by a
+tag:feature.
+This will mark the tagged functionality in the spec as deprecated by this
+version.
+Extensions should never deprecate interfaces, although this usage is allowed
+by the schema.
+
+Except for the tag name and behavior, the contents of tag:require, tag:remove
+and tag:deprecate tags are identical.
+
+
+== Attributes of tag:require, tag:remove, and tag:deprecate Tags
 
   * attr:profile - optional.
     String name of an API profile.
-    Interfaces in the tag are only required (or removed) if the specified
-    profile is being generated.
-    If not specified, interfaces are required (or removed) for all API
-    profiles.
+    Interfaces in the tag are only required, removed, or deprecated if the
+    specified profile is being generated.
+    If not specified, interfaces are required, removed, or deprecated for all
+    API profiles.
   * attr:comment - optional.
     Arbitrary string (unused).
   * attr:api - optional comma-separated list of <<schema:apiname, API
-    names>> requiring or removing these interfaces.
-    Interfaces in the tag are only required (or removed) if the requested
-    API name matches an element of the attribute.
-    If not specified, interfaces are required (or removed) for all APIs.
+    names>> requiring, removing, or deprecating these interfaces.
+    Interfaces in the tag are only required, removed, or deprecated if the
+    requested API name matches an element of the attribute.
+    If not specified, interfaces are required, removed, or deprecated for all
+    APIs.
 
 [NOTE]
 ====
@@ -1775,7 +1797,15 @@ These attributes are allowed only for a tag:remove tag.
     String containing the name of an asciidoc anchor in the <<vulkan-spec,
     Vulkan API Specification>> to link to, explaining the removal.
 
-== Contents of tag:require and tag:remove Tags
+[[tag-required-deprecate]]
+== Attributes of tag:deprecate Tags
+
+These attributes are allowed only for a tag:deprecate tag.
+
+  * attr:explanation - a link to an explanation in the specification of why
+    the tagged functionality is deprecated.
+
+== Contents of tag:require, tag:remove, and tag:deprecate Tags
 
 Zero or more of the following tags, in any order:
 
@@ -1785,7 +1815,7 @@ Zero or more of the following tags, in any order:
 
 === Command Tags
 
-tag:command specifies a required (or removed) command defined in a
+tag:command specifies a required, removed, or deprecated command defined in a
 tag:commands block.
 The tag has no content, but contains attributes:
 
@@ -1796,7 +1826,7 @@ The tag has no content, but contains attributes:
 
 === Enum Tags
 
-tag:enum specifies a required (or removed) enumerant defined in an tag:enums
+tag:enum specifies a required, removed, or deprecated enumerant defined in an tag:enums
 block.
 All forms of this tag support the following attributes:
 
@@ -1854,7 +1884,7 @@ enumerant:
     block is given by the attr:number attribute of the surrounding
     tag:extension tag.
     The numeric value of an enumerant is computed as defined in the
-    ``Assigning Extension Token Values`" section of the <<vulkan-styleguide,
+    ``Assigning Extension Token Values`` section of the <<vulkan-styleguide,
     Vulkan Documentation and Extensions: Procedures and Conventions>>
     document.
   * Attribute attr:dir - if present, the calculated enumerant value will be
@@ -1904,7 +1934,7 @@ are given below.
 
 === Type Tags
 
-tag:type specifies a required (or removed) type defined in a tag:types
+tag:type specifies a required, removed, or deprecated type defined in a tag:types
 block.
 Most types are picked up implicitly by using the tag:type tags of commands,
 but in a few cases, additional types need to be specified explicitly.
@@ -1962,7 +1992,7 @@ typedef enum VkResult {
 [[tag-required-feature]]
 === Individual Feature Tags
 
-tag:feature specifies a required (or removed) feature, as described in the
+tag:feature specifies a required, removed, or deprecated feature, as described in the
 "`Features`" chapter of the <<vulkan-spec, Vulkan API Specification>>.
 The tag has no content, but contains attributes:
 
@@ -2000,7 +2030,6 @@ is currently not supported, and an error will be generated.
 This will be fixed in future, as it is intended to be supported, but it was
 not necessary for feature requirements as initially proposed.
 ====
-
 
 [[tag-formats]]
 = Formats (tag:formats Tag)
@@ -3329,6 +3358,14 @@ Changes to the `.xml` files and Python scripts are logged in GitHub history.
 [[changelog]]
 = Change Log
 
+  * 2025-06-18 - Allow attr:selection attributes of members of <<tag-type,
+    `"union"`>> types to include multiple comma-separated selections of the
+    same member (internal issue 4246).
+  * 2025-05-07 - Add "maybe" and "maybe:<expression>" to attr:externsync
+    (internal issues 4175 and 4217)
+  * 2025-04-23 - Add <<tag-required, tag:deprecate>> blocks to features.
+  * 2025-03-19 - Establish and clarify the use of "min" and "max" limit
+    types for boolean limits and remove the, now obsolete, "not" limit type.
   * 2025-02-19 - Clean up description of the tag:member attr:limittype
     `"exact"` value (internal MR 7142).
   * 2024-11-12 - Add tag:extension attr:nofeatures attribute to identify

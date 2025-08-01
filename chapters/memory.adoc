@@ -559,6 +559,39 @@ memory heap which is considered to be equally "`local`" to the host and to
 the device, and such an implementation must: advertise the heap as
 device-local.
 
+ifdef::VK_QCOM_tile_memory_heap[]
+[[memory-tile-heaps]]
+Memory contents within a tile memory heap, denoted by
+ename:VK_MEMORY_HEAP_TILE_MEMORY_BIT_QCOM, are only visible across the
+command buffers executed in a single command buffer submission batch within
+a flink:vkQueueSubmit or flink:vkQueueSubmit2 call.
+If the
+slink:VkPhysicalDeviceTileMemoryHeapPropertiesQCOM::pname:queueSubmitBoundary
+property is set, the visibility is extended across all batches in the submit
+call.
+Memory contents are discarded and made undefined: after the respective
+submission batch or submit call.
+Tile memory may: have different performance characteristics than non tile
+memory.
+Tile memory can: be used simultaneously by command buffers in other queues
+without invalidating each others contents.
+Collectively, these rules define the _tile memory scope_.
+
+[NOTE]
+====
+Tile memory heaps work differently than most heaps as it is allowing
+addressing on device cache memory.
+Therefore, the heap's address space is aliased across the different queues,
+with each queue retaining its individual copy of the heap.
+The implementation takes care of any required saving and restoring of the
+tile memory contents.
+
+Effectively, this means that the same address in the heap in different
+queues have simultaneously different defined contents and the contents has a
+lifespan scoped to the submit or batch for that specific queues.
+====
+endif::VK_QCOM_tile_memory_heap[]
+
 [[memory-device-bitmask-list]]
 Each memory type returned by flink:vkGetPhysicalDeviceMemoryProperties must:
 have its pname:propertyFlags set to one of the following values:
@@ -842,6 +875,10 @@ ifdef::hidden[]
 // end::scaddition[]
 endif::hidden[]
 endif::VKSC_VERSION_1_0[]
+ifdef::VK_QCOM_tile_memory_heap[]
+  * ename:VK_MEMORY_HEAP_TILE_MEMORY_BIT_QCOM bit specifies that the heap
+    corresponds to tile memory.
+endif::VK_QCOM_tile_memory_heap[]
 --
 
 ifdef::VKSC_VERSION_1_0[]
@@ -1022,6 +1059,23 @@ A Vulkan device operates on data in device memory via memory objects that
 are represented in the API by a sname:VkDeviceMemory handle:
 
 include::{generated}/api/handles/VkDeviceMemory.adoc[]
+
+ifdef::VKSC_VERSION_1_0[]
+ifdef::hidden[]
+// tag::scremoved[]
+  * fname:vkFreeMemory <<SCID-4>>
+// end::scremoved[]
+endif::hidden[]
+
+Device memory cannot: be freed <<SCID-4>>.
+If <<limits-deviceDestroyFreesMemory,
+slink:VkPhysicalDeviceVulkanSC10Properties::pname:deviceDestroyFreesMemory>>
+is ename:VK_TRUE, the memory is returned to the system when the device is
+destroyed.
+Otherwise, it may: not be returned to the system until the process is
+terminated.
+
+endif::VKSC_VERSION_1_0[]
 --
 
 
@@ -1135,6 +1189,18 @@ The overallocation behavior can: be specified through the
 
 endif::VK_AMD_memory_overallocation_behavior[]
 
+ifdef::VK_QCOM_tile_memory_heap[]
+
+If the pname:memoryTypeIndex belongs to a heap with the
+ename:VK_MEMORY_HEAP_TILE_MEMORY_BIT_QCOM bit included in its properties,
+this allocation is backed by tile memory, which is an on device cache.
+Unlike other heaps, allocations out of the tile memory will always have a
+starting address at the start of the heap and its contents are aliased with
+all other slink:VkDeviceMemory objects bound to the same range while
+executing within the same <<memory-tile-heaps, _tile memory scope_>>.
+
+endif::VK_QCOM_tile_memory_heap[]
+
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 
 ifdef::VK_EXT_pageable_device_local_memory[]
@@ -1186,6 +1252,14 @@ endif::VK_AMD_device_coherent_memory[]
     There must: be less than
     sname:VkPhysicalDeviceLimits::pname:maxMemoryAllocationCount device
     memory allocations currently allocated on the device
+ifdef::VK_QCOM_tile_memory_heap[]
+  * [[VUID-VkTileMemoryBindInfoQCOM-memoryTypeIndex]]
+    If the <<features-tileMemoryHeap, pname:tileMemoryHeap>> feature is not
+    enabled, pname:pAllocateInfo->memoryTypeIndex must: not identify a
+    memory type that corresponds to a slink:VkMemoryHeap with the
+    ename:VK_MEMORY_HEAP_TILE_MEMORY_BIT_QCOM property
+endif::VK_QCOM_tile_memory_heap[]
+
 include::{chapters}/commonvalidity/memory_reservation_request_count_common.adoc[]
 ****
 
@@ -1421,8 +1495,18 @@ ifdef::VK_KHR_dedicated_allocation,VK_NV_dedicated_allocation[]
     its pname:image or pname:buffer member set to a value other than
     dlink:VK_NULL_HANDLE
 endif::VK_KHR_dedicated_allocation,VK_NV_dedicated_allocation[]
-endif::VK_KHR_external_memory[]
-ifdef::VK_KHR_external_memory[]
+ifdef::VK_ARM_tensors[]
+  * [[VUID-VkMemoryAllocateInfo-pNext-09858]]
+    If the pname:pNext chain includes a sname:VkExportMemoryAllocateInfo
+    structure, and any of the handle types specified in
+    sname:VkExportMemoryAllocateInfo::pname:handleTypes require a dedicated
+    allocation, as reported by
+    flink:vkGetPhysicalDeviceExternalTensorPropertiesARM in
+    sname:VkExternalTensorPropertiesARM::pname:externalMemoryProperties.externalMemoryFeatures,
+    the pname:pNext chain must: include a
+    sname:VkMemoryDedicatedAllocateInfoTensorARM structure with its
+    pname:tensor member set to a value other than dlink:VK_NULL_HANDLE
+endif::VK_ARM_tensors[]
 ifdef::VK_NV_external_memory[]
   * [[VUID-VkMemoryAllocateInfo-pNext-00640]]
     If the pname:pNext chain includes a slink:VkExportMemoryAllocateInfo
@@ -1875,6 +1959,95 @@ include::{generated}/validity/structs/VkMemoryDedicatedAllocateInfo.adoc[]
 --
 endif::VK_VERSION_1_1,VK_KHR_dedicated_allocation[]
 
+ifdef::VK_QCOM_tile_memory_heap[]
+[[memory-bind-tile-memory]]
+[open,refpage='vkCmdBindTileMemoryQCOM',desc='Bind tile memory to a command buffer',type='protos']
+--
+To bind a range of tile memory to the command buffer, call:
+
+include::{generated}/api/protos/vkCmdBindTileMemoryQCOM.adoc[]
+
+  * pname:commandBuffer is the command buffer that the tile memory will be
+    bound to.
+  * pname:pTileMemoryBindInfo is dlink:VK_NULL_HANDLE or a pointer to a
+    slink:VkTileMemoryBindInfoQCOM structure defining how tile memory is
+    bound.
+
+Calling flink:vkCmdBindTileMemoryQCOM when pname:pTileMemoryBindInfo is
+dlink:VK_NULL_HANDLE is equivalent to binding no tile memory to the command
+buffer.
+
+include::{generated}/validity/protos/vkCmdBindTileMemoryQCOM.adoc[]
+--
+
+[open,refpage='VkTileMemoryBindInfoQCOM',desc='Structure specifying tile memory to bind',type='structs']
+--
+The sname:VkTileMemoryBindInfoQCOM structure is defined as:
+
+include::{generated}/api/structs/VkTileMemoryBindInfoQCOM.adoc[]
+
+  * pname:memory is the tile memory object to be bound.
+
+pname:memory is used to bind this memory object to tile memory for all
+subsequent commands in the pname:commandBuffer.
+Tile memory contents for ranges in the heap outside the bound pname:memory
+are discarded and become undefined: for the <<memory-tile-heaps, active
+_tile memory scope_>> if an action command is executed.
+
+For secondary command buffers executing within a render pass instance, the
+active bound tile memory object is provided with this structure included in
+the pname:pNext chain of sname:VkCommandBufferInheritanceInfo.
+
+If this structure was not specified since recording started for
+pname:commandBuffer, no tile memory is bound to the command buffer and all
+contents become undefined: for the _tile memory scope_ if an action command
+is executed.
+
+.Valid Usage
+****
+  * [[VUID-VkTileMemoryBindInfoQCOM-memory-10726]]
+    pname:memory must: have been allocated from a slink:VkMemoryHeap with
+    the `VK_MEMORY_HEAP_TILE_MEMORY_BIT_QCOM` property
+****
+
+include::{generated}/validity/structs/VkTileMemoryBindInfoQCOM.adoc[]
+--
+endif::VK_QCOM_tile_memory_heap[]
+
+ifdef::VK_ARM_tensors[]
+[open,refpage='VkMemoryDedicatedAllocateInfoTensorARM',desc='Specify a dedicated memory allocation tensor resource',type='structs']
+--
+If the pname:pNext chain includes a
+sname:VkMemoryDedicatedAllocateInfoTensorARM structure, then that structure
+includes a handle of the sole tensor resource that the memory can: be bound
+to.
+
+The sname:VkMemoryDedicatedAllocateInfoTensorARM structure is defined as:
+
+include::{generated}/api/structs/VkMemoryDedicatedAllocateInfoTensorARM.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:tensor is a handle of a tensor which this memory will be bound to.
+
+.Valid Usage
+****
+  * [[VUID-VkMemoryDedicatedAllocateInfoTensorARM-allocationSize-09710]]
+    sname:VkMemoryAllocateInfo::pname:allocationSize must: equal the
+    sname:VkMemoryRequirements::pname:size of the tensor
+  * [[VUID-VkMemoryDedicatedAllocateInfoTensorARM-tensor-09859]]
+    If slink:VkMemoryAllocateInfo defines a memory import operation with
+    handle type ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT, the
+    memory being imported must: also be a dedicated tensor allocation and
+    pname:tensor must: be identical to the tensor associated with the
+    imported memory
+****
+
+include::{generated}/validity/structs/VkMemoryDedicatedAllocateInfoTensorARM.adoc[]
+--
+endif::VK_ARM_tensors[]
+
 ifdef::VK_NV_dedicated_allocation[]
 [open,refpage='VkDedicatedAllocationMemoryAllocateInfoNV',desc='Specify a dedicated memory allocation resource',type='structs']
 --
@@ -2029,9 +2202,11 @@ endif::VK_KHR_external_memory[]
 
 .Valid Usage
 ****
-  * [[VUID-VkExportMemoryAllocateInfo-handleTypes-00656]]
+  * [[VUID-VkExportMemoryAllocateInfo-handleTypes-09860]]
     The bits in pname:handleTypes must: be supported and compatible, as
-    reported by slink:VkExternalImageFormatProperties or
+    reported by
+ifdef::VK_ARM_tensors[slink:VkExternalTensorPropertiesARM,]
+    slink:VkExternalImageFormatProperties, or
     slink:VkExternalBufferProperties
 ****
 
@@ -2145,9 +2320,11 @@ sname:VkDeviceMemory object.
 
 .Valid Usage
 ****
-  * [[VUID-VkImportMemoryWin32HandleInfoKHR-handleType-00658]]
+  * [[VUID-VkImportMemoryWin32HandleInfoKHR-handleType-09861]]
     If pname:handleType is not `0`, it must: be supported for import, as
-    reported by slink:VkExternalImageFormatProperties or
+    reported by
+ifdef::VK_ARM_tensors[slink:VkExternalTensorPropertiesARM,]
+    slink:VkExternalImageFormatProperties, or
     slink:VkExternalBufferProperties
   * [[VUID-VkImportMemoryWin32HandleInfoKHR-handle-00659]]
     The memory from which pname:handle was exported, or the memory named by
@@ -2341,9 +2518,11 @@ sname:VkDeviceMemory object.
 
 .Valid Usage
 ****
-  * [[VUID-VkImportMemoryFdInfoKHR-handleType-00667]]
+  * [[VUID-VkImportMemoryFdInfoKHR-handleType-09862]]
     If pname:handleType is not `0`, it must: be supported for import, as
-    reported by slink:VkExternalImageFormatProperties or
+    reported by
+ifdef::VK_ARM_tensors[slink:VkExternalTensorPropertiesARM,]
+    slink:VkExternalImageFormatProperties or
     slink:VkExternalBufferProperties
   * [[VUID-VkImportMemoryFdInfoKHR-fd-00668]]
     The memory from which pname:fd was exported must: have been created on
@@ -2682,10 +2861,11 @@ If the command fails, the implementation must: not retain a reference.
 
 .Valid Usage
 ****
-  * [[VUID-VkImportAndroidHardwareBufferInfoANDROID-buffer-01880]]
+  * [[VUID-VkImportAndroidHardwareBufferInfoANDROID-buffer-09863]]
     If pname:buffer is not `NULL`, Android hardware buffers must: be
     supported for import, as reported by
-    slink:VkExternalImageFormatProperties or
+ifdef::VK_ARM_tensors[slink:VkExternalTensorPropertiesARM,]
+    slink:VkExternalImageFormatProperties, or
     slink:VkExternalBufferProperties
   * [[VUID-VkImportAndroidHardwareBufferInfoANDROID-buffer-01881]]
     If pname:buffer is not `NULL`, it must: be a valid Android hardware
@@ -3345,6 +3525,15 @@ allocations.
   * [[VUID-VkMemoryAllocateFlagsInfo-deviceMask-00676]]
     If ename:VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT is set, pname:deviceMask
     must: not be zero
+ifdef::VK_EXT_zero_initialize_device_memory[]
+  * [[VUID-VkMemoryAllocateFlagsInfo-flags-10760]]
+    If the allocation is performing a memory import operation, then
+    pname:flags must: not contain
+    ename:VK_MEMORY_ALLOCATE_ZERO_INITIALIZE_BIT_EXT
+  * [[VUID-VkMemoryAllocateFlagsInfo-flags-10761]]
+    If the allocation uses protected memory, then pname:flags must: not
+    contain ename:VK_MEMORY_ALLOCATE_ZERO_INITIALIZE_BIT_EXT
+endif::VK_EXT_zero_initialize_device_memory[]
 ****
 
 include::{generated}/validity/structs/VkMemoryAllocateFlagsInfo.adoc[]
@@ -3377,6 +3566,11 @@ ifdef::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
     (e.g. for trace capture and replay), see
     slink:VkBufferOpaqueCaptureAddressCreateInfo for more detail.
 endif::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
+ifdef::VK_EXT_zero_initialize_device_memory[]
+  * ename:VK_MEMORY_ALLOCATE_ZERO_INITIALIZE_BIT_EXT specifies that the
+    memory will be zeroed automatically by the implementation before
+    application is able to access it.
+endif::VK_EXT_zero_initialize_device_memory[]
 --
 
 [open,refpage='VkMemoryAllocateFlags',desc='Bitmask of VkMemoryAllocateFlagBits',type='flags']
@@ -3445,23 +3639,9 @@ include::{generated}/validity/structs/VkMemoryOpaqueCaptureAddressAllocateInfo.a
 endif::VK_VERSION_1_2,VK_KHR_buffer_device_address[]
 
 
+ifndef::VKSC_VERSION_1_0[]
 === Freeing Device Memory
 
-ifdef::VKSC_VERSION_1_0[]
-ifdef::hidden[]
-// tag::scremoved[]
-  * fname:vkFreeMemory <<SCID-4>>
-// end::scremoved[]
-endif::hidden[]
-
-Device memory cannot: be freed <<SCID-4>>.
-If
-slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,pname:deviceDestroyFreesMemory>>
-is ename:VK_TRUE, the memory is returned to the system when the device is
-destroyed.
-
-endif::VKSC_VERSION_1_0[]
-ifndef::VKSC_VERSION_1_0[]
 [open,refpage='vkFreeMemory',desc='Free device memory',type='protos']
 --
 To free a memory object, call:
@@ -4289,10 +4469,12 @@ Protected memory adds the following concepts:
   ** Protected device memory, which can: be visible to the device but must:
      not be visible to the host
   * Resources:
-  ** Unprotected images and unprotected buffers, to which unprotected memory
-     can: be bound
-  ** Protected images and protected buffers, to which protected memory can:
-     be bound
+  ** Unprotected images
+ifdef::VK_ARM_tensors[, unprotected tensors, ]
+     and unprotected buffers, to which unprotected memory can: be bound
+  ** Protected images
+ifdef::VK_ARM_tensors[, protected tensors, ]
+     and protected buffers, to which protected memory can: be bound
   * Command buffers:
   ** Unprotected command buffers, which can: be submitted to a device queue
      to execute unprotected queue operations
@@ -4372,8 +4554,12 @@ device memory that is shareable across processes and that can: be accessed
 by a variety of media APIs and the hardware used to implement them.
 These Android hardware buffer objects may: be imported into
 slink:VkDeviceMemory objects for access via Vulkan, or exported from Vulkan.
-An slink:VkImage or slink:VkBuffer can: be bound to the imported or exported
-slink:VkDeviceMemory object if it is created with
+An slink:VkImage or slink:VkBuffer
+ifdef::VK_ARM_tensors[]
+or slink:VkTensorARM
+endif::VK_ARM_tensors[]
+can: be bound to the imported or exported slink:VkDeviceMemory object if it
+is created with
 ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID.
 
 [open,refpage='AHardwareBuffer',desc='Android hardware buffer type',type='basetypes']
@@ -4809,8 +4995,12 @@ specify them during replay.
 .Valid Usage
 ****
   * [[VUID-vkGetDeviceMemoryOpaqueCaptureAddress-None-03334]]
-    The <<features-bufferDeviceAddress, pname:bufferDeviceAddress>> feature
-    must: be enabled
+    The <<features-bufferDeviceAddress, pname:bufferDeviceAddress>> and
+    <<features-bufferDeviceAddressCaptureReplay,
+    pname:bufferDeviceAddressCaptureReplay>> features must: be enabled
+  * [[VUID-vkGetDeviceMemoryOpaqueCaptureAddress-pInfo-10727]]
+    pname:pInfo::pname:memory must: have been allocated using the
+    ename:VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT flag
   * [[VUID-vkGetDeviceMemoryOpaqueCaptureAddress-device-03335]]
     If pname:device was created with multiple physical devices, then the
     <<features-bufferDeviceAddressMultiDevice,

@@ -32,9 +32,11 @@ EXTENSION_ENUM_NAME_SPELLING_CHANGE = {
 EXTENSION_NAME_VERSION_EXCEPTIONS = (
     'VK_AMD_gpu_shader_int16',
     'VK_EXT_index_type_uint8',
+    'VK_EXT_shader_float8',
     'VK_EXT_shader_image_atomic_int64',
     'VK_KHR_video_decode_h264',
     'VK_KHR_video_decode_h265',
+    'VK_KHR_video_decode_vp9',
     'VK_KHR_video_decode_av1',
     'VK_KHR_video_encode_h264',
     'VK_KHR_video_encode_h265',
@@ -44,6 +46,7 @@ EXTENSION_NAME_VERSION_EXCEPTIONS = (
     'VK_KHR_external_semaphore_win32',
     'VK_KHR_index_type_uint8',
     'VK_KHR_shader_atomic_int64',
+    'VK_KHR_shader_bfloat16',
     'VK_KHR_shader_float16_int8',
     'VK_KHR_spirv_1_4',
     'VK_NV_external_memory_win32',
@@ -74,6 +77,7 @@ EXTENSION_API_NAME_EXCEPTIONS = {
     'VkComponentTypeKHR',
     'VkDeviceOrHostAddressKHR',
     'VkDeviceOrHostAddressConstKHR',
+    'OHNativeWindow',
 }
 
 # These are APIs which contain _RESERVED_ intentionally
@@ -121,6 +125,10 @@ CHECK_TYPE_STYPE_EXCEPTIONS = (
     'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_SC_1_0_PROPERTIES',
 )
 
+# Exceptions to bitmask types requiring _BIT in their name
+EXTENSION_BITFLAG_WITHOUT_BIT_NAME_EXCEPTIONS = (
+)
+
 def get_extension_commands(reg):
     extension_cmds = set()
     for ext in reg.extensions:
@@ -143,6 +151,12 @@ def get_extension_source(extname):
     fn = f'{extname}.adoc'
     return str(SPECIFICATION_DIR / 'appendices' / fn)
 
+def containsWord(name, word):
+    """Check if API name contains the specified word, which must not be
+       imbedded in a longer word.
+       This allows either '..._word_... or '..._word'."""
+
+    return ('_' + word + '_') in name or name.endswith('_' + word)
 
 class EntityDatabase(OrigEntityDatabase):
 
@@ -318,14 +332,14 @@ class Checker(XMLChecker):
         if countParams:
             assert(len(countParams) == 1)
             if 'VK_INCOMPLETE' not in successcodes:
-                message = "Apparent enumeration of an array without VK_INCOMPLETE in successcodes for command {}.".format(name)
+                message = f"Apparent enumeration of an array without VK_INCOMPLETE in successcodes for command {name}."
                 if name in CHECK_ARRAY_ENUMERATION_RETURN_CODE_EXCEPTIONS:
                     self.record_warning('(Allowed exception)', message)
                 else:
                     self.record_error(message)
 
         elif 'VK_INCOMPLETE' in successcodes:
-            message = "VK_INCOMPLETE in successcodes of command {} that is apparently not an array enumeration.".format(name)
+            message = f"VK_INCOMPLETE in successcodes of command {name} that is apparently not an array enumeration."
             if name in CHECK_ARRAY_ENUMERATION_RETURN_CODE_EXCEPTIONS:
                 self.record_warning('(Allowed exception)', message)
             else:
@@ -465,8 +479,8 @@ class Checker(XMLChecker):
                     # There are many more constraints that could potentially be checked.
                     typeName = member.findtext('type')
                     if typeName == 'VkBool32':
-                        if value not in (('exact', 'not')):
-                            self.record_error(f'{name} has invalid limittype="{value}" for a VkBool32 type. Use "exact" or "not" instead.')
+                        if value not in (('exact', 'min', 'max')):
+                            self.record_error(f'{name} has invalid limittype="{value}" for a VkBool32 type. Use "exact", "min", or "max" instead.')
 
         return badFields
 
@@ -729,7 +743,7 @@ Other exceptions can be added to xml_consistency.py:EXTENSION_API_NAME_EXCEPTION
             # Treat the version number as a separate word.
             base = matches.group('base')
             version = matches.group('version')
-            ext_enum_name = base.upper() + '_' + version
+            ext_enum_name = f"{base.upper()}_{version}"
             # Keep track of this case
             ext_versioned_name = True
 
@@ -782,6 +796,22 @@ Other exceptions can be added to xml_consistency.py:EXTENSION_API_NAME_EXCEPTION
                 if '_RESERVED_' in enum_name and enum_name not in EXTENSION_NAME_RESERVED_EXCEPTIONS:
                     self.record_error(enum_name, 'should not contain _RESERVED_ for a supported extension.\n\
 If this is intentional, add it to EXTENSION_NAME_RESERVED_EXCEPTIONS in scripts/xml_consistency.py.')
+
+                # Check for bitflags without _BIT in their name and which
+                # are not old aliases or exceptions.
+                # _NONE is allowed in bitflag names without _BIT as it is
+                # not, in fact, a bitflag but the value '0'.
+                extends = enum.get('extends')
+                if extends and 'FlagBits' in extends and not containsWord(enum_name, 'BIT'):
+                        if containsWord(enum_name, 'NONE'):
+                            continue
+                        if enum.get('deprecated') == 'aliased':
+                            continue
+                        if enum_name in EXTENSION_BITFLAG_WITHOUT_BIT_NAME_EXCEPTIONS:
+                            continue
+
+                        self.record_error(f'{enum_name} extends the bitmask type {extends} but does not contain _BIT\n\
+If this is intentional, either make this name an alias of the correct name and give it the deprecated="aliased" attribute, or add it to EXTENSION_BITFLAG_WITHOUT_BIT_NAME_EXCEPTIONS in scripts/xml_consistency.py.')
 
         name_define = f'{ext_enum_name}_EXTENSION_NAME'
         name_elem = findNamedElem(enums, name_define)

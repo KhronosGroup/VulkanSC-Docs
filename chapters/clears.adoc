@@ -260,7 +260,7 @@ include::{generated}/api/protos/vkCmdClearAttachments.adoc[]
     use.
   * pname:rectCount is the number of entries in the pname:pRects array.
   * pname:pRects is a pointer to an array of slink:VkClearRect structures
-    defining regions within each selected attachment to clear.
+    defining regions to clear for every attachment in pname:pAttachments.
 
 ifdef::VK_EXT_fragment_density_map[]
 If the render pass has a <<renderpass-fragmentdensitymapattachment,fragment
@@ -378,6 +378,12 @@ endif::VK_ANDROID_external_format_resolve[]
   * [[VUID-vkCmdClearAttachments-None-09679]]
     If the attachment format has components other than R and G, it must: not
     have a 64-bit component width
+ifdef::VK_QCOM_tile_shading[]
+  * [[VUID-vkCmdClearAttachments-None-10616]]
+    This command must: not be recorded when
+    <<renderpass-per-tile-execution-model,per-tile execution model>> is
+    enabled
+endif::VK_QCOM_tile_shading[]
 ****
 
 include::{generated}/validity/protos/vkCmdClearAttachments.adoc[]

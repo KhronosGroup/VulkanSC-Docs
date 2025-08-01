@@ -96,10 +96,16 @@ Pending::
     A <<synchronization, synchronization>> command should: be used to detect
     when this occurs.
 Invalid::
-    Some operations, such as <<fundamentals-objectmodel-lifetime-cmdbuffers,
-    modifying or deleting a resource>> that was used in a command recorded
-    to a command buffer, will transition the state of that command buffer
-    into the _invalid state_.
+    Other than
+ifdef::VKSC_VERSION_1_0[]
+    slink:VkQueryPool, slink:VkDescriptorPool, slink:VkDeviceMemory, or
+endif::VKSC_VERSION_1_0[]
+    slink:VkCommandPool objects, destroying or freeing any object or memory
+    that may: be accessed when the command buffer is accessed (e.g. an
+    object bound to the command buffer) will transition the state of that
+    command buffer to the _invalid state_.
+    The command buffer must: not be in the _pending state_ when this
+    happens.
     Command buffers in the invalid state can: only be reset or freed.
 
 [[commandbuffer-lifecycle-diagram]]
@@ -151,6 +157,24 @@ not be used concurrently in multiple threads.
 That includes use via recording commands on any command buffers allocated
 from the pool, as well as operations that allocate, free, and reset command
 buffers or the pool itself.
+
+ifdef::VKSC_VERSION_1_0[]
+ifdef::hidden[]
+// tag::scremoved[]
+  * fname:vkDestroyCommandPool <<SCID-4>>
+// end::scremoved[]
+endif::hidden[]
+
+Command pools cannot: be destroyed or trimmed <<SCID-4>>.
+
+If <<limits-deviceDestroyFreesMemory,
+slink:VkPhysicalDeviceVulkanSC10Properties::pname:deviceDestroyFreesMemory>>
+is ename:VK_TRUE, then the memory used by command pools is returned to the
+system when the device is destroyed.
+Otherwise, it may: not be returned to the system until the process is
+terminated.
+
+endif::VKSC_VERSION_1_0[]
 
 Command pools are represented by sname:VkCommandPool handles:
 
@@ -219,6 +243,19 @@ ifdef::VKSC_VERSION_1_0[]
     The pname:pNext chain must: include a
     slink:VkCommandPoolMemoryReservationCreateInfo structure
 endif::VKSC_VERSION_1_0[]
+ifdef::VK_ARM_data_graph[]
+  * [[VUID-VkCommandPoolCreateInfo-pNext-09908]]
+    If the pname:pNext chain includes a
+    slink:VkDataGraphProcessingEngineCreateInfoARM structure, then
+    pname:queueFamilyIndex must: designate a queue family that supports
+    ename:VK_QUEUE_DATA_GRAPH_BIT_ARM
+  * [[VUID-VkCommandPoolCreateInfo-pNext-09909]]
+    If the pname:pNext chain includes a
+    slink:VkDataGraphProcessingEngineCreateInfoARM structure, then the queue
+    family designated by pname:queueFamilyIndex must: support the data graph
+    processing engines specified in the
+    slink:VkDataGraphProcessingEngineCreateInfoARM structure
+endif::VK_ARM_data_graph[]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -316,9 +353,10 @@ Two command buffers will consume the same amount of pool memory if:
 
 [NOTE]
 ====
-The rules for identically defined objects apply recursively, implying for
-example that if the command buffers are created in different devices that
-those devices must have been created with the same features enabled.
+The rules for <<glossary-identically-defined,identically defined>> objects
+apply recursively, implying for example that if the command buffers are
+created in different devices that those devices must have been created with
+the same features enabled.
 ====
 
 Each command buffer may: require some base alignment in the pool, so the
@@ -562,20 +600,6 @@ tname:VkCommandPoolResetFlags is a bitmask type for setting a mask of zero
 or more elink:VkCommandPoolResetFlagBits.
 --
 
-ifdef::VKSC_VERSION_1_0[]
-ifdef::hidden[]
-// tag::scremoved[]
-  * fname:vkDestroyCommandPool <<SCID-4>>
-// end::scremoved[]
-endif::hidden[]
-
-Command pools cannot: be destroyed or trimmed <<SCID-4>>.
-If
-slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,pname:deviceDestroyFreesMemory>>
-is ename:VK_TRUE, then the memory used by command pools is returned to the
-system when the device is destroyed.
-
-endif::VKSC_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 
 [open,refpage='vkDestroyCommandPool',desc='Destroy a command pool object',type='protos']
@@ -630,6 +654,8 @@ include::{generated}/api/protos/vkAllocateCommandBuffers.adoc[]
   * pname:device is the logical device that owns the command pool.
   * pname:pAllocateInfo is a pointer to a slink:VkCommandBufferAllocateInfo
     structure describing parameters of the allocation.
+    pname:commandPool may: be accessed any time one of the resulting command
+    buffers is accessed.
   * pname:pCommandBuffers is a pointer to an array of slink:VkCommandBuffer
     handles in which the resulting command buffer objects are returned.
     The array must: be at least the length specified by the
@@ -733,6 +759,10 @@ include::{generated}/api/protos/vkResetCommandBuffer.adoc[]
 Any primary command buffer that is in the <<commandbuffers-lifecycle,
 recording or executable state>> and has pname:commandBuffer recorded into
 it, becomes <<commandbuffers-lifecycle, invalid>>.
+
+After a command buffer is reset, any objects or memory specified by commands
+recorded into the command buffer must: no longer be accessed when the
+command buffer is accessed by the implementation.
 
 .Valid Usage
 ****
@@ -1019,6 +1049,34 @@ endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
     the pname:subpass member of pname:pInheritanceInfo must: be a valid
     subpass index within the pname:renderPass member of
     pname:pInheritanceInfo
+ifdef::VK_QCOM_tile_shading[]
+  * [[VUID-VkCommandBufferBeginInfo-flags-10617]]
+    If pname:flags contains
+    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    , the pname:renderPass member of pname:pInheritanceInfo is not
+    dlink:VK_NULL_HANDLE,
+endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    and pname:renderPass was created with <<renderpass-tile-shading,tile
+    shading enabled>>, ename:VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM
+    must: be included in
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags
+  * [[VUID-VkCommandBufferBeginInfo-flags-10618]]
+    If pname:flags does not contain
+    ename:VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    , the pname:renderPass member of pname:pInheritanceInfo is
+    dlink:VK_NULL_HANDLE,
+endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+    or pname:renderPass was not created with tile shading enabled,
+    ename:VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM must: not be included
+    in slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags
+  * [[VUID-VkCommandBufferBeginInfo-flags-10619]]
+    If ename:VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM is included in
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags,
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:tileApronSize must:
+    be equal to the pname:tileApronSize used to create pname:renderPass
+endif::VK_QCOM_tile_shading[]
 ****
 ifdef::VKSC_VERSION_1_0[]
 ifdef::hidden[]
@@ -1700,10 +1758,15 @@ endif::VK_KHR_synchronization2[]
   * pname:submitCount is the number of elements in the pname:pSubmits array.
   * pname:pSubmits is a pointer to an array of slink:VkSubmitInfo2
     structures, each specifying a command buffer submission batch.
+    Command buffers and semaphores specified in this array may: be accessed
+    at any point until the <<devsandqueues-submission, queue operations>>
+    they define complete execution on the device.
   * pname:fence is an optional: handle to a fence to be signaled once all
     submitted command buffers have completed execution.
     If pname:fence is not dlink:VK_NULL_HANDLE, it defines a
     <<synchronization-fences-signaling, fence signal operation>>.
+    If it is not dlink:VK_NULL_HANDLE, pname:fence may: be accessed at any
+    point until this command completes on the device.
 
 fname:vkQueueSubmit2 is a <<devsandqueues-submission,queue submission
 command>>, with each batch defined by an element of pname:pSubmits.
@@ -1953,6 +2016,32 @@ ifdef::VK_EXT_sample_locations[]
     on, must: use the same sample locations
 endif::VK_EXT_sample_locations[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+ifdef::VK_EXT_frame_boundary+VK_ARM_tensors[]
+  * [[VUID-VkSubmitInfo2-pNext-09682]]
+    If the pname:pNext chain of this structure includes a
+    slink:VkFrameBoundaryTensorsARM structure then it must: also include a
+    slink:VkFrameBoundaryEXT structure.
+endif::VK_EXT_frame_boundary+VK_ARM_tensors[]
+ifdef::VK_ARM_data_graph[]
+  * [[VUID-VkSubmitInfo2-pCommandBufferInfos-09933]]
+    If at least one slink:VkCommandBufferSubmitInfo structure in
+    pname:pCommandBufferInfos references a pname:commandBuffer allocated
+    from a pool that was created with a
+    slink:VkDataGraphProcessingEngineCreateInfoARM structure in the
+    pname:pNext chain of slink:VkCommandPoolCreateInfo that included a
+    foreign data graph processing engine in its pname:pProcessingEngines
+    member, then pname:pWaitSemaphoreInfos and pname:pSignalSemaphoreInfos
+    must: only reference pname:semaphore objects that were created from
+    external handle types reported as supported in a
+    slink:VkQueueFamilyDataGraphProcessingEnginePropertiesARM::pname:foreignSemaphoreHandleTypes
+    structure via
+    flink:vkGetPhysicalDeviceQueueFamilyDataGraphProcessingEnginePropertiesARM
+    with a pname:queueFamilyIndex matching the one the command pool was
+    created for, for all the foreign data graph processing engines that were
+    part of the slink:VkDataGraphProcessingEngineCreateInfoARM used to
+    create the command pool
+endif::VK_ARM_data_graph[]
+
 ****
 
 include::{generated}/validity/structs/VkSubmitInfo2.adoc[]
@@ -2166,10 +2255,15 @@ include::{generated}/api/protos/vkQueueSubmit.adoc[]
   * pname:submitCount is the number of elements in the pname:pSubmits array.
   * pname:pSubmits is a pointer to an array of slink:VkSubmitInfo
     structures, each specifying a command buffer submission batch.
+    Command buffers and semaphores specified in this array may: be accessed
+    at any point until the <<devsandqueues-submission, queue operations>>
+    they define complete execution on the device.
   * pname:fence is an optional: handle to a fence to be signaled once all
     submitted command buffers have completed execution.
     If pname:fence is not dlink:VK_NULL_HANDLE, it defines a
     <<synchronization-fences-signaling, fence signal operation>>.
+    If it is not dlink:VK_NULL_HANDLE, pname:fence may: be accessed at any
+    point until this command completes on the device.
 
 fname:vkQueueSubmit is a <<devsandqueues-submission,queue submission
 command>>, with each batch defined by an element of pname:pSubmits.
@@ -2464,6 +2558,31 @@ ifdef::VK_EXT_sample_locations[]
     locations
 endif::VK_EXT_sample_locations[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+ifdef::VK_EXT_frame_boundary+VK_ARM_tensors[]
+  * [[VUID-VkSubmitInfo-pNext-09683]]
+    If the pname:pNext chain of this structure includes a
+    slink:VkFrameBoundaryTensorsARM structure then it must: also include a
+    slink:VkFrameBoundaryEXT structure.
+endif::VK_EXT_frame_boundary+VK_ARM_tensors[]
+ifdef::VK_ARM_data_graph[]
+  * [[VUID-VkSubmitInfo-pCommandBufferInfos-09942]]
+    If at least one slink:VkCommandBufferSubmitInfo structure in
+    pname:pCommandBufferInfos references a pname:commandBuffer allocated
+    from a pool that was created with a
+    slink:VkDataGraphProcessingEngineCreateInfoARM structure in the
+    pname:pNext chain of slink:VkCommandPoolCreateInfo that included a
+    foreign data graph processing engine in its pname:pProcessingEngines
+    member, then pname:pWaitSemaphoreInfos and pname:pSignalSemaphoreInfos
+    must: only reference pname:semaphore objects that were created from
+    external handle types reported as supported in a
+    slink:VkQueueFamilyDataGraphProcessingEnginePropertiesARM::pname:foreignSemaphoreHandleTypes
+    structure via
+    flink:vkGetPhysicalDeviceQueueFamilyDataGraphProcessingEnginePropertiesARM
+    with a pname:queueFamilyIndex matching the one the command pool was
+    created for, for all the foreign data graph processing engines that were
+    part of the slink:VkDataGraphProcessingEngineCreateInfoARM used to
+    create the command pool
+endif::VK_ARM_data_graph[]
 ****
 
 include::{generated}/validity/structs/VkSubmitInfo.adoc[]
@@ -3225,7 +3344,7 @@ ifdef::VK_ANDROID_external_format_resolve[]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRendering, with any color attachment
     using a resolve mode of
-    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_ANDROID, the
+    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_BIT_ANDROID, the
     pname:pNext chain of slink:VkCommandBufferInheritanceInfo used to create
     each element of pname:pCommandBuffers must: include a
     slink:VkExternalFormatANDROID structure with an pname:externalFormat
@@ -3234,7 +3353,7 @@ ifdef::VK_ANDROID_external_format_resolve[]
     If fname:vkCmdExecuteCommands is being called within a render pass
     instance begun with flink:vkCmdBeginRendering with any color attachment
     using a resolve mode of
-    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_ANDROID, and the
+    ename:VK_RESOLVE_MODE_EXTERNAL_FORMAT_DOWNSAMPLE_BIT_ANDROID, and the
     pname:pNext chain of slink:VkCommandBufferInheritanceInfo does not
     include a slink:VkAttachmentSampleCountInfoAMD or
     slink:VkAttachmentSampleCountInfoNV structure, the value of
@@ -3284,6 +3403,51 @@ ifdef::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
     current state of pname:commandBuffer must: match
 endif::VK_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
 endif::VK_VERSION_1_3,VK_KHR_dynamic_rendering[]
+ifdef::VK_QCOM_tile_memory_heap[]
+  * [[VUID-vkCmdExecuteCommands-memory-10724]]
+    If fname:vkCmdExecuteCommands is being called within a render pass
+    instance, the size of pname:memory member of the
+    slink:VkTileMemoryBindInfoQCOM structure included in the pname:pNext
+    chain of slink:VkCommandBufferBeginInfo::pname:pInheritanceInfo used to
+    begin recording each element of pname:pCommandBuffers must: be equal to
+    the active bound <<memory-bind-tile-memory, bound tile memory object>>
+    in pname:commandBuffer
+endif::VK_QCOM_tile_memory_heap[]
+ifdef::VK_QCOM_tile_shading[]
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-10620]]
+    If this command is being recorded within a render pass instance with
+    <<renderpass-tile-shading, tile shading>> enabled, all elements of
+    pname:pCommandBuffers must: have been recorded with
+    ename:VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM included in
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-10621]]
+    If the <<renderpass-per-tile-execution-model, per-tile execution model>>
+    is enabled, all elements of pname:pCommandBuffers must: have been
+    recorded with
+    ename:VK_TILE_SHADING_RENDER_PASS_PER_TILE_EXECUTION_BIT_QCOM included
+    in slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags
+  * [[VUID-vkCmdExecuteCommands-tileApronSize-10622]]
+    If this command is being recorded within a render pass instance, the
+    pname:tileApronSize used to create the render pass instance must: equal
+    the slink:VkRenderPassTileShadingCreateInfoQCOM::pname:tileApronSize
+    used to record all elements of pname:pCommandBuffers
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-10623]]
+    If any element of pname:pCommandBuffers was recorded with
+    ename:VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM included in
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags, this command
+    must: be recorded in a render pass that has tile shading enabled
+  * [[VUID-vkCmdExecuteCommands-pCommandBuffers-10624]]
+    If any element of pname:pCommandBuffers was recorded with
+    ename:VK_TILE_SHADING_RENDER_PASS_PER_TILE_EXECUTION_BIT_QCOM included
+    in slink:VkRenderPassTileShadingCreateInfoQCOM::pname:flags,
+    <<renderpass-per-tile-execution-model, per-tile execution model>> must:
+    be enabled
+  * [[VUID-vkCmdExecuteCommands-tileApronSize-10625]]
+    If this command is not being recorded into a render pass instance, the
+    slink:VkRenderPassTileShadingCreateInfoQCOM::pname:tileApronSize that
+    was recorded into all elements of pname:pCommandBuffers must: equal
+    `(0,0)`
+endif::VK_QCOM_tile_shading[]
 ****
 
 include::{generated}/validity/protos/vkCmdExecuteCommands.adoc[]

@@ -61,9 +61,9 @@ ifdef::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-{refpage}-None-01549]]
     In a copy to or from a plane of a
    <<formats-multiplanar, multi-planar image>>, the elink:VkFormat of the
-    image and plane must: be compatible according to
-    <<formats-compatible-planes,the description of compatible planes>> for
-    the plane being copied
+   image and plane must: be compatible according to
+   <<formats-compatible-planes,the description of compatible planes>> for
+   the plane being copied
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * [[VUID-{refpage}-srcImage-09247]]
     If the elink:VkFormat of each of pname:srcImage and pname:dstImage is a
@@ -123,16 +123,6 @@ endif::VK_KHR_maintenance8[]
     ename:VK_IMAGE_ASPECT_COLOR_BIT
 endif::VK_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 ifdef::VK_KHR_maintenance8[]
-  * [[VUID-{refpage}-srcSubresource-10209]]
-    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT
-    and pname:dstSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT
-    or ename:VK_IMAGE_ASPECT_STENCIL_BIT, then
-    <<features-maintenance8,pname:maintenance8>> must: be enabled
-  * [[VUID-{refpage}-srcSubresource-10210]]
-    If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT or
-    ename:VK_IMAGE_ASPECT_STENCIL_BIT and pname:dstSubresource.aspectMask is
-    ename:VK_IMAGE_ASPECT_COLOR_BIT, then
-    <<features-maintenance8,pname:maintenance8>> must: be enabled
   * [[VUID-{refpage}-srcSubresource-10211]]
     If pname:srcSubresource.aspectMask is ename:VK_IMAGE_ASPECT_COLOR_BIT
     and pname:dstSubresource.aspectMask is ename:VK_IMAGE_ASPECT_DEPTH_BIT
@@ -284,24 +274,28 @@ endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
 endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
   * [[VUID-{refpage}-dstOffset-00150]]
     For each element of pname:pRegions, pname:dstOffset.x and
-    [eq]#(pname:extent.width {plus} pname:dstOffset.x)# must: both be
-    greater than or equal to `0` and less than or equal to the width of the
-    specified pname:dstSubresource of pname:dstImage
+    [eq]#(pname:extent.width {plus} pname:dstOffset.x)#, where pname:extent
+    is <<formats-size-compatibility, adjusted for size-compatibility>>,
+    must: both be greater than or equal to `0` and less than or equal to the
+    width of the specified pname:dstSubresource of pname:dstImage
   * [[VUID-{refpage}-dstOffset-00151]]
     For each element of pname:pRegions, pname:dstOffset.y and
-    [eq]#(pname:extent.height {plus} pname:dstOffset.y)# must: both be
-    greater than or equal to `0` and less than or equal to the height of the
-    specified pname:dstSubresource of pname:dstImage
+    [eq]#(pname:extent.height {plus} pname:dstOffset.y)#, where pname:extent
+    is <<formats-size-compatibility, adjusted for size-compatibility>>,
+    must: both be greater than or equal to `0` and less than or equal to the
+    height of the specified pname:dstSubresource of pname:dstImage
   * [[VUID-{refpage}-dstImage-00152]]
     If pname:dstImage is of type ename:VK_IMAGE_TYPE_1D, then for each
     element of pname:pRegions, pname:dstOffset.y must: be `0` and
-    pname:extent.height must: be `1`
+    pname:extent.height must: be `1`, where pname:extent is
+    <<formats-size-compatibility, adjusted for size-compatibility>>
   * [[VUID-{refpage}-dstOffset-00153]]
     If pname:dstImage is of type ename:VK_IMAGE_TYPE_3D, then for each
     element of pname:pRegions, pname:dstOffset.z and
-    [eq]#(pname:extent.depth {plus} pname:dstOffset.z)# must: both be
-    greater than or equal to `0` and less than or equal to the depth of the
-    specified pname:dstSubresource of pname:dstImage
+    [eq]#(pname:extent.depth {plus} pname:dstOffset.z)#, where pname:extent
+    is <<formats-size-compatibility, adjusted for size-compatibility>>,
+    must: both be greater than or equal to `0` and less than or equal to the
+    depth of the specified pname:dstSubresource of pname:dstImage
   * [[VUID-{refpage}-pRegions-07278]]
     For each element of pname:pRegions, pname:srcOffset.x must: be a
     multiple of the <<formats-compatibility-classes,texel block extent
@@ -344,24 +338,6 @@ endif::VK_VERSION_1_1,VK_KHR_maintenance1[]
     by pname:srcSubresource, pname:extent.depth must: be a multiple of the
     <<formats-compatibility-classes,texel block extent depth>> of the
     elink:VkFormat of pname:srcImage
-  * [[VUID-{refpage}-dstImage-01732]]
-    For each element of pname:pRegions, if the sum of pname:dstOffset.x and
-    pname:extent.width does not equal the width of the subresource specified
-    by pname:dstSubresource, pname:extent.width must: be a multiple of the
-    <<formats-compatibility-classes,texel block extent width>> of the
-    elink:VkFormat of pname:dstImage
-  * [[VUID-{refpage}-dstImage-01733]]
-    For each element of pname:pRegions, if the sum of pname:dstOffset.y and
-    pname:extent.height does not equal the height of the subresource
-    specified by pname:dstSubresource, pname:extent.height must: be a
-    multiple of the <<formats-compatibility-classes,texel block extent
-    height>> of the elink:VkFormat of pname:dstImage
-  * [[VUID-{refpage}-dstImage-01734]]
-    For each element of pname:pRegions, if the sum of pname:dstOffset.z and
-    pname:extent.depth does not equal the depth of the subresource specified
-    by pname:dstSubresource, pname:extent.depth must: be a multiple of the
-    <<formats-compatibility-classes,texel block extent depth>> of the
-    elink:VkFormat of pname:dstImage
   * [[VUID-{refpage}-aspect-06662]]
 ifdef::VK_VERSION_1_2,VK_EXT_separate_stencil_usage[]
     If the pname:aspect member of any element of pname:pRegions includes any

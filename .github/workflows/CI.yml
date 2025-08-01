@@ -22,7 +22,7 @@ jobs:
     # We now refer to the container by its SHA instead of the name, to prevent
     # caching problems when updating the image.
     # container: khronosgroup/docker-images:asciidoctor-spec.20240726
-    container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
 
     steps:
       - uses: actions/checkout@v4
@@ -32,24 +32,30 @@ jobs:
   consistency-check:
     name: Run consistency checks on the spec and XML sources
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
 
     steps:
+      # The repo is extracted under /__w/Vulkan-Docs/Vulkan-Docs, apparently
+      # with different ownership than the checks performed below.
+      # This causes 'fatal: detected dubious ownership in repostory' and
+      # failure to run the checks, although it is not actually propagated
+      # back to the Makefile as errors.
       - uses: actions/checkout@v4
       - name: Internal self-test of the check_spec_links script
         run: pytest test*.py
         working-directory: scripts
       - name: Generate a summary of problems for CI logs (if any)
         run: |
+          git config --global --add safe.directory '*'
           mkdir -p gen/out/checks
-          scripts/check_spec_links.py --html=gen/out/checks/problems.html > /dev/null || true
+          python3 scripts/check_spec_links.py --html=gen/out/checks/problems.html > /dev/null || true
           make CHECK_XREFS= allchecks
 
   # Commented out for Vulkan SC, for now (relies on extensions not supported in VKSC)
   #spec-toolchain:
   #  name: Build a test spec and check against expectation, to make sure the spec toolchain works as expected
   #  runs-on: ubuntu-latest
-  #  container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+  #  container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
 
   #  steps:
   #    - uses: actions/checkout@v4
@@ -58,7 +64,7 @@ jobs:
   spec-core:
     name: Build the core-only spec, to try and catch ifdef errors in extension markup
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
 
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +73,7 @@ jobs:
   spec-generate:
     name: Build the vulkan specification and generate any associated files (such as vulkan.h)
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
 
     steps:
       - uses: actions/checkout@v4
@@ -143,7 +149,7 @@ jobs:
   cts-framework-tests:
     name: Run Vulkan CTS framework tests to validate against XML changes
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:9f5add2758a383ba329bc8c4b819dea9fb695ee629b05b7da4739ddf81d39073
+    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
     continue-on-error: true
 
     steps:

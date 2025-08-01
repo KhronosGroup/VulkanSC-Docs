@@ -14,6 +14,357 @@ appears frequently in the change log.
 
 '''
 
+Change log for June 20, 2025 Vulkan 1.4.319 spec update:
+
+Github Issues
+
+  * Update WorkgroupId definition to make clear that the variable contains
+    coordinates of a local workgroup, not "`the global workgroup`", and
+    tighten up the definition of the range (public issue 2538).
+
+Internal Issues
+
+  * Add externsync="maybe" for conditionally extern sync params (internal MR
+    7245).
+  * Allow suppressing non-core prototypes at compile time by defining
+    VK_ONLY_EXPORTED_PROTOTYPES before including Vulkan headers (internal
+    issue 3069).
+  * Fix KHR_robustness2 enum promotion issue that affected Vulkan SC
+    (internal MR 7384).
+  * Clarify which access flag applies to QP map reads in video encode
+    (internal MR 7391).
+  * Update video codec extension references in proposal documents (internal
+    MR 7393).
+  * Always define Vk{Fence,Semaphore}ImportFlag{Bit,}s in spec language
+    (internal MR 7417).
+  * Remove left-over resolve attachment feedback loop from UIL (internal MR
+    7418).
+  * VU Fixes for VK_QCOM_render_pass_shader_resolve (internal MR !7422).
+  * Remove VkAttachmentFeedbackLoopInfoEXT from fragment output state
+    (internal issue 4310).
+  * Remove unused VUs from VK_QCOM_render_pass_shader_resolve (internal
+    issue 4320).
+  * Fix updated framebuffer/viewport limits so they only apply to Vulkan 1.4
+    (internal issue 4117).
+  * Add note explaining forward-compatible break (internal issue 4308).
+  * Fix several grammar issues from maintenance9 (internal MR !7434).
+  * Combine rasterizationSample VU for ShaderObject and Pipeline (internal
+    MR !7438).
+  * Combine vkCmdSetColorBlendEnableEXT and vkCmdSetColorWriteMaskEXT VUs
+    (internal MR !7439).
+  * Combine vkCmdSetColorWriteEnableEXT VUs (internal MR !7440).
+  * Add CI check for VU text ending in a period (internal MR !7441).
+  * Support multiple 'selection' attribute values for the same union member
+    (internal issue 4246).
+  * Add struct/opType to fetch template cluster's index data (internal MR
+    !7443).
+
+New Extensions
+
+  * VK_ARM_data_graph
+
+'''
+
+Change log for June 13, 2025 Vulkan 1.4.318 spec update:
+
+Github Issues
+
+  * Rework and expand docs site landing page (public PR 2524).
+  * Make git commands within Github Actions work (public PR 2542).
+
+Internal Issues
+
+  * Change XML limittype for polygonModePointSize to `exact` (internal issue
+    4305).
+  * Alias VK_COMPONENT_TYPE_FLOAT_E5M2_NV to
+    VK_COMPONENT_TYPE_FLOAT8_E5M2_EXT using the NV numeric enum value, as
+    was intended (internal issue 4309).
+  * Refer to "`location`" rather than "`binding`" for unbound vertex
+    attributes in VkPhysicalDeviceMaintenance9PropertiesKHR (internal issue
+    4312).
+  * Add support for extension ratification status to VulkanObject (internal
+    MR 7389).
+  * Restore <<interfaces-iointerfaces-locations, GLSL & D3D varying packing
+    rules for arrays>> (internal MR 7395).
+  * Fix XML for VkPhysicalDeviceDescriptorBufferTensorPropertiesARM
+    (internal MR 7400).
+  * Mark queue in vkQueueSetPerformanceConfigurationINTEL XML as
+    `externsync` (internal MR 7408).
+  * Move detailed robustness information from VkPhysicalDeviceFeatures and
+    VkPipelineRobustnessBufferBehavior to the new
+    <<shaders-execution-memory-access-bounds, Shader Out-of-Bounds Memory
+    Access>> sections (internal MR 7345).
+
+New Extensions
+
+  * VK_OHOS_surface
+  * VK_VALVE_fragment_density_map_layered
+
+'''
+
+Change log for June 6, 2025 Vulkan 1.4.317 spec update:
+
+Internal Issues
+
+  * Don't require host-image-copy on external resources in
+    vkGetPhysicalDeviceImageFormatProperties and
+    vkGetPhysicalDeviceImageFormatProperties2 (internal issue 4078)
+  * Update common copy image VUs to account for texel block extend (internal
+    issue 4113)
+  * Increase the framebuffer/viewport width/height minimum requirement for
+    Vulkan 1.4 to support 8k rendering (internal issue 4117).
+  * Add VU for VkAccelerationStructureGeometryTrianglesDataKHR::maxVertex
+    (internal issue 4234).
+  * Add xml_consistency.py check for enum names extending FlagBits types but
+    without _BIT in the enum name, fix existing violations by adding
+    aliases, and document the naming requirement (internal issue 4276).
+  * Clarify that previous written values may be returned when
+    <<sparsememory-accessing-unbound, reading unbound sparse memory>>
+    (internal issue 4285).
+  * Fix check for version name match in scripts/reg.py so it does the right
+    thing (internal issue 4299).
+  * Combine line rasterization dynamic state common draw VUs (internal MR
+    6957).
+  * Combine line stipple enable dynamic state common draw VUs (internal MR
+    6958).
+  * Add VkDescriptorBindingFlagBits VU for VkWriteDescriptorSet (internal MR
+    7371).
+  * Add deprecate XML tag support to VulkanObject (internal MR 7387).
+
+New Extensions
+
+  * VK_KHR_maintenance9
+  * VK_KHR_present_id2
+  * VK_KHR_present_wait2
+  * VK_KHR_unified_image_layouts
+  * VK_KHR_video_decode_vp9
+  * VK_ARM_tensors
+  * VK_EXT_shader_float8
+
+'''
+
+Change log for May 30, 2025 Vulkan 1.4.316 spec update:
+
+Github Issues
+
+  * Make depthWriteEnable depend on depthTestEnable in common draw VUs
+    (public issue 2522).
+
+Internal Issues
+
+  * Remove common copy image VUs constraining extent with compressed
+    destination images, and redundant common blit image and copy image VUs
+    (internal issue 4113)
+  * Improve wording of surface-maintenance1 present mode query in
+    VkSurfacePresentScalingCapabilitiesEXT and
+    VkSurfacePresentModeCompatibilityEXT (internal issue 4266).
+  * Use updated Docker build image including support for htmldiff script
+    (internal issue 4268)
+  * Add common draw VU requiring that multiview must not be enabled when a
+    shader object is bound (internal issue 4269)
+  * Remove infinite recursion in VulkanObject script (internal issue 4291).
+  * Add VK_NV_cuda_kernel_launch to beta extension list in genvk.py
+    (internal issue 4281).
+  * Correct VU wording for sum of offset and size in relation to buffer size
+    for VUs 03616 and 07437 (internal issue 4289).
+  * Require implementation behavior for VK_COLOR_SPACE_PASS_THROUGH_EXT on
+    Wayland (internal MR 7291).
+  * Typo fixes for VK_QCOM_tile_shading (internal MR 7337).
+  * Fix common bind descriptor sets VU 00358 to allow null sets (internal MR
+    7361).
+  * Modify formats generator to split compatibility format table rows into
+    multiple rows when they threaten to exceed asciidoctor-pdf restrictions
+    that a table call cannot span a page boundary.
+
+New Extensions
+
+  * VK_ARM_format_pack
+
+'''
+
+Change log for May 9, 2025 Vulkan 1.4.315 spec update:
+
+Internal Issues
+
+  * Add runtime SPIR-V VUs to cover the cooperative matrix version
+    requirement reduction (internal issue 4245).
+  * Add missing runtime SPIR-V OpExtInstWithForwardRefsKHR VU (internal
+    issue 4252).
+  * Clarify that ALL_COMMANDS is interpreted contextually for renderpass
+    creation (internal issue 4257).
+  * Remove incorrect common draw validity `nextStage` VU 10744 (internal
+    issue 4258).
+  * Add renderpass VU (vkCmdExecuteGeneratedCommandsEXT) for device
+    generated commands (internal issue 4274)
+  * Remove erroneously added word in runtime SPIR-V VU 10133 (internal MR
+    7310).
+  * Remove asciidoctor conditional markup from standalone SPIR-V VUs
+    (internal MR 7317).
+  * Fix naming of VK_QCOM_tile_memory_heap bitflag enums (internal MR 7327).
+
+New Extensions
+
+  * VK_EXT_zero_initialize_device_memory
+
+'''
+
+Change log for May 2, 2025 Vulkan 1.4.314 spec update:
+
+Github Issues
+
+  * Clarify update-after-bind descriptor limits in
+    VkPipelineLayoutCreateInfo VUs (public issue 2515).
+  * Fix union name markup in VkPerformanceValueDataINTEL to omit the
+    un-needed union name (public PR 2526).
+  * Fix pname: markup in VkSurfaceCapabilitiesFullScreenExclusiveEXT to
+    match the member name in the XML (public PR 2527).
+
+Internal Issues
+
+  * Ad image layout mismatch VUs for vkCmdPipelineBarrier (internal issue
+    4240).
+  * Add `deprecates` attributes to XML `version` tags to enable marking
+    individual APIs as deprecated (internal MR 7069).
+  * Merge VK_KHR_maintenance8 validity language into vkCmdWaitEvents2 VU
+    10394 (internal MR 7118).
+  * Add missing XML `externsync` attribute on queue parameters in
+    VK_EXT_debug_utils (internal MR 7268).
+  * Delete conflicting VkRenderPassFragmentDensityMapOffsetEndInfoEXT
+    language already addressed by VUs (internal MR 7268).
+  * Fix external link to GLSL registry in VK_NV_cooperative_vector appendix
+    (internal MR 7313).
+
+New Extensions
+
+  * VK_KHR_robustness2 (for Roadmap 2026) (internal MR 7143).
+
+'''
+
+Change log for April 18, 2025 Vulkan 1.4.313 spec update:
+
+Internal Issues
+
+  * Add common draw vertex binding VUs for primitive topology (internal
+    issue 3499).
+  * Add language about null index opacity micromaps to
+    VkAccelerationStructureTrianglesOpacityMicromapEXT (internal issue
+    4220).
+  * Add common stage mask VUs to require feature enablement for pipeline
+    stages (internal issue 4233).
+  * Add runtime SPIR-V VUs for workgroup layout storage rules (internal
+    issue 4255).
+  * Update VkBufferDeviceAddressInfo and vkGetBufferOpaqueCaptureAddress for
+    forbid obtaining the device address of a non-sparse and non-mapped
+    buffer (internal MR 6883).
+  * Rewrite the <<fundamentals-objectmodel-lifetime, Object Lifetime>>
+    section to describe common shared behavior, while noting that exceptions
+    are listed with the commands that have those exceptions, rather than in
+    this section (internal MR 7132).
+  * Refactor and improve the XML RNC schema, based on similar changes to the
+    OpenXR schema. Add scripts/checkXml.sh (internal MR 7227).
+  * Mark structure members as `externsync` directly, rather than marking the
+    command parameters passing those structures (internal MR 7233).
+  * Move opacity micromap and displacement micromap geometry rules to the
+    right section (internal MR 7266).
+  * Mark VK_NV_displacement_micromap as deprecated, referring to
+    VK_NV_cluster_acceleration_structure instead (internal MR 7271).
+  * Fix typo in vkCreateMicromapEXT (internal MR 7275).
+  * Require fragment density map offsets to match across a render pass in
+    VkRenderPassFragmentDensityMapOffsetEndInfoEXT (internal MR 7279).
+  * Add nextStage shader object VU to common draw validity (internal MR
+    7280).
+  * Revert back to should: when describing <<ray-traversal-watertight,
+    Watertightness>> (internal MR 7295).
+  * Add common dispatch VU for binding compute shaders (internal MR 7296).
+  * Fix VkRayTracingPipelineCreateInfoKHR VU 10392 (internal MR 7303).
+
+New Extensions
+
+  * VK_QCOM_tile_memory_heap
+
+'''
+
+Change log for April 4, 2025 Vulkan 1.4.312 spec update:
+
+Github Issues
+
+  * Fix SRGB alpha numeric formats in XML (public issue 2513).
+
+Internal Issues
+
+  * Update BUILD.adoc to refer to the `htmldiff` script instead of the
+    currently non-working `diff_html` Makefile target (internal issue 4210).
+  * Clarify that resolves may ignore sRGB for vkCmdResolveImage and
+    VkResolveModeFlagBits (internal issue 4181).
+  * Upgrade <<ray-traversal-watertight, Watertightness>> from should: to
+    must: (internal MR 7208).
+  * Add standalone SPIR-V VU for explicit layout decorations, referring to
+    the <<interfaces-explicit-layout-decorations>> section (internal MR
+    7256).
+  * Merge changes from Vulkan SC 1.0.18 to main (internal MR 7259).
+  * Add VU fix for common blit image VUs 10579 and 10580 (internal MR 7261).
+
+New Extensions
+
+  * VK_NV_external_compute_queue_vendor
+  * VK_QCOM_tile_shading
+
+'''
+
+Change log for March 21, 2025 Vulkan 1.4.311 spec update:
+
+Github Issues
+
+  * Clarify that all specified vkCmdClearAttachments::pRects are cleared in
+    all specified attachments (public issue 2497).
+  * Add VkPushConstantRange link in VkPipelineLayoutCreateInfo (public PR
+    2508).
+  * Link _identically defined_ to the glossary definition (public PR 2510).
+
+Internal Issues
+
+  * Add binary <<fundamentals-binaryresults, Opaque Binary Data Results>>
+    section to the Fundamentals chapter, and describe exceptions from this
+    default behavior in legacy commands behaving differently (internal issue
+    4101).
+  * Update common draw dispatch VU 07753 to require that an accessed
+    VkBufferView's numeric type must match the OpTypeImage (internal issue
+    4128).
+  * Annotate the <<limits-required, Required Limits>> table so all limits
+    with multiple values shown explicitly tag them as Vulkan core or a
+    Roadmap limit (internal issue 4167).
+  * Clarify that STD_VIDEO_H264_PROFILE_IDC_BASELINE indicates support for
+    the constrained baseline profile only in VkVideoDecodeH264ProfileInfoKHR
+    and VkVideoEncodeH264ProfileInfoKHR (internal MR 7153).
+  * Update promotion language in some extension appendices that were
+    initially partially promoted, and further promoted in later core
+    versions (internal MR 7191).
+  * Invoke scripts in CI explicitly with python3 so execute bit is not
+    needed (internal MR 7215).
+  * Ignore antora generated files in .gitignore (internal MR 7217).
+  * Update descriptions of VkDebugUtilsMessengerCallbackDataEXT members
+    pMessageIdName, messageIdNumber, and pMessage (internal MR 7218).
+  * Conditionalize VkDependencyInfo VU 10606 for VK_KHR_maintenance8
+    (internal MR 7220).
+  * Add Enum / Flag value and value string to the Vulkan Object generator
+    (internal MR 7221).
+  * Numerous minor markup fixes and missing boilerplate sType / pNext member
+    descriptions detected by new checker scripts (internal MRs 7228, 7229,
+    7230).
+  * Use Python f-strings more consistently (internal MR 7231).
+  * Fix math for VK_QCOM_fragment_density_map_offset to match the shipping
+    implementation (internal MRs 7237, 7240).
+  * Update limittypes for VkBool32 limits in vk.xml again after discovering
+    the previous update caused issues with Vulkan-Profiles' interpretation
+    (internal MR 7243).
+
+New Extensions
+
+  * VK_EXT_fragment_density_map_offset
+  * VK_KHR_shader_bfloat16
+
+'''
+
 Change log for March 7, 2025 Vulkan 1.4.310 spec update:
 
 Github Issues
@@ -13001,7 +13352,7 @@ GitHub Issues:
     discussion of <<synchronization-submission-order, submission order>>;
     and references elsewhere to these sections (public issue 133).
   * Clarify <<descriptorsets-compatibility,Pipeline Layout Compatibility>>
-    language and introduce the term ``identically defined'' (public issue
+    language and introduce the term <<glossary-identically-defined,identically defined>> (public issue
     164).
   * Add a dependency to the +VK_EXT_debug_marker+ extension that is needed to
     reuse the object type enum from +VK_EXT_debug_report+, and moves the

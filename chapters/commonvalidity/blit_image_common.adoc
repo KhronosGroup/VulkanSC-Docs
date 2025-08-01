@@ -4,12 +4,6 @@
 
 // Common Valid Usage
 // Common to VkCmdBlitImage* commands
-  * [[VUID-{refpage}-pRegions-00215]]
-    The source region specified by each element of pname:pRegions must: be a
-    region that is contained within pname:srcImage
-  * [[VUID-{refpage}-pRegions-00216]]
-    The destination region specified by each element of pname:pRegions must:
-    be a region that is contained within pname:dstImage
   * [[VUID-{refpage}-pRegions-00217]]
     The union of all destination regions, specified by the elements of
     pname:pRegions, must: not overlap in memory with any texel that may: be
@@ -161,17 +155,17 @@ ifdef::VK_KHR_maintenance8[]
     `0`, and pname:srcSubresource.layerCount and
     pname:dstSubresource.layerCount must: each be `1`
   * [[VUID-{refpage}-maintenance8-10579]]
-    If the <<features-maintenance8,pname:maintenance8>> feature is enabled
-    and pname:srcImage is not of type ename:VK_IMAGE_TYPE_3D, then for each
-    element of pname:pRegions, the absolute difference of the pname:z member
-    of each member of pname:dstOffsets must: equal
-    pname:srcSubresource.layerCount
+    If the <<features-maintenance8,pname:maintenance8>> feature is enabled,
+    pname:dstImage is ename:VK_IMAGE_TYPE_3D, and pname:srcImage is not of
+    type ename:VK_IMAGE_TYPE_3D, then for each element of pname:pRegions,
+    the absolute difference of the pname:z member of each member of
+    pname:dstOffsets must: equal pname:srcSubresource.layerCount
   * [[VUID-{refpage}-maintenance8-10580]]
-    If the <<features-maintenance8,pname:maintenance8>> feature is enabled
-    and pname:dstImage is not of type ename:VK_IMAGE_TYPE_3D, then for each
-    element of pname:pRegions, the absolute difference of the pname:z member
-    of each member of pname:srcOffsets must: equal
-    pname:dstSubresource.layerCount
+    If the <<features-maintenance8,pname:maintenance8>> feature is enabled,
+    pname:srcImage is ename:VK_IMAGE_TYPE_3D, and pname:dstImage is not of
+    type ename:VK_IMAGE_TYPE_3D, then for each element of pname:pRegions,
+    the absolute difference of the pname:z member of each member of
+    pname:srcOffsets must: equal pname:dstSubresource.layerCount
 endif::VK_KHR_maintenance8[]
   * [[VUID-{refpage}-srcImage-00240]]
     If

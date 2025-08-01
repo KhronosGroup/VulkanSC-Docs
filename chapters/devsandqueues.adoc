@@ -17,6 +17,9 @@ which there are a finite number.
 A logical device represents an instance of that implementation with its own
 state and resources independent of other logical devices.
 
+Physical devices cannot: be independently destroyed, and are instead
+destroyed with the slink:VkInstance that they were retrieved from.
+
 Physical devices are represented by sname:VkPhysicalDevice handles:
 
 include::{generated}/api/handles/VkPhysicalDevice.adoc[]
@@ -651,7 +654,7 @@ Otherwise, pname:deviceNodeMask must: be `1`.
 ====
 Although they have identical descriptions,
 slink:VkPhysicalDeviceIDProperties::pname:deviceUUID may differ from
-slink:VkPhysicalDeviceProperties2::pname:pipelineCacheUUID.
+slink:VkPhysicalDeviceProperties2::pname:properties.pipelineCacheUUID.
 The former is intended to identify and correlate devices across API and
 driver boundaries, while the latter is used to identify a compatible device
 and driver combination to use when serializing and de-serializing pipeline
@@ -1409,6 +1412,10 @@ ifdef::VK_NV_optical_flow[]
   * ename:VK_QUEUE_OPTICAL_FLOW_BIT_NV specifies that queues in this queue
     family support optical flow operations.
 endif::VK_NV_optical_flow[]
+ifdef::VK_ARM_data_graph[]
+  * ename:VK_QUEUE_DATA_GRAPH_BIT_ARM specifies that queues in this queue
+    family support <<graphs-operations,data graph operations>>.
+endif::VK_ARM_data_graph[]
 ifdef::VK_VERSION_1_1[]
   * ename:VK_QUEUE_PROTECTED_BIT specifies that queues in this queue family
     support the ename:VK_DEVICE_QUEUE_CREATE_PROTECTED_BIT bit.
@@ -1633,6 +1640,32 @@ endif::VK_KHR_video_queue[]
 ifdef::VK_KHR_performance_query[]
 include::{chapters}/VK_KHR_performance_query/queuefamily.adoc[]
 endif::VK_KHR_performance_query[]
+
+ifdef::VK_KHR_maintenance9[]
+[open,refpage='VkQueueFamilyOwnershipTransferPropertiesKHR',desc='Structure describing queue family ownership transfer properties',type='structs']
+--
+The slink:VkQueueFamilyOwnershipTransferPropertiesKHR structure is defined
+as:
+
+include::{generated}/api/structs/VkQueueFamilyOwnershipTransferPropertiesKHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:optimalImageTransferToQueueFamilies is a bitmask of queue family
+    indices that indicates which queue families belonging to the same
+    logical device support implicitly acquiring optimal image resources
+    owned by this queue family, without the resources' contents becoming
+    undefined:.
+
+If this structure is included in the pname:pNext chain of the
+slink:VkQueueFamilyProperties2 structure passed to
+flink:vkGetPhysicalDeviceQueueFamilyProperties2, then it is filled with the
+queue family ownership properties for the specified queue family.
+
+include::{generated}/validity/structs/VkQueueFamilyOwnershipTransferPropertiesKHR.adoc[]
+--
+endif::VK_KHR_maintenance9[]
 
 
 [[devsandqueues-devices]]
@@ -1913,7 +1946,7 @@ endif::VK_EXT_application_parameters[]
     All <<extendingvulkan-extensions-extensiondependencies, required device
     extensions>> for each extension in the
     slink:VkDeviceCreateInfo::pname:ppEnabledExtensionNames list must: also
-    be present in that list
+    be present in that list.
 ifdef::VK_EXT_application_parameters[]
   * [[VUID-vkCreateDevice-key-05092]]
     The pname:key value of each slink:VkApplicationParametersEXT structure
@@ -2129,17 +2162,17 @@ ifdef::VK_VERSION_1_4[]
   * [[VUID-VkDeviceCreateInfo-pNext-10360]]
     If the pname:pNext chain includes a
     slink:VkPhysicalDeviceVulkan14Features structure, then it must: not
-    include a slink:VkPhysicalDeviceGlobalPriorityQueryFeatures
-    slink:VkPhysicalDeviceShaderSubgroupRotateFeatures
-    slink:VkPhysicalDeviceShaderFloatControls2Features
-    slink:VkPhysicalDeviceShaderExpectAssumeFeatures
-    slink:VkPhysicalDeviceLineRasterizationFeatures
-    slink:VkPhysicalDeviceVertexAttributeDivisorFeatures
-    slink:VkPhysicalDeviceIndexTypeUint8Features
-    slink:VkPhysicalDeviceDynamicRenderingLocalReadFeatures
-    slink:VkPhysicalDeviceMaintenance5Features
-    slink:VkPhysicalDeviceMaintenance6Features
-    slink:VkPhysicalDevicePipelineProtectedAccessFeatures
+    include a slink:VkPhysicalDeviceGlobalPriorityQueryFeatures,
+    slink:VkPhysicalDeviceShaderSubgroupRotateFeatures,
+    slink:VkPhysicalDeviceShaderFloatControls2Features,
+    slink:VkPhysicalDeviceShaderExpectAssumeFeatures,
+    slink:VkPhysicalDeviceLineRasterizationFeatures,
+    slink:VkPhysicalDeviceVertexAttributeDivisorFeatures,
+    slink:VkPhysicalDeviceIndexTypeUint8Features,
+    slink:VkPhysicalDeviceDynamicRenderingLocalReadFeatures,
+    slink:VkPhysicalDeviceMaintenance5Features,
+    slink:VkPhysicalDeviceMaintenance6Features,
+    slink:VkPhysicalDevicePipelineProtectedAccessFeatures,
     slink:VkPhysicalDevicePipelineRobustnessFeatures, or
     slink:VkPhysicalDeviceHostImageCopyFeatures structure
 // Jon 1.4 TBD - add extension-specific VUs specifying when Vulkan14Features
@@ -2242,6 +2275,12 @@ ifdef::VK_ARM_scheduling_controls[]
     must: contain
     ename:VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM
 endif::VK_ARM_scheduling_controls[]
+  * [[VUID-VkDeviceCreateInfo-None-10778]]
+    {empty}
+ifdef::VK_KHR_maintenance9[]
+    If the <<features-maintenance9,maintenance9>> feature is not supported,
+endif::VK_KHR_maintenance9[]
+    pname:queueCreateInfoCount must: be greater than `0`
 ****
 
 include::{generated}/validity/structs/VkDeviceCreateInfo.adoc[]
@@ -3076,9 +3115,9 @@ include::{generated}/api/protos/vkDestroyDevice.adoc[]
 To ensure that no work is active on the device, flink:vkDeviceWaitIdle can:
 be used to gate the destruction of the device.
 Prior to destroying a device, an application is responsible for
-destroying/freeing any Vulkan objects that were created using that device as
-the first parameter of the corresponding ftext:vkCreate* or
-ftext:vkAllocate* command.
+destroying/freeing any Vulkan objects with explicit ftext:vkDestroy* or
+ftext:vkFree* commands that were created using that device as the first
+parameter of the corresponding ftext:vkCreate* or ftext:vkAllocate* command.
 
 [NOTE]
 ====
@@ -3089,24 +3128,11 @@ explicitly free all of these resources prior to calling
 fname:vkDestroyDevice.
 ====
 
-ifdef::VKSC_VERSION_1_0[]
-If
-slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,
-pname:deviceDestroyFreesMemory>> is ename:VK_TRUE, the reserved memory for
-child objects without explicit free or destroy commands is returned to the
-system when the device is destroyed, otherwise it may: not be returned to
-the system until the process is terminated.
-endif::VKSC_VERSION_1_0[]
-
 .Valid Usage
 ****
   * [[VUID-vkDestroyDevice-device-05137]]
-    All child objects created on pname:device
-ifdef::VKSC_VERSION_1_0[]
-    , except those with no explicit <<fundamentals-objectmodel-no-destroy,
-    free or destroy command>>,
-endif::VKSC_VERSION_1_0[]
-    must: have been destroyed prior to destroying pname:device
+    All child objects created on pname:device that can be destroyed or freed
+    must: have been destroyed or freed prior to destroying pname:device
 ifndef::VKSC_VERSION_1_0[]
   * [[VUID-vkDestroyDevice-device-00379]]
     If sname:VkAllocationCallbacks were provided when pname:device was
@@ -3169,6 +3195,8 @@ device.
 The queues to create are described by a set of slink:VkDeviceQueueCreateInfo
 structures that are passed to flink:vkCreateDevice in
 pname:pQueueCreateInfos.
+Queues cannot: be independently destroyed, and are instead destroyed with
+the slink:VkDevice that they were created from.
 
 Queues are represented by sname:VkQueue handles:
 

@@ -56,6 +56,24 @@ Queries are managed using _query pool_ objects.
 Each query pool is a collection of a specific number of queries of a
 particular type.
 
+ifdef::VKSC_VERSION_1_0[]
+ifdef::hidden[]
+// tag::scremoved[]
+  * fname:vkDestroyQueryPool <<SCID-4>>
+// end::scremoved[]
+endif::hidden[]
+
+Query pools cannot: be destroyed <<SCID-4>>.
+
+If <<limits-deviceDestroyFreesMemory,
+slink:VkPhysicalDeviceVulkanSC10Properties::pname:deviceDestroyFreesMemory>>
+is ename:VK_TRUE, the memory is returned to the system when the device is
+destroyed.
+Otherwise, it may: not be returned to the system until the process is
+terminated.
+
+endif::VKSC_VERSION_1_0[]
+
 Query pools are represented by sname:VkQueryPool handles:
 
 include::{generated}/api/handles/VkQueryPool.adoc[]
@@ -112,7 +130,7 @@ include::{generated}/api/structs/VkQueryPoolCreateInfo.adoc[]
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * pname:flags is reserved for future use.
+  * pname:flags is a bitmask of elink:VkQueryPoolCreateFlagBits
   * pname:queryType is a elink:VkQueryType value specifying the type of
     queries managed by the pool.
   * pname:queryCount is the number of queries managed by the pool.
@@ -182,6 +200,14 @@ ifdef::VK_KHR_performance_query[]
     values specified when pname:device was created
 endif::VK_KHR_performance_query[]
 endif::VKSC_VERSION_1_0[]
+ifdef::VK_KHR_video_decode_vp9[]
+  * [[VUID-VkQueryPoolCreateInfo-pNext-10779]]
+    If the pname:pNext chain includes a slink:VkVideoProfileInfoKHR
+    structure and its pname:videoCodecOperation member is
+    ename:VK_VIDEO_CODEC_OPERATION_DECODE_VP9_BIT_KHR, then the
+    <<features-videoDecodeVP9,pname:videoDecodeVP9>> feature must: be
+    enabled
+endif::VK_KHR_video_decode_vp9[]
 ifdef::VK_KHR_video_encode_queue[]
   * [[VUID-VkQueryPoolCreateInfo-queryType-07133]]
     If pname:queryType is ename:VK_QUERY_TYPE_VIDEO_ENCODE_FEEDBACK_KHR,
@@ -215,32 +241,40 @@ endif::VK_KHR_video_encode_av1[]
 include::{generated}/validity/structs/VkQueryPoolCreateInfo.adoc[]
 --
 
-[open,refpage='VkQueryPoolCreateFlags',desc='Reserved for future use',type='flags']
+[open,refpage='VkQueryPoolCreateFlagBits',desc='Bitmask specifying query pool properties',type='enums']
+--
+Bits which can: be set in slink:VkQueryPoolCreateInfo::pname:flags,
+specifying options for query pools, are:
+
+include::{generated}/api/enums/VkQueryPoolCreateFlagBits.adoc[]
+
+ifdef::VK_KHR_maintenance9[]
+  * ename:VK_QUERY_POOL_CREATE_RESET_BIT_KHR specifies that queries in the
+    query pool are initialized on creation and do not need to be reset
+    before first use.
+endif::VK_KHR_maintenance9[]
+
+ifndef::VK_KHR_maintenance9[]
+[NOTE]
+====
+All bits for this type are defined by extensions, and none of those
+extensions are enabled in this build of the specification.
+====
+endif::VK_KHR_maintenance9[]
+--
+
+[open,refpage='VkQueryPoolCreateFlags',desc='Bitmask of VkQueryPoolCreateFlagBits',type='flags']
 --
 include::{generated}/api/flags/VkQueryPoolCreateFlags.adoc[]
 
-tname:VkQueryPoolCreateFlags is a bitmask type for setting a mask, but is
-currently reserved for future use.
+tname:VkQueryPoolCreateFlags is a bitmask type for setting a mask of zero or
+more elink:VkQueryPoolCreateFlagBits.
 --
 
 ifdef::VK_KHR_performance_query[]
 include::{chapters}/VK_KHR_performance_query/querycreateinfo.adoc[]
 endif::VK_KHR_performance_query[]
 
-ifdef::VKSC_VERSION_1_0[]
-ifdef::hidden[]
-// tag::scremoved[]
-  * fname:vkDestroyQueryPool <<SCID-4>>
-// end::scremoved[]
-endif::hidden[]
-
-Query pools cannot: be destroyed <<SCID-4>>.
-If
-slink:VkPhysicalDeviceVulkanSC10Properties::<<limits-deviceDestroyFreesMemory,pname:deviceDestroyFreesMemory>>
-is ename:VK_TRUE, the memory is returned to the system when the device is
-destroyed.
-
-endif::VKSC_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 
 [open,refpage='vkDestroyQueryPool',desc='Destroy a query pool object',type='protos']
@@ -386,8 +420,13 @@ Both the availability status and numerical results can: be retrieved by
 calling either flink:vkGetQueryPoolResults or
 flink:vkCmdCopyQueryPoolResults.
 
-After query pool creation, each query is in an uninitialized state and must:
-be reset before it is used.
+After query pool creation,
+ifdef::VK_KHR_maintenance9[]
+where ename:VK_QUERY_POOL_CREATE_RESET_BIT_KHR was not set in
+slink:VkQueryPoolCreateInfo::pname:flags
+endif::VK_KHR_maintenance9[]
+each query is in an uninitialized state and must: be reset before it is
+used.
 Queries must: also be reset between uses.
 
 ifdef::VK_VERSION_1_1,VK_KHR_device_group[]
@@ -1741,8 +1780,8 @@ zero or more elink:VkQueryPipelineStatisticFlagBits.
 [[queries-timestamps]]
 == Timestamp Queries
 
-_Timestamps_ provide applications with a mechanism for timing the execution
-of commands.
+_Timestamps_ provide applications with a mechanism for monotonically
+tracking the execution of commands.
 A timestamp is an integer value generated by the sname:VkPhysicalDevice.
 Unlike other queries, timestamps do not operate over a range, and so do not
 use flink:vkCmdBeginQuery or flink:vkCmdEndQuery.
@@ -1751,8 +1790,6 @@ to tell the sname:VkPhysicalDevice to write timestamp values to a
 <<queries-pools,query pool>> and then either read timestamp values on the
 host (using flink:vkGetQueryPoolResults) or copy timestamp values to a
 sname:VkBuffer (using flink:vkCmdCopyQueryPoolResults).
-The application can: then compute differences between timestamps to
-determine execution time.
 
 The number of valid bits in a timestamp value is determined by the
 sname:VkQueueFamilyProperties::pname:timestampValidBits property of the
@@ -1833,49 +1870,27 @@ ifndef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_EXT]
 endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 If an overflow occurs, the timestamp value must: wrap back to zero.
 
-[NOTE]
-====
-Comparisons between timestamps should be done between timestamps where they
-are guaranteed to not decrease.
-For example, subtracting an older timestamp from a newer one to determine
-the execution time of a sequence of commands is only a reliable measurement
-if the two timestamp writes were performed in the same
-ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-submission, or if the writes were performed on the same logical device and
-ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
-ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
-ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
-is enabled.
-endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-ifndef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-submission.
-endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-====
-
 ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
 
 If fname:vkCmdWriteTimestamp2 is called while executing a render pass
 instance that has multiview enabled, the timestamp uses [eq]#N# consecutive
 query indices in the query pool (starting at pname:query) where [eq]#N# is
-the number of bits set in the view mask of the subpass the command is
-executed in.
+the number of bits set in the view mask of the subpass
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[or dynamic render pass]
+the command is executed in.
 The resulting query values are determined by an implementation-dependent
 choice of one of the following behaviors:
 
   * The first query is a timestamp value and (if more than one bit is set in
     the view mask) zero is written to the remaining queries.
-    If two timestamps are written in the same subpass, the sum of the
-    execution time of all views between those commands is the difference
-    between the first query written by each command.
   * All [eq]#N# queries are timestamp values.
-    If two timestamps are written in the same subpass, the sum of the
-    execution time of all views between those commands is the sum of the
-    difference between corresponding queries written by each command.
-    The difference between corresponding queries may: be the execution time
-    of a single view.
 
-In either case, the application can: sum the differences between all [eq]#N#
-queries to determine the total execution time.
+Either way, if two timestamps are written in the same subpass
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[or dynamic render pass]
+with multiview enabled, each of the [eq]#N# consecutive queries written for
+a timestamp must: not have a lower value than the queries with corresponding
+indices written by the timestamp that happens-before unless the value
+overflows the maximum supported integer bit width of the query.
 
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
 
@@ -1909,6 +1924,12 @@ ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
     subpass's view mask must: be less than or equal to the number of queries
     in pname:queryPool
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
+ifdef::VK_QCOM_tile_shading[]
+  * [[VUID-vkCmdWriteTimestamp2-None-10639]]
+    This command must: not be recorded when
+    <<renderpass-per-tile-execution-model,per-tile execution model>> is
+    enabled
+endif::VK_QCOM_tile_shading[]
 ****
 
 include::{generated}/validity/protos/vkCmdWriteTimestamp2.adoc[]
@@ -1971,50 +1992,27 @@ ifndef::VK_KHR_calibrated_timestamps[ename:VK_TIME_DOMAIN_DEVICE_EXT]
 endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 If an overflow occurs, the timestamp value must: wrap back to zero.
 
-[NOTE]
-====
-Comparisons between timestamps should be done between timestamps where they
-are guaranteed to not decrease.
-For example, subtracting an older timestamp from a newer one to determine
-the execution time of a sequence of commands is only a reliable measurement
-if the two timestamp writes were performed in the same
-ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-submission, or if the writes were performed on the same logical device and
-ifdef::VK_KHR_calibrated_timestamps[`apiext:VK_KHR_calibrated_timestamps`]
-ifdef::VK_KHR_calibrated_timestamps+VK_EXT_calibrated_timestamps[or]
-ifdef::VK_EXT_calibrated_timestamps[`apiext:VK_EXT_calibrated_timestamps`]
-is enabled.
-endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-ifndef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-submission.
-endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
-====
-
-
 ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
 
 If fname:vkCmdWriteTimestamp is called while executing a render pass
 instance that has multiview enabled, the timestamp uses [eq]#N# consecutive
 query indices in the query pool (starting at pname:query) where [eq]#N# is
-the number of bits set in the view mask of the subpass the command is
-executed in.
+the number of bits set in the view mask of the subpass
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[or dynamic render pass]
+the command is executed in.
 The resulting query values are determined by an implementation-dependent
 choice of one of the following behaviors:
 
   * The first query is a timestamp value and (if more than one bit is set in
     the view mask) zero is written to the remaining queries.
-    If two timestamps are written in the same subpass, the sum of the
-    execution time of all views between those commands is the difference
-    between the first query written by each command.
   * All [eq]#N# queries are timestamp values.
-    If two timestamps are written in the same subpass, the sum of the
-    execution time of all views between those commands is the sum of the
-    difference between corresponding queries written by each command.
-    The difference between corresponding queries may: be the execution time
-    of a single view.
 
-In either case, the application can: sum the differences between all [eq]#N#
-queries to determine the total execution time.
+Either way, if two timestamps are written in the same subpass
+ifdef::VK_VERSION_1_3,VK_KHR_dynamic_rendering[or dynamic render pass]
+with multiview enabled, each of the [eq]#N# consecutive queries written for
+a timestamp must: not have a lower value than the queries with corresponding
+indices written by the timestamp that happens-before unless the value
+overflows the maximum supported integer bit width of the query.
 
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
 
@@ -2038,6 +2036,12 @@ ifdef::VK_VERSION_1_1,VK_KHR_multiview[]
     subpass's view mask must: be less than or equal to the number of queries
     in pname:queryPool
 endif::VK_VERSION_1_1,VK_KHR_multiview[]
+ifdef::VK_QCOM_tile_shading[]
+  * [[VUID-vkCmdWriteTimestamp-None-10640]]
+    This command must: not be recorded when
+    <<renderpass-per-tile-execution-model,per-tile execution model>> is
+    enabled
+endif::VK_QCOM_tile_shading[]
 ****
 
 include::{generated}/validity/protos/vkCmdWriteTimestamp.adoc[]

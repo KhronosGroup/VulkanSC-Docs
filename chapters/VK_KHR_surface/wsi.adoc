@@ -128,6 +128,9 @@ ifdef::VK_QNX_screen_surface[]
 include::{chapters}/VK_QNX_screen_surface/platformCreateSurface_screen.adoc[]
 endif::VK_QNX_screen_surface[]
 
+ifdef::VK_OHOS_surface[]
+include::{chapters}/VK_OHOS_surface/platformCreateSurface_OHOS.adoc[]
+endif::VK_OHOS_surface[]
 
 === Platform-Independent Information
 
@@ -277,6 +280,10 @@ endif::VK_NN_vi_surface[]
 ifdef::VK_QNX_screen_surface[]
 include::{chapters}/VK_QNX_screen_surface/platformQuerySupport_screen.adoc[]
 endif::VK_QNX_screen_surface[]
+
+ifdef::VK_OHOS_surface[]
+include::{chapters}/VK_OHOS_surface/platformQuerySupport_OHOS.adoc[]
+endif::VK_OHOS_surface[]
 
 
 == Surface Queries
@@ -732,16 +739,18 @@ include::{generated}/api/structs/VkSurfacePresentScalingCapabilitiesEXT.adoc[]
     or equal to the corresponding pname:width and pname:height of
     slink:VkSurfaceCapabilitiesKHR::pname:maxImageExtent.
 
-ifdef::VK_EXT_swapchain_maintenance1[]
-Before creating a swapchain whose scaling mode can: be specified through the
-use of slink:VkSwapchainPresentScalingCreateInfoEXT, obtain the set of
-supported scaling modes by including a slink:VkSurfacePresentModeEXT
-structure in the pname:pNext chain of slink:VkPhysicalDeviceSurfaceInfo2KHR
-when calling flink:vkGetPhysicalDeviceSurfaceCapabilities2KHR.
+To query the set of supported scaling modes for a given present mode, add a
+slink:VkSurfacePresentModeEXT structure in the pname:pNext chain of
+slink:VkPhysicalDeviceSurfaceInfo2KHR when calling
+flink:vkGetPhysicalDeviceSurfaceCapabilities2KHR.
 The implementation must: return the same values in
 sname:VkSurfacePresentScalingCapabilitiesEXT for any of the compatible
 present modes as obtained through
 slink:VkSurfacePresentModeCompatibilityEXT.
+
+ifdef::VK_EXT_swapchain_maintenance1[]
+The application can: specify the scaling mode when creating a swapchain
+through the use of slink:VkSwapchainPresentScalingCreateInfoEXT.
 endif::VK_EXT_swapchain_maintenance1[]
 
 include::{generated}/validity/structs/VkSurfacePresentScalingCapabilitiesEXT.adoc[]
@@ -897,13 +906,14 @@ The implementation must: include the present mode passed to
 slink:VkSurfacePresentModeEXT in pname:pPresentModes, unless
 pname:presentModeCount is zero.
 
-ifdef::VK_EXT_swapchain_maintenance1[]
-Before creating a swapchain whose present modes can: be modified through the
-use of slink:VkSwapchainPresentModesCreateInfoEXT, obtain the set of present
-modes compatible with a given initial present mode by including a
-slink:VkSurfacePresentModeEXT structure in the pname:pNext chain of
-slink:VkPhysicalDeviceSurfaceInfo2KHR when calling
+To query the set of present modes compatible with a given initial present
+mode, add a slink:VkSurfacePresentModeEXT structure in the pname:pNext chain
+of slink:VkPhysicalDeviceSurfaceInfo2KHR when calling
 flink:vkGetPhysicalDeviceSurfaceCapabilities2KHR.
+
+ifdef::VK_EXT_swapchain_maintenance1[]
+The application can: create a swapchain whose present mode can: be modified
+through the use of slink:VkSwapchainPresentModesCreateInfoEXT.
 endif::VK_EXT_swapchain_maintenance1[]
 
 include::{generated}/validity/structs/VkSurfacePresentModeCompatibilityEXT.adoc[]
@@ -967,8 +977,8 @@ include::{generated}/api/structs/VkSurfaceCapabilitiesFullScreenExclusiveEXT.ado
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * pname:fullScreenExclusiveControlSupported is a boolean describing
-    whether the surface is able to make use of exclusive full-screen access.
+  * pname:fullScreenExclusiveSupported is a boolean describing whether the
+    surface is able to make use of exclusive full-screen access.
 
 This structure can: be included in the pname:pNext chain of
 slink:VkSurfaceCapabilities2KHR to determine support for exclusive
@@ -1006,6 +1016,58 @@ present barrier feature is not obtainable for this surface.
 include::{generated}/validity/structs/VkSurfaceCapabilitiesPresentBarrierNV.adoc[]
 --
 endif::VK_NV_present_barrier[]
+
+ifdef::VK_KHR_present_id2[]
+[open,refpage='VkSurfaceCapabilitiesPresentId2KHR',desc='Structure describing presentation-ID capabilities of a surface',type='structs']
+--
+The sname:VkSurfaceCapabilitiesPresentId2KHR structure is defined as:
+
+include::{generated}/api/structs/VkSurfaceCapabilitiesPresentId2KHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:presentId2Supported is a boolean describing whether the surface is
+    able to support the present-ID extension
+
+This structure can: be included in the pname:pNext chain of
+slink:VkSurfaceCapabilities2KHR to determine support for present-wait.
+If pname:presentId2Supported is ename:VK_FALSE, it indicates that attaching
+an ID to presentation requests is not possible for this surface.
+
+Applications must: not attempt to include slink:VkPresentId2KHR in the
+pname:pNext chain of a slink:VkPresentInfoKHR if pname:presentId2Supported
+is ename:VK_FALSE.
+
+include::{generated}/validity/structs/VkSurfaceCapabilitiesPresentId2KHR.adoc[]
+--
+endif::VK_KHR_present_id2[]
+
+ifdef::VK_KHR_present_wait2[]
+[open,refpage='VkSurfaceCapabilitiesPresentWait2KHR',desc='Structure describing presentation-wait capabilities of a surface',type='structs']
+--
+The sname:VkSurfaceCapabilitiesPresentWait2KHR structure is defined as:
+
+include::{generated}/api/structs/VkSurfaceCapabilitiesPresentWait2KHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:presentWait2Supported is a boolean describing whether the surface
+    is able to support the present-wait extension
+
+This structure can: be included in the pname:pNext chain of
+slink:VkSurfaceCapabilities2KHR to determine support for present-wait.
+If pname:presentWait2Supported is ename:VK_FALSE, it indicates that waiting
+for presentation is not possible for this surface.
+
+Applications must: not attempt to call flink:vkWaitForPresent2KHR on a
+swapchain if pname:presentWait2Supported is ename:VK_FALSE.
+
+include::{generated}/validity/structs/VkSurfaceCapabilitiesPresentWait2KHR.adoc[]
+--
+endif::VK_KHR_present_wait2[]
+
 endif::VK_KHR_get_surface_capabilities2[]
 
 ifdef::VK_EXT_display_surface_counter[]
@@ -1378,6 +1440,18 @@ This enum is deprecated but is maintained for backwards compatibility.
 For a traditional "`Linear`" or non-gamma transfer function color space use
 ename:VK_COLOR_SPACE_PASS_THROUGH_EXT.
 ====
+
+ifdef::VK_KHR_wayland_surface[]
+[NOTE]
+====
+On Wayland, ename:VK_COLOR_SPACE_PASS_THROUGH_EXT can be used to disable
+color management by the WSI on a surface, which makes it possible for the
+application to create a code:wp_color_management_surface_v1 object without
+triggering a code:surface_exists protocol error.
+
+See flink:vkCreateWaylandSurfaceKHR
+====
+endif::VK_KHR_wayland_surface[]
 
 The presentation engine interprets the pixel values of the R, G, and B
 components as having been encoded using an appropriate transfer function.
@@ -1951,6 +2025,10 @@ endif::VK_GOOGLE_display_timing[]
 ifdef::VK_KHR_present_wait[]
 include::{chapters}/VK_KHR_present_wait/present_wait.adoc[]
 endif::VK_KHR_present_wait[]
+
+ifdef::VK_KHR_present_wait2[]
+include::{chapters}/VK_KHR_present_wait2/present_wait2.adoc[]
+endif::VK_KHR_present_wait2[]
 
 include::{chapters}/VK_KHR_swapchain/wsi.adoc[]
 

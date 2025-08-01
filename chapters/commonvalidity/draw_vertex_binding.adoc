@@ -32,8 +32,8 @@ ifdef::VK_EXT_vertex_input_dynamic_state[]
 endif::VK_EXT_vertex_input_dynamic_state[]
     is a <<formats-packed,packed format>>,
 ifdef::VK_EXT_legacy_vertex_attributes[]
-    and <<features-legacyVertexAttributes, pname:legacyVertexAttributes>> is
-    not enabled,
+    and the <<features-legacyVertexAttributes,
+    pname:legacyVertexAttributes>> feature is not enabled,
 endif::VK_EXT_legacy_vertex_attributes[]
     the value of `attribAddress`, calculated as described in
     <<fxvertex-input-address-calculation, Vertex Input Calculation>>, must:
@@ -46,9 +46,9 @@ ifdef::VK_EXT_vertex_input_dynamic_state[]
 endif::VK_EXT_vertex_input_dynamic_state[]
     is not a <<formats-packed,packed format>>,
 ifdef::VK_EXT_legacy_vertex_attributes[]
-    and either <<features-legacyVertexAttributes,
-    pname:legacyVertexAttributes>> is not enabled or pname:format has 64-bit
-    components,
+    and either the <<features-legacyVertexAttributes,
+    pname:legacyVertexAttributes>> feature is not enabled or pname:format
+    has 64-bit components,
 endif::VK_EXT_legacy_vertex_attributes[]
     the value of `attribAddress`, calculated as described in
     <<fxvertex-input-address-calculation, Vertex Input Calculation>>, must:
@@ -79,13 +79,27 @@ endif::VK_EXT_extended_dynamic_state3[]
     fname:vkCmdSetPrimitiveTopology must: be of the same
     <<drawing-primitive-topology-class, topology class>> as the pipeline
     slink:VkPipelineInputAssemblyStateCreateInfo::pname:topology state
-ifdef::VK_EXT_shader_object[]
   * [[VUID-{refpage}-primitiveTopology-10286]]
-    If there is a shader object bound to the
-    ename:VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT stage, then
-    flink:vkCmdSetPrimitiveTopology must: have set pname:primitiveTopology
-    to ename:VK_PRIMITIVE_TOPOLOGY_PATCH_LIST prior to this drawing command
-endif::VK_EXT_shader_object[]
+    If a ename:VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT stage is bound, then
+    the <<dynamic-state-current-value, current value>> of
+    pname:primitiveTopology must: be ename:VK_PRIMITIVE_TOPOLOGY_PATCH_LIST
+    prior to this drawing command
+  * [[VUID-{refpage}-primitiveTopology-10747]]
+    If flink:vkCmdSetPrimitiveTopology set pname:primitiveTopology to
+    ename:VK_PRIMITIVE_TOPOLOGY_PATCH_LIST prior to this drawing command,
+    then a ename:VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT stage must: be
+    bound
+  * [[VUID-{refpage}-primitiveTopology-10748]]
+    If flink:vkCmdSetPrimitiveTopology set pname:primitiveTopology to
+    ename:VK_PRIMITIVE_TOPOLOGY_POINT_LIST prior to this drawing command,
+ifdef::VK_VERSION_1_4,VK_KHR_maintenance5[]
+    the <<features-maintenance5, pname:maintenance5>> feature is not
+    enabled,
+endif::VK_VERSION_1_4,VK_KHR_maintenance5[]
+    both a ename:VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT and
+    ename:VK_SHADER_STAGE_GEOMETRY_BIT stage are not bound, then the
+    code:Vertex {ExecutionModel} must: have a code:PointSize decorated
+    variable that is statically written to
   * [[VUID-{refpage}-pStrides-04913]]
     If the bound graphics pipeline was created with the
     ename:VK_DYNAMIC_STATE_VERTEX_INPUT_BINDING_STRIDE dynamic state
@@ -117,9 +131,13 @@ endif::VK_EXT_vertex_input_dynamic_state[]
   * [[VUID-{refpage}-Input-07939]]
     If
 ifdef::VK_EXT_vertex_attribute_robustness[]
-    <<features-vertexAttributeRobustness, pname:vertexAttributeRobustness>>
-    is not enabled and
+    the <<features-vertexAttributeRobustness,
+    pname:vertexAttributeRobustness>> feature is not enabled, and
 endif::VK_EXT_vertex_attribute_robustness[]
+ifdef::VK_KHR_maintenance9[]
+    the <<features-maintenance9, pname:maintenance9>> feature is not
+    enabled, and
+endif::VK_KHR_maintenance9[]
 ifdef::VK_EXT_shader_object[]
     there is a shader object bound to the ename:VK_SHADER_STAGE_VERTEX_BIT
     stage
@@ -285,28 +303,4 @@ endif::VK_EXT_shader_object[]
     called and not subsequently <<dynamic-state-lifetime, invalidated>> in
     the current command buffer prior to this drawing command
 endif::VK_EXT_extended_dynamic_state3,VK_EXT_shader_object[]
-ifdef::VK_EXT_shader_object[]
-  * [[VUID-{refpage}-None-08684]]
-    If there is no bound graphics pipeline, fname:vkCmdBindShadersEXT must:
-    have been called in the current command buffer with pname:pStages with
-    an element of ename:VK_SHADER_STAGE_VERTEX_BIT
-  * [[VUID-{refpage}-None-08685]]
-    If there is no bound graphics pipeline, and the
-    <<features-tessellationShader, pname:tessellationShader>> feature is
-    enabled, fname:vkCmdBindShadersEXT must: have been called in the current
-    command buffer with pname:pStages with an element of
-    ename:VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT
-  * [[VUID-{refpage}-None-08686]]
-    If there is no bound graphics pipeline, and the
-    <<features-tessellationShader, pname:tessellationShader>> feature is
-    enabled, fname:vkCmdBindShadersEXT must: have been called in the current
-    command buffer with pname:pStages with an element of
-    ename:VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT
-  * [[VUID-{refpage}-None-08687]]
-    If there is no bound graphics pipeline, and the
-    <<features-geometryShader, pname:geometryShader>> feature is enabled,
-    fname:vkCmdBindShadersEXT must: have been called in the current command
-    buffer with pname:pStages with an element of
-    ename:VK_SHADER_STAGE_GEOMETRY_BIT
-endif::VK_EXT_shader_object[]
 // Common Valid Usage

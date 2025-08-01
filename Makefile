@@ -83,6 +83,7 @@ allchecks: check-copyright-dates \
     check-spelling \
     check-writing \
     check-bullets \
+    check-vuperiod \
     check-reflow \
     check-links \
     check-consistency \
@@ -148,12 +149,12 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 310
+PATCHVERSION = 319
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 18
+SCPATCHVERSION = 19
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
@@ -445,7 +446,7 @@ proposals: $(PROPOSALDOCS) $(PROPOSALSOURCES)
 # Proposal documents are built outside of the main specification
 $(PROPOSALDIR)/%.html: $(PROPOSALPATH)/%.adoc
 	$(QUIET)$(ASCIIDOC) --failure-level ERROR -b html5 -o $@ $<
-	$(QUIET) if egrep -q '\\[([]' $@ ; then \
+	$(QUIET) if grep -q -E '\\[([]' $@ ; then \
 	    $(TRANSLATEMATH) $@ ; \
 	fi
 
@@ -461,7 +462,7 @@ reflow:
 # 'ci-allchecks' targets or individually.
 
 # Look for disallowed contractions
-CHECK_CONTRACTIONS = git grep -n -i -F -f $(ROOTDIR)/config/CI/contractions | egrep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
+CHECK_CONTRACTIONS = git grep -n -i -F -f $(ROOTDIR)/config/CI/contractions | grep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
 check-contractions:
 	if test `$(CHECK_CONTRACTIONS) | wc -l` != 0 ; then \
 	    echo "Contractions found that are not allowed:" ; \
@@ -508,6 +509,15 @@ check-bullets:
 	    exit 1 ; \
 	fi
 
+# Look for VU text ending in a period
+CHECK_VUPERIOD = ag --nocolor --asciidoc '\* \[\[VUID[^.]+\.\n( {2}\* \[\[VUID|\*\*\*\*)' $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style $(SPECDIR)/[a-z]*.adoc
+check-vuperiod:
+	if test `$(CHECK_VUPERIOD) | wc -l` != 0 ; then \
+	    echo "VU rule ending with a disallowed period found. Note that the matched text may be very long:" ; \
+	    $(CHECK_VUPERIOD) ; \
+	    exit 1 ; \
+	fi
+
 # Look for asciidoctor conditionals inside VU statements; and for
 # duplicated VUID numbers, but only in spec sources.
 check-reflow:
@@ -531,8 +541,14 @@ check-links:
 
 # Perform XML consistency checks
 # Use '-warn' option to display warnings as well as errors
+CHECK_UGLY_TYPE_DECL = git grep -E '</type>\*+<name>' $(VKXML)
 check-consistency:
 	$(PYTHON) $(SCRIPTS)/xml_consistency.py
+	if test `$(CHECK_UGLY_TYPE_DECL) | wc -l` != 0 ; then \
+	    echo "XML contains declarations lacking whitespace:" ; \
+	    $(CHECK_UGLY_TYPE_DECL) ; \
+	    exit 1 ; \
+	fi
 
 # Look for untagged use of 'undefined' in spec sources
 check-undefined:
@@ -555,7 +571,7 @@ check-custom-macros:
 	fi
 
 # Look for '.txt' and '.asciidoc' files, which should almost all be .adoc now
-CHECK_TXTFILES = find . -name '*.txt' -o -name '*.asciidoc' | egrep -v -E -f $(ROOTDIR)/config/CI/txt-files-allowed
+CHECK_TXTFILES = find . -name '*.txt' -o -name '*.asciidoc' | grep -v -E -f $(ROOTDIR)/config/CI/txt-files-allowed
 check-txtfiles:
 	if test `$(CHECK_TXTFILES) | wc -l` != 0 ; then \
 	    echo "*.txt and/or .asciidoc files found that are not allowed (use .adoc):" ; \
@@ -632,7 +648,7 @@ $(MANHTMLDIR)/%.html: $(REFPATH)/%.adoc $(GENDEPENDS) $(KATEXINSTDIR)
 	$(VERYQUIET)$(MKDIR) $(MANHTMLDIR)
 	$(VERYQUIET)$(ASCIIDOC) -b html5 $(ADOCOPTS) $(ADOCHTMLOPTS) $(ADOCREFOPTS) \
 	    -d manpage -o $@ $<
-	$(VERYQUIET)if egrep -q '\\[([]' $@ ; then \
+	$(VERYQUIET)if grep -q -E '\\[([]' $@ ; then \
 	    $(TRANSLATEMATH) $@ ; \
 	fi
 

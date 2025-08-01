@@ -98,6 +98,10 @@ ifdef::VK_EXT_fragment_density_map[]
 include::{chapters}/fragmentdensitymapops.adoc[]
 endif::VK_EXT_fragment_density_map[]
 
+ifdef::VK_ARM_tensors[]
+include::{chapters}/VK_ARM_tensors/tensorops.adoc[]
+endif::VK_ARM_tensors[]
+
 include::{chapters}/queries.adoc[]
 
 // Transfer operations
@@ -193,6 +197,14 @@ ifdef::VK_AMDX_shader_enqueue[]
 include::{chapters}/executiongraphs.adoc[]
 endif::VK_AMDX_shader_enqueue[]
 
+ifdef::VK_NV_external_compute_queue[]
+include::{chapters}/VK_NV_external_compute_queue/VK_NV_external_compute_queue.adoc[]
+endif::VK_NV_external_compute_queue[]
+
+ifdef::VK_ARM_data_graph[]
+include::{chapters}/VK_ARM_data_graph/graphs.adoc[]
+endif::VK_ARM_data_graph[]
+
 // Sort of an appendix
 include::{chapters}/extensions.adoc[]
 
@@ -225,6 +237,8 @@ include::{appendices}/extensions.adoc[]
 ifdef::VK_VERSION_1_3[]
 include::{appendices}/roadmap.adoc[]
 endif::VK_VERSION_1_3[]
+
+include::{appendices}/deprecation.adoc[]
 
 include::{appendices}/boilerplate.adoc[]
 

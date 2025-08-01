@@ -43,7 +43,7 @@ def makeREstring(strings, default=None, strings_are_regex=False):
     if strings or default is None:
         if not strings_are_regex:
             strings = (re.escape(s) for s in strings)
-        return '^(' + '|'.join(strings) + ')$'
+        return f"^({'|'.join(strings)})$"
     return default
 
 
@@ -327,7 +327,7 @@ def makeGenOpts(args):
                 emitExtensions    = emitExtensionsPat,
                 reparentEnums     = False)
             ]
-    
+
         # Feature requirements for versions/extensions
         # Includes all extensions by default.
         genOpts['requirementsinc'] = [
@@ -433,6 +433,7 @@ def makeGenOpts(args):
         'VK_KHR_portability_subset',
         'VK_NV_displacement_micromap',
         'VK_AMDX_shader_enqueue',
+        'VK_NV_cuda_kernel_launch',
     ]
 
     betaSuppressExtensions = [
@@ -473,6 +474,7 @@ def makeGenOpts(args):
         [ 'vulkan_metal.h',       [ 'VK_EXT_metal_surface',
                                     'VK_EXT_metal_objects',
                                     'VK_EXT_external_memory_metal' ], commonSuppressExtensions ],
+        [ 'vulkan_ohos.h',        ['VK_OHOS_surface'               ], commonSuppressExtensions ],
         [ 'vulkan_screen.h',      [ 'VK_QNX_screen_surface',
                                     'VK_QNX_external_memory_screen_buffer' ], commonSuppressExtensions ],
         [ 'vulkan_sci.h',         [ 'VK_NV_external_sci_sync',
@@ -511,6 +513,8 @@ def makeGenOpts(args):
             protectFeature    = False,
             protectProto      = '#ifndef',
             protectProtoStr   = 'VK_NO_PROTOTYPES',
+            protectExportName    = defaultAPIName,
+            protectExportProtoStr = 'VK_ONLY_EXPORTED_PROTOTYPES',
             apicall           = 'VKAPI_ATTR ',
             apientry          = 'VKAPI_CALL ',
             apientryp         = 'VKAPI_PTR *',
@@ -553,6 +557,8 @@ def makeGenOpts(args):
             protectFeature    = False,
             protectProto      = '#ifndef',
             protectProtoStr   = 'VK_NO_PROTOTYPES',
+            protectExportName    = 'vulkan',
+            protectExportProtoStr = 'VK_ONLY_EXPORTED_PROTOTYPES',
             apicall           = 'VKAPI_ATTR ',
             apientry          = 'VKAPI_CALL ',
             apientryp         = 'VKAPI_PTR *',
@@ -584,6 +590,8 @@ def makeGenOpts(args):
             protectFeature    = False,
             protectProto      = '#ifndef',
             protectProtoStr   = 'VK_NO_PROTOTYPES',
+            protectExportName    = defaultAPIName,
+            protectExportProtoStr = 'VK_ONLY_EXPORTED_PROTOTYPES',
             apicall           = 'VKAPI_ATTR ',
             apientry          = 'VKAPI_CALL ',
             apientryp         = 'VKAPI_PTR *',
@@ -612,6 +620,8 @@ def makeGenOpts(args):
             protectFeature    = False,
             protectProto      = '#ifndef',
             protectProtoStr   = 'VK_NO_PROTOTYPES',
+            protectExportName    = defaultAPIName,
+            protectExportProtoStr = 'VK_ONLY_EXPORTED_PROTOTYPES',
             apicall           = 'VKAPI_ATTR ',
             apientry          = 'VKAPI_CALL ',
             apientryp         = 'VKAPI_PTR *',
@@ -880,6 +890,8 @@ def makeGenOpts(args):
         'vulkan_video_codec_h265std',
         'vulkan_video_codec_h265std_decode',
         'vulkan_video_codec_h265std_encode',
+        'vulkan_video_codec_vp9std',
+        'vulkan_video_codec_vp9std_decode',
         'vulkan_video_codec_av1std',
         'vulkan_video_codec_av1std_decode',
         'vulkan_video_codec_av1std_encode',
@@ -1141,7 +1153,7 @@ if __name__ == '__main__':
     else:
         startTimer(args.time)
         reg.apiGen()
-        endTimer(args.time, '* Time to generate ' + options.filename + ' =')
+        endTimer(args.time, f"* Time to generate {options.filename} =")
 
     if not args.quiet:
         logDiag('* Generated', options.filename)

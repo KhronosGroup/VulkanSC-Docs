@@ -262,7 +262,8 @@ In this case fname:vkCmdSetDiscardRectangleEXT must: be called to set the
 discard rectangle for all indices [eq]#[0, pname:maxDiscardRectangles)#
 before drawing with discard rectangles enabled.
 Individual discard rectangles can: be made ineffective by setting their
-slink:VkRect2D::pname:width and slink:VkRect2D::pname:height to zero.
+slink:VkRect2D::pname:extent.width and slink:VkRect2D::pname:extent.height
+to zero.
 
 .Valid Usage
 ****
@@ -2420,9 +2421,10 @@ If any of those associated samples are covered, the color sample is covered.
 endif::VK_NV_coverage_reduction_mode[]
 
 ifdef::VK_NV_coverage_reduction_mode[]
-When the `apiext:VK_NV_coverage_reduction_mode` extension is enabled, the
-pipeline state controlling coverage reduction is specified through the
-members of the sname:VkPipelineCoverageReductionStateCreateInfoNV structure.
+When the <<features-coverageReductionMode, pname:coverageReductionMode>>
+feature is enabled, the pipeline state controlling coverage reduction is
+specified through the members of the
+sname:VkPipelineCoverageReductionStateCreateInfoNV structure.
 
 [open,refpage='VkPipelineCoverageReductionStateCreateInfoNV',desc='Structure specifying parameters controlling coverage reduction',type='structs']
 --

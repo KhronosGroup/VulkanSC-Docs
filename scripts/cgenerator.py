@@ -27,6 +27,8 @@ class CGeneratorOptions(GeneratorOptions):
                  protectProtoStr=None,
                  protectExtensionProto=None,
                  protectExtensionProtoStr=None,
+                 protectExportName=None,
+                 protectExportProtoStr=None,
                  apicall='',
                  apientry='',
                  apientryp='',
@@ -66,6 +68,12 @@ class CGeneratorOptions(GeneratorOptions):
         set to None
         - protectExtensionProtoStr - #ifdef/#ifndef symbol to use around
         extension prototype declarations, if protectExtensionProto is set
+        - protectExportName - name used to determine if a command is
+        exported matching an entry in the XML 'export' attribute.
+        Set to None if no matching should be done.
+        - protectExportProtoStr - #ifndef symbol to use around prototypes
+        for commands that are not exported.
+        Set to None if no protection is wanted.
         - apicall - string to use for the function declaration prefix,
         such as APICALL on Windows
         - apientry - string to use for the calling convention macro,
@@ -114,6 +122,12 @@ class CGeneratorOptions(GeneratorOptions):
 
         self.protectExtensionProtoStr = protectExtensionProtoStr
         """#ifdef/#ifndef symbol to use around extension prototype declarations, if protectExtensionProto is set"""
+
+        self.protectExportName = protectExportName
+        """Export name for commands which are exported"""
+
+        self.protectExportProtoStr = protectExportProtoStr
+        """#ifndef symbol to use around prototypes for commands which are not exported"""
 
         self.apicall = apicall
         """string to use for the function declaration prefix, such as APICALL on Windows."""
@@ -242,7 +256,7 @@ class COutputGenerator(OutputGenerator):
                     raise MissingGeneratorOptionsError()
                 if self.genOpts.conventions is None:
                     raise MissingGeneratorOptionsConventionsError()
-                is_core = self.featureName and self.featureName.startswith(self.conventions.api_prefix + 'VERSION_')
+                is_core = self.featureName and self.featureName.startswith(f"{self.conventions.api_prefix}VERSION_")
                 if self.genOpts.conventions.writeFeature(self.featureName, self.featureExtraProtect, self.genOpts.filename):
                     self.newline()
                     if self.genOpts.protectFeature:
@@ -340,7 +354,7 @@ class COutputGenerator(OutputGenerator):
             # OpenXR: this section was not under 'else:' previously, just fell through
             if alias:
                 # If the type is an alias, just emit a typedef declaration
-                body += 'typedef ' + alias + ' ' + name + ';\n'
+                body += f"typedef {alias} {name};\n"
             else:
                 # Replace <apientry /> tags with an APIENTRY-style string
                 # (from self.genOpts). Copy other text through unchanged.
@@ -373,13 +387,13 @@ class COutputGenerator(OutputGenerator):
 
         if ',' in protect_str:
             protect_list = protect_str.split(',')
-            protect_defs = ('defined(%s)' % d for d in protect_list)
+            protect_defs = (f'defined({d})' for d in protect_list)
             protect_def_str = ' && '.join(protect_defs)
-            protect_if_str = '#if %s\n' % protect_def_str
-            protect_end_str = '#endif // %s\n' % protect_def_str
+            protect_if_str = f'#if {protect_def_str}\n'
+            protect_end_str = f'#endif // {protect_def_str}\n'
         else:
-            protect_if_str = '#ifdef %s\n' % protect_str
-            protect_end_str = '#endif // %s\n' % protect_str
+            protect_if_str = f'#ifdef {protect_str}\n'
+            protect_end_str = f'#endif // {protect_str}\n'
 
         return (protect_if_str, protect_end_str)
 
@@ -423,7 +437,7 @@ class COutputGenerator(OutputGenerator):
         body = self.deprecationComment(typeElem)
 
         if alias:
-            body += 'typedef ' + alias + ' ' + typeName + ';\n'
+            body += f"typedef {alias} {typeName};\n"
         else:
             (protect_begin, protect_end) = self.genProtectString(typeElem.get('protect'))
             if protect_begin:
@@ -431,24 +445,24 @@ class COutputGenerator(OutputGenerator):
 
             if self.genOpts.genStructExtendsComment:
                 structextends = typeElem.get('structextends')
-                body += '// ' + typeName + ' extends ' + structextends + '\n' if structextends else ''
+                body += f"// {typeName} extends {structextends}\n" if structextends else ''
 
-            body += 'typedef ' + typeElem.get('category')
+            body += f"typedef {typeElem.get('category')}"
 
             # This is an OpenXR-specific alternative where aliasing refers
             # to an inheritance hierarchy of types rather than C-level type
             # aliases.
             if self.genOpts.genAliasMacro and self.typeMayAlias(typeName):
-                body += ' ' + self.genOpts.aliasMacro
+                body += f" {self.genOpts.aliasMacro}"
 
-            body += ' ' + typeName + ' {\n'
+            body += f" {typeName} {{\n"
 
             targetLen = self.getMaxCParamTypeLength(typeinfo)
             for member in typeElem.findall('.//member'):
                 body += self.deprecationComment(member, indent = 4)
                 body += self.makeCParamDecl(member, targetLen + 4)
                 body += ';\n'
-            body += '} ' + typeName + ';\n'
+            body += f"}} {typeName};\n"
             if protect_end:
                 body += protect_end
 
@@ -474,13 +488,13 @@ class COutputGenerator(OutputGenerator):
         if alias:
             # If the group name is aliased, just emit a typedef declaration
             # for the alias.
-            body = 'typedef ' + alias + ' ' + groupName + ';\n'
+            body = f"typedef {alias} {groupName};\n"
             self.appendSection(section, body)
         else:
             if self.genOpts is None:
                 raise MissingGeneratorOptionsError()
             (section, body) = self.buildEnumCDecl(self.genOpts.genEnumBeginEndRange, groupinfo, groupName)
-            self.appendSection(section, '\n' + body)
+            self.appendSection(section, f"\n{body}")
 
     def genEnum(self, enuminfo, name, alias):
         """Generate the C declaration for a constant (a single <enum> value).
@@ -507,7 +521,24 @@ class COutputGenerator(OutputGenerator):
 
         prefix = ''
         decls = self.makeCDecls(cmdinfo.elem)
-        self.appendSection('command', prefix + decls[0] + '\n')
+
+        # If the 'export' attribute is not set for this command, or does not
+        # match the export name selected during generation, wrap the command
+        # prototype in a C conditional which can be enabled to make the
+        # prototype not appear at compile time.
+
+        export = cmdinfo.elem.get('export','')
+        protect_prefix = protect_suffix = ''
+        if export is None or self.genOpts.protectExportName not in export.split(','):
+            if self.genOpts.protectExportProtoStr is not None:
+                # Command is not exported, so should not be visible if
+                # suppressed by this symbol
+                protect_prefix = f'#ifndef {self.genOpts.protectExportProtoStr}\n'
+                protect_suffix = '\n#endif'
+
+        decls[0] = protect_prefix + decls[0] + protect_suffix
+
+        self.appendSection('command', f"{prefix + decls[0]}\n")
         if self.genOpts.genFuncPointers:
             self.appendSection('commandPointer', decls[1])
 

@@ -27,16 +27,20 @@ class Extension:
     deprecatedBy: (str | None)
     obsoletedBy: (str | None)
     specialUse: list[str]
+    ratified: bool
 
     # These are here to allow for easy reverse lookups
+    # To prevent infinite recursion, other classes reference a string back to the Extension class
     # Quotes allow us to forward declare the dataclass
+    handles: list['Handle'] = field(default_factory=list, init=False)
     commands: list['Command'] = field(default_factory=list, init=False)
     enums:    list['Enum']    = field(default_factory=list, init=False)
     bitmasks: list['Bitmask'] = field(default_factory=list, init=False)
+    flags: dict[str, list['Flags']] = field(default_factory=dict, init=False)
     # Use the Enum name to see what fields are extended
     enumFields: dict[str, list['EnumField']] = field(default_factory=dict, init=False)
-    # Use the Bitmaks name to see what flags are extended
-    flags: dict[str, list['Flag']] = field(default_factory=dict, init=False)
+    # Use the Bitmask name to see what flag bits are added to it
+    flagBits: dict[str, list['Flag']] = field(default_factory=dict, init=False)
 
 @dataclass
 class Version:
@@ -47,6 +51,13 @@ class Version:
     name: str       # ex) VK_VERSION_1_1
     nameString: str # ex) "VK_VERSION_1_1" (no marco, so has quotes)
     nameApi: str    # ex) VK_API_VERSION_1_1
+
+@dataclass
+class Deprecate:
+    """<deprecate>"""
+    link: (str | None) # Spec URL Anchor - ex) deprecation-dynamicrendering
+    version: (Version | None)
+    extensions: list[str]
 
 @dataclass
 class Handle:
@@ -65,8 +76,17 @@ class Handle:
 
     dispatchable: bool
 
+    extensions: list[str] # All extensions that enable the handle
+
     def __lt__(self, other):
         return self.name < other.name
+
+class ExternSync(Enum):
+    NONE          = auto() # no externsync attribute
+    ALWAYS        = auto() # externsync="true"
+    MAYBE         = auto() # externsync="maybe"
+    SUBTYPE       = auto() # externsync="param->member"
+    SUBTYPE_MAYBE = auto() # externsync="maybe:param->member"
 
 @dataclass
 class Param:
@@ -97,8 +117,9 @@ class Param:
     optional: bool
     optionalPointer: bool # if type contains a pointer, is the pointer value optional
 
-    externSync: bool
-    externSyncPointer: list[str] # if type contains a pointer, might only specific members modified
+    externSync: ExternSync
+    externSyncPointer: (str | None)  # if type contains a pointer (externSync is SUBTYPE*),
+                                     # only a specific member is externally synchronized.
 
     # C string of member, example:
     #   - const void* pNext
@@ -133,7 +154,7 @@ class Command:
     alias: (str | None) # Because commands are interfaces into layers/drivers, we need all command alias
     protect: (str | None) # ex) 'VK_ENABLE_BETA_EXTENSIONS'
 
-    extensions: list[Extension] # All extensions that enable the struct
+    extensions: list[str] # All extensions that enable the struct
     version: (Version | None) # None if Version 1.0
 
     returnType: str # ex) void, VkResult, etc
@@ -157,6 +178,8 @@ class Command:
     videoCoding: CommandScope
 
     implicitExternSyncParams: list[str]
+
+    deprecate: (Deprecate | None)
 
     # C prototype string - ex:
     # VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(
@@ -202,7 +225,7 @@ class Member:
     optional: bool
     optionalPointer: bool # if type contains a pointer, is the pointer value optional
 
-    externSync: bool
+    externSync: ExternSync
 
     # C string of member, example:
     #   - const void* pNext
@@ -219,7 +242,7 @@ class Struct:
     name: str # ex) VkImageSubresource2
     aliases: list[str] # ex) ['VkImageSubresource2KHR', 'VkImageSubresource2EXT']
 
-    extensions: list[Extension] # All extensions that enable the struct
+    extensions: list[str] # All extensions that enable the struct
     version: (Version | None) # None if Version 1.0
     protect: (str | None) # ex) VK_ENABLE_BETA_EXTENSIONS
 
@@ -242,12 +265,17 @@ class Struct:
 @dataclass
 class EnumField:
     """<enum> of type enum"""
-    name: str # ex) VK_DYNAMIC_STATE_SCISSOR
-    negative: bool # True if negative values are allowed (ex. VkResult)
+    name: str # ex) VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT
+    aliases: list[str] # ex) ['VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT_EXT']
+
     protect: (str | None) # ex) VK_ENABLE_BETA_EXTENSIONS
 
+    negative: bool # True if negative values are allowed (ex. VkResult)
+    value: int
+    valueStr: str # value as shown in spec (ex. "0", "2", "1000267000", "0x00000004")
+
     # some fields are enabled from 2 extensions (ex) VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_PUSH_DESCRIPTORS_KHR)
-    extensions: list[Extension] # None if part of 1.0 core
+    extensions: list[str] # None if part of 1.0 core
 
     def __lt__(self, other):
         return self.name < other.name
@@ -260,14 +288,14 @@ class Enum:
 
     protect: (str | None) # ex) VK_ENABLE_BETA_EXTENSIONS
 
-    bitWidth: int # 32 or 64
+    bitWidth: int # 32 or 64 (currently all are 32, but field is to match with Bitmask)
     returnedOnly: bool
 
     fields: list[EnumField]
 
-    extensions: list[Extension] # None if part of 1.0 core
+    extensions: list[str] # None if part of 1.0 core
     # Unique list of all extension that are involved in 'fields' (superset of 'extensions')
-    fieldExtensions: list[Extension]
+    fieldExtensions: list[str]
 
     def __lt__(self, other):
         return self.name < other.name
@@ -276,14 +304,17 @@ class Enum:
 class Flag:
     """<enum> of type bitmask"""
     name: str # ex) VK_ACCESS_2_SHADER_READ_BIT
+    aliases: str # ex) ['VK_ACCESS_2_SHADER_READ_BIT_KHR']
+
     protect: (str | None) # ex) VK_ENABLE_BETA_EXTENSIONS
 
     value: int
+    valueStr: str # value as shown in spec (ex. 0x00000000", "0x00000004", "0x0000000F", "0x800000000ULL")
     multiBit: bool # if true, more than one bit is set (ex) VK_SHADER_STAGE_ALL_GRAPHICS)
     zero: bool     # if true, the value is zero (ex) VK_PIPELINE_STAGE_NONE)
 
     # some fields are enabled from 2 extensions (ex) VK_TOOL_PURPOSE_DEBUG_REPORTING_BIT_EXT)
-    extensions: list[Extension] # None if part of 1.0 core
+    extensions: list[str] # None if part of 1.0 core
 
     def __lt__(self, other):
         return self.name < other.name
@@ -302,9 +333,27 @@ class Bitmask:
 
     flags: list[Flag]
 
-    extensions: list[Extension] # None if part of 1.0 core
+    extensions: list[str] # None if part of 1.0 core
     # Unique list of all extension that are involved in 'flag' (superset of 'extensions')
-    flagExtensions: list[Extension]
+    flagExtensions: list[str]
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+@dataclass
+class Flags:
+    """<type> defining flags types"""
+    name: str # ex) VkAccessFlags2
+    aliases: list[str] # ex) [`VkAccessFlags2KHR`]
+
+    bitmaskName: (str | None) # ex) VkAccessFlagBits2
+    protect: (str | None) # ex) VK_ENABLE_BETA_EXTENSIONS
+
+    baseFlagsType: str # ex) VkFlags
+    bitWidth: int # 32 or 64
+    returnedOnly: bool
+
+    extensions: list[str] # None if part of 1.0 core
 
     def __lt__(self, other):
         return self.name < other.name
@@ -418,6 +467,7 @@ class VulkanObject():
     structs:  dict[str, Struct]      = field(default_factory=dict, init=False)
     enums:    dict[str, Enum]        = field(default_factory=dict, init=False)
     bitmasks: dict[str, Bitmask]     = field(default_factory=dict, init=False)
+    flags:    dict[str, Flags]       = field(default_factory=dict, init=False)
     formats:  dict[str, Format]      = field(default_factory=dict, init=False)
 
     syncStage:    list[SyncStage]    = field(default_factory=list, init=False)

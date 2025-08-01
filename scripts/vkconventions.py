@@ -28,6 +28,8 @@ SPECIAL_WORDS = set((
     'ASTC',  # VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT
     'D3D12',  # VkD3D12FenceSubmitInfoKHR
     'Float16',  # VkPhysicalDeviceShaderFloat16Int8FeaturesKHR
+    'Bfloat16',  # VkPhysicalDeviceShaderBfloat16FeaturesKHR
+    'Float8',  # VkPhysicalDeviceShaderFloat8FeaturesEXT
     'ImagePipe',  # VkImagePipeSurfaceCreateInfoFUCHSIA
     'Int64',  # VkPhysicalDeviceShaderAtomicInt64FeaturesKHR
     'Int8',  # VkPhysicalDeviceShaderFloat16Int8FeaturesKHR
@@ -38,7 +40,7 @@ SPECIAL_WORDS = set((
 ))
 # A regex to match any of the SPECIAL_WORDS
 EXCEPTION_PATTERN = r'(?P<exception>{})'.format(
-    '|'.join('(%s)' % re.escape(w) for w in SPECIAL_WORDS))
+    '|'.join(f'({re.escape(w)})' for w in SPECIAL_WORDS))
 MAIN_RE = re.compile(
     # the negative lookahead is to prevent the all-caps pattern from being too greedy.
     r'({}|([0-9]+)|([A-Z][a-z]+)|([A-Z][A-Z]*(?![a-z])))'.format(EXCEPTION_PATTERN))
@@ -119,6 +121,7 @@ class VulkanConventions(ConventionsBase):
         # The simple-minded rules need modification for some structure names
         subpats = [
             [ r'_H_(26[45])_',              r'_H\1_' ],
+            [ r'_VP_9_',                    r'_VP9_' ],
             [ r'_AV_1_',                    r'_AV1_' ],
             [ r'_VULKAN_([0-9])([0-9])_',   r'_VULKAN_\1_\2_' ],
             [ r'_VULKAN_SC_([0-9])([0-9])_',r'_VULKAN_SC_\1_\2_' ],
