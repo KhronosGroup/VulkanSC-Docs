@@ -89,6 +89,10 @@ class ValidityOutputGenerator(OutputGenerator):
 
         self.currentExtension = ''
 
+        # Commands affected by conditional rendering, for constructing a
+        # summary table in that section.
+        self.conditionalRenderingCommands = []
+
         # Tracks whether we are tracing operations
         self.trace = False
 
@@ -174,6 +178,26 @@ class ValidityOutputGenerator(OutputGenerator):
         OutputGenerator.beginFile(self, genOpts)
 
     def endFile(self):
+        # Write summary of commands affected by conditional rendering for
+        # inclusion in that section of the spec.
+        # This appears in the 'validity' directory; changing it would
+        # require refactoring the detection code into a different generator.
+
+        filename = Path(self.genOpts.directory) / f'conditionalrendering{self.file_suffix}'
+
+        self.logMsg('diag', '# Generating summary file:', filename)
+
+        with open(filename, 'w', encoding='utf-8') as fp:
+            # No need to protect with VK_EXT_conditional_rendering, since
+            # this is included from a protected section of the specification
+            write('.Commands Affected by Conditional Rendering', file=fp)
+            write('****', file=fp)
+
+            for command in sorted(self.conditionalRenderingCommands):
+                write(f'* flink:{command}', file=fp)
+
+            write('****', file=fp)
+
         OutputGenerator.endFile(self)
 
     def beginFeature(self, interface, emit):
@@ -227,6 +251,7 @@ class ValidityOutputGenerator(OutputGenerator):
 
     def writeInclude(self, directory, basename, validity: ValidityCollection,
                      threadsafety, commandpropertiesentry=None,
+                     conditionalrendering = None,
                      successcodes=None, errorcodes=None):
         """Generate an include file.
 
@@ -234,6 +259,8 @@ class ValidityOutputGenerator(OutputGenerator):
         basename - base name of the file
         validity - ValidityCollection to write.
         threadsafety - List (may be empty) of thread safety statements to write.
+        commandpropertiesentry - Command properties table or None
+        conditionalrendering - Whether command is affected by conditional rendering or None
         successcodes - Optional success codes to document.
         errorcodes - Optional error codes to document.
         """
@@ -277,6 +304,27 @@ class ValidityOutputGenerator(OutputGenerator):
                 write(commandpropertiesentry, file=fp)
                 write('|====', file=fp)
                 write('****', file=fp)
+                write('', file=fp)
+
+            # Whether command is affected by conditional rendering
+            # We already known from schema validation that this can only be
+            # specified for vkCmd*
+            if conditionalrendering is not None:
+                # This will have to change if conditional rendering is ever
+                # promoted
+                write('ifdef::VK_EXT_conditional_rendering[]', file=fp)
+                write('.Conditional Rendering', file=fp)
+                write('****', file=fp)
+
+                if conditionalrendering == 'false':
+                    term = 'not '
+                else:
+                    term = ''
+                    self.conditionalRenderingCommands.append(basename)
+
+                write(f'{basename} is {term}affected by <<drawing-conditional-rendering, conditional rendering>>', file=fp)
+                write('****', file=fp)
+                write('endif::VK_EXT_conditional_rendering[]', file=fp)
                 write('', file=fp)
 
             # Success Codes - contained within a block, to avoid table numbering
@@ -323,9 +371,7 @@ class ValidityOutputGenerator(OutputGenerator):
         """Get the length of a parameter that has been identified as a static array."""
         paramenumsize = param.find('enum')
         if paramenumsize is not None:
-            return paramenumsize.text
-            # TODO switch to below when cosmetic changes OK
-            # return self.makeEnumerantName(paramenumsize.text)
+            return self.makeEnumerantName(paramenumsize.text)
 
         return param.find('name').tail[1:-1]
 
@@ -768,6 +814,9 @@ class ValidityOutputGenerator(OutputGenerator):
             else:
                 typetext = f'{self.makeBaseTypeName(paramtype)} value'
 
+        elif paramtype == 'VkDeviceAddress':
+                typetext = f'{self.makeBaseTypeName(paramtype)} value'
+
         elif typecategory is None:
             if not self.isStructAlwaysValid(paramtype):
                 typetext = f'{self.makeExternalTypeName(paramtype)} value'
@@ -950,7 +999,7 @@ class ValidityOutputGenerator(OutputGenerator):
             # makeStructureExtensionPointer, although that is not relevant in
             # the current extension struct model.
             entry += self.makeProseList((self.makeEnumerantName(v)
-                                         for v in values), 'or')
+                                         for v in values), fmt=plf.OR)
             return entry
 
         if 'Base' in structname:
@@ -1085,6 +1134,11 @@ class ValidityOutputGenerator(OutputGenerator):
         vk11 = re.match(self.registry.genOpts.emitversions, 'VK_VERSION_1_1') is not None
         return vk11
 
+    def dynamicRenderingRequired(self):
+        """Returns true if VK_KHR_dynamic_rendering is being emitted."""
+        vk13 = re.match(self.registry.genOpts.emitversions, 'VK_VERSION_1_3') is not None
+        return ('VK_KHR_dynamic_rendering' in self.registry.requiredextensions) or vk13
+
     def videocodingRequired(self):
         """Returns true if VK_KHR_video_queue is being emitted and thus validity
         with respect to the videocoding attribute should be generated."""
@@ -1110,37 +1164,30 @@ class ValidityOutputGenerator(OutputGenerator):
             return None
         queues = queues.split(',')
 
-        # Filter queue types that have dependencies
-        self.conditionallyRemoveQueueType(queues, 'sparse_binding', self.conventions.xml_api_name == "vulkansc")
-        self.conditionallyRemoveQueueType(queues, 'decode',         'VK_KHR_video_decode_queue' not in self.registry.requiredextensions)
-        self.conditionallyRemoveQueueType(queues, 'encode',         'VK_KHR_video_encode_queue' not in self.registry.requiredextensions)
-        self.conditionallyRemoveQueueType(queues, 'opticalflow',    'VK_NV_optical_flow' not in self.registry.requiredextensions)
-        self.conditionallyRemoveQueueType(queues, 'data_graph',     'VK_ARM_data_graph' not in self.registry.requiredextensions)
+        self.conditionallyRemoveQueueType(queues, 'VK_QUEUE_SPARSE_BINDING_BIT',    self.conventions.xml_api_name == "vulkansc")
+        self.conditionallyRemoveQueueType(queues, 'VK_QUEUE_VIDEO_DECODE_BIT_KHR',  'VK_KHR_video_decode_queue' not in self.registry.requiredextensions)
+        self.conditionallyRemoveQueueType(queues, 'VK_QUEUE_VIDEO_ENCODE_BIT_KHR',  'VK_KHR_video_encode_queue' not in self.registry.requiredextensions)
+        self.conditionallyRemoveQueueType(queues, 'VK_QUEUE_OPTICAL_FLOW_BIT_NV',   'VK_NV_optical_flow' not in self.registry.requiredextensions)
+        self.conditionallyRemoveQueueType(queues, 'VK_QUEUE_DATA_GRAPH_BIT_ARM',    'VK_ARM_data_graph' not in self.registry.requiredextensions)
 
-        # Verify that no new queue type is introduced accidentally
-        for queue in queues:
-            if queue not in [ 'transfer', 'compute', 'graphics', 'sparse_binding', 'decode', 'encode', 'opticalflow', 'data_graph' ]:
-                self.logMsg('error', f'Unknown queue type "{queue}".')
-
-        return queues
+        return sorted(queues)
 
     def getPrettyQueueList(self, cmd):
-        """Returns a prettified version of the queue list which can be included in spec language text."""
-        queues = self.getQueueList(cmd)
-        if queues is None:
-            return None
+        """Returns a prettified version of the queue list which can be
+           included in spec language text.
+           Now that the queue list contains flag bit names instead of
+           colloquial short names, we might want to transform the list into
+           the short names here.
+           """
 
-        replace = {
-            'sparse_binding': 'sparse binding',
-            'opticalflow': 'optical flow'
-        }
-        return [replace[queue] if queue in replace else queue for queue in queues]
+        return self.getQueueList(cmd)
 
     def makeStructOrCommandValidity(self, cmd, blockname, params):
         """Generate all the valid usage information for a given struct or command."""
         validity = self.makeValidityCollection(blockname)
         handles = []
         arraylengths = dict()
+
         for param in params:
             param_name = getElemName(param)
             paramtype = getElemType(param)
@@ -1190,7 +1237,7 @@ class ValidityOutputGenerator(OutputGenerator):
             if queues:
                 entry = ValidityEntry(anchor=('queuetype',))
                 entry += 'The pname:queue must: support '
-                entry += self.makeProseList(queues,
+                entry += self.makeProseList((self.makeEnumerantName(q) for q in queues),
                                             fmt=plf.OR, comma_for_two_elts=True)
                 entry += ' operations'
                 validity += entry
@@ -1211,19 +1258,18 @@ class ValidityOutputGenerator(OutputGenerator):
             # to conditionally have queues enabled or disabled by an extension.
             # As the VU stuff is all moving out (hopefully soon), this hack solves the issue for now
             if blockname == 'vkCmdFillBuffer':
-                entry += 'The sname:VkCommandPool that pname:commandBuffer was allocated from must: support '
                 if self.isVKVersion11() or 'VK_KHR_maintenance1' in self.registry.requiredextensions:
-                    entry += 'transfer, graphics or compute operations'
+                    queues = [ 'VK_QUEUE_COMPUTE_BIT', 'VK_QUEUE_GRAPHICS_BIT', 'VK_QUEUE_TRANSFER_BIT' ]
                 else:
-                    entry += 'graphics or compute operations'
+                    queues = [ 'VK_QUEUE_COMPUTE_BIT', 'VK_QUEUE_GRAPHICS_BIT' ]
             else:
-                # The queue type must be valid
                 queues = self.getPrettyQueueList(cmd)
                 assert(queues)
-                entry += 'The sname:VkCommandPool that pname:commandBuffer was allocated from must: support '
-                entry += self.makeProseList(queues,
-                                            fmt=plf.OR, comma_for_two_elts=True)
-                entry += ' operations'
+
+            entry += 'The sname:VkCommandPool that pname:commandBuffer was allocated from must: support '
+            entry += self.makeProseList((self.makeEnumerantName(q) for q in queues),
+                                        fmt=plf.OR, comma_for_two_elts=True)
+            entry += ' operations'
             validity += entry
 
             # Must be called inside/outside a render pass appropriately
@@ -1231,19 +1277,26 @@ class ValidityOutputGenerator(OutputGenerator):
 
             if renderpass != 'both':
                 entry = ValidityEntry(anchor=('renderpass',))
-                entry += 'This command must: only be called '
-                entry += renderpass
-                entry += ' of a render pass instance'
+                entry += f'This command must: only be called {renderpass} of a render pass instance'
                 validity += entry
+
+            # ex) [ action, state, synchronization ]
+            tasks = cmd.get('tasks').split(',')
+
+            # This is also the same as VUID-VkSubmitInfo-pCommandBuffers-06015
+            # See https://gitlab.khronos.org/vulkan/vulkan/-/issues/4468
+            if self.dynamicRenderingRequired():
+                if 'action' in tasks or 'synchronization' in tasks:
+                    entry = ValidityEntry(anchor=('suspended',))
+                    entry += 'This command must: not be called between suspended render pass instances'
+                    validity += entry
 
             # Must be called inside/outside a video coding scope appropriately
             if self.videocodingRequired():
                 videocoding = self.getVideocoding(cmd)
                 if videocoding != 'both':
                     entry = ValidityEntry(anchor=('videocoding',))
-                    entry += 'This command must: only be called '
-                    entry += videocoding
-                    entry += ' of a video coding scope'
+                    entry += f'This command must: only be called {videocoding} of a video coding scope'
                     validity += entry
 
             # Must be in the right level command buffer
@@ -1251,9 +1304,7 @@ class ValidityOutputGenerator(OutputGenerator):
 
             if cmdbufferlevel != 'primary,secondary':
                 entry = ValidityEntry(anchor=('bufferlevel',))
-                entry += 'pname:commandBuffer must: be a '
-                entry += cmdbufferlevel
-                entry += ' sname:VkCommandBuffer'
+                entry += f'pname:commandBuffer must: be a {cmdbufferlevel} sname:VkCommandBuffer'
                 validity += entry
 
         if 'vkCreate' in blockname or 'vkAllocate' in blockname:
@@ -1435,12 +1486,12 @@ class ValidityOutputGenerator(OutputGenerator):
             # As the VU stuff is all moving out (hopefully soon), this hack solves the issue for now
             if name == 'vkCmdFillBuffer':
                 if self.isVKVersion11() or 'VK_KHR_maintenance1' in self.registry.requiredextensions:
-                    queues = [ 'transfer', 'graphics', 'compute' ]
+                    queues = [ 'VK_QUEUE_COMPUTE_BIT', 'VK_QUEUE_GRAPHICS_BIT', 'VK_QUEUE_TRANSFER_BIT' ]
                 else:
-                    queues = [ 'graphics', 'compute' ]
+                    queues = [ 'VK_QUEUE_COMPUTE_BIT', 'VK_QUEUE_GRAPHICS_BIT' ]
             else:
                 queues = self.getQueueList(cmd)
-            queues = (' + \n').join([queue.title() for queue in queues])
+            queues = (' + \n').join([queue for queue in queues])
 
             tasks = cmd.get('tasks')
             tasks = (' + \n').join(tasks.title().split(','))
@@ -1512,10 +1563,13 @@ class ValidityOutputGenerator(OutputGenerator):
         codes_attr = cmd.get(attrib)
         if codes_attr:
             codes = self.findRequiredEnums(codes_attr.split(','))
+
             if codes:
                 return_lines.extend((RETURN_CODE_FORMAT.format(code)
-                                     for code in codes))
+                                     for code in sorted(codes)))
 
+        # These are extending error codes added by commands.
+        # There are none in the Vulkan XML today.
         applicable_ext_codes = (ext_code
                                 for ext_code in self.registry.commandextensionsuccesses
                                 if ext_code.command == name)
@@ -1557,6 +1611,7 @@ class ValidityOutputGenerator(OutputGenerator):
         # Vulkan-specific
         commandpropertiesentry = self.makeCommandPropertiesTableEntry(
             cmdinfo.elem, name)
+        conditionalrendering = cmdinfo.elem.get('conditionalrendering')
         successcodes = self.makeSuccessCodes(cmdinfo.elem, name)
         errorcodes = self.makeErrorCodes(cmdinfo.elem, name)
 
@@ -1564,7 +1619,9 @@ class ValidityOutputGenerator(OutputGenerator):
         # self.generateStateValidity(validity, name)
 
         self.writeInclude('protos', name, validity, threadsafety,
-                          commandpropertiesentry, successcodes, errorcodes)
+                          commandpropertiesentry,
+                          conditionalrendering,
+                          successcodes, errorcodes)
 
     def genStruct(self, typeinfo, typeName, alias):
         """Struct Generation."""
@@ -1592,7 +1649,11 @@ class ValidityOutputGenerator(OutputGenerator):
                     typeinfo.elem, typeName, typeinfo.getMembers())
 
         self.writeInclude('structs', typeName, validity,
-                          threadsafety, None, None, None)
+                          threadsafety,
+                          commandpropertiesentry = None,
+                          conditionalrendering = None,
+                          successcodes = None,
+                          errorcodes = None)
 
     def genGroup(self, groupinfo, groupName, alias):
         """Group (e.g. C "enum" type) generation.

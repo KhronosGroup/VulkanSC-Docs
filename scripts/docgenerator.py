@@ -32,6 +32,9 @@ def orgLevelKey(name):
     # and vendor extensions
 
     prefixes = (
+        'VK_BASE_VERSION_',
+        'VK_COMPUTE_VERSION_',
+        'VK_GRAPHICS_VERSION_',
         'VK_VERSION_',
         'VKSC_VERSION_',
         'VK_KHR_',
@@ -260,8 +263,8 @@ class DocOutputGenerator(OutputGenerator):
         source_directive = f'[source{source_options},{source_language}]'
         
         # Only output deprecation warnings for versions, for now
-        if deprecatedby and self.conventions.xml_api_name != 'vulkansc':
-            write("WARNING: This functionality is deprecated by " + conventions.formatVersionOrExtension(deprecatedby) + ". See <<" + deprecatedlink + ", Deprecated Functionality>> for more information.", file=fp);
+        if deprecatedby:
+            write("WARNING: This functionality is superseded by " + conventions.formatVersionOrExtension(deprecatedby) + ". See <<" + deprecatedlink + ", Legacy Functionality>> for more information.", file=fp);
             write('', file=fp);
 
         write(source_directive, file=fp)
@@ -366,7 +369,7 @@ class DocOutputGenerator(OutputGenerator):
                 # Replace <apientry /> tags with an APIENTRY-style string
                 # (from self.genOpts). Copy other text through unchanged.
                 # If the resulting text is an empty string, do not emit it.
-                body += noneStr(typeElem.text)
+                body += noneStr(typeElem.text).lstrip()
                 for elem in typeElem:
                     if elem.tag == 'apientry':
                         body += self.genOpts.apientry + noneStr(elem.tail)
@@ -528,6 +531,8 @@ class DocOutputGenerator(OutputGenerator):
         OutputGenerator.genCmd(self, cmdinfo, name, alias)
 
         body = self.genRequirements(name)
+        if alias and self.registry.cmddict[alias].required:
+            body += f'// Equivalent to {alias}\n'
         decls = self.makeCDecls(cmdinfo.elem)
         body += decls[0]
         self.writeInclude('protos', name, body, cmdinfo.deprecatedbyversion, cmdinfo.deprecatedlink)

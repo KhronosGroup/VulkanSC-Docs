@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: CC-BY-4.0
 
 = VK_KHR_shader_bfloat16
+:toc: left
 :docs: https://docs.vulkan.org/spec/latest/
 :extensions: {docs}appendices/extensions.html#
+:spirvspec: https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html
 :sectnums:
 
 This extension enables support for bfloat16 operations in shaders.
@@ -19,7 +21,7 @@ bfloat16 is a floating point type devised to provide similar dynamic range as IE
 
 == Solution Space
 
-Two existing features widely used for machine learning algorithms include https://github.com/KhronosGroup/SPIRV-Registry/blob/main/extensions/KHR/SPV_KHR_cooperative_matrix.asciidoc[SPV_KHR_cooperative_matrix], and the https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpDot[OpDot] instruction.
+Two existing features widely used for machine learning algorithms include https://github.khronos.org/SPIRV-Registry/extensions/KHR/SPV_KHR_cooperative_matrix.html[SPV_KHR_cooperative_matrix], and the https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpDot[OpDot] instruction.
 Any proposal here has to support that functionality, as well as basic manipulation of data for these types, and some way to perform standard arithmetic.
 
 
@@ -61,7 +63,7 @@ New capabilities enable both the declaration of the type and its use with dot pr
 |====
 2+^| Capability ^| Implicitly Declares
 | 5116 | *BFloat16TypeKHR* +
-Uses *OpTypeFloat* to specify types with the *BFloat16KHR* <<Floating_Point_Encoding, floating point encoding>> and the use of conversion functions for those types.
+Uses *OpTypeFloat* to specify types with the *BFloat16KHR* link:{spirvspec}#FP_Encoding[floating point encoding] and the use of conversion functions for those types.
 |
 | 5117 | *BFloat16DotProductKHR* +
 Uses vectors with a *Component Type* of *OpTypeFloat* with the *BFloat16KHR* encoding with *OpDot*.

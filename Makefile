@@ -1,5 +1,4 @@
 # Copyright 2014-2025 The Khronos Group Inc.
-#
 # SPDX-License-Identifier: Apache-2.0
 
 # Vulkan Specification makefile
@@ -34,7 +33,9 @@
 # default to 'vulkansc'
 VULKAN_API ?= vulkansc
 ifeq ($(VULKAN_API),vulkan)
-VERSIONS := VK_VERSION_1_0 VK_VERSION_1_1 VK_VERSION_1_2 VK_VERSION_1_3
+VERSIONS := VK_VERSION_1_0 VK_VERSION_1_1 VK_VERSION_1_2 VK_VERSION_1_3 VK_VERSION_1_4
+else ifeq ($(VULKAN_API),vulkanbase)
+VERSIONS := VK_BASE_VERSION_1_0 VK_BASE_VERSION_1_1 VK_BASE_VERSION_1_2 VK_BASE_VERSION_1_3 VK_BASE_VERSION_1_4
 else
 VERSIONS := VK_VERSION_1_0 VK_VERSION_1_1 VK_VERSION_1_2 VKSC_VERSION_1_0
 endif
@@ -84,6 +85,7 @@ allchecks: check-copyright-dates \
     check-writing \
     check-bullets \
     check-vuperiod \
+    check-markup \
     check-reflow \
     check-links \
     check-consistency \
@@ -149,26 +151,26 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 319
+PATCHVERSION = 330
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 19
+SCPATCHVERSION = 20
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
 
-ifneq (,$(findstring VK_VERSION_1_4,$(VERSIONS)))
+ifneq (,$(findstring VK_BASE_VERSION_1_4,$(VERSIONS)))
 SPECMINOR = 4
 else
-ifneq (,$(findstring VK_VERSION_1_3,$(VERSIONS)))
+ifneq (,$(findstring VK_BASE_VERSION_1_3,$(VERSIONS)))
 SPECMINOR = 3
 else
-ifneq (,$(findstring VK_VERSION_1_2,$(VERSIONS)))
+ifneq (,$(findstring VK_BASE_VERSION_1_2,$(VERSIONS)))
 SPECMINOR = 2
 else
-ifneq (,$(findstring VK_VERSION_1_1,$(VERSIONS)))
+ifneq (,$(findstring VK_BASE_VERSION_1_1,$(VERSIONS)))
 SPECMINOR = 1
 else
 SPECMINOR = 0
@@ -409,7 +411,7 @@ $(VUDIR)/validusage.json: $(SPECSRC) $(COMMONDOCS) $(PYXREFMAP) $(PYPAGEMAP)
 	$(QUIET)$(ASCIIDOC) $(ADOCOPTS) $(ADOCVUOPTS) --trace \
 	    -a json_output=$@ -o $@ $(SPECSRC)
 	$(QUIET)$(PYTHON) $(SCRIPTS)/add_validusage_pages.py \
-	    -xrefmap $(PYXREFMAP) -pagemap $(PYPAGEMAP) -validusage $@
+	    -xrefMap $(PYXREFMAP) -pageMap $(PYPAGEMAP) -validusage $@
 
 # Vulkan Documentation and Extensions, a.k.a. "Style Guide" documentation
 
@@ -461,6 +463,9 @@ reflow:
 # Automated markup and consistency checks, invoked by 'allchecks' and
 # 'ci-allchecks' targets or individually.
 
+# Sources of spec-type markup - spec, registry schema document, and style guide
+MARKUP_SPEC_SOURCES = $(SPECDIR)/[a-z]*.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style
+
 # Look for disallowed contractions
 CHECK_CONTRACTIONS = git grep -n -i -F -f $(ROOTDIR)/config/CI/contractions | grep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
 check-contractions:
@@ -492,7 +497,7 @@ check-spelling:
 # Look for old or unpreferred language in specification language.
 # This mostly helps when we make global changes that also need to be
 # made in outstanding extension branches for new text.
-CHECK_WRITING = git grep -n -E -f $(ROOTDIR)/config/CI/writing $(SPECDIR)/registry.adoc $(SPECDIR)/vkspec.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices
+CHECK_WRITING = git grep -n -E -f $(ROOTDIR)/config/CI/writing $(SPECDIR)/[a-z]*.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices
 check-writing:
 	if test `$(CHECK_WRITING) | wc -l` != 0 ; then \
 	    echo "Found old style writing. Please refer to the style guide or similar language in current main branch for fixes:" ; \
@@ -501,7 +506,7 @@ check-writing:
 	fi
 
 # Look for bullet list items not preceded by exactly two spaces, per styleguide
-CHECK_BULLETS = git grep -n -E '^( |   +)[-*]+ ' $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style $(SPECDIR)/[a-z]*.adoc
+CHECK_BULLETS = git grep -n -E '^( |   +)[-*]+ ' $(MARKUP_SPEC_SOURCES)
 check-bullets:
 	if test `$(CHECK_BULLETS) | wc -l` != 0 ; then \
 	    echo "Bullet list item found not preceded by exactly two spaces:" ; \
@@ -510,11 +515,20 @@ check-bullets:
 	fi
 
 # Look for VU text ending in a period
-CHECK_VUPERIOD = ag --nocolor --asciidoc '\* \[\[VUID[^.]+\.\n( {2}\* \[\[VUID|\*\*\*\*)' $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style $(SPECDIR)/[a-z]*.adoc
+CHECK_VUPERIOD = ag --nocolor --asciidoc '\* \[\[VUID[^.]+\.\n( {2}\* \[\[VUID|\*\*\*\*)' $(MARKUP_SPEC_SOURCES)
 check-vuperiod:
 	if test `$(CHECK_VUPERIOD) | wc -l` != 0 ; then \
 	    echo "VU rule ending with a disallowed period found. Note that the matched text may be very long:" ; \
 	    $(CHECK_VUPERIOD) ; \
+	    exit 1 ; \
+	fi
+
+# Look for common macro markup errors
+CHECK_MARKUP = git grep -n -E -f $(ROOTDIR)/config/CI/markup $(MARKUP_SPEC_SOURCES)
+check-markup:
+	if test `$(CHECK_MARKUP) | wc -l` != 0 ; then \
+	    echo "Common macro markup errors found. Please refer to the style guide or similar markup in current main branch for fixes:" ; \
+	    $(CHECK_MARKUP) ; \
 	    exit 1 ; \
 	fi
 
@@ -557,16 +571,16 @@ check-undefined:
 # Look for use of custom macros in the proposals and other
 # non-Specification document (except for the ChangeLog*.adoc) markup
 CHECK_CUSTOM_MACROS = git grep -n -E -f $(ROOTDIR)/config/CI/custom-macros [A-Z][A-Z]*.adoc proposals/
-CHECK_REFPAGE_ATTRIBUTES = git grep -n -E -f $(ROOTDIR)/config/CI/refpage-attributes proposals/
+CHECK_PROPOSALS = git grep -n -E -f $(ROOTDIR)/config/CI/proposals-disallowed proposals/
 check-custom-macros:
 	if test `$(CHECK_CUSTOM_MACROS) | wc -l` != 0 ; then \
 	    echo "Found use of specification macros in proposal or repository metadocumentation, where they are not allowed. Please use straight asciidoc markup like *must* for fixes:" ; \
 	    $(CHECK_CUSTOM_MACROS) ; \
 	    exit 1 ; \
 	fi
-	if test `$(CHECK_REFPAGE_ATTRIBUTES) | wc -l` != 0 ; then \
-	    echo "Found use of {refpage} attribute in proposals, which has been replaced by {docs} and {extensions}. See proposals/template.adoc for the current link markup style:" ; \
-	    $(CHECK_REFPAGE_ATTRIBUTES) ; \
+	if test `$(CHECK_PROPOSALS) | wc -l` != 0 ; then \
+	    echo "Found use of {refpage} attribute in proposals (use {docs} or {extensions}, see proposals/template.adoc); or of asciidoctor markup which cannot be rendered on github, such as include: or asciimath: directives:" ; \
+	    $(CHECK_PROPOSALS) ; \
 	    exit 1 ; \
 	fi
 
@@ -584,7 +598,7 @@ check-xrefs: $(HTMLDIR)/vkspec.html
 	$(PYTHON) $(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
 
 # Generated refpage sources. For now, always build all refpages.
-MANSOURCES   = $(filter-out $(REFPATH)/apispec.adoc, $(wildcard $(REFPATH)/*.adoc))
+MANSOURCES   = $(wildcard $(REFPATH)/*.adoc)
 
 # Generation of refpage asciidoctor sources by extraction from the
 # specification(s).
@@ -596,25 +610,30 @@ MANSOURCES   = $(filter-out $(REFPATH)/apispec.adoc, $(wildcard $(REFPATH)/*.ado
 # Should pass in $(EXTOPTIONS) to determine which pages to generate.
 # For now, all core and extension refpages are extracted by genRef.py.
 GENREF = $(SCRIPTS)/genRef.py
-LOGFILE = $(REFPATH)/refpage.log
-refpages: $(REFPATH)/apispec.adoc
-$(REFPATH)/apispec.adoc: $(SPECFILES) $(GENREF) $(SCRIPTS)/reflib.py $(PYAPIMAP)
+LOGPATH = $(REFPATH)/
+# Proxy target for the entire set of generated refpages.
+# This page will always be generated.
+REFPAGEPROXY = $(REFPATH)/VkResult.adoc
+refpages: $(REFPAGEPROXY)
+$(REFPAGEPROXY): $(SPECFILES) $(GENREF) $(SCRIPTS)/reflib.py $(PYAPIMAP)
 	$(QUIET)$(MKDIR) $(REFPATH)
 	$(PYTHON) $(GENREF) -genpath $(GENERATED) -basedir $(REFPATH) \
-	    -log $(LOGFILE) -extpath $(SPECDIR)/appendices \
+	    -diag $(LOGPATH)/refpage.diag \
+	    -warn $(LOGPATH)/refpage.warn \
+	    -extpath $(SPECDIR)/appendices \
 	    $(EXTOPTIONS) $(SPECFILES)
 
 # These targets are HTML5 refpages
 #
-# The recursive $(MAKE) is an apparently unavoidable hack, since the
-# actual list of man page sources is not known until after
-# $(REFPATH)/apispec.adoc is generated. $(GENDEPENDS) is generated before
-# running the recursive make, so it does not trigger twice
+# The recursive $(MAKE) is an apparently unavoidable hack, since the list
+# of refpage sources is not known until $(REFPAGEPROXY) is generated.
+# $(GENDEPENDS) is generated before the recursive make, so it does not
+# trigger twice.
 # $(SUBMAKEOPTIONS) suppresses the redundant "Entering / leaving"
 # messages make normally prints out, similarly to suppressing make
 # command output logging in the individual refpage actions below.
 SUBMAKEOPTIONS = --no-print-directory
-manhtmlpages: $(REFPATH)/apispec.adoc $(GENDEPENDS)
+manhtmlpages: $(REFPAGEPROXY) $(GENDEPENDS)
 	$(QUIET) echo "manhtmlpages: building HTML refpages with these options:"
 	$(QUIET) echo $(ASCIIDOC) -b html5 $(ADOCOPTS) $(ADOCHTMLOPTS) \
 	    $(ADOCREFOPTS) -d manpage -o REFPAGE.html REFPAGE.adoc
@@ -651,32 +670,6 @@ $(MANHTMLDIR)/%.html: $(REFPATH)/%.adoc $(GENDEPENDS) $(KATEXINSTDIR)
 	$(VERYQUIET)if grep -q -E '\\[([]' $@ ; then \
 	    $(TRANSLATEMATH) $@ ; \
 	fi
-
-# The 'manhtml' and 'manpdf' targets are NO LONGER SUPPORTED by Khronos.
-# They generate HTML5 and PDF single-file versions of the refpages.
-# The generated refpage sources are included by $(REFPATH)/apispec.adoc,
-# and are always generated along with that file. Therefore there is no
-# need for a recursive $(MAKE) or a $(MANHTML) dependency, unlike the
-# manhtmlpages target.
-
-manpdf: $(OUTDIR)/apispec.pdf
-
-$(OUTDIR)/apispec.pdf: $(SPECVERSION) $(REFPATH)/apispec.adoc $(SVGFILES) $(GENDEPENDS)
-	$(QUIET)$(MKDIR) $(OUTDIR)
-	$(QUIET)$(MKDIR) $(PDFMATHDIR)
-	$(QUIET)$(ASCIIDOC) -b pdf -a html_spec_relative='html/vkspec.html' \
-	    $(ADOCOPTS) $(ADOCPDFOPTS) -o $@ $(REFPATH)/apispec.adoc
-	$(QUIET)$(OPTIMIZEPDF) $@ $@.out.pdf && mv $@.out.pdf $@
-
-manhtml: $(OUTDIR)/apispec.html
-
-$(OUTDIR)/apispec.html: KATEXDIR = katex
-$(OUTDIR)/apispec.html: ADOCMISCOPTS =
-$(OUTDIR)/apispec.html: $(SPECVERSION) $(REFPATH)/apispec.adoc $(SVGFILES) $(GENDEPENDS) $(KATEXINSTDIR)
-	$(QUIET)$(MKDIR) $(OUTDIR)
-	$(QUIET)$(ASCIIDOC) -b html5 -a html_spec_relative='html/vkspec.html' \
-	    $(ADOCOPTS) $(ADOCHTMLOPTS) -o $@ $(REFPATH)/apispec.adoc
-	$(QUIET)$(TRANSLATEMATH) $@
 
 # Create links for refpage aliases
 
@@ -728,7 +721,7 @@ rubyapi $(RBAPIMAP): $(VKXML) $(GENVK)
 # Cross-references of anchors to spec chapters they lie within
 # Used both by Antora and validusage_page targets
 
-xrefmaps: $(PYXREFMAP) $(JSXREFMAP)
+xrefMap: $(PYXREFMAP) $(JSXREFMAP)
 
 $(PYXREFMAP) $(JSXREFMAP): $(HTMLDIR)/vkspec.html
 	$(QUIET)$(PYTHON) $(SCRIPTS)/map_html_anchors.py \
@@ -798,17 +791,17 @@ $(SYNCDEPEND): $(VKXML) $(GENVK)
 # After the targets are built, the $(JSXREFMAP) and $(JSPAGEMAP) files
 # used by spec macros in the Antora build must be copied into the Antora
 # project build tree, which is in a different repository.
-setup_antora: xrefmaps .WAIT setup_spec_antora setup_features_antora
+setup_antora: xrefMap .WAIT setup_spec_antora setup_features_antora setup_refpages_antora
 
 # Generate Antora spec module content by rewriting spec sources
 # Individual files must be specified last
-# This target is also used to generate the pagemap, which is combined
-# with the xrefmaps above to map VUID anchors into the Antora pages they
+# This target is also used to generate the pageMap, which is combined
+# with the xrefMap above to map VUID anchors into the Antora pages they
 # are found within.
 
 ANTORA_SPECMODULE = antora/spec/modules/ROOT
 
-# The list of files is long enough to exceed system limits on arguments
+# The list of files is long enough to exceed system limits on argument
 # lists, so instead of passing them on the command line they are stored
 # in a separate file.
 ANTORA_FILELIST = $(GENERATED)/antoraFileList.txt
@@ -822,28 +815,43 @@ ANTORA_EXTRAFILES = \
 	$(JSXREFMAP) \
 	$(JSAPIMAP)
 
-# The pagemap is copied, separately since the rewrite script creates it.
-setup_spec_antora pagemap $(JSPAGEMAP) $(PYPAGEMAP): xrefmaps $(JSAPIMAP)
+# The pageMap is copied, separately since antora-prep.py creates it.
+setup_spec_antora pageMap $(JSPAGEMAP) $(PYPAGEMAP): xrefMap $(JSAPIMAP) spec_nav_antora
 	$(QUIET)find $(GENERATED) ./chapters ./appendices -name '[A-Za-z]*.adoc' | \
 	    grep -v /vulkanscdeviations.adoc > $(ANTORA_FILELIST)
 	$(QUIET)ls -1 $(ANTORA_EXTRAFILES) >> $(ANTORA_FILELIST)
 	$(QUIET)$(PYTHON) $(SCRIPTS)/antora-prep.py \
 	    -root . \
 	    -component $(shell realpath antora/spec/modules/ROOT) \
-	    -xrefpath $(GENERATED) \
+	    -xrefMap $(PYXREFMAP) \
+	    -module 'spec::' \
 	    -pageHeaders antora/pageHeaders-spec.adoc \
 	    -jspagemap $(JSPAGEMAP) \
 	    -pypagemap $(PYPAGEMAP) \
 	    -filelist $(ANTORA_FILELIST)
 	$(QUIET)$(CP) $(JSPAGEMAP) $(ANTORA_SPECMODULE)/partials/$(GENERATED_DIR)
 
+# Construct the spec component nav.adoc from the list of included
+# chapters in vkspec.adoc, so it remains up to date.
+# This is a simple transformation turning include directives into xrefs.
+# Unfortunately we cannot set or use attributes in nav files, so the
+#   {chapters} and {appendices} attributes must be turned into hardcoded
+#   paths in the pages/ directory.
+SPECNAV = antora/spec/modules/ROOT/nav.adoc
+spec_nav_antora: $(SPECSRC)
+	cat $(SPECSRC) | \
+	    sed -n '/tag::antora-vulkan-nav/,/end::antora-vulkan-nav/p' | \
+	    egrep '^include::' | \
+	    tr -d '{}' | \
+	    sed -e 's/include::/* xref:/' > $(SPECNAV)
+
 # Generate Antora features module content by rewriting feature sources
 # No additional pageHeaders required.
-setup_features_antora: xrefmaps features_nav_antora
+setup_features_antora: xrefMap features_nav_antora
 	$(QUIET)$(PYTHON) $(SCRIPTS)/antora-prep.py \
 	    -root . \
 	    -component $(shell realpath antora/features/modules/features) \
-	    -xrefpath $(GENERATED) \
+	    -xrefMap $(PYXREFMAP) \
 	    `find ./images/proposals -type f` \
 	    `find ./proposals -name '[A-Za-z]*.adoc'`
 
@@ -861,6 +869,37 @@ features_nav_antora:
 	    -component $(shell realpath antora/features/modules/features) \
 	    -roadmappath proposals/Roadmap.adoc \
 	    `find ./proposals -name 'VK_*.adoc'`
+
+# Generate Antora refpages module content by extraction from rewritten
+# spec sources.
+# The sources in the spec component partials/ directory are used since
+# that has all source files, and some of the files not in pages/ have
+# refpage content.
+# At present, this is done by symlinking spec module directories into
+# the corresponding refpages module directories.
+# The pageMap and xrefMap created by setup_spec_antora are used here.
+
+ANTORA_REFMODULE = antora/refpages/modules/refpages
+# Where to create the extracted refpage files
+ANTORA_EXTRACT_PAGES = $(ANTORA_REFMODULE)/pages/source
+ANTORA_LOGPATH = antora/refpages/
+# Same as SPECFILES but pointing to rewritten partials
+ANTORA_SPECFILES = $(wildcard $(ANTORA_SPECMODULE)/partials/chapters/[A-Za-z]*.adoc $(ANTORA_SPECMODULE)/partials/chapters/*/[A-Za-z]*.adoc $(ANTORA_SPECMODULE)/partials/appendices/[A-Za-z]*.adoc)
+
+setup_refpages_antora: setup_spec_antora xrefMap pageMap $(GENREF) $(SCRIPTS)/reflib.py $(PYAPIMAP)
+	$(QUIET)$(MKDIR) $(ANTORA_EXTRACT_PAGES)
+	$(PYTHON) $(GENREF) -basedir $(ANTORA_EXTRACT_PAGES) \
+	    -diag $(ANTORA_LOGPATH)/refpage.diag \
+	    -warn $(ANTORA_LOGPATH)/refpage.warn \
+	    -extpath $(ANTORA_SPECMODULE)/partials/appendices \
+	    -antora \
+	    -xrefMap $(PYXREFMAP) \
+	    -pageMap $(PYPAGEMAP) \
+	    -module 'spec::' \
+	    -nav $(ANTORA_REFMODULE)/nav.adoc \
+	    $(EXTOPTIONS) $(ANTORA_SPECFILES)
+	$(QUIET)$(RM) $(ANTORA_REFMODULE)/partials && ln -s $(shell realpath $(ANTORA_SPECMODULE)/partials) $(ANTORA_REFMODULE)/partials
+	$(QUIET)$(RM) $(ANTORA_REFMODULE)/images && ln -s $(shell realpath $(ANTORA_SPECMODULE)/images) $(ANTORA_REFMODULE)/images
 
 # This generates a single file containing asciidoc attributes for each
 # core version and extension in the spec being built.
@@ -890,11 +929,10 @@ clean: clean_html clean_pdf clean_man clean_generated clean_antora clean_validus
 
 clean_html:
 	$(QUIET)$(RMRF) $(HTMLDIR) $(OUTDIR)/katex
-	$(QUIET)$(RM) $(OUTDIR)/apispec.html $(OUTDIR)/styleguide.html \
-	    $(OUTDIR)/registry.html
+	$(QUIET)$(RM) $(OUTDIR)/styleguide.html $(OUTDIR)/registry.html
 
 clean_pdf:
-	$(QUIET)$(RMRF) $(PDFDIR) $(OUTDIR)/apispec.pdf
+	$(QUIET)$(RMRF) $(PDFDIR)
 
 clean_man:
 	$(QUIET)$(RMRF) $(MANHTMLDIR)
@@ -923,19 +961,30 @@ clean_generated:
 	$(QUIET)$(RMRF) $(CLEAN_GEN_PATHS)
 
 # Files generated by 'setup_antora' target
-# Omit antora/features/modules/features/nav.adoc which is generated, but
+# Omit
+#   antora/<module>/modules/<module>/nav.adoc
+# and
+#   antora/<module>/modules/<module>/pages/index.adoc
 # also checked in.
 CLEAN_ANTORA_PATHS = \
 	$(ANTORA_FILELIST) \
+	antora/spec/modules/ROOT/nav.adoc \
 	antora/spec/modules/ROOT/images \
 	antora/spec/modules/ROOT/pages/appendices \
 	antora/spec/modules/ROOT/pages/chapters \
 	antora/spec/modules/ROOT/pages/partials \
 	antora/spec/modules/ROOT/pages/$(GENERATED_DIR) \
 	antora/spec/modules/ROOT/partials \
+	antora/features/modules/features/nav.adoc \
 	antora/features/modules/features/pages/proposals \
 	antora/features/modules/features/partials \
 	antora/features/modules/features/images \
+	antora/refpages/modules/refpages/nav.adoc \
+	antora/refpages/modules/refpages/pages/source \
+	antora/refpages/modules/refpages/partials \
+	antora/refpages/modules/refpages/images \
+	antora/refpages/refpage.diag \
+	antora/refpages/refpage.warn \
 	$(JSXREFMAP) \
 	$(PYXREFMAP) \
 	$(JSPAGEMAP) \
@@ -946,5 +995,3 @@ clean_antora:
 
 clean_validusage:
 	$(QUIET)$(RM) $(VUDIR)/validusage.json
-
-

@@ -13,61 +13,48 @@ affected between different versions, and compatibility rules that are
 followed by the Vulkan Working Group.
 
 
-[[extendingvulkan-instanceanddevicefunctionality]]
-== Instance and Device Functionality
+[[extendingvulkan-functionalitylevels]]
+== Functionality Levels
 
-Commands that enumerate instance properties, or that accept a
-slink:VkInstance object as a parameter, are considered instance-level
-functionality.
+Functionality in Vulkan is divided into several different levels; global,
+instance-level, physical-device-level, and device-level.
 
-Commands that dispatch from a slink:VkDevice object or a child object of a
-slink:VkDevice, or take any of them as a parameter, are considered
-device-level functionality.
-Types defined by a <<extendingvulkan-device-extensions,device extension>>
-are also considered device-level functionality.
+* slink:VkInstance and any objects created from a slink:VkInstance other
+  than slink:VkPhysicalDevice are instance-level.
+* slink:VkPhysicalDevice is the only physical-device-level object.
+* slink:VkDevice and any objects created from a slink:VkDevice are
+  device-level.
 
-Commands that dispatch from slink:VkPhysicalDevice, or accept a
-slink:VkPhysicalDevice object as a parameter, are considered either
-instance-level or device-level functionality depending if the functionality
-is specified by an <<extendingvulkan-instance-extensions,instance
-extension>> or <<extendingvulkan-device-extensions,device extension>>
-respectively.
+The level of a command is the same as the level of its first parameter - if
+the first parameter is not a <<fundamentals-objectmodel-overview,
+dispatchable handle>>, it is a global command.
+Different levels of functionality may: be advertised in different ways.
 
-ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-Additionally, commands that enumerate physical device properties are
-considered device-level functionality.
-endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 
-ifdef::VK_VERSION_1_1[]
-[NOTE]
-====
-Applications usually interface to Vulkan using a loader that implements only
-instance-level functionality, passing device-level functionality to
-implementations of the full Vulkan API on the system.
-In some circumstances, as these may be implemented independently, it is
-possible that the loader and device implementations on a given installation
-will support different versions.
-To allow for this and call out when it happens, the Vulkan specification
-enumerates device and instance level functionality separately - they have
-<<extendingvulkan-coreversions-queryingversionsupport,independent version
-queries>>.
-====
-endif::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
+[[extendingvulkan-instanceanddeviceversions]]
+== Instance and Device Versions
 
-ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-[NOTE]
-====
-Vulkan 1.0 initially specified new physical device enumeration functionality
-as instance-level, requiring it to be included in an instance extension.
-As the capabilities of device-level functionality require discovery via
-physical device enumeration, this led to the situation where many device
-extensions required an instance extension as well.
-To alleviate this extra work,
-`apiext:VK_KHR_get_physical_device_properties2` (and subsequently Vulkan
-1.1) redefined device-level functionality to include physical device
-enumeration.
-====
-endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+Starting with Vulkan 1.1, there are separate versions advertised for the
+Vulkan instance, and for each device supported on the system.
+This allows a system with multiple devices to advertise all devices at their
+full capabilities, even if those devices do not support the same version of
+Vulkan.
+
+The instance version indicates which global and instance-level functionality
+is supported, while each device version indicates the physical-device-level
+and device-level functionality supported.
+
+The instance version can: be queried by calling
+flink:vkEnumerateInstanceVersion.
+Querying for this function via flink:vkGetInstanceProcAddr will return
+`NULL` on implementations that only support Vulkan 1.0 functionality.
+
+The device version can: be queried by calling
+flink:vkGetPhysicalDeviceProperties or flink:vkGetPhysicalDeviceProperties2,
+and is returned in slink:VkPhysicalDeviceProperties::pname:apiVersion,
+encoded as described in <<extendingvulkan-coreversions-versionnumbers>>.
+endif::VK_BASE_VERSION_1_1[]
 
 
 [[extendingvulkan-coreversions]]
@@ -111,7 +98,7 @@ ifndef::VKSC_VERSION_1_0[]
 As Vulkan uses variant 0, this change is fully backwards compatible with the
 previous version number format for Vulkan implementations.
 New version number macros have been added for this change and the old macros
-deprecated.
+marked as legacy.
 For existing applications using the older format and macros, an
 implementation with non-zero variant will decode as a very high Vulkan
 version.
@@ -158,6 +145,7 @@ packed version number:
 include::{generated}/api/defines/VK_API_VERSION_MAJOR.adoc[]
 --
 
+ifdef::VK_BASE_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 [open,refpage='VK_VERSION_MAJOR',desc='Extract API major version number',type='defines']
 --
@@ -167,6 +155,7 @@ version number:
 include::{generated}/api/defines/VK_VERSION_MAJOR.adoc[]
 --
 endif::VKSC_VERSION_1_0[]
+endif::VK_BASE_VERSION_1_0[]
 
 [open,refpage='VK_API_VERSION_MINOR',desc='Extract API minor version number',type='defines']
 --
@@ -176,6 +165,7 @@ packed version number:
 include::{generated}/api/defines/VK_API_VERSION_MINOR.adoc[]
 --
 
+ifdef::VK_BASE_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 [open,refpage='VK_VERSION_MINOR',desc='Extract API minor version number',type='defines']
 --
@@ -185,6 +175,7 @@ version number:
 include::{generated}/api/defines/VK_VERSION_MINOR.adoc[]
 --
 endif::VKSC_VERSION_1_0[]
+endif::VK_BASE_VERSION_1_0[]
 
 [open,refpage='VK_API_VERSION_PATCH',desc='Extract API patch version number',type='defines']
 --
@@ -194,6 +185,7 @@ packed version number:
 include::{generated}/api/defines/VK_API_VERSION_PATCH.adoc[]
 --
 
+ifdef::VK_BASE_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 [open,refpage='VK_VERSION_PATCH',desc='Extract API patch version number',type='defines']
 --
@@ -203,6 +195,7 @@ version number:
 include::{generated}/api/defines/VK_VERSION_PATCH.adoc[]
 --
 endif::VKSC_VERSION_1_0[]
+endif::VK_BASE_VERSION_1_0[]
 
 [open,refpage='VK_MAKE_API_VERSION',desc='Construct an API version number',type='defines',xrefs='VkApplicationInfo vkCreateInstance']
 --
@@ -216,6 +209,7 @@ include::{generated}/api/defines/VK_MAKE_API_VERSION.adoc[]
   * pname:patch is the patch version number.
 --
 
+ifdef::VK_BASE_VERSION_1_0[]
 ifndef::VKSC_VERSION_1_0[]
 [open,refpage='VK_MAKE_VERSION',desc='Construct an API version number',type='defines',xrefs='VkApplicationInfo vkCreateInstance']
 --
@@ -228,49 +222,52 @@ include::{generated}/api/defines/VK_MAKE_VERSION.adoc[]
   * pname:patch is the patch version number.
 --
 endif::VKSC_VERSION_1_0[]
+endif::VK_BASE_VERSION_1_0[]
 
+ifdef::VK_BASE_VERSION_1_0[]
 [open,refpage='VK_API_VERSION_1_0',desc='Return API version number for Vulkan 1.0',type='defines',xrefs='vkCreateInstance vkGetPhysicalDeviceProperties']
 --
 dname:VK_API_VERSION_1_0 returns the API version number for Vulkan 1.0.0.
 
 include::{generated}/api/defines/VK_API_VERSION_1_0.adoc[]
 --
+endif::VK_BASE_VERSION_1_0[]
 
-ifdef::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
 [open,refpage='VK_API_VERSION_1_1',desc='Return API version number for Vulkan 1.1',type='defines',xrefs='vkCreateInstance vkGetPhysicalDeviceProperties']
 --
 dname:VK_API_VERSION_1_1 returns the API version number for Vulkan 1.1.0.
 
 include::{generated}/api/defines/VK_API_VERSION_1_1.adoc[]
 --
-endif::VK_VERSION_1_1[]
+endif::VK_BASE_VERSION_1_1[]
 
-ifdef::VK_VERSION_1_2[]
+ifdef::VK_BASE_VERSION_1_2[]
 [open,refpage='VK_API_VERSION_1_2',desc='Return API version number for Vulkan 1.2',type='defines',xrefs='vkCreateInstance vkGetPhysicalDeviceProperties']
 --
 dname:VK_API_VERSION_1_2 returns the API version number for Vulkan 1.2.0.
 
 include::{generated}/api/defines/VK_API_VERSION_1_2.adoc[]
 --
-endif::VK_VERSION_1_2[]
+endif::VK_BASE_VERSION_1_2[]
 
-ifdef::VK_VERSION_1_3[]
+ifdef::VK_BASE_VERSION_1_3[]
 [open,refpage='VK_API_VERSION_1_3',desc='Return API version number for Vulkan 1.3',type='defines',xrefs='vkCreateInstance vkGetPhysicalDeviceProperties']
 --
 dname:VK_API_VERSION_1_3 returns the API version number for Vulkan 1.3.0.
 
 include::{generated}/api/defines/VK_API_VERSION_1_3.adoc[]
 --
-endif::VK_VERSION_1_3[]
+endif::VK_BASE_VERSION_1_3[]
 
-ifdef::VK_VERSION_1_4[]
+ifdef::VK_BASE_VERSION_1_4[]
 [open,refpage='VK_API_VERSION_1_4',desc='Return API version number for Vulkan 1.4',type='defines',xrefs='vkCreateInstance vkGetPhysicalDeviceProperties']
 --
 dname:VK_API_VERSION_1_4 returns the API version number for Vulkan 1.4.0.
 
 include::{generated}/api/defines/VK_API_VERSION_1_4.adoc[]
 --
-endif::VK_VERSION_1_4[]
+endif::VK_BASE_VERSION_1_4[]
 
 ifdef::VKSC_VERSION_1_0[]
 [open,refpage='VKSC_API_VARIANT',desc='Returns the API variant number for Vulkan SC',type='defines']
@@ -288,37 +285,6 @@ dname:VKSC_API_VERSION_1_0 returns the API version number for Vulkan SC
 include::{generated}/api/defines/VKSC_API_VERSION_1_0.adoc[]
 --
 endif::VKSC_VERSION_1_0[]
-
-
-[[extendingvulkan-coreversions-queryingversionsupport]]
-=== Querying Version Support
-
-ifndef::VK_VERSION_1_1[]
-[NOTE]
-====
-In Vulkan 1.0, there is no mechanism to detect the separate versions of
-<<extendingvulkan-instanceanddevicefunctionality,instance-level and
-device-level functionality>> supported.
-However, the fname:vkEnumerateInstanceVersion command was added in Vulkan
-1.1 to determine the supported version of instance-level functionality -
-querying for this function via flink:vkGetInstanceProcAddr will return
-`NULL` on implementations that only support Vulkan 1.0 functionality.
-For more information on this, please refer to the Vulkan 1.1 specification.
-====
-endif::VK_VERSION_1_1[]
-
-ifdef::VK_VERSION_1_1[]
-The version of instance-level functionality can be queried by calling
-flink:vkEnumerateInstanceVersion.
-endif::VK_VERSION_1_1[]
-
-The version of device-level functionality can be queried by calling
-flink:vkGetPhysicalDeviceProperties
-ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-or flink:vkGetPhysicalDeviceProperties2,
-endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-and is returned in slink:VkPhysicalDeviceProperties::pname:apiVersion,
-encoded as described in <<extendingvulkan-coreversions-versionnumbers>>.
 
 
 [[extendingvulkan-layers]]
@@ -446,35 +412,6 @@ Explicitly enabling a layer that is implicitly enabled results in this layer
 being loaded as an implicitly enabled layer; it has no additional effect.
 
 
-[[extendingvulkan-layers-devicelayerdeprecation]]
-=== Device Layer Deprecation
-
-Previous versions of this specification distinguished between instance and
-device layers.
-Instance layers were only able to intercept commands that operate on
-sname:VkInstance and sname:VkPhysicalDevice, except they were not able to
-intercept flink:vkCreateDevice.
-Device layers were enabled for individual devices when they were created,
-and could only intercept commands operating on that device or its child
-objects.
-
-Device-only layers are now deprecated, and this specification no longer
-distinguishes between instance and device layers.
-Layers are enabled during instance creation, and are able to intercept all
-commands operating on that instance or any of its child objects.
-At the time of deprecation there were no known device-only layers and no
-compelling reason to create one.
-
-ifndef::VKSC_VERSION_1_0[]
-In order to maintain compatibility with implementations released prior to
-device-layer deprecation, applications should: still enumerate and enable
-device layers.
-The behavior of fname:vkEnumerateDeviceLayerProperties and valid usage of
-the pname:ppEnabledLayerNames member of slink:VkDeviceCreateInfo maximizes
-compatibility with applications written to work with the previous
-requirements.
-endif::VKSC_VERSION_1_0[]
-
 [open,refpage='vkEnumerateDeviceLayerProperties',desc='Returns properties of available physical device layers',type='protos']
 --
 :refpage: vkEnumerateDeviceLayerProperties
@@ -525,7 +462,7 @@ include::{generated}/validity/protos/vkEnumerateDeviceLayerProperties.adoc[]
 --
 
 The pname:ppEnabledLayerNames and pname:enabledLayerCount members of
-slink:VkDeviceCreateInfo are deprecated and their values must: be ignored by
+slink:VkDeviceCreateInfo are legacy and their values must: be ignored by
 implementations.
 ifndef::VKSC_VERSION_1_0[]
 However, for compatibility, only an empty list of layers or a list that
@@ -571,11 +508,11 @@ To enable a device extension, the name of the extension can: be added to the
 pname:ppEnabledExtensionNames member of slink:VkDeviceCreateInfo when
 creating a sname:VkDevice.
 
-ifdef::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+ifdef::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 Physical-Device-Level functionality does not have any enabling mechanism and
 can: be used as long as the slink:VkPhysicalDevice supports the device
 extension as determined by flink:vkEnumerateDeviceExtensionProperties.
-endif::VK_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+endif::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 
 Enabling an extension (with no further use of that extension) does not
 change the behavior of functionality exposed by the core Vulkan API or any
@@ -592,9 +529,11 @@ It is defined only in the <<fundamentals-validusage-extensions>> section.
 [[extendingvulkan-instance-extensions]]
 === Instance Extensions
 
-Instance extensions add new
-<<extendingvulkan-instanceanddevicefunctionality,instance-level
-functionality>> to the API, outside of the core specification.
+Instance extensions add new <<extendingvulkan-functionalitylevels,global or
+instance-level functionality>> to the API, outside of the core
+specification.
+Instance extensions may: also add <<extendingvulkan-functionalitylevels,
+physical-device-level functionality>>.
 
 [open,refpage='vkEnumerateInstanceExtensionProperties',desc='Returns up to requested number of global extension properties',type='protos']
 --
@@ -644,9 +583,17 @@ include::{generated}/validity/protos/vkEnumerateInstanceExtensionProperties.adoc
 [[extendingvulkan-device-extensions]]
 === Device Extensions
 
-Device extensions add new
-<<extendingvulkan-instanceanddevicefunctionality,device-level
+Device extensions add new <<extendingvulkan-functionalitylevels,device-level
 functionality>> to the API, outside of the core specification.
+ifdef::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+If
+ifdef::VK_BASE_VERSION_1_1[Vulkan 1.1]
+ifdef::VK_BASE_VERSION_1_1+VK_KHR_get_physical_device_properties2[or]
+ifdef::VK_KHR_get_physical_device_properties2[apiext:VK_KHR_get_physical_device_properties2]
+is required by the extension, it may: also add new
+<<extendingvulkan-functionalitylevels,physical-device-level functionality>>.
+endif::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
+
 
 [open,refpage='vkEnumerateDeviceExtensionProperties',desc='Returns properties of available physical device extensions',type='protos']
 --
@@ -682,6 +629,7 @@ supported by this query, the `apiext:VK_KHR_pipeline_library` extension
 must: also be supported.
 endif::VK_KHR_ray_tracing_pipeline[]
 
+// This use of VK_VERSION_1_3 in this block is intentional
 ifdef::VK_VERSION_1_3[]
 Implementations claiming support for the <<roadmap-2022, Roadmap 2022>>
 profile must: advertise the `apiext:VK_KHR_global_priority` extension in
@@ -734,24 +682,6 @@ include::{generated}/api/structs/VkExtensionProperties.adoc[]
 
 include::{generated}/validity/structs/VkExtensionProperties.adoc[]
 --
-
-
-[[extendingvulkan-accessing-device-physical-device]]
-==== Accessing Device-Level Functionality From a slink:VkPhysicalDevice
-
-Some device extensions also add support for physical-device-level
-functionality.
-Physical-device-level functionality can: be used, if the required extension
-is supported as advertised by flink:vkEnumerateDeviceExtensionProperties for
-a given slink:VkPhysicalDevice.
-
-
-[[extendingvulkan-accessing-device-logical-device]]
-==== Accessing Device-Level Functionality From a slink:VkDevice
-
-For commands that are dispatched from a slink:VkDevice, or from a child
-object of a slink:VkDevice, device extensions must: be enabled in
-flink:vkCreateDevice.
 
 
 [[extendingvulkan-extensions-extensiondependencies]]
@@ -855,8 +785,8 @@ Changes in the minor version of the specification indicate that new
 functionality has been added to the core specification.
 This will usually include new interfaces in the header, and may: also
 include behavior changes and bug fixes.
-Core functionality may: be deprecated in a minor version, but will not be
-obsoleted or removed.
+Core functionality may: be marked as legacy in a minor version, but will not
+be obsoleted or removed.
 
 The specification's minor version is strictly increasing for a given major
 version of the specification; any change to a specification as described
@@ -876,8 +806,8 @@ across minor versions, though in general they are with few exceptions - see
 
 A difference in the major version of specifications indicates a large set of
 changes which will likely include interface changes, behavioral changes,
-removal of <<deprecation,deprecated functionality>>, and the modification,
-addition, or replacement of other functionality.
+removal of <<legacy,legacy functionality>>, and the modification, addition,
+or replacement of other functionality.
 
 The specification's major version is monotonically increasing; any change to
 the specification as described above will result in the major version being
@@ -981,8 +911,8 @@ when the extension was initially published.
 [[extendingvulkan-compatibility-deprecation]]
 ==== Deprecation
 
-Extensions may: be marked as <<deprecation,deprecated>> when they are no
-longer intended to be used by applications under certain conditions.
+Extensions may: be marked as <<legacy,deprecated>> when they are no longer
+intended to be used by applications under certain conditions.
 Generally, a new feature will become available to solve the use case in
 another extension or core version of the API, but it is not guaranteed.
 

@@ -366,9 +366,8 @@ ename:VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR
 ename:VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR.
 
 Accesses to memory with input data as identified by any used values of
-slink:VkClusterAccelerationStructureCommandsInfoNV::pname:srcInfosArray,
-slink:VkClusterAccelerationStructureCommandsInfoNV::pname:srcInfosCount and
-slink:VkClusterAccelerationStructureCommandsInfoNV::pname:addressResolutionFlags
+slink:VkClusterAccelerationStructureCommandsInfoNV::pname:srcInfosArray and
+slink:VkClusterAccelerationStructureCommandsInfoNV::pname:srcInfosCount
 must: be <<synchronization-dependencies,synchronized>> with the
 ename:VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR
 <<synchronization-pipeline-stages, pipeline stage>> and an
@@ -386,8 +385,8 @@ ename:VK_ACCESS_INDIRECT_COMMAND_READ_BIT.
     slink:VkRayTracingPipelineClusterAccelerationStructureCreateInfoNV
     structure
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10445]]
-    pname:pCommandInfos->input::pname:maxAccelerationStructureCount must: be
-    less than or equal to the value used in
+    pname:pCommandInfos->input.maxAccelerationStructureCount must: be less
+    than or equal to the value used in
     pname:pInfo->maxAccelerationStructureCount in
     flink:vkGetClusterAccelerationStructureBuildSizesNV to determine the
     memory requirements for the build operation
@@ -403,41 +402,41 @@ ename:VK_ACCESS_INDIRECT_COMMAND_READ_BIT.
     its alignment properties as queried with
     slink:VkPhysicalDeviceClusterAccelerationStructurePropertiesNV
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10448]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureMoveObjectsInfoNV structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10449]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_CLUSTERS_BOTTOM_LEVEL_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureBuildClustersBottomLevelInfoNV
     structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10450]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureBuildTriangleClusterInfoNV
     structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10451]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_TEMPLATE_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureBuildTriangleClusterTemplateInfoNV
     structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10452]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_INSTANTIATE_TRIANGLE_CLUSTER_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureInstantiateClusterInfoNV structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10832]]
-    If pname:pCommandInfos->input::pname:opType is
+    If pname:pCommandInfos->input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_GET_CLUSTER_TEMPLATE_INDICES_NV,
     pname:pCommandInfos->srcInfosArray must: be an array of
     slink:VkClusterAccelerationStructureGetTemplateIndicesInfoNV structures
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10453]]
     The value in pname:pCommandInfos->srcInfosCount must: be less than or
-    equal to pname:pCommandInfos->input::pname:maxAccelerationStructureCount
+    equal to pname:pCommandInfos->input.maxAccelerationStructureCount
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10454]]
     The number of inputs specified in pname:pCommandInfos->srcInfosArray
     must: be greater than or equal to pname:pCommandInfos->srcInfosCount
@@ -457,9 +456,9 @@ ename:VK_ACCESS_INDIRECT_COMMAND_READ_BIT.
     the ename:VK_BUFFER_USAGE_STORAGE_BUFFER_BIT usage flag
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10458]]
     The buffers from which the buffer device addresses for
-    pname:pCommandInfos->srcInfosArray, pname:pCommandInfos->srcInfosCount
-    and pname:pCommandInfos->addressResolutionFlags are queried must: have
-    been created with the
+    pname:pCommandInfos->srcInfosArray and
+    pname:pCommandInfos->srcInfosCount are queried must: have been created
+    with the
     ename:VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR
     usage flag
   * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10459]]
@@ -468,30 +467,6 @@ ename:VK_ACCESS_INDIRECT_COMMAND_READ_BIT.
     pname:pCommandInfos->dstAddressesArray are queried must: have been
     created with the
     ename:VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR usage flag
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10460]]
-    If pname:pCommandInfos->dstImplicitData is the address of a non-sparse
-    buffer then it must: be bound completely and contiguously to a single
-    slink:VkDeviceMemory object
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10461]]
-    If pname:pCommandInfos->scratchData is the address of a non-sparse
-    buffer then it must: be bound completely and contiguously to a single
-    slink:VkDeviceMemory object
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10462]]
-    If pname:pCommandInfos->srcInfosCount is the address of a non-sparse
-    buffer then it must: be bound completely and contiguously to a single
-    slink:VkDeviceMemory object
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10463]]
-    If the addresses specified in pname:pCommandInfos->dstAddressesArray are
-    the address of a non-sparse buffer then they each must: be bound
-    completely and contiguously to a single slink:VkDeviceMemory object
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10464]]
-    If the addresses specified in pname:pCommandInfos->dstSizesArray are the
-    address of a non-sparse buffer then they each must: be bound completely
-    and contiguously to a single slink:VkDeviceMemory object
-  * [[VUID-vkCmdBuildClusterAccelerationStructureIndirectNV-pCommandInfos-10465]]
-    If the addresses specified in pname:pCommandInfos->srcInfosArray are the
-    address of a non-sparse buffer then they each must: be bound completely
-    and contiguously to a single slink:VkDeviceMemory object
 ****
 
 include::{generated}/validity/protos/vkCmdBuildClusterAccelerationStructureIndirectNV.adoc[]
@@ -551,7 +526,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
     table below.
 [options="header"]
 |====
-| pname:input::pname:opType | Format of pname:srcInfosArray
+| pname:input.opType | Format of pname:srcInfosArray
 | ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV |slink:VkClusterAccelerationStructureMoveObjectsInfoNV
 | ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_CLUSTERS_BOTTOM_LEVEL_NV |slink:VkClusterAccelerationStructureBuildClustersBottomLevelInfoNV
 | ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_NV |slink:VkClusterAccelerationStructureBuildTriangleClusterInfoNV
@@ -562,9 +537,9 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
   * pname:srcInfosCount is the device address of memory containing the count
     of number of build or move operations to perform.
     The actual value is the minimum of this value and the value specified in
-    pname:input::pname:maxAccelerationStructureCount.
+    pname:input.maxAccelerationStructureCount.
     If this value is `0`, the count is determined by
-    pname:input::pname:maxAccelerationStructureCount alone.
+    pname:input.maxAccelerationStructureCount alone.
   * pname:addressResolutionFlags is a bitmask of
     elink:VkClusterAccelerationStructureAddressResolutionFlagBitsNV values
     specifying how an implementation will interpret the device addresses in
@@ -579,7 +554,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-opMode-10467]]
     If slink:VkClusterAccelerationStructureInputInfoNV::pname:opMode is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_IMPLICIT_DESTINATIONS_NV
-    and pname:input::pname:opType is not
+    and pname:input.opType is not
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV, the
     memory in pname:dstImplicitData must: be equal to or larger than the
     slink:VkAccelerationStructureBuildSizesInfoKHR::pname:accelerationStructureSize
@@ -588,12 +563,12 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-opMode-10468]]
     If slink:VkClusterAccelerationStructureInputInfoNV::pname:opMode is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_IMPLICIT_DESTINATIONS_NV
-    and pname:input::pname:opType is
+    and pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV, the
     memory in pname:dstImplicitData must: be equal to or larger than the sum
     of all the built acceleration structures that are being moved
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-input-10469]]
-    If pname:input::pname:opType is
+    If pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV, the
     total memory moved must: not be larger than the size provided in
     slink:VkClusterAccelerationStructureMoveObjectsInputNV::pname:maxMovedBytes
@@ -627,7 +602,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
     The stride in pname:srcInfosArray must: be greater than the type of
     structure the address is describing
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-input-10477]]
-    If pname:input::pname:opType is
+    If pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_NV,
     then depending on the
     slink:VkClusterAccelerationStructureInputInfoNV::pname:opMode,
@@ -635,7 +610,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
     must: be aligned to
     slink:VkPhysicalDeviceClusterAccelerationStructurePropertiesNV::pname:clusterByteAlignment
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-input-10478]]
-    If pname:input::pname:opType is
+    If pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_TEMPLATE_NV,
     then depending on the
     slink:VkClusterAccelerationStructureInputInfoNV::pname:opMode,
@@ -643,7 +618,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
     must: be aligned to
     slink:VkPhysicalDeviceClusterAccelerationStructurePropertiesNV::pname:clusterTemplateByteAlignment
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-input-10479]]
-    If pname:input::pname:opType is
+    If pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_INSTANTIATE_TRIANGLE_CLUSTER_NV,
     then depending on the
     slink:VkClusterAccelerationStructureInputInfoNV::pname:opMode,
@@ -656,7 +631,7 @@ include::{generated}/api/structs/VkClusterAccelerationStructureCommandsInfoNV.ad
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-srcInfosCount-10481]]
     pname:srcInfosCount must: be 4-byte aligned
   * [[VUID-VkClusterAccelerationStructureCommandsInfoNV-input-10482]]
-    If pname:input::pname:opType is
+    If pname:input.opType is
     ename:VK_CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_CLUSTERS_BOTTOM_LEVEL_NV,
     the total and per argument number of cluster acceleration structures
     referenced in pname:srcInfosArray must: be equal or less than the
@@ -891,24 +866,26 @@ include::{generated}/api/structs/VkClusterAccelerationStructureBuildTriangleClus
   * pname:opacityMicromapIndexBufferStride is the stride in bytes in
     pname:opacityMicromapIndexBuffer with `0` meaning the values are
     tightly-packed.
-  * pname:indexBuffer contains the indices of vertices in the cluster and is
-    of type pname:indexType.
-  * pname:vertexBuffer specifies the vertex data of the triangles in the
-    cluster with format specified in
+  * pname:indexBuffer is a device address containing the indices of the
+    vertices in the cluster and are of type pname:indexType.
+  * pname:vertexBuffer is a device address containing the vertex data of the
+    triangles in the cluster with format specified in
     slink:VkClusterAccelerationStructureTriangleClusterInputNV::pname:vertexFormat.
   * [[cluster-geometry-index-flags]] pname:geometryIndexAndFlagsBuffer is
-    either `NULL` or an address containing strided
+    either `0` or an address containing strided
     slink:VkClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV
     values specifying the geometry index and flag for every triangle in the
     cluster.
-  * pname:opacityMicromapArray is either `NULL` or specifies the address of
-    a valid opacity micromap array to reference from the cluster
+  * pname:opacityMicromapArray is either `0` or specifies the address of a
+    valid opacity micromap array to reference from the cluster acceleration
+    structure.
+    If it is `0`, then opacity micromaps will be disabled for this cluster
     acceleration structure.
-    If it is `NULL`, then opacity micromaps will be disabled for this
-    cluster acceleration structure.
-  * pname:opacityMicromapIndexBuffer is either `NULL` or specifies the
-    address of a strided array with size equal to the number of triangles or
-    indices into the opacity micromap array.
+  * pname:opacityMicromapIndexBuffer is either `0` or specifies the address
+    of a strided array with size equal to the number of triangles or indices
+    into the opacity micromap array.
+    If pname:opacityMicromapIndexBuffer is `0` then the index used is the
+    index of the triangle in the geometry.
 
 The C language specification does not define the ordering of bit-fields, but
 in practice, this structure produces the correct layout with existing
@@ -961,6 +938,11 @@ pattern.
     The maximum geometry index after using the values in
     pname:baseGeometryIndex and pname:geometryIndexBuffer must: be less than
     slink:VkPhysicalDeviceClusterAccelerationStructurePropertiesNV::pname:maxClusterGeometryIndex
+  * [[VUID-VkClusterAccelerationStructureBuildTriangleClusterInfoNV-opacityMicromapArray-10881]]
+    If pname:opacityMicromapArray is not `0`, then the cluster acceleration
+    structure must: have been built with
+    ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_CLUSTER_OPACITY_MICROMAPS_BIT_NV
+    flag set in slink:VkClusterAccelerationStructureInputInfoNV::pname:flags
 ****
 
 include::{generated}/validity/structs/VkClusterAccelerationStructureBuildTriangleClusterInfoNV.adoc[]
@@ -1032,23 +1014,25 @@ include::{generated}/api/structs/VkClusterAccelerationStructureBuildTriangleClus
     pname:opacityMicromapIndexBuffer.
   * pname:indexBuffer contains the indices of vertices in the cluster and is
     of type pname:indexType.
-  * pname:vertexBuffer is either `NULL` or specifies the vertex data of the
+  * pname:vertexBuffer is either `0` or specifies the vertex data of the
     triangles in the cluster template with format specified in
     slink:VkClusterAccelerationStructureTriangleClusterInputNV::pname:vertexFormat.
-  * pname:geometryIndexAndFlagsBuffer is either `NULL` or an address
-    containing strided
+  * pname:geometryIndexAndFlagsBuffer is either `0` or an address containing
+    strided
     slink:VkClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV
     values specifying the geometry index and flag for every triangle in the
     cluster.
-  * pname:opacityMicromapArray is either `NULL` or specifies the address of
-    a valid opacity micromap array to reference from the cluster
+  * pname:opacityMicromapArray is either `0` or specifies the address of a
+    valid opacity micromap array to reference from the cluster acceleration
+    structure.
+    If it is `0`, then opacity micromaps will be disabled for this cluster
     acceleration structure.
-    If it is `NULL`, then opacity micromaps will be disabled for this
-    cluster acceleration structure.
-  * pname:opacityMicromapIndexBuffer is either `NULL` or specifies the
-    address of a strided array with size equal to the number of triangles or
-    indices into the opacity micromap array.
-  * pname:instantiationBoundingBoxLimit is either `NULL` or specifies the
+  * pname:opacityMicromapIndexBuffer is either `0` or specifies the address
+    of a strided array with size equal to the number of triangles or indices
+    into the opacity micromap array.
+    If pname:opacityMicromapIndexBuffer is `0` then the index used is the
+    index of the triangle in the geometry.
+  * pname:instantiationBoundingBoxLimit is either `0` or specifies the
     address of a bounding box within which all instantiated clusters must:
     lie.
     The bounding box is specified by six 32-bit floating-point values in the
@@ -1112,6 +1096,11 @@ structures, instead, they must: be instantiated into
     The maximum geometry index after using the values in
     pname:baseGeometryIndex and pname:geometryIndexBuffer must: be less than
     slink:VkPhysicalDeviceClusterAccelerationStructurePropertiesNV::pname:maxClusterGeometryIndex
+  * [[VUID-VkClusterAccelerationStructureBuildTriangleClusterTemplateInfoNV-opacityMicromapArray-10882]]
+    If pname:opacityMicromapArray is not `0`, then the template cluster
+    acceleration structure must: have been built with
+    ename:VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_CLUSTER_OPACITY_MICROMAPS_BIT_NV
+    flag set in slink:VkClusterAccelerationStructureInputInfoNV::pname:flags
 ****
 
 include::{generated}/validity/structs/VkClusterAccelerationStructureBuildTriangleClusterTemplateInfoNV.adoc[]
@@ -1134,14 +1123,14 @@ include::{generated}/api/structs/VkClusterAccelerationStructureInstantiateCluste
   * pname:reserved is reserved for future use.
   * pname:clusterTemplateAddress is the address of a previously built
     cluster template.
-  * pname:vertexBuffer is either `NULL` or a slink:VkStridedDeviceAddressNV
+  * pname:vertexBuffer is either `0` or a slink:VkStridedDeviceAddressNV
     structure containing the vertex data for the indexed triangles stored in
     the cluster template.
 
 .Valid Usage
 ****
   * [[VUID-VkClusterAccelerationStructureInstantiateClusterInfoNV-vertexBuffer-10507]]
-    pname:vertexBuffer must: not be `NULL` if the template was built without
+    pname:vertexBuffer must: not be `0` if the template was built without
     vertex data
   * [[VUID-VkClusterAccelerationStructureInstantiateClusterInfoNV-vertexBuffer-10508]]
     The format in pname:vertexBuffer must: match the original format

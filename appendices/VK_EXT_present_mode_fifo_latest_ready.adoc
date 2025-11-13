@@ -34,6 +34,14 @@ be releasing images as new requests become ready.
 
 This additional present mode is useful when using a time-based present API.
 
+=== Promotion to `VK_KHR_present_mode_fifo_latest_ready`
+
+All functionality in this extension is included in
+`apiext:VK_KHR_present_mode_fifo_latest_ready`, with the suffix changed to
+KHR.
+The original type and enum names are still available as aliases of the KHR
+names.
+
 include::{generated}/interfaces/VK_EXT_present_mode_fifo_latest_ready.adoc[]
 
 === Version History

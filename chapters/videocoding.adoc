@@ -847,6 +847,13 @@ ifdef::VK_KHR_video_encode_av1[]
     chain of pname:pCapabilities must: include a
     slink:VkVideoEncodeAV1CapabilitiesKHR structure
 endif::VK_KHR_video_encode_av1[]
+ifdef::VK_VALVE_video_encode_rgb_conversion[]
+  * [[VUID-vkGetPhysicalDeviceVideoCapabilitiesKHR-pNext-10921]]
+    If the pname:pNext chain of pname:pVideoProfile includes a
+    slink:VkVideoEncodeProfileRgbConversionInfoVALVE structure, then the
+    <<features-videoEncodeRgbConversion, pname:videoEncodeRgbConversion>>
+    feature must: be supported
+endif::VK_VALVE_video_encode_rgb_conversion[]
 ****
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceVideoCapabilitiesKHR.adoc[]
@@ -988,38 +995,29 @@ profiles, then this command returns
 ename:VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR.
 
 ifdef::VK_KHR_video_decode_queue[]
-This command also returns ename:VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR if
-slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage does not include
-the appropriate flags as dictated by the decode capability flags returned in
-slink:VkVideoDecodeCapabilitiesKHR::pname:flags for any of the profiles
-specified in the slink:VkVideoProfileListInfoKHR structure provided in the
-pname:pNext chain of pname:pVideoFormatInfo.
-
 If the decode capability flags include
-ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR but not
-ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR, then in
-order to query video format properties for decode DPB and output usage,
-slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage must: include
-both ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR and
-ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR.
-Otherwise, the call will fail with
-ename:VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR.
+ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR, then
+querying video format properties that support both decode DPB and output
+usage can: be done by including both
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR and
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR in
+slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage.
+However, even in this case, querying video format properties with
+slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage including only
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR or
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR will also return formats
+supporting both.
 
-If the decode capability flags include
-ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR but not
-ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR, then in
-order to query video format properties for decode DPB usage,
-slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage must: include
-ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR, but not
-ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR.
-Otherwise, the call will fail with
-ename:VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR.
-Similarly, to query video format properties for decode output usage,
-slink:VkPhysicalDeviceVideoFormatInfoKHR::pname:imageUsage must: include
-ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR, but not
-ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR.
-Otherwise, the call will fail with
-ename:VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR.
+[NOTE]
+====
+This enables application to be able to query all formats supporting
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR and/or
+ename:VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR by just including one of the
+flags, respectively, regardless of whether the implementation supports
+ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR,
+ename:VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR, or both.
+This makes enumerating decode DPB and output formats simpler and unified.
+====
 endif::VK_KHR_video_decode_queue[]
 
 The pname:imageUsage member of the slink:VkPhysicalDeviceVideoFormatInfoKHR
@@ -1141,6 +1139,13 @@ components.a = VK_COMPONENT_SWIZZLE_IDENTITY; // unused, defaults to 1.0
     The pname:pNext chain of pname:pVideoFormatInfo must: include a
     slink:VkVideoProfileListInfoKHR structure with pname:profileCount
     greater than `0`
+ifdef::VK_VALVE_video_encode_rgb_conversion[]
+  * [[VUID-vkGetPhysicalDeviceVideoFormatPropertiesKHR-pNext-10922]]
+    If the pname:pNext chain of pname:pVideoFormatInfo includes a
+    slink:VkVideoEncodeProfileRgbConversionInfoVALVE structure, then the
+    <<features-videoEncodeRgbConversion, pname:videoEncodeRgbConversion>>
+    feature must: be supported
+endif::VK_VALVE_video_encode_rgb_conversion[]
 ****
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceVideoFormatPropertiesKHR.adoc[]
@@ -1423,6 +1428,10 @@ ifdef::VK_KHR_video_encode_quantization_map[]
     specified by pname:pVideoProfile, then pname:flags must: not include
     ename:VK_VIDEO_SESSION_CREATE_ALLOW_ENCODE_EMPHASIS_MAP_BIT_KHR
 endif::VK_KHR_video_encode_quantization_map[]
+  * [[VUID-VkVideoSessionCreateInfoKHR-pVideoProfile-11759]]
+    pname:pVideoProfile->videoCodecOperation must: be supported by the queue
+    family index specified in pname:queueFamilyIndex, as reported in
+    slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations
   * [[VUID-VkVideoSessionCreateInfoKHR-pVideoProfile-04845]]
     pname:pVideoProfile must: be a <<video-profile-support, supported video
     profile>>
@@ -1500,6 +1509,26 @@ ifdef::VK_KHR_video_encode_queue[]
     chain of its pname:pVideoFormatInfo parameter whose pname:pProfiles
     member contains an element matching pname:pVideoProfile
 endif::VK_KHR_video_encode_queue[]
+ifdef::VK_KHR_video_encode_intra_refresh[]
+  * [[VUID-VkVideoSessionCreateInfoKHR-pVideoProfile-10835]]
+    If pname:pVideoProfile->videoCodecOperation specifies an encode
+    operation, the pname:pNext chain of this structure includes a
+    slink:VkVideoEncodeSessionIntraRefreshCreateInfoKHR structure, and its
+    pname:intraRefreshMode member is not
+    ename:VK_VIDEO_ENCODE_INTRA_REFRESH_MODE_NONE_KHR, then the
+    <<features-videoEncodeIntraRefresh,pname:videoEncodeIntraRefresh>>
+    feature must: be enabled
+  * [[VUID-VkVideoSessionCreateInfoKHR-pVideoProfile-10836]]
+    If pname:pVideoProfile->videoCodecOperation specifies an encode
+    operation, the pname:pNext chain of this structure includes a
+    slink:VkVideoEncodeSessionIntraRefreshCreateInfoKHR structure, and its
+    pname:intraRefreshMode member is not
+    ename:VK_VIDEO_ENCODE_INTRA_REFRESH_MODE_NONE_KHR, then
+    pname:intraRefreshMode must: specify one of the bits included in
+    slink:VkVideoEncodeIntraRefreshCapabilitiesKHR::pname:intraRefreshModes,
+    as returned by flink:vkGetPhysicalDeviceVideoCapabilitiesKHR for the
+    video profile specified by pname:pVideoProfile
+endif::VK_KHR_video_encode_intra_refresh[]
   * [[VUID-VkVideoSessionCreateInfoKHR-pStdHeaderVersion-07190]]
     pname:pStdHeaderVersion->extensionName must: match
     slink:VkVideoCapabilitiesKHR::pname:stdHeaderVersion.extensionName, as
@@ -1555,6 +1584,20 @@ ifdef::VK_KHR_video_encode_av1[]
     flink:vkGetPhysicalDeviceVideoCapabilitiesKHR for the video profile
     specified in pname:pVideoProfile
 endif::VK_KHR_video_encode_av1[]
+ifdef::VK_VALVE_video_encode_rgb_conversion[]
+  * [[VUID-VkVideoSessionCreateInfoKHR-pVideoProfile-10923]]
+    If the pname:pVideoProfile->pNext chain includes a
+    slink:VkVideoEncodeProfileRgbConversionInfoVALVE structure, then the
+    <<features-videoEncodeRgbConversion, pname:videoEncodeRgbConversion>>
+    feature must: be enabled
+  * [[VUID-VkVideoSessionCreateInfoKHR-pNext-10924]]
+    If a slink:VkVideoEncodeProfileRgbConversionInfoVALVE structure is
+    included in the pname:pNext chain of pname:pVideoProfile and
+    sname:VkVideoEncodeProfileRgbConversionInfoVALVE::pname:performEncodeRgbConversion
+    is enabled, a slink:VkVideoEncodeSessionRgbConversionCreateInfoVALVE
+    structure must: be included in the pname:pNext chain of
+    slink:VkVideoSessionCreateInfoKHR.
+endif::VK_VALVE_video_encode_rgb_conversion[]
 ****
 
 include::{generated}/validity/structs/VkVideoSessionCreateInfoKHR.adoc[]
@@ -3378,12 +3421,10 @@ endif::VK_KHR_video_encode_queue[]
 
 .Valid Usage
 ****
-  * [[VUID-vkCmdBeginVideoCodingKHR-commandBuffer-07231]]
+  * [[VUID-vkCmdBeginVideoCodingKHR-commandBuffer-11760]]
     The sname:VkCommandPool that pname:commandBuffer was allocated from
-    must: support the video codec operation pname:pBeginInfo->videoSession
-    was created with, as returned by
-    flink:vkGetPhysicalDeviceQueueFamilyProperties2 in
-    slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations
+    must: have been created with the same queue family index that
+    pname:pBeginInfo->videoSession was created with
   * [[VUID-vkCmdBeginVideoCodingKHR-None-07232]]
     There must: be no <<queries-operation-active,active>> queries
   * [[VUID-vkCmdBeginVideoCodingKHR-commandBuffer-07233]]

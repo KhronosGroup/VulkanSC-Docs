@@ -492,7 +492,7 @@ include::{generated}/api/structs/VkIndirectExecutionSetShaderInfoEXT.adoc[]
     set.
     These shaders will be automatically added to the set beginning at index
     `0`.
-  * pname:pSetLayoutInfos is a pointer to an array containing a
+  * pname:pSetLayoutInfos is NULL or a pointer to an array containing a
     slink:VkIndirectExecutionSetShaderLayoutInfoEXT used by each
     corresponding pname:pInitialShaders shader stage in the set.
   * pname:maxShaderCount is the maximum number of shader objects stored in
@@ -507,6 +507,9 @@ shaders added to the set even if they are removed from the set or destroyed.
 
 When an Indirect Execution Set created with shader objects is used,
 pname:pInitialShaders constitutes the initial shader state.
+
+If pname:pSetLayoutInfos is `NULL`, the descriptor layout parameters are
+inherited from the shader object.
 
 .Valid Usage
 ****
@@ -527,6 +530,10 @@ pname:pInitialShaders constitutes the initial shader state.
   * [[VUID-VkIndirectExecutionSetShaderInfoEXT-pInitialShaders-11154]]
     Each member of pname:pInitialShaders must: have been created with
     ename:VK_SHADER_CREATE_INDIRECT_BINDABLE_BIT_EXT
+  * [[VUID-VkIndirectExecutionSetShaderInfoEXT-pSetLayoutInfos-10929]]
+    If pname:pSetLayoutInfos is not `NULL`, the descriptor layout values
+    specified must: be compatible with the descriptor set layouts defined at
+    the creation of the shader object
 ****
 
 include::{generated}/validity/structs/VkIndirectExecutionSetShaderInfoEXT.adoc[]
@@ -825,17 +832,17 @@ endif::VK_NV_device_generated_commands_compute[]
 ****
 include::{chapters}/commonvalidity/draw_common.adoc[]
 include::{chapters}/commonvalidity/draw_vertex_binding.adoc[]
-ifdef::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdExecuteGeneratedCommandsNV-commandBuffer-02970]]
     pname:commandBuffer must: not be a protected command buffer
-endif::VK_VERSION_1_1[]
+endif::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdExecuteGeneratedCommandsNV-isPreprocessed-02908]]
     If pname:isPreprocessed is ename:VK_TRUE then
     flink:vkCmdPreprocessGeneratedCommandsNV must: have already been
     executed on the device, using the same pname:pGeneratedCommandsInfo
     content as well as the content of the input buffers it references (all
     except slink:VkGeneratedCommandsInfoNV::pname:preprocessBuffer).
-    Furthermore pname:pGeneratedCommandsInfo`s pname:indirectCommandsLayout
+    Furthermore, pname:pGeneratedCommandsInfo's pname:indirectCommandsLayout
     must: have been created with the
     ename:VK_INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_NV bit
     set
@@ -964,7 +971,7 @@ endif::VK_NV_device_generated_commands_compute[]
     If pname:preprocessBuffer is non-sparse then it must: be bound
     completely and contiguously to a single sname:VkDeviceMemory object
   * [[VUID-VkGeneratedCommandsInfoNV-preprocessSize-02920]]
-    pname:preprocessSize must: be at least equal to the memory requirement`s
+    pname:preprocessSize must: be at least equal to the memory requirement's
     size returned by flink:vkGetGeneratedCommandsMemoryRequirementsNV using
     the matching inputs (pname:indirectCommandsLayout, ...) as within this
     structure
@@ -1057,13 +1064,13 @@ include::{generated}/api/protos/vkCmdPreprocessGeneratedCommandsNV.adoc[]
 
 .Valid Usage
 ****
-ifdef::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdPreprocessGeneratedCommandsNV-commandBuffer-02974]]
     pname:commandBuffer must: not be a protected command buffer
-endif::VK_VERSION_1_1[]
+endif::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdPreprocessGeneratedCommandsNV-pGeneratedCommandsInfo-02927]]
-    pname:pGeneratedCommandsInfo`s pname:indirectCommandsLayout must: have
-    been created with the
+    pname:pGeneratedCommandsInfo->indirectCommandsLayout must: have been
+    created with the
     ename:VK_INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_NV bit
     set
   * [[VUID-vkCmdPreprocessGeneratedCommandsNV-deviceGeneratedCommands-02928]]
@@ -1141,10 +1148,10 @@ invalidation.
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/draw_common.adoc[]
-ifdef::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdExecuteGeneratedCommandsEXT-commandBuffer-11045]]
     pname:commandBuffer must: not be a protected command buffer
-endif::VK_VERSION_1_1[]
+endif::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdExecuteGeneratedCommandsEXT-isPreprocessed-11046]]
     If pname:isPreprocessed is ename:VK_TRUE and
     flink:vkGetGeneratedCommandsMemoryRequirementsEXT did not return a
@@ -1269,7 +1276,7 @@ endif::VK_EXT_transform_feedback[]
   * [[VUID-vkCmdExecuteGeneratedCommandsEXT-None-11062]]
     If a rendering pass is currently active, the view mask must: be `0`
   * [[VUID-vkCmdExecuteGeneratedCommandsEXT-commandBuffer-11143]]
-    pname:commandBuffer must: not have been created with
+    pname:commandBuffer must: not have been recorded with
     ename:VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
   * [[VUID-vkCmdExecuteGeneratedCommandsEXT-indirectCommandsLayout-10769]]
     If the pname:indirectCommandsLayout member of
@@ -1333,7 +1340,7 @@ indirect token, pname:maxDrawCount is ignored.
 ****
   * [[VUID-VkGeneratedCommandsInfoEXT-preprocessAddress-11063]]
     If flink:vkGetGeneratedCommandsMemoryRequirementsEXT returns a non-zero
-    size, pname:preprocessAddress must: not be `NULL`
+    size, pname:preprocessAddress must: not be `0`
   * [[VUID-VkGeneratedCommandsInfoEXT-preprocessAddress-11064]]
     sname:VkDeviceMemory objects bound to the underlying buffer for
     pname:preprocessAddress must: have been allocated using one of the
@@ -1371,10 +1378,6 @@ indirect token, pname:maxDrawCount is ignored.
     The underlying buffer for pname:preprocessAddress must: have the
     ename:VK_BUFFER_USAGE_2_PREPROCESS_BUFFER_BIT_EXT bit set in its usage
     flag
-  * [[VUID-VkGeneratedCommandsInfoEXT-preprocessAddress-11070]]
-    If the underlying buffer for pname:preprocessAddress is non-sparse then
-    it must: be bound completely and contiguously to a single
-    sname:VkDeviceMemory object
   * [[VUID-VkGeneratedCommandsInfoEXT-indirectCommandsLayout-11144]]
     If the pname:indirectCommandsLayout contains a
     ename:VK_INDIRECT_COMMANDS_TOKEN_TYPE_EXECUTION_SET_EXT token, then the
@@ -1405,12 +1408,6 @@ indirect token, pname:maxDrawCount is ignored.
     must: be aligned to `4`
   * [[VUID-VkGeneratedCommandsInfoEXT-indirectAddress-11074]]
     pname:indirectAddress must: be aligned to `4`
-  * [[VUID-VkGeneratedCommandsInfoEXT-sequenceCountAddress-11075]]
-    If the underlying buffer for pname:sequenceCountAddress is non-sparse
-    then it must: be bound completely and contiguously to a single
-    sname:VkDeviceMemory object
-  * [[VUID-VkGeneratedCommandsInfoEXT-indirectAddress-11076]]
-    pname:indirectAddress must: not be `NULL`
   * [[VUID-VkGeneratedCommandsInfoEXT-indirectAddressSize-11077]]
     pname:indirectAddressSize must: be greater than zero
   * [[VUID-VkGeneratedCommandsInfoEXT-maxDrawCount-11078]]
@@ -1497,10 +1494,10 @@ manner.
 
 .Valid Usage
 ****
-ifdef::VK_VERSION_1_1[]
+ifdef::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdPreprocessGeneratedCommandsEXT-commandBuffer-11081]]
     pname:commandBuffer must: not be a protected command buffer
-endif::VK_VERSION_1_1[]
+endif::VK_BASE_VERSION_1_1[]
   * [[VUID-vkCmdPreprocessGeneratedCommandsEXT-pGeneratedCommandsInfo-11082]]
     pname:pGeneratedCommandsInfo's pname:indirectCommandsLayout must: have
     been created with the
@@ -1541,9 +1538,15 @@ ename:VK_INDIRECT_COMMANDS_TOKEN_TYPE_PUSH_CONSTANT_EXT or
 ename:VK_INDIRECT_COMMANDS_TOKEN_TYPE_SEQUENCE_INDEX_EXT token, then those
 values override the push constants that were previously pushed.
 
-All state bound on pname:stateCommandBuffer will be used.
-All state bound on pname:stateCommandBuffer must: be identical to the state
-bound at the time flink:vkCmdExecuteGeneratedCommandsEXT is recorded.
+All <<fundamentals-queueoperation-command-types, State-setting commands>>
+that are bound on pname:stateCommandBuffer will be used.
+Any parameters set by those commands must: be set identically in a command
+buffer that flink:vkCmdExecuteGeneratedCommandsEXT is recorded into, at the
+point flink:vkCmdExecuteGeneratedCommandsEXT is recorded.
+ifdef::VK_EXT_conditional_rendering[]
+If conditional rendering is used, the predicate value at preprocessing time
+must: match the one at execution time.
+endif::VK_EXT_conditional_rendering[]
 The queue family index pname:stateCommandBuffer was allocated from must: be
 the same as the queue family index of the command buffer used in
 flink:vkCmdExecuteGeneratedCommandsEXT.

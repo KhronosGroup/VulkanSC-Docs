@@ -22,7 +22,7 @@ jobs:
     # We now refer to the container by its SHA instead of the name, to prevent
     # caching problems when updating the image.
     # container: khronosgroup/docker-images:asciidoctor-spec.20240726
-    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
   consistency-check:
     name: Run consistency checks on the spec and XML sources
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
 
     steps:
       # The repo is extracted under /__w/Vulkan-Docs/Vulkan-Docs, apparently
@@ -51,11 +51,29 @@ jobs:
           python3 scripts/check_spec_links.py --html=gen/out/checks/problems.html > /dev/null || true
           make CHECK_XREFS= allchecks
 
+  spec-extension-branch-check:
+    name: Consistency check for extension development branches
+    runs-on: ubuntu-latest
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
+
+    steps:
+      # Consistency check for extension development branches
+      # First verify that SPEC_VERSION >= 1 (-test argument)
+      # Then verify that core + extension spec builds for extension development
+      #   branches (-build argument)
+      # This only runs on merge requests where CI_COMMIT_BRANCH is defined, and is
+      # a valid extension name, or is mapped to one in an exception list in
+      # scripts/testSpecVersion.py
+      - uses: actions/checkout@v4
+      - run: |
+          echo "Branch name is ${{github.ref_name}}"
+          python3 scripts/testSpecVersion.py -branch ${{github.ref_name}} -test -build
+
   # Commented out for Vulkan SC, for now (relies on extensions not supported in VKSC)
   #spec-toolchain:
   #  name: Build a test spec and check against expectation, to make sure the spec toolchain works as expected
   #  runs-on: ubuntu-latest
-  #  container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+  #  container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
 
   #  steps:
   #    - uses: actions/checkout@v4
@@ -64,7 +82,7 @@ jobs:
   spec-core:
     name: Build the core-only spec, to try and catch ifdef errors in extension markup
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
 
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +91,7 @@ jobs:
   spec-generate:
     name: Build the vulkan specification and generate any associated files (such as vulkan.h)
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
 
     steps:
       - uses: actions/checkout@v4
@@ -127,12 +145,6 @@ jobs:
 #          git submodule update --init --recursive -- tinyxml2
 #          rm -rf Vulkan-Docs
 #          ln -s "${SPEC_DIR}" Vulkan-Docs
-#          ##cp -r "${SPEC_DIR}" Vulkan-Docs
-#          # Copy Vulkan C headers into subdir copy used by Vulkan-Hpp
-#          ##cp -p ${SPEC_DIR}/include/vulkan/*.h Vulkan-Docs/include/vulkan/
-#          echo "Files in Vulkan-Docs:"
-#          find Vulkan-Docs -type f
-#          # cd /tmp/Vulkan-Hpp
 #          cmake -H. -Bbuild
 #          make -C build
 #          cd build
@@ -149,7 +161,7 @@ jobs:
   cts-framework-tests:
     name: Run Vulkan CTS framework tests to validate against XML changes
     runs-on: ubuntu-latest
-    container: khronosgroup/docker-images@sha256:503b7e697143cd700e610929c0858c66f5412b846c3c53d96f63c57fe1235c8b
+    container: khronosgroup/docker-images@sha256:0f91e60e1af2bdd889783af3907f63279c08f573f2eccbc31094e348d1a32a4f
     continue-on-error: true
 
     steps:
@@ -198,6 +210,10 @@ jobs:
 #    needs: [spec-generate, hpp-generate]
 #    continue-on-error: true
 #
+#    strategy:
+#      matrix:
+#        cpp_standard: [c++11, c++14, c++17, c++20]
+#
 #    steps:
 #      - uses: actions/checkout@v4
 #      - name: Download generated spec
@@ -215,6 +231,5 @@ jobs:
 #      # Depends on spec-generate and hpp-generate
 #      # Failure (should be) allowed, for now
 #      - run: |
-#          g++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
-#          clang++ -c -std=c++11 -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror tests/hpptest.cpp
-#
+#          g++ -c -std=${{matrix.cpp_standard}} -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror -Wpedantic tests/hpptest.cpp
+#          clang++ -c -std=${{matrix.cpp_standard}} -Igen/include -IVulkan-Hpp -Wall -Wextra -Werror -Wpedantic tests/hpptest.cpp

@@ -80,6 +80,9 @@ def makeGenOpts(args):
     # Whether to disable inclusion protect in headers
     protect = args.protect
 
+    # Whether to enable internal API merging
+    mergeInternalApis = args.mergeInternalApis
+
     # Output target directory
     directory = args.directory
 
@@ -140,6 +143,9 @@ def makeGenOpts(args):
     # APIs to merge
     mergeApiNames = args.mergeApiNames
 
+    if defaultAPIName == "vulkanbase":
+        mergeInternalApis = False
+
     isCTS = args.isCTS
 
     # Try to set up specification generators if the needed modules are available
@@ -173,6 +179,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = genpath,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -198,6 +205,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -216,6 +224,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -234,6 +243,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -257,6 +267,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -277,6 +288,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -299,6 +311,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = None,
@@ -318,6 +331,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -338,6 +352,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -355,6 +370,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -375,6 +391,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -395,6 +412,7 @@ def makeGenOpts(args):
                 directory         = directory,
                 genpath           = None,
                 apiname           = defaultAPIName,
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = featuresPat,
                 emitversions      = featuresPat,
@@ -432,6 +450,7 @@ def makeGenOpts(args):
     betaRequireExtensions = [
         'VK_KHR_portability_subset',
         'VK_NV_displacement_micromap',
+        'VK_AMDX_dense_geometry_format',
         'VK_AMDX_shader_enqueue',
         'VK_NV_cuda_kernel_launch',
     ]
@@ -474,7 +493,8 @@ def makeGenOpts(args):
         [ 'vulkan_metal.h',       [ 'VK_EXT_metal_surface',
                                     'VK_EXT_metal_objects',
                                     'VK_EXT_external_memory_metal' ], commonSuppressExtensions ],
-        [ 'vulkan_ohos.h',        ['VK_OHOS_surface'               ], commonSuppressExtensions ],
+        ['vulkan_ohos.h',         ['VK_OHOS_surface',
+                                   'VK_OHOS_native_buffer' ], commonSuppressExtensions],
         [ 'vulkan_screen.h',      [ 'VK_QNX_screen_surface',
                                     'VK_QNX_external_memory_screen_buffer' ], commonSuppressExtensions ],
         [ 'vulkan_sci.h',         [ 'VK_NV_external_sci_sync',
@@ -500,6 +520,7 @@ def makeGenOpts(args):
             genpath           = None,
             apiname           = defaultAPIName,
             mergeApiNames     = mergeApiNames,
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = featuresPat,
             emitversions      = None,
@@ -544,6 +565,7 @@ def makeGenOpts(args):
             genpath           = None,
             apiname           = defaultAPIName,
             mergeApiNames     = mergeApiNames,
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = featuresPat,
             emitversions      = featuresPat,
@@ -567,8 +589,39 @@ def makeGenOpts(args):
             misracppstyle     = misracppstyle)
         ]
 
+    genOpts['vulkan_base_core.h'] = [
+          COutputGenerator,
+          CGeneratorOptions(
+            conventions       = conventions,
+            filename          = 'vulkan_base_core.h',
+            directory         = directory,
+            genpath           = None,
+            apiname           = defaultAPIName,
+            mergeApiNames     = mergeApiNames,
+            mergeInternalApis = mergeInternalApis,
+            profile           = None,
+            versions          = featuresPat,
+            emitversions      = featuresPat,
+            defaultExtensions = defaultExtensions,
+            addExtensions     = addExtensionsPat,
+            removeExtensions  = removeExtensionsPat,
+            emitExtensions    = emitExtensionsPat,
+            prefixText        = prefixStrings + vkPrefixStrings,
+            genFuncPointers   = True,
+            protectFile       = protectFile,
+            protectFeature    = False,
+            protectProto      = '#ifndef',
+            protectProtoStr   = 'VK_NO_PROTOTYPES',
+            apicall           = 'VKAPI_ATTR ',
+            apientry          = 'VKAPI_CALL ',
+            apientryp         = 'VKAPI_PTR *',
+            alignFuncParam    = 48,
+            misracstyle       = misracstyle,
+            misracppstyle     = misracppstyle)
+        ]
+
     # Vulkan versions to include for SC header - SC *removes* features from 1.0/1.1/1.2
-    scVersions = makeREstring(['VK_VERSION_1_0', 'VK_VERSION_1_1', 'VK_VERSION_1_2', 'VKSC_VERSION_1_0'])
+    scVersions = makeREstring(['VK_BASE_VERSION_1_0', 'VK_COMPUTE_VERSION_1_0', 'VK_GRAPHICS_VERSION_1_0', 'VK_VERSION_1_0', 'VK_BASE_VERSION_1_1', 'VK_COMPUTE_VERSION_1_1', 'VK_GRAPHICS_VERSION_1_1', 'VK_VERSION_1_1', 'VK_BASE_VERSION_1_2', 'VK_COMPUTE_VERSION_1_2', 'VK_GRAPHICS_VERSION_1_2', 'VK_VERSION_1_2', 'VKSC_VERSION_1_0'])
 
     genOpts['vulkan_sc_core.h'] = [
           COutputGenerator,
@@ -577,6 +630,7 @@ def makeGenOpts(args):
             filename          = 'vulkan_sc_core.h',
             directory         = directory,
             apiname           = 'vulkansc',
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = scVersions,
             emitversions      = scVersions,
@@ -607,6 +661,7 @@ def makeGenOpts(args):
             filename          = 'vulkan_sc_core.hpp',
             directory         = directory,
             apiname           = 'vulkansc',
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = scVersions,
             emitversions      = scVersions,
@@ -645,6 +700,7 @@ def makeGenOpts(args):
                 filename          = 'vk.json',
                 directory         = directory,
                 apiname           = 'vulkansc',
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = scVersions,
                 emitversions      = scVersions,
@@ -672,6 +728,7 @@ def makeGenOpts(args):
                     filename          = 'vulkan_json_data.hpp',
                     directory         = directory,
                     apiname           = 'vulkan',
+                    mergeInternalApis = mergeInternalApis,
                     profile           = None,
                     versions          = featuresPat,
                     emitversions      = featuresPat,
@@ -699,6 +756,7 @@ def makeGenOpts(args):
                 filename          = 'vulkan_json_data.hpp',
                 directory         = directory,
                 apiname           = 'vulkansc',
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = scVersions,
                 emitversions      = scVersions,
@@ -733,6 +791,7 @@ def makeGenOpts(args):
                 filename          = 'vulkan_json_gen.h',
                 directory         = directory,
                 apiname           = 'vulkansc',
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = scVersions,
                 emitversions      = scVersions,
@@ -760,6 +819,7 @@ def makeGenOpts(args):
                 filename          = 'vulkan_json_gen.c',
                 directory         = directory,
                 apiname           = 'vulkansc',
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = scVersions,
                 emitversions      = scVersions,
@@ -786,6 +846,7 @@ def makeGenOpts(args):
                 filename          = 'vulkan_json_parser.hpp',
                 directory         = directory,
                 apiname           = 'vulkansc',
+                mergeInternalApis = mergeInternalApis,
                 profile           = None,
                 versions          = scVersions,
                 emitversions      = scVersions,
@@ -822,6 +883,7 @@ def makeGenOpts(args):
             directory         = directory,
             genpath           = None,
             apiname           = defaultAPIName,
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = 'VK_VERSION_1_0',
             emitversions      = 'VK_VERSION_1_0',
@@ -942,6 +1004,7 @@ def makeGenOpts(args):
             directory         = directory,
             genpath           = None,
             apiname           = defaultAPIName,
+            mergeInternalApis = mergeInternalApis,
             profile           = None,
             versions          = '^VK_VERSION_1_[01]$',
             emitversions      = '^VK_VERSION_1_[01]$',
@@ -1104,6 +1167,9 @@ if __name__ == '__main__':
                         help='generate MISRA C++-friendly headers')
     parser.add_argument('--iscts', action='store_true', dest='isCTS',
                         help='Specify if this should generate CTS compatible code')
+    parser.add_argument('-no-internal-api-merging', dest='mergeInternalApis', action='store_false',
+                        default=True,
+                        help='Disable merging of internal APIs into public APIs')
 
     args = parser.parse_args()
 

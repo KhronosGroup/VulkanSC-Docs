@@ -7,8 +7,11 @@ include::{generated}/meta/{refprefix}VK_EXT_swapchain_maintenance1.adoc[]
 === Other Extension Metadata
 
 *Last Modified Date*::
-    2022-10-28
+    2022-12-16
+*Interactions and External Dependencies*::
+  - Promoted to `apiext:VK_KHR_swapchain_maintenance1`
 *Contributors*::
+  - James Jones, NVIDIA
   - Jeff Juliano, NVIDIA
   - Shahbaz Youssefi, Google
   - Chris Forbes, Google
@@ -48,11 +51,18 @@ The new features are as follows:
   * Allow applications to release previously acquired images without
     presenting them.
 
+=== Promotion to `VK_KHR_swapchain_maintenance1`
+
+All functionality in this extension is included in
+`apiext:VK_KHR_swapchain_maintenance1`, with the suffix changed to KHR.
+The original type, enum and command names are still available as aliases of
+the KHR functionality.
+
 include::{generated}/interfaces/VK_EXT_swapchain_maintenance1.adoc[]
 
 === Version History
 
-  * Revision 0, 2019-05-28
+  * Revision 0, 2019-05-28 (James Jones)
   ** Initial revisions
   * Revision 1, 2022-08-21 (Shahbaz Youssefi)
   ** Add functionality and complete spec

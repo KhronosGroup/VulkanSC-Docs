@@ -29,8 +29,6 @@ Private data slots are represented by sname:VkPrivateDataSlot handles:
 include::{generated}/api/handles/VkPrivateDataSlot.adoc[]
 
 ifdef::VK_EXT_private_data[]
-or the equivalent
-
 include::{generated}/api/handles/VkPrivateDataSlotEXT.adoc[]
 endif::VK_EXT_private_data[]
 --
@@ -39,11 +37,9 @@ endif::VK_EXT_private_data[]
 --
 To create a private data slot, call:
 
-ifdef::VK_VERSION_1_3[]
+ifdef::VK_BASE_VERSION_1_3[]
 include::{generated}/api/protos/vkCreatePrivateDataSlot.adoc[]
-endif::VK_VERSION_1_3[]
-
-ifdef::VK_VERSION_1_3+VK_EXT_private_data[or the equivalent command]
+endif::VK_BASE_VERSION_1_3[]
 
 ifdef::VK_EXT_private_data[]
 include::{generated}/api/protos/vkCreatePrivateDataSlotEXT.adoc[]
@@ -81,8 +77,6 @@ The sname:VkPrivateDataSlotCreateInfo structure is defined as:
 include::{generated}/api/structs/VkPrivateDataSlotCreateInfo.adoc[]
 
 ifdef::VK_EXT_private_data[]
-or the equivalent
-
 include::{generated}/api/structs/VkPrivateDataSlotCreateInfoEXT.adoc[]
 endif::VK_EXT_private_data[]
 
@@ -99,8 +93,6 @@ include::{generated}/validity/structs/VkPrivateDataSlotCreateInfo.adoc[]
 include::{generated}/api/flags/VkPrivateDataSlotCreateFlags.adoc[]
 
 ifdef::VK_EXT_private_data[]
-or the equivalent
-
 include::{generated}/api/flags/VkPrivateDataSlotCreateFlagsEXT.adoc[]
 endif::VK_EXT_private_data[]
 
@@ -112,11 +104,9 @@ is currently reserved for future use.
 --
 To destroy a private data slot, call:
 
-ifdef::VK_VERSION_1_3[]
+ifdef::VK_BASE_VERSION_1_3[]
 include::{generated}/api/protos/vkDestroyPrivateDataSlot.adoc[]
-endif::VK_VERSION_1_3[]
-
-ifdef::VK_VERSION_1_3+VK_EXT_private_data[or the equivalent command]
+endif::VK_BASE_VERSION_1_3[]
 
 ifdef::VK_EXT_private_data[]
 include::{generated}/api/protos/vkDestroyPrivateDataSlotEXT.adoc[]
@@ -148,11 +138,9 @@ include::{generated}/validity/protos/vkDestroyPrivateDataSlot.adoc[]
 To store application-defined data in a slot associated with a Vulkan object,
 call:
 
-ifdef::VK_VERSION_1_3[]
+ifdef::VK_BASE_VERSION_1_3[]
 include::{generated}/api/protos/vkSetPrivateData.adoc[]
-endif::VK_VERSION_1_3[]
-
-ifdef::VK_VERSION_1_3+VK_EXT_private_data[or the equivalent command]
+endif::VK_BASE_VERSION_1_3[]
 
 ifdef::VK_EXT_private_data[]
 include::{generated}/api/protos/vkSetPrivateDataEXT.adoc[]
@@ -184,11 +172,9 @@ include::{generated}/validity/protos/vkSetPrivateData.adoc[]
 To retrieve application-defined data from a slot associated with a Vulkan
 object, call:
 
-ifdef::VK_VERSION_1_3[]
+ifdef::VK_BASE_VERSION_1_3[]
 include::{generated}/api/protos/vkGetPrivateData.adoc[]
-endif::VK_VERSION_1_3[]
-
-ifdef::VK_VERSION_1_3+VK_EXT_private_data[or the equivalent command]
+endif::VK_BASE_VERSION_1_3[]
 
 ifdef::VK_EXT_private_data[]
 include::{generated}/api/protos/vkGetPrivateDataEXT.adoc[]
