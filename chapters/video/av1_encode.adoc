@@ -1,5 +1,4 @@
-// Copyright 2023-2025 The Khronos Group Inc.
-//
+// Copyright 2023-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[encode-av1]]
@@ -563,7 +562,7 @@ the implementation.
 It is important to note that both the bits of these masks and the elements
 of pname:referenceNameSlotIndices are indexed such that the first value
 specifies the support bit and DPB slot index, respectively, for the AV1
-reference name ename:STD_VIDEO_AV1_REFERENCE_NAME_LAST_FRAME (i.e. there is
+reference name code:STD_VIDEO_AV1_REFERENCE_NAME_LAST_FRAME (i.e. there is
 no bit or element for code:STD_VIDEO_AV1_REFERENCE_NAME_INTRA_FRAME).
 ====
 
@@ -672,7 +671,7 @@ include::{generated}/api/enums/VkVideoEncodeAV1StdFlagBitsKHR.adoc[]
     application-provided value for
     code:StdVideoAV1TileInfoFlags::code:uniform_tile_spacing_flag in the
     <<encode-av1-tile-params,AV1 tile parameters>> when that value is `1`,
-    indifferent of the coded extent of the <<encode-input-picture,encode
+    regardless of the coded extent of the <<encode-input-picture,encode
     input picture>> and the number of tile columns and rows requested in the
     pname:TileCols and pname:TileRows members of code:StdVideoAV1TileInfo.
   * ename:VK_VIDEO_ENCODE_AV1_STD_SKIP_MODE_PRESENT_UNSET_BIT_KHR specifies
@@ -1326,7 +1325,7 @@ include::{generated}/api/enums/VkVideoEncodeAV1RateControlGroupKHR.adoc[]
 [NOTE]
 ====
 While the application can specify any rate control group for any frame,
-indifferent of the frame type, prediction mode, or prediction direction,
+regardless of the frame type, prediction mode, or prediction direction,
 specifying a rate control group that does not reflect the prediction
 direction used by the encoded frame may result in unexpected behavior of the
 implementation's rate control algorithm.
@@ -1342,9 +1341,7 @@ A regular GOP is defined by the following parameters:
     ename:VK_VIDEO_ENCODE_AV1_RATE_CONTROL_GROUP_BIPREDICTIVE_KHR between
     frames encoded with other rate control groups in display order.
 
-GOPs are further classified as _open_ and _closed_ GOPs.
-
-Frame types in an open GOP follow each other in display order according to
+Frame types in a regular GOP follow each other in display order according to
 the following algorithm:
 
   1. The first frame is always a frame encoded with
@@ -1356,15 +1353,13 @@ the following algorithm:
      ename:VK_VIDEO_ENCODE_AV1_RATE_CONTROL_GROUP_PREDICTIVE_KHR and the
      algorithm continues from step 2.
 
-[[encode-av1-open-gop]]
-image::{images}/av1_open_gop.svg[align="center",title="AV1 open GOP",opts="{imageopts}"]
+image::{images}/av1_regular_gop.svg[align="center",title="AV1 regular GOP starting with an intra-only frame",opts="{imageopts}"]
 
 [[encode-av1-key-frame-period]]
-In case of a closed GOP, a frame with the AV1 frame type
-code:STD_VIDEO_AV1_FRAME_TYPE_KEY is used at a certain period.
-
-[[encode-av1-closed-gop]]
-image::{images}/av1_closed_gop.svg[align="center",title="AV1 closed GOP",opts="{imageopts}"]
+When frames with the AV1 frame type code:STD_VIDEO_AV1_FRAME_TYPE_KEY are
+used in a video sequence, the _key frame period_ refers to the distance
+between subsequent frames with the AV1 frame type
+code:STD_VIDEO_AV1_FRAME_TYPE_KEY.
 
 It is also typical for AV1 encoding to use specific reference picture usage
 patterns across the frames of the GOP.
@@ -1906,6 +1901,7 @@ operation ename:VK_VIDEO_CODEC_OPERATION_ENCODE_AV1_BIT_KHR, as returned by
 flink:vkGetPhysicalDeviceQueueFamilyProperties2 in
 slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations.
 
+[[av1_encode-required-video-std-header-versions-table]]
 .Required <<video-std-header-version,Video Std Header Versions>>
 [options="header"]
 |====
@@ -1913,6 +1909,7 @@ slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations.
 | `vulkan_video_codec_av1std_encode` | 1.0.0
 |====
 
+[[av1_encode-required-video-capabilities-table]]
 .Required Video Capabilities
 [width="100%",cols="<35,<14,<11",options="header"]
 |====

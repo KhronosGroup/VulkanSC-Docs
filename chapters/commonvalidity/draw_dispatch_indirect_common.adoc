@@ -1,4 +1,4 @@
-// Copyright 2019-2025 The Khronos Group Inc.
+// Copyright 2019-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -9,7 +9,7 @@
     contiguously to a single sname:VkDeviceMemory object
   * [[VUID-{refpage}-buffer-02709]]
     pname:buffer must: have been created with the
-    ename:VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT bit set
+    ename:VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT usage flag set
   * [[VUID-{refpage}-offset-02710]]
     pname:offset must: be a multiple of `4`
 ifdef::VK_BASE_VERSION_1_1[]

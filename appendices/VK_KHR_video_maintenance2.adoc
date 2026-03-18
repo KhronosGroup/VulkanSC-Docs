@@ -1,4 +1,4 @@
-// Copyright 2023-2025 The Khronos Group Inc.
+// Copyright 2023-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -13,7 +13,7 @@ include::{generated}/meta/{refprefix}VK_KHR_video_maintenance2.adoc[]
 *Contributors*::
   - Ahmed Abdelkhalek, AMD
   - Benjamin Cheng, AMD
-  - Aidan Fabius, Core Avionics & Industrial Inc.
+  - Aidan Fabius, Lynx
   - Ping Liu, Intel
   - Lynne Iribarren, Independent
   - Srinath Kumarapuram, NVIDIA

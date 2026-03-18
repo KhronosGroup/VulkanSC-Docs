@@ -1,4 +1,4 @@
-// Copyright 2023-2025 The Khronos Group Inc.
+// Copyright 2023-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -263,7 +263,7 @@ that is compatible with fickle hardware requirements.
 
 == Issues
 
-=== RESOLVED: OUT OF SCOPE. How to determine if a resource's external memory is modified?
+=== OUT OF SCOPE. How to determine if a resource's external memory is modified?
 
 This proposal does not provide a way for the application to query whether the
 resource's external memory was modified by an external queue family,

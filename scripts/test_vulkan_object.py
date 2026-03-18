@@ -1,6 +1,6 @@
 #!/usr/bin/env python3 -i
 #
-# Copyright 2025 The Khronos Group Inc.
+# Copyright 2025-2026 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 import os
@@ -100,6 +100,10 @@ class MyGenerator(BaseGenerator):
                 assert isinstance(plane, FormatPlane)
             for extent in format.blockExtent:
                 assert isinstance(extent, str)
+        for funcPointer in self.vk.funcPointers.values():
+            assert isinstance(funcPointer, FuncPointer)
+            for param in funcPointer.params:
+                assert isinstance(param, FuncPointerParam)
         for extension in self.vk.extensions.values():
             assert isinstance(extension, Extension)
             for special in extension.specialUse:
@@ -114,9 +118,8 @@ class MyGenerator(BaseGenerator):
                 assert isinstance(enum, Enum)
             for bitmask in extension.bitmasks:
                 assert isinstance(bitmask, Bitmask)
-            for flags in extension.flags.values():
-                for flag in flags:
-                    assert isinstance(flag, Flags)
+            for flag in extension.flags:
+                assert isinstance(flag, Flags)
             for enumFields in extension.enumFields.values():
                 for enum in enumFields:
                     assert isinstance(enum, EnumField)

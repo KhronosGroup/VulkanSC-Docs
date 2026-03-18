@@ -1,4 +1,4 @@
-// Copyright 2022-2025 The Khronos Group Inc.
+// Copyright 2022-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -332,7 +332,7 @@ typedef struct VkReleaseSwapchainImagesInfoEXT {
 
 == Issues
 
-=== RESOLVED: Should there be a surface capability bit to advertise the present fence functionality?
+=== Should there be a surface capability bit to advertise the present fence functionality?
 
 No.
 Present fences fix a critical hole in the swapchain programming model and hence

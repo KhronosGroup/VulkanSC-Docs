@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2020 Khronos Group.
-//
+// Copyright 2014-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [appendix]
@@ -29,7 +28,7 @@ The following items have been added to Vulkan SC:
 | <<pipelines,Pipelines>> a| include::{chapters}/pipelines.adoc[tag=scaddition]
 | <<memory,Memory Allocation>> a| include::{chapters}/memory.adoc[tag=scaddition]
 | <<features,Features>> a| include::{chapters}/features.adoc[tag=scaddition]
-| <<debugging,Debugging>> a| include::{chapters}/fault_handling.adoc[tag=scaddition]
+| <<debugging,Debugging>> a| include::{chapters}/debugging.adoc[tag=scaddition]
 |===
 
 == Modifications
@@ -54,7 +53,7 @@ endif::editing-notes[]
 | <<resources,Resource Creation>> a| include::{chapters}/resources.adoc[tag=scdeviation]
 | <<descriptorsets,Resource Descriptors>> a| include::{chapters}/descriptorsets.adoc[tag=scdeviation]
 | <<sparsememory,Sparse Resources>> a| include::{chapters}/sparsemem.adoc[tag=scdeviation]
-| <<wsi,WSI Swapchain>> a| include::{chapters}/VK_KHR_swapchain/wsi.adoc[tag=scdeviation]
+| <<wsi,WSI Swapchain>> a| include::{chapters}/VK_KHR_surface/wsi.adoc[tag=scdeviation]
 | <<features,Features>> a| include::{chapters}/features.adoc[tag=scdeviation]
 | <<limits,Limits>> a| include::{chapters}/limits.adoc[tag=scdeviation]
 |===
@@ -85,7 +84,7 @@ endif::editing-notes[]
 | <<fragops,Fragment Operations>> a| include::{chapters}/fragops.adoc[tag=scremoved]
 | <<sparsememory,Sparse Resources>> a| include::{chapters}/sparsemem.adoc[tag=scremoved]
 | <<wsi,Window System Integration>> a| include::{chapters}/VK_KHR_surface/wsi.adoc[tag=scremoved]
-| <<wsi,WSI Swapchain>> a| include::{chapters}/VK_KHR_swapchain/wsi.adoc[tag=scremoved]
+| <<wsi,WSI Swapchain>> a| include::{chapters}/VK_KHR_surface/wsi.adoc[tag=scremoved_swapchain]
 |===
 
 == Extension Support

@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [appendix]
@@ -29,13 +28,14 @@ Specification.
 [[appendix-compressedtex-bc]]
 == Block-Compressed Image Formats
 
-BC1, BC2 and BC3 formats are described in "`S3TC Compressed Texture Image
+BC1, BC2, and BC3 formats are described in "`S3TC Compressed Texture Image
 Formats`" chapter of the <<data-format,Khronos Data Format Specification>>.
 BC4 and BC5 are described in the "`RGTC Compressed Texture Image Formats`"
 chapter.
 BC6H and BC7 are described in the "`BPTC Compressed Texture Image Formats`"
 chapter.
 
+[[compressedtex-mapping-of-vulkan-bc-formats-to-descriptions-table]]
 .Mapping of Vulkan BC Formats to Descriptions
 [width="90%",options="header",cols="5,4"]
 |====
@@ -70,6 +70,7 @@ chapter.
 The following formats are described in the "`ETC2 Compressed Texture Image
 Formats`" chapter of the <<data-format,Khronos Data Format Specification>>.
 
+[[compressedtex-mapping-of-vulkan-etc-formats-to-descriptions-table]]
 .Mapping of Vulkan ETC Formats to Descriptions
 [options="header",cols="1,1"]
 |====
@@ -95,6 +96,7 @@ Formats`" chapter of the <<data-format,Khronos Data Format Specification>>.
 ASTC formats are described in the "`ASTC Compressed Texture Image Formats`"
 chapter of the <<data-format,Khronos Data Format Specification>>.
 
+[[compressedtex-mapping-of-vulkan-astc-formats-to-descriptions-table]]
 .Mapping of Vulkan ASTC Formats to Descriptions
 [width="90%",options="header",cols="55%,20%,25%"]
 |====
@@ -143,6 +145,38 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
 | ename:VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK     ^|[eq]#12 {times} 10# ^|HDR
 | ename:VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK     ^|[eq]#12 {times} 12# ^|HDR
 endif::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
+ifdef::VK_EXT_texture_compression_astc_3d[]
+| ename:VK_FORMAT_ASTC_3x3x3_UNORM_BLOCK_EXT  ^|[eq]#3 {times} 3 {times} 3#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_3x3x3_SRGB_BLOCK_EXT   ^|[eq]#3 {times} 3 {times} 3#   ^|sRGB
+| ename:VK_FORMAT_ASTC_3x3x3_SFLOAT_BLOCK_EXT ^|[eq]#3 {times} 3 {times} 3#   ^|HDR
+| ename:VK_FORMAT_ASTC_4x3x3_UNORM_BLOCK_EXT  ^|[eq]#4 {times} 3 {times} 3#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_4x3x3_SRGB_BLOCK_EXT   ^|[eq]#4 {times} 3 {times} 3#   ^|sRGB
+| ename:VK_FORMAT_ASTC_4x3x3_SFLOAT_BLOCK_EXT ^|[eq]#4 {times} 3 {times} 3#   ^|HDR
+| ename:VK_FORMAT_ASTC_4x4x3_UNORM_BLOCK_EXT  ^|[eq]#4 {times} 4 {times} 3#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_4x4x3_SRGB_BLOCK_EXT   ^|[eq]#4 {times} 4 {times} 3#   ^|sRGB
+| ename:VK_FORMAT_ASTC_4x4x3_SFLOAT_BLOCK_EXT ^|[eq]#4 {times} 4 {times} 3#   ^|HDR
+| ename:VK_FORMAT_ASTC_4x4x4_UNORM_BLOCK_EXT  ^|[eq]#4 {times} 4 {times} 4#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_4x4x4_SRGB_BLOCK_EXT   ^|[eq]#4 {times} 4 {times} 4#   ^|sRGB
+| ename:VK_FORMAT_ASTC_4x4x4_SFLOAT_BLOCK_EXT ^|[eq]#4 {times} 4 {times} 4#   ^|HDR
+| ename:VK_FORMAT_ASTC_5x4x4_UNORM_BLOCK_EXT  ^|[eq]#5 {times} 4 {times} 4#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_5x4x4_SRGB_BLOCK_EXT   ^|[eq]#5 {times} 4 {times} 4#   ^|sRGB
+| ename:VK_FORMAT_ASTC_5x4x4_SFLOAT_BLOCK_EXT ^|[eq]#5 {times} 4 {times} 4#   ^|HDR
+| ename:VK_FORMAT_ASTC_5x5x4_UNORM_BLOCK_EXT  ^|[eq]#5 {times} 5 {times} 4#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_5x5x4_SRGB_BLOCK_EXT   ^|[eq]#5 {times} 5 {times} 4#   ^|sRGB
+| ename:VK_FORMAT_ASTC_5x5x4_SFLOAT_BLOCK_EXT ^|[eq]#5 {times} 5 {times} 4#   ^|HDR
+| ename:VK_FORMAT_ASTC_5x5x5_UNORM_BLOCK_EXT  ^|[eq]#5 {times} 5 {times} 5#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_5x5x5_SRGB_BLOCK_EXT   ^|[eq]#5 {times} 5 {times} 5#   ^|sRGB
+| ename:VK_FORMAT_ASTC_5x5x5_SFLOAT_BLOCK_EXT ^|[eq]#5 {times} 5 {times} 5#   ^|HDR
+| ename:VK_FORMAT_ASTC_6x5x5_UNORM_BLOCK_EXT  ^|[eq]#6 {times} 5 {times} 5#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_6x5x5_SRGB_BLOCK_EXT   ^|[eq]#6 {times} 5 {times} 5#   ^|sRGB
+| ename:VK_FORMAT_ASTC_6x5x5_SFLOAT_BLOCK_EXT ^|[eq]#6 {times} 5 {times} 5#   ^|HDR
+| ename:VK_FORMAT_ASTC_6x6x5_UNORM_BLOCK_EXT  ^|[eq]#6 {times} 6 {times} 5#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_6x6x5_SRGB_BLOCK_EXT   ^|[eq]#6 {times} 6 {times} 5#   ^|sRGB
+| ename:VK_FORMAT_ASTC_6x6x5_SFLOAT_BLOCK_EXT ^|[eq]#6 {times} 6 {times} 5#   ^|HDR
+| ename:VK_FORMAT_ASTC_6x6x6_UNORM_BLOCK_EXT  ^|[eq]#6 {times} 6 {times} 6#   ^|Linear LDR
+| ename:VK_FORMAT_ASTC_6x6x6_SRGB_BLOCK_EXT   ^|[eq]#6 {times} 6 {times} 6#   ^|sRGB
+| ename:VK_FORMAT_ASTC_6x6x6_SFLOAT_BLOCK_EXT ^|[eq]#6 {times} 6 {times} 6#   ^|HDR
+endif::VK_EXT_texture_compression_astc_3d[]
 |====
 
 ifndef::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
@@ -169,6 +203,7 @@ ifdef::VK_EXT_astc_decode_mode[]
 If the `VK_EXT_astc_decode_mode` extension is enabled, the decode mode is
 determined as follows:
 
+[[compressedtex-mapping-of-vulkan-astc-decoding-format-to-astc-decoding-modes-table]]
 .Mapping of Vulkan ASTC Decoding Format to ASTC Decoding Modes
 [width="75%",options="header",cols="75%,25%"]
 |====
@@ -200,6 +235,7 @@ ifdef::VK_IMG_format_pvrtc[]
 PVRTC formats are described in the "`PVRTC Compressed Texture Image
 Formats`" chapter of the <<data-format,Khronos Data Format Specification>>.
 
+[[compressedtex-mapping-of-vulkan-pvrtc-formats-to-descriptions-table]]
 .Mapping of Vulkan PVRTC Formats to Descriptions
 [width="75%",options="header",cols="63%,15%,22%"]
 |====

@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 // This text fragment is used many times in the Features chapter.
@@ -58,10 +57,9 @@ consistently: either all must: be reported as supported, or none of them.
 When a promoted extension is available, any corresponding feature aliases
 must: be supported.
 
-[[features-extension-aliases]]
-.Extension Feature Aliases
-
 // Jon 1.3 TBD - add any appropriate extensions promoted to 1.3
+[[features-extension-aliases-table]]
+.Extension Feature Aliases
 [width="100%",options="header"]
 |====
 | Extension                                    | Feature(s)
@@ -579,9 +577,9 @@ capability, are already covered by core Vulkan
   * [[features-shaderStorageImageMultisample]]
     pname:shaderStorageImageMultisample specifies whether multisampled
     storage images are supported.
-    If this feature is not enabled, images that are created with a
-    pname:usage that includes ename:VK_IMAGE_USAGE_STORAGE_BIT must: be
-    created with pname:samples equal to ename:VK_SAMPLE_COUNT_1_BIT.
+    If this feature is not enabled, images that are created with the
+    ename:VK_IMAGE_USAGE_STORAGE_BIT usage flag set must: be created with
+    pname:samples equal to ename:VK_SAMPLE_COUNT_1_BIT.
     This also specifies whether shader modules can: declare the
     code:StorageImageMultisample and code:ImageMSArray capabilities.
   * [[features-shaderStorageImageReadWithoutFormat]]
@@ -1038,7 +1036,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceVulkan14Features.adoc[]
 endif::VK_BASE_VERSION_1_4[]
 
 ifdef::VK_COMPUTE_VERSION_1_1,VK_KHR_variable_pointers[]
-[open,refpage='VkPhysicalDeviceVariablePointersFeatures',desc='Structure describing variable pointers features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceVariablePointerFeatures VkPhysicalDeviceVariablePointersFeaturesKHR VkPhysicalDeviceVariablePointerFeaturesKHR']
+[open,refpage='VkPhysicalDeviceVariablePointersFeatures',desc='Structure describing variable pointers features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceVariablePointersFeatures structure is defined as:
 
@@ -1165,20 +1163,20 @@ This structure describes the following features:
 
 // tag::VK_EXT_shader_atomic_float-features[]
   * [[features-shaderBufferFloat32Atomics]] pname:shaderBufferFloat32Atomics
-    indicates whether shaders can: perform 32-bit floating-point load, store
-    and exchange atomic operations on storage buffers.
+    indicates whether shaders can: perform 32-bit floating-point load,
+    store, and exchange atomic operations on storage buffers.
   * [[features-shaderBufferFloat32AtomicAdd]]
     pname:shaderBufferFloat32AtomicAdd indicates whether shaders can:
     perform 32-bit floating-point add atomic operations on storage buffers.
   * [[features-shaderBufferFloat64Atomics]] pname:shaderBufferFloat64Atomics
-    indicates whether shaders can: perform 64-bit floating-point load, store
-    and exchange atomic operations on storage buffers.
+    indicates whether shaders can: perform 64-bit floating-point load,
+    store, and exchange atomic operations on storage buffers.
   * [[features-shaderBufferFloat64AtomicAdd]]
     pname:shaderBufferFloat64AtomicAdd indicates whether shaders can:
     perform 64-bit floating-point add atomic operations on storage buffers.
   * [[features-shaderSharedFloat32Atomics]] pname:shaderSharedFloat32Atomics
-    indicates whether shaders can: perform 32-bit floating-point load, store
-    and exchange atomic operations on shared
+    indicates whether shaders can: perform 32-bit floating-point load,
+    store, and exchange atomic operations on shared
 ifdef::VK_EXT_mesh_shader[]
     and payload
 endif::VK_EXT_mesh_shader[]
@@ -1191,8 +1189,8 @@ ifdef::VK_EXT_mesh_shader[]
 endif::VK_EXT_mesh_shader[]
     memory.
   * [[features-shaderSharedFloat64Atomics]] pname:shaderSharedFloat64Atomics
-    indicates whether shaders can: perform 64-bit floating-point load, store
-    and exchange atomic operations on shared
+    indicates whether shaders can: perform 64-bit floating-point load,
+    store, and exchange atomic operations on shared
 ifdef::VK_EXT_mesh_shader[]
     and payload
 endif::VK_EXT_mesh_shader[]
@@ -1205,13 +1203,13 @@ ifdef::VK_EXT_mesh_shader[]
 endif::VK_EXT_mesh_shader[]
     memory.
   * [[features-shaderImageFloat32Atomics]] pname:shaderImageFloat32Atomics
-    indicates whether shaders can: perform 32-bit floating-point load, store
-    and exchange atomic image operations.
+    indicates whether shaders can: perform 32-bit floating-point load,
+    store, and exchange atomic image operations.
   * [[features-shaderImageFloat32AtomicAdd]]
     pname:shaderImageFloat32AtomicAdd indicates whether shaders can: perform
     32-bit floating-point add atomic image operations.
   * [[features-sparseImageFloat32Atomics]] pname:sparseImageFloat32Atomics
-    indicates whether 32-bit floating-point load, store and exchange atomic
+    indicates whether 32-bit floating-point load, store, and exchange atomic
     operations can: be used on sparse images.
   * [[features-sparseImageFloat32AtomicAdd]]
     pname:sparseImageFloat32AtomicAdd indicates whether 32-bit
@@ -1259,8 +1257,8 @@ This structure describes the following features:
     perform 64-bit floating-point min and max atomic operations on storage
     buffers.
   * [[features-shaderSharedFloat16Atomics]] pname:shaderSharedFloat16Atomics
-    indicates whether shaders can: perform 16-bit floating-point load, store
-    and exchange atomic operations on shared
+    indicates whether shaders can: perform 16-bit floating-point load,
+    store, and exchange atomic operations on shared
 ifdef::VK_EXT_mesh_shader[]
     and payload
 endif::VK_EXT_mesh_shader[]
@@ -1310,7 +1308,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderAtomicFloat2Features
 endif::VK_EXT_shader_atomic_float2[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_KHR_shader_atomic_int64[]
-[open,refpage='VkPhysicalDeviceShaderAtomicInt64Features',desc='Structure describing features supported by VK_KHR_shader_atomic_int64',type='structs',alias='VkPhysicalDeviceShaderAtomicInt64FeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderAtomicInt64Features',desc='Structure describing features supported by VK_KHR_shader_atomic_int64',type='structs']
 --
 The slink:VkPhysicalDeviceShaderAtomicInt64Features structure is defined as:
 
@@ -1376,7 +1374,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderImageAtomicInt64Feat
 endif::VK_EXT_shader_image_atomic_int64[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_KHR_8bit_storage[]
-[open,refpage='VkPhysicalDevice8BitStorageFeatures',desc='Structure describing features supported by VK_KHR_8bit_storage',type='structs',alias='VkPhysicalDevice8BitStorageFeaturesKHR']
+[open,refpage='VkPhysicalDevice8BitStorageFeatures',desc='Structure describing features supported by VK_KHR_8bit_storage',type='structs']
 --
 The slink:VkPhysicalDevice8BitStorageFeatures structure is defined as:
 
@@ -1561,7 +1559,7 @@ include::{generated}/validity/structs/VkPhysicalDevice16BitStorageFeatures.adoc[
 endif::VK_COMPUTE_VERSION_1_1,VK_KHR_16bit_storage[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_KHR_shader_float16_int8[]
-[open,refpage='VkPhysicalDeviceShaderFloat16Int8Features',desc='Structure describing features supported by VK_KHR_shader_float16_int8',type='structs',alias='VkPhysicalDeviceShaderFloat16Int8FeaturesKHR VkPhysicalDeviceFloat16Int8FeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderFloat16Int8Features',desc='Structure describing features supported by VK_KHR_shader_float16_int8',type='structs']
 --
 The sname:VkPhysicalDeviceShaderFloat16Int8Features structure is defined as:
 
@@ -1652,7 +1650,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderClockFeaturesKHR.ado
 endif::VK_KHR_shader_clock[]
 
 ifdef::VK_COMPUTE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
-[open,refpage='VkPhysicalDeviceSamplerYcbcrConversionFeatures',desc='Structure describing {YCbCr} conversion features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR']
+[open,refpage='VkPhysicalDeviceSamplerYcbcrConversionFeatures',desc='Structure describing {YCbCr} conversion features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceSamplerYcbcrConversionFeatures structure is
 defined as:
@@ -1778,7 +1776,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceConditionalRenderingFeatur
 endif::VK_EXT_conditional_rendering[]
 
 ifdef::VK_GRAPHICS_VERSION_1_1[]
-[open,refpage='VkPhysicalDeviceShaderDrawParametersFeatures',desc='Structure describing shader draw parameter features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceShaderDrawParameterFeatures']
+[open,refpage='VkPhysicalDeviceShaderDrawParametersFeatures',desc='Structure describing shader draw parameter features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderDrawParametersFeatures structure is defined
 as:
@@ -1921,8 +1919,6 @@ defined as:
 include::{generated}/api/structs/VkPhysicalDeviceMemoryDecompressionFeaturesEXT.adoc[]
 
 ifdef::VK_NV_memory_decompression[]
-or the equivalent
-
 include::{generated}/api/structs/VkPhysicalDeviceMemoryDecompressionFeaturesNV.adoc[]
 endif::VK_NV_memory_decompression[]
 
@@ -1942,7 +1938,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceMemoryDecompressionFeature
 endif::VK_NV_memory_decompression,VK_EXT_memory_decompression[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_EXT_descriptor_indexing[]
-[open,refpage='VkPhysicalDeviceDescriptorIndexingFeatures',desc='Structure describing descriptor indexing features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceDescriptorIndexingFeaturesEXT']
+[open,refpage='VkPhysicalDeviceDescriptorIndexingFeatures',desc='Structure describing descriptor indexing features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceDescriptorIndexingFeatures structure is defined
 as:
@@ -2208,7 +2204,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceCopyMemoryIndirectFeatures
 endif::VK_KHR_copy_memory_indirect[]
 
 ifdef::VK_GRAPHICS_VERSION_1_4,VK_KHR_vertex_attribute_divisor,VK_EXT_vertex_attribute_divisor[]
-[open,refpage='VkPhysicalDeviceVertexAttributeDivisorFeatures',desc='Structure describing if fetching of vertex attribute may be repeated for instanced rendering',type='structs',alias='VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT']
+[open,refpage='VkPhysicalDeviceVertexAttributeDivisorFeatures',desc='Structure describing if fetching of vertex attribute may be repeated for instanced rendering',type='structs']
 --
 The sname:VkPhysicalDeviceVertexAttributeDivisorFeatures structure is
 defined as:
@@ -2342,7 +2338,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceVulkanMemoryModelFeatures.
 endif::VK_BASE_VERSION_1_2,VK_KHR_vulkan_memory_model[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_EXT_inline_uniform_block[]
-[open,refpage='VkPhysicalDeviceInlineUniformBlockFeatures',desc='Structure describing inline uniform block features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceInlineUniformBlockFeaturesEXT']
+[open,refpage='VkPhysicalDeviceInlineUniformBlockFeatures',desc='Structure describing inline uniform block features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceInlineUniformBlockFeatures structure is defined
 as:
@@ -2467,7 +2463,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceCornerSampledImageFeatures
 endif::VK_NV_corner_sampled_image[]
 
 ifdef::VK_KHR_compute_shader_derivatives,VK_NV_compute_shader_derivatives[]
-[open,refpage='VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR',desc='Structure describing compute shader derivative features that can be supported by an implementation',type='structs',alias="VkPhysicalDeviceComputeShaderDerivativesFeaturesNV"]
+[open,refpage='VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR',desc='Structure describing compute shader derivative features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR structure is
 defined as:
@@ -2736,7 +2732,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceInvocationMaskFeaturesHUAW
 endif::VK_HUAWEI_invocation_mask[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_EXT_scalar_block_layout[]
-[open,refpage='VkPhysicalDeviceScalarBlockLayoutFeatures',desc='Structure indicating support for scalar block layouts',type='structs',alias='VkPhysicalDeviceScalarBlockLayoutFeaturesEXT']
+[open,refpage='VkPhysicalDeviceScalarBlockLayoutFeatures',desc='Structure indicating support for scalar block layouts',type='structs']
 --
 The sname:VkPhysicalDeviceScalarBlockLayoutFeatures structure is defined as:
 
@@ -2770,7 +2766,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceScalarBlockLayoutFeatures.
 endif::VK_COMPUTE_VERSION_1_2,VK_EXT_scalar_block_layout[]
 
 ifdef::VK_COMPUTE_VERSION_1_2,VK_KHR_uniform_buffer_standard_layout[]
-[open,refpage='VkPhysicalDeviceUniformBufferStandardLayoutFeatures',desc='Structure indicating support for std430-like packing in uniform buffers',type='structs',alias='VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR']
+[open,refpage='VkPhysicalDeviceUniformBufferStandardLayoutFeatures',desc='Structure indicating support for std430-like packing in uniform buffers',type='structs']
 --
 The sname:VkPhysicalDeviceUniformBufferStandardLayoutFeatures structure is
 defined as:
@@ -2857,7 +2853,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceMemoryPriorityFeaturesEXT.
 endif::VK_EXT_memory_priority[]
 
 ifdef::VK_BASE_VERSION_1_2,VK_KHR_buffer_device_address[]
-[open,refpage='VkPhysicalDeviceBufferDeviceAddressFeatures',desc='Structure describing buffer address features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceBufferDeviceAddressFeaturesKHR']
+[open,refpage='VkPhysicalDeviceBufferDeviceAddressFeatures',desc='Structure describing buffer address features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceBufferDeviceAddressFeatures structure is defined
 as:
@@ -2929,7 +2925,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceBufferDeviceAddressFeature
 endif::VK_BASE_VERSION_1_2,VK_KHR_buffer_device_address[]
 
 ifdef::VK_EXT_buffer_device_address[]
-[open,refpage='VkPhysicalDeviceBufferDeviceAddressFeaturesEXT',desc='Structure describing buffer address features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceBufferAddressFeaturesEXT']
+[open,refpage='VkPhysicalDeviceBufferDeviceAddressFeaturesEXT',desc='Structure describing buffer address features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceBufferDeviceAddressFeaturesEXT structure is
 defined as:
@@ -3006,7 +3002,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceDedicatedAllocationImageAl
 endif::VK_NV_dedicated_allocation_image_aliasing[]
 
 ifdef::VK_GRAPHICS_VERSION_1_2,VK_KHR_imageless_framebuffer[]
-[open,refpage='VkPhysicalDeviceImagelessFramebufferFeatures',desc='Structure indicating support for imageless framebuffers',type='structs',alias='VkPhysicalDeviceImagelessFramebufferFeaturesKHR']
+[open,refpage='VkPhysicalDeviceImagelessFramebufferFeatures',desc='Structure indicating support for imageless framebuffers',type='structs']
 --
 The sname:VkPhysicalDeviceImagelessFramebufferFeatures structure is defined
 as:
@@ -3129,6 +3125,30 @@ include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrixFeaturesK
 --
 endif::VK_KHR_cooperative_matrix[]
 
+ifdef::VK_QCOM_cooperative_matrix_conversion[]
+[open,refpage='VkPhysicalDeviceCooperativeMatrixConversionFeaturesQCOM',desc='Structure describing cooperative matrix conversion features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceCooperativeMatrixConversionFeaturesQCOM structure
+is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceCooperativeMatrixConversionFeaturesQCOM.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-cooperativeMatrixConversion]]
+    pname:cooperativeMatrixConversion indicates that the implementation
+    supports the code:CooperativeMatrixConversionQCOM SPIR-V capability.
+
+:refpage: VkPhysicalDeviceCooperativeMatrixConversionFeaturesQCOM
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceCooperativeMatrixConversionFeaturesQCOM.adoc[]
+--
+endif::VK_QCOM_cooperative_matrix_conversion[]
+
 ifdef::VK_NV_cooperative_matrix2[]
 [open,refpage='VkPhysicalDeviceCooperativeMatrix2FeaturesNV',desc='Structure describing cooperative matrix features that can be supported by an implementation',type='structs']
 --
@@ -3211,6 +3231,29 @@ include::{generated}/validity/structs/VkPhysicalDeviceCooperativeVectorFeaturesN
 --
 endif::VK_NV_cooperative_vector[]
 
+ifdef::VK_EXT_shader_long_vector[]
+[open,refpage='VkPhysicalDeviceShaderLongVectorFeaturesEXT',desc='Structure describing long vector features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceShaderLongVectorFeaturesEXT structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDeviceShaderLongVectorFeaturesEXT.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-longVector]] pname:longVector indicates that the
+    implementation supports the code:LongVectorEXT SPIR-V capability.
+
+:refpage: VkPhysicalDeviceShaderLongVectorFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceShaderLongVectorFeaturesEXT.adoc[]
+--
+endif::VK_EXT_shader_long_vector[]
+
 ifdef::VK_EXT_ycbcr_image_arrays[]
 [open,refpage='VkPhysicalDeviceYcbcrImageArraysFeaturesEXT',desc='Structure describing extended {YCbCr} image creation features that can be supported by an implementation',type='structs']
 --
@@ -3238,7 +3281,7 @@ endif::VK_EXT_ycbcr_image_arrays[]
 
 ifdef::VK_COMPUTE_VERSION_1_1[]
 ifdef::VK_COMPUTE_VERSION_1_2,VK_KHR_shader_subgroup_extended_types[]
-[open,refpage='VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures',desc='Structure describing the extended types subgroups support feature for an implementation',type='structs',alias='VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures',desc='Structure describing the extended types subgroups support feature for an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures structure is
 defined as:
@@ -3277,7 +3320,7 @@ endif::VK_COMPUTE_VERSION_1_2,VK_KHR_shader_subgroup_extended_types[]
 endif::VK_COMPUTE_VERSION_1_1[]
 
 ifdef::VK_BASE_VERSION_1_2,VK_EXT_host_query_reset[]
-[open,refpage='VkPhysicalDeviceHostQueryResetFeatures',desc='Structure describing whether queries can be reset from the host',type='structs',alias='VkPhysicalDeviceHostQueryResetFeaturesEXT']
+[open,refpage='VkPhysicalDeviceHostQueryResetFeatures',desc='Structure describing whether queries can be reset from the host',type='structs']
 --
 The sname:VkPhysicalDeviceHostQueryResetFeatures structure is defined as:
 
@@ -3358,7 +3401,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceCoverageReductionModeFeatu
 endif::VK_NV_coverage_reduction_mode[]
 
 ifdef::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
-[open,refpage='VkPhysicalDeviceTimelineSemaphoreFeatures',desc='Structure describing timeline semaphore features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceTimelineSemaphoreFeaturesKHR']
+[open,refpage='VkPhysicalDeviceTimelineSemaphoreFeatures',desc='Structure describing timeline semaphore features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceTimelineSemaphoreFeatures structure is defined as:
 
@@ -3389,6 +3432,31 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceTimelineSemaphoreFeatures.adoc[]
 --
 endif::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
+
+ifdef::VK_KHR_internally_synchronized_queues[]
+[open,refpage='VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR',desc='Structure indicating support for queues that are internally synchronized',type='structs']
+--
+The sname:VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR structure
+is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-internallySynchronizedQueues]]
+    pname:internallySynchronizedQueues indicates that
+    ename:VK_DEVICE_QUEUE_CREATE_INTERNALLY_SYNCHRONIZED_BIT_KHR can be used
+    to make queues internally synchronized.
+
+:refpage: VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR.adoc[]
+--
+endif::VK_KHR_internally_synchronized_queues[]
 
 ifdef::VK_NV_external_sci_sync[]
 [open,refpage='VkPhysicalDeviceExternalSciSyncFeaturesNV',desc='Structure describing SciSync features that can be supported by an implementation',type='structs']
@@ -3627,7 +3695,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceExternalMemoryScreenBuffer
 endif::VK_QNX_external_memory_screen_buffer[]
 
 ifdef::VK_BASE_VERSION_1_4,VK_KHR_index_type_uint8,VK_EXT_index_type_uint8[]
-[open,refpage='VkPhysicalDeviceIndexTypeUint8Features',desc='Structure describing whether uint8 index type can be used',type='structs',alias='VkPhysicalDeviceIndexTypeUint8FeaturesKHR VkPhysicalDeviceIndexTypeUint8FeaturesEXT']
+[open,refpage='VkPhysicalDeviceIndexTypeUint8Features',desc='Structure describing whether uint8 index type can be used',type='structs']
 --
 The sname:VkPhysicalDeviceIndexTypeUint8Features structure is defined as:
 
@@ -3722,7 +3790,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderSMBuiltinsFeaturesNV
 endif::VK_NV_shader_sm_builtins[]
 
 ifdef::VK_GRAPHICS_VERSION_1_2,VK_KHR_separate_depth_stencil_layouts[]
-[open,refpage='VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures',desc='Structure describing whether the implementation can do depth and stencil image barriers separately',type='structs',alias='VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR']
+[open,refpage='VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures',desc='Structure describing whether the implementation can do depth and stencil image barriers separately',type='structs']
 --
 The sname:VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures structure is
 defined as:
@@ -3787,7 +3855,7 @@ include::{generated}/validity/structs/VkPhysicalDevicePipelineExecutableProperti
 endif::VK_KHR_pipeline_executable_properties[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_EXT_shader_demote_to_helper_invocation[]
-[open,refpage='VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures',desc='Structure describing the shader demote to helper invocations features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT']
+[open,refpage='VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures',desc='Structure describing the shader demote to helper invocations features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures structure
 is defined as:
@@ -3896,7 +3964,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceLegacyVertexAttributesFeat
 endif::VK_EXT_legacy_vertex_attributes[]
 
 ifdef::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
-[open,refpage='VkPhysicalDeviceTextureCompressionASTCHDRFeatures',desc='Structure describing ASTC HDR features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT']
+[open,refpage='VkPhysicalDeviceTextureCompressionASTCHDRFeatures',desc='Structure describing ASTC HDR features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceTextureCompressionASTCHDRFeatures structure is
 defined as:
@@ -3954,8 +4022,69 @@ include::{generated}/validity/structs/VkPhysicalDeviceTextureCompressionASTCHDRF
 --
 endif::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
 
+ifdef::VK_EXT_texture_compression_astc_3d[]
+
+[open,refpage='VkPhysicalDeviceTextureCompressionASTC3DFeaturesEXT',desc='Structure describing ASTC 3D features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceTextureCompressionASTC3DFeaturesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceTextureCompressionASTC3DFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-textureCompressionASTC_3D]] pname:textureCompressionASTC_3D
+    indicates whether all of the ASTC 3D compressed texture formats are
+    supported.
+    If this feature is enabled, then the
+    ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT,
+    ename:VK_FORMAT_FEATURE_BLIT_SRC_BIT and
+    ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT features must:
+    be supported in pname:optimalTilingFeatures for the following formats:
++
+  ** ename:VK_FORMAT_ASTC_3x3x3_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_3x3x3_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_3x3x3_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x3x3_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x3x3_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x3x3_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x3_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x3_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x3_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x4_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x4_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_4x4x4_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x4x4_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x4x4_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x4x4_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x4_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x4_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x4_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x5_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x5_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_5x5x5_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x5x5_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x5x5_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x5x5_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x5_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x5_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x5_SFLOAT_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x6_UNORM_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x6_SRGB_BLOCK_EXT
+  ** ename:VK_FORMAT_ASTC_6x6x6_SFLOAT_BLOCK_EXT
+
+:refpage: VkPhysicalDeviceTextureCompressionASTC3DFeatures
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceTextureCompressionASTC3DFeaturesEXT.adoc[]
+--
+endif::VK_EXT_texture_compression_astc_3d[]
+
 ifdef::VK_GRAPHICS_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
-[open,refpage='VkPhysicalDeviceLineRasterizationFeatures',desc='Structure describing the line rasterization features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceLineRasterizationFeaturesKHR VkPhysicalDeviceLineRasterizationFeaturesEXT']
+[open,refpage='VkPhysicalDeviceLineRasterizationFeatures',desc='Structure describing the line rasterization features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceLineRasterizationFeatures structure is defined as:
 
@@ -4010,7 +4139,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceLineRasterizationFeatures.
 endif::VK_GRAPHICS_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_EXT_subgroup_size_control[]
-[open,refpage='VkPhysicalDeviceSubgroupSizeControlFeatures',desc='Structure describing the subgroup size control features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceSubgroupSizeControlFeaturesEXT']
+[open,refpage='VkPhysicalDeviceSubgroupSizeControlFeatures',desc='Structure describing the subgroup size control features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceSubgroupSizeControlFeatures structure is defined
 as:
@@ -4869,7 +4998,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceDeviceMemoryReportFeatures
 endif::VK_EXT_device_memory_report[]
 
 ifdef::VK_BASE_VERSION_1_4,VK_KHR_global_priority,VK_EXT_global_priority_query[]
-[open,refpage='VkPhysicalDeviceGlobalPriorityQueryFeatures',desc='Structure describing whether global priority query can be supported by an implementation',type='structs',alias='VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT']
+[open,refpage='VkPhysicalDeviceGlobalPriorityQueryFeatures',desc='Structure describing whether global priority query can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceGlobalPriorityQueryFeatures structure is defined
 as:
@@ -4907,7 +5036,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceGlobalPriorityQueryFeature
 endif::VK_BASE_VERSION_1_4,VK_KHR_global_priority,VK_EXT_global_priority_query[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
-[open,refpage='VkPhysicalDevicePipelineCreationCacheControlFeatures',desc='Structure describing whether pipeline cache control can be supported by an implementation',type='structs',alias='VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT']
+[open,refpage='VkPhysicalDevicePipelineCreationCacheControlFeatures',desc='Structure describing whether pipeline cache control can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDevicePipelineCreationCacheControlFeatures structure is
 defined as:
@@ -4947,7 +5076,7 @@ include::{generated}/validity/structs/VkPhysicalDevicePipelineCreationCacheContr
 endif::VK_COMPUTE_VERSION_1_3,VK_EXT_pipeline_creation_cache_control[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_zero_initialize_workgroup_memory[]
-[open,refpage='VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures',desc='Structure describing support for zero initialization of workgroup memory by an implementation',type='structs',alias='VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR']
+[open,refpage='VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures',desc='Structure describing support for zero initialization of workgroup memory by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures structure is
 defined as:
@@ -4982,7 +5111,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceZeroInitializeWorkgroupMem
 endif::VK_COMPUTE_VERSION_1_3,VK_KHR_zero_initialize_workgroup_memory[]
 
 ifdef::VK_BASE_VERSION_1_3,VK_EXT_private_data[]
-[open,refpage='VkPhysicalDevicePrivateDataFeatures',desc='Structure specifying physical device support',type='structs',alias='VkPhysicalDevicePrivateDataFeaturesEXT']
+[open,refpage='VkPhysicalDevicePrivateDataFeatures',desc='Structure specifying physical device support',type='structs']
 --
 The sname:VkPhysicalDevicePrivateDataFeatures structure is defined as:
 
@@ -5085,7 +5214,7 @@ ifndef::VK_EXT_robustness2+VK_KHR_robustness2[]
 endif::VK_EXT_robustness2+VK_KHR_robustness2[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_EXT_image_robustness[]
-[open,refpage='VkPhysicalDeviceImageRobustnessFeatures',desc='Structure describing the out-of-bounds behavior for an implementation',type='structs',alias='VkPhysicalDeviceImageRobustnessFeaturesEXT']
+[open,refpage='VkPhysicalDeviceImageRobustnessFeatures',desc='Structure describing the out-of-bounds behavior for an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceImageRobustnessFeatures structure is defined as:
 
@@ -5118,7 +5247,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceImageRobustnessFeatures.ad
 endif::VK_COMPUTE_VERSION_1_3,VK_EXT_image_robustness[]
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_shader_terminate_invocation[]
-[open,refpage='VkPhysicalDeviceShaderTerminateInvocationFeatures',desc='Structure describing support for the SPIR-V code:SPV_KHR_terminate_invocation extension',type='structs',alias='VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderTerminateInvocationFeatures',desc='Structure describing support for the SPIR-V code:SPV_KHR_terminate_invocation extension',type='structs']
 --
 The sname:VkPhysicalDeviceShaderTerminateInvocationFeatures structure is
 defined as:
@@ -5346,7 +5475,33 @@ include::{generated}/validity/structs/VkPhysicalDeviceVulkanSC10Features.adoc[]
 endif::VKSC_VERSION_1_0[]
 
 ifdef::VK_KHR_performance_query[]
-include::{chapters}/VK_KHR_performance_query/features.adoc[]
+[open,refpage='VkPhysicalDevicePerformanceQueryFeaturesKHR',desc='Structure describing performance query support for an implementation',type='structs']
+--
+The sname:VkPhysicalDevicePerformanceQueryFeaturesKHR structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDevicePerformanceQueryFeaturesKHR.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+// tag::VK_KHR_performance_query-features[]
+  * [[features-performanceCounterQueryPools]]
+    pname:performanceCounterQueryPools indicates whether the implementation
+    supports performance counter query pools.
+  * [[features-performanceCounterMultipleQueryPools]]
+    pname:performanceCounterMultipleQueryPools indicates whether the
+    implementation supports using multiple performance query pools in a
+    primary command buffer and secondary command buffers executed within it.
+// end::VK_KHR_performance_query-features[]
+
+:refpage: VkPhysicalDevicePerformanceQueryFeaturesKHR
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDevicePerformanceQueryFeaturesKHR.adoc[]
+--
 endif::VK_KHR_performance_query[]
 
 ifdef::VK_EXT_4444_formats[]
@@ -5394,7 +5549,7 @@ endif::VK_BASE_VERSION_1_3[]
 endif::VK_EXT_4444_formats[]
 
 ifdef::VK_EXT_mutable_descriptor_type,VK_VALVE_mutable_descriptor_type[]
-[open,refpage='VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT',desc='Structure describing whether the mutable descriptor type is supported',type='structs',alias='VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE']
+[open,refpage='VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT',desc='Structure describing whether the mutable descriptor type is supported',type='structs']
 --
 The sname:VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT structure is
 defined as:
@@ -5564,7 +5719,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceWorkgroupMemoryExplicitLay
 endif::VK_KHR_workgroup_memory_explicit_layout[]
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkPhysicalDeviceSynchronization2Features',desc='Structure describing whether the implementation supports v2 synchronization commands',type='structs',alias='VkPhysicalDeviceSynchronization2FeaturesKHR']
+[open,refpage='VkPhysicalDeviceSynchronization2Features',desc='Structure describing whether the implementation supports v2 synchronization commands',type='structs']
 --
 The sname:VkPhysicalDeviceSynchronization2Features structure is defined as:
 
@@ -5806,7 +5961,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceInheritedViewportScissorFe
 endif::VK_NV_inherited_viewport_scissor[]
 
 ifdef::VK_COMPUTE_VERSION_1_4,VK_EXT_pipeline_protected_access[]
-[open,refpage='VkPhysicalDevicePipelineProtectedAccessFeatures',desc='Structure describing support for specifying protected access on individual pipelines',type='structs',alias='VkPhysicalDevicePipelineProtectedAccessFeaturesEXT']
+[open,refpage='VkPhysicalDevicePipelineProtectedAccessFeatures',desc='Structure describing support for specifying protected access on individual pipelines',type='structs']
 --
 The sname:VkPhysicalDevicePipelineProtectedAccessFeatures structure is
 defined as:
@@ -5853,8 +6008,8 @@ This structure describes the following feature:
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
   * [[features-ycbcr2plane444Formats]] pname:ycbcr2plane444Formats indicates
-    that the implementation supports the following 2-plane 444 {YCbCr}
-    formats:
+    that the implementation supports querying format features for, and
+    using, the following 2-plane 444 {YCbCr} formats:
   ** ename:VK_FORMAT_G8_B8R8_2PLANE_444_UNORM
   ** ename:VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16
   ** ename:VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16
@@ -6425,7 +6580,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceUnifiedImageLayoutsFeature
 endif::VK_KHR_unified_image_layouts[]
 
 ifdef::VK_BASE_VERSION_1_4,VK_EXT_host_image_copy[]
-[open,refpage='VkPhysicalDeviceHostImageCopyFeatures',desc='Structure indicating support for copies to or from images from host memory',type='structs',alias='VkPhysicalDeviceHostImageCopyFeaturesEXT']
+[open,refpage='VkPhysicalDeviceHostImageCopyFeatures',desc='Structure indicating support for copies to or from images from host memory',type='structs']
 --
 The sname:VkPhysicalDeviceHostImageCopyFeatures structure is defined as:
 
@@ -6458,6 +6613,34 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceHostImageCopyFeatures.adoc[]
 --
 endif::VK_BASE_VERSION_1_4,VK_EXT_host_image_copy[]
+
+ifdef::VK_EXT_present_timing[]
+[open,refpage='VkPhysicalDevicePresentTimingFeaturesEXT',desc='Structure indicating support for present timing',type='structs']
+--
+The sname:VkPhysicalDevicePresentTimingFeaturesEXT structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDevicePresentTimingFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-presentTiming]] pname:presentTiming indicates that the
+    implementation supports fname:vkGetPastPresentationTimingEXT.
+  * [[features-presentAtAbsoluteTime]] pname:presentAtAbsoluteTime indicates
+    that the implementation supports specifying absolute target present
+    times.
+  * [[features-presentAtRelativeTime]] pname:presentAtRelativeTime indicates
+    that the implementation supports specifying relative target present
+    times.
+
+:refpage: VkPhysicalDevicePresentTimingFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDevicePresentTimingFeaturesEXT.adoc[]
+--
+endif::VK_EXT_present_timing[]
 
 ifdef::VK_NV_present_barrier[]
 [open,refpage='VkPhysicalDevicePresentBarrierFeaturesNV',desc='Structure indicating support for VK_NV_present_barrier extension',type='structs']
@@ -6509,7 +6692,7 @@ endif::VK_KHR_shader_fma[]
 
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_shader_integer_dot_product[]
-[open,refpage='VkPhysicalDeviceShaderIntegerDotProductFeatures',desc='Structure describing integer dot product features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderIntegerDotProductFeatures',desc='Structure describing integer dot product features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderIntegerDotProductFeatures structure is
 defined as:
@@ -6544,7 +6727,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderIntegerDotProductFea
 endif::VK_COMPUTE_VERSION_1_3,VK_KHR_shader_integer_dot_product[]
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_maintenance4[]
-[open,refpage='VkPhysicalDeviceMaintenance4Features',desc='Structure describing whether the implementation supports maintenance4 functionality',type='structs',alias='VkPhysicalDeviceMaintenance4FeaturesKHR']
+[open,refpage='VkPhysicalDeviceMaintenance4Features',desc='Structure describing whether the implementation supports maintenance4 functionality',type='structs']
 --
 The sname:VkPhysicalDeviceMaintenance4Features structure is defined as:
 
@@ -6592,7 +6775,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceMaintenance4Features.adoc[
 endif::VK_BASE_VERSION_1_3,VK_KHR_maintenance4[]
 
 ifdef::VK_BASE_VERSION_1_4,VK_KHR_maintenance5[]
-[open,refpage='VkPhysicalDeviceMaintenance5Features',desc='Structure describing whether the implementation supports maintenance5 functionality',type='structs',alias='VkPhysicalDeviceMaintenance5FeaturesKHR']
+[open,refpage='VkPhysicalDeviceMaintenance5Features',desc='Structure describing whether the implementation supports maintenance5 functionality',type='structs']
 --
 The sname:VkPhysicalDeviceMaintenance5Features structure is defined as:
 
@@ -6667,7 +6850,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceMaintenance5Features.adoc[
 endif::VK_BASE_VERSION_1_4,VK_KHR_maintenance5[]
 
 ifdef::VK_BASE_VERSION_1_4,VK_KHR_maintenance6[]
-[open,refpage='VkPhysicalDeviceMaintenance6Features',desc='Structure describing whether the implementation supports maintenance6 functionality',type='structs',alias='VkPhysicalDeviceMaintenance6FeaturesKHR']
+[open,refpage='VkPhysicalDeviceMaintenance6Features',desc='Structure describing whether the implementation supports maintenance6 functionality',type='structs']
 --
 The sname:VkPhysicalDeviceMaintenance6Features structure is defined as:
 
@@ -6858,7 +7041,7 @@ This structure describes the following feature:
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
   * [[features-maintenance10]] pname:maintenance10 indicates that the
-     implementation supports the following:
+    implementation supports the following:
   ** New image format feature bits that indicate support for copying depth
      or stencil aspects using non-graphics queue families
   ** If flink:vkCmdSetSampleMaskEXT is called with pname:pSampleMask set to
@@ -6884,7 +7067,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceMaintenance10FeaturesKHR.a
 endif::VK_KHR_maintenance10[]
 
 ifdef::VK_GRAPHICS_VERSION_1_3,VK_KHR_dynamic_rendering[]
-[open,refpage='VkPhysicalDeviceDynamicRenderingFeatures',desc='Structure indicating support for dynamic render pass instances',type='structs',alias='VkPhysicalDeviceDynamicRenderingFeaturesKHR']
+[open,refpage='VkPhysicalDeviceDynamicRenderingFeatures',desc='Structure indicating support for dynamic render pass instances',type='structs']
 --
 The sname:VkPhysicalDeviceDynamicRenderingFeatures structure is defined as:
 
@@ -6916,6 +7099,28 @@ include::{generated}/validity/structs/VkPhysicalDeviceDynamicRenderingFeatures.a
 --
 endif::VK_GRAPHICS_VERSION_1_3,VK_KHR_dynamic_rendering[]
 
+ifdef::VK_EXT_custom_resolve[]
+[open,refpage='VkPhysicalDeviceCustomResolveFeaturesEXT',desc='Structure indicating support for shader resolves',type='structs']
+--
+The sname:VkPhysicalDeviceCustomResolveFeaturesEXT structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceCustomResolveFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-customResolve]] pname:customResolve specifies that the
+    implementation supports render pass resolves using shaders.
+
+:refpage: VkPhysicalDeviceCustomResolveFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceCustomResolveFeaturesEXT.adoc[]
+--
+endif::VK_EXT_custom_resolve[]
+
 ifdef::VK_EXT_rgba10x6_formats[]
 [open,refpage='VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT',desc='Structure describing whether rendering to VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16 formats can be supported by an implementation',type='structs']
 --
@@ -6944,7 +7149,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT
 endif::VK_EXT_rgba10x6_formats[]
 
 ifdef::VK_COMPUTE_VERSION_1_4,VK_EXT_pipeline_robustness[]
-[open,refpage='VkPhysicalDevicePipelineRobustnessFeatures',desc='Structure describing whether an implementation supports robustness requests on a per-pipeline stage granularity',type='structs',alias='VkPhysicalDevicePipelineRobustnessFeaturesEXT']
+[open,refpage='VkPhysicalDevicePipelineRobustnessFeatures',desc='Structure describing whether an implementation supports robustness requests on a per-pipeline stage granularity',type='structs']
 --
 The sname:VkPhysicalDevicePipelineRobustnessFeatures structure is defined
 as:
@@ -7117,8 +7322,8 @@ This structure describes the following feature:
     pname:attachmentFeedbackLoopLayout indicates whether the implementation
     supports using
     ename:VK_IMAGE_LAYOUT_ATTACHMENT_FEEDBACK_LOOP_OPTIMAL_EXT image layout
-    for images created with
-    ename:VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT.
+    for images created with the
+    ename:VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT usage flag set.
 
 include::{generated}/validity/structs/VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT.adoc[]
 --
@@ -7360,7 +7565,7 @@ endif::VK_KHR_ray_tracing_position_fetch[]
 
 
 ifdef::VK_COMPUTE_VERSION_1_4,VK_KHR_shader_float_controls2[]
-[open,refpage='VkPhysicalDeviceShaderFloatControls2Features',desc='Structure describing shader float controls 2 features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceShaderFloatControls2FeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderFloatControls2Features',desc='Structure describing shader float controls 2 features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderFloatControls2Features structure is defined
 as:
@@ -7574,7 +7779,7 @@ endif::VK_QCOM_image_processing2[]
 
 
 ifdef::VK_EXT_depth_clamp_zero_one,VK_KHR_depth_clamp_zero_one[]
-[open,refpage='VkPhysicalDeviceDepthClampZeroOneFeaturesKHR',desc='Structure describing feature to control zero to one depth clamping',type='structs',alias='VkPhysicalDeviceDepthClampZeroOneFeaturesEXT']
+[open,refpage='VkPhysicalDeviceDepthClampZeroOneFeaturesKHR',desc='Structure describing feature to control zero to one depth clamping',type='structs']
 --
 The sname:VkPhysicalDeviceDepthClampZeroOneFeaturesKHR structure is defined
 as:
@@ -7880,7 +8085,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceFrameBoundaryFeaturesEXT.a
 endif::VK_EXT_frame_boundary[]
 
 ifdef::VK_KHR_swapchain_maintenance1,VK_EXT_swapchain_maintenance1[]
-[open,refpage='VkPhysicalDeviceSwapchainMaintenance1FeaturesKHR',desc='Structure describing whether implementation supports swapchain maintenance1 functionality',type='structs',alias='VkPhysicalDeviceSwapchainMaintenance1FeaturesEXT']
+[open,refpage='VkPhysicalDeviceSwapchainMaintenance1FeaturesKHR',desc='Structure describing whether implementation supports swapchain maintenance1 functionality',type='structs']
 --
 The sname:VkPhysicalDeviceSwapchainMaintenance1FeaturesKHR structure is
 defined as:
@@ -7997,6 +8202,30 @@ include::{generated}/validity/structs/VkPhysicalDeviceDynamicRenderingUnusedAtta
 --
 endif::VK_EXT_dynamic_rendering_unused_attachments[]
 
+ifdef::VK_EXT_ray_tracing_invocation_reorder[]
+[open,refpage='VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT',desc='Structure describing feature to control ray tracing invocation reordering',type='structs']
+--
+The sname:VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT structure
+is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT.adoc[]
+
+This structure describes the following feature:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-rayTracingInvocationReorder]]
+    pname:rayTracingInvocationReorder indicates that the implementation
+    supports `SPV_EXT_shader_invocation_reorder`.
+
+:refpage: VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT.adoc[]
+--
+endif::VK_EXT_ray_tracing_invocation_reorder[]
+
 ifdef::VK_NV_ray_tracing_invocation_reorder[]
 [open,refpage='VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV',desc='Structure describing feature to control ray tracing invocation reordering',type='structs']
 --
@@ -8010,7 +8239,7 @@ This structure describes the following feature:
   * pname:sType is a elink:VkStructureType value identifying this structure.
   * pname:pNext is `NULL` or a pointer to a structure extending this
     structure.
-  * [[features-rayTracingInvocationReorder]]
+  * [[features-rayTracingInvocationReorderNV]]
     pname:rayTracingInvocationReorder indicates that the implementation
     supports `SPV_NV_shader_invocation_reorder`.
 
@@ -8018,7 +8247,6 @@ This structure describes the following feature:
 include::{chapters}/features.adoc[tag=features]
 
 include::{generated}/validity/structs/VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV.adoc[]
-
 --
 endif::VK_NV_ray_tracing_invocation_reorder[]
 
@@ -8511,7 +8739,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceRenderPassStripedFeaturesA
 endif::VK_ARM_render_pass_striped[]
 
 ifdef::VK_COMPUTE_VERSION_1_4,VK_KHR_shader_subgroup_rotate[]
-[open,refpage='VkPhysicalDeviceShaderSubgroupRotateFeatures',desc='Structure describing whether subgroup rotation is enabled',type='structs',alias='VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderSubgroupRotateFeatures',desc='Structure describing whether subgroup rotation is enabled',type='structs']
 --
 The sname:VkPhysicalDeviceShaderSubgroupRotateFeatures structure is defined
 as:
@@ -8547,7 +8775,7 @@ include::{generated}/validity/structs/VkPhysicalDeviceShaderSubgroupRotateFeatur
 endif::VK_COMPUTE_VERSION_1_4,VK_KHR_shader_subgroup_rotate[]
 
 ifdef::VK_COMPUTE_VERSION_1_4,VK_KHR_shader_expect_assume[]
-[open,refpage='VkPhysicalDeviceShaderExpectAssumeFeatures',desc='Structure describing shader expect assume features that can be supported by an implementation',type='structs',alias='VkPhysicalDeviceShaderExpectAssumeFeaturesKHR']
+[open,refpage='VkPhysicalDeviceShaderExpectAssumeFeatures',desc='Structure describing shader expect assume features that can be supported by an implementation',type='structs']
 --
 The sname:VkPhysicalDeviceShaderExpectAssumeFeatures structure is defined
 as:
@@ -8580,7 +8808,7 @@ endif::VK_COMPUTE_VERSION_1_4,VK_KHR_shader_expect_assume[]
 
 
 ifdef::VK_GRAPHICS_VERSION_1_4,VK_KHR_dynamic_rendering_local_read[]
-[open,refpage='VkPhysicalDeviceDynamicRenderingLocalReadFeatures',desc='Structure indicating support for local reads in dynamic render pass instances',type='structs',alias='VkPhysicalDeviceDynamicRenderingLocalReadFeaturesKHR']
+[open,refpage='VkPhysicalDeviceDynamicRenderingLocalReadFeatures',desc='Structure indicating support for local reads in dynamic render pass instances',type='structs']
 --
 The sname:VkPhysicalDeviceDynamicRenderingLocalReadFeatures structure is
 defined as:
@@ -9049,6 +9277,31 @@ include::{generated}/validity/structs/VkPhysicalDeviceDataGraphFeaturesARM.adoc[
 --
 endif::VK_ARM_data_graph[]
 
+ifdef::VK_QCOM_data_graph_model[]
+[open,refpage='VkPhysicalDeviceDataGraphModelFeaturesQCOM',desc='Structure describing features to control data graph model',type='structs']
+--
+The sname:VkPhysicalDeviceDataGraphModelFeaturesQCOM structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDeviceDataGraphModelFeaturesQCOM.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-dataGraphModelQCOM]] pname:dataGraphModel specifies whether
+    the functionality defined by this extension is available, and guarantees
+    that the implementation supports a data graph queue family with at least
+    one of the following engine types:
+  ** ename:VK_PHYSICAL_DEVICE_DATA_GRAPH_PROCESSING_ENGINE_TYPE_NEURAL_QCOM
+  ** ename:VK_PHYSICAL_DEVICE_DATA_GRAPH_PROCESSING_ENGINE_TYPE_COMPUTE_QCOM
+
+:refpage: VkPhysicalDeviceDataGraphModelFeaturesQCOM
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceDataGraphModelFeaturesQCOM.adoc[]
+--
+endif::VK_QCOM_data_graph_model[]
+
 ifdef::VK_EXT_shader_float8[]
 [open,refpage='VkPhysicalDeviceShaderFloat8FeaturesEXT',desc='Structure describing float8 features that can be supported by the implementation',type='structs']
 --
@@ -9100,6 +9353,163 @@ include::{chapters}/features.adoc[tag=features]
 include::{generated}/validity/structs/VkPhysicalDeviceShader64BitIndexingFeaturesEXT.adoc[]
 --
 endif::VK_EXT_shader_64bit_indexing[]
+
+ifdef::VK_EXT_shader_subgroup_partitioned[]
+[open,refpage='VkPhysicalDeviceShaderSubgroupPartitionedFeaturesEXT',desc='Structure describing shader subgroup partitioned features that can be supported by an implementation',type='structs']
+--
+The sname:VkPhysicalDeviceShaderSubgroupPartitionedFeaturesEXT structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceShaderSubgroupPartitionedFeaturesEXT.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-shaderSubgroupPartitioned]] pname:shaderSubgroupPartitioned
+    indicates that the implementation supports
+    <<features-subgroup-partitioned,VK_SUBGROUP_FEATURE_PARTITIONED_BIT_EXT>>.
+
+:refpage: VkPhysicalDeviceShaderSubgroupPartitionedFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceShaderSubgroupPartitionedFeaturesEXT.adoc[]
+--
+endif::VK_EXT_shader_subgroup_partitioned[]
+
+ifdef::VK_ARM_performance_counters_by_region[]
+[open,refpage='VkPhysicalDevicePerformanceCountersByRegionFeaturesARM',desc='Structure describing support for VK_ARM_performance_counters_by_region by an implementation',type='structs']
+--
+The sname:VkPhysicalDevicePerformanceCountersByRegionFeaturesARM structure
+is defined as:
+
+include::{generated}/api/structs/VkPhysicalDevicePerformanceCountersByRegionFeaturesARM.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-performanceCountersByRegion]]
+    pname:performanceCountersByRegion specifies whether the implementation
+    supports capture of per region performance counters.
+
+See <<appendix-performance-counters-by-region-security, security model>> for
+additional guarantees made by implementations that expose this feature.
+
+:refpage: VkPhysicalDevicePerformanceCountersByRegionFeaturesARM
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDevicePerformanceCountersByRegionFeaturesARM.adoc[]
+--
+endif::VK_ARM_performance_counters_by_region[]
+
+ifdef::VK_NV_compute_occupancy_priority[]
+[open,refpage='VkPhysicalDeviceComputeOccupancyPriorityFeaturesNV',desc='Structure describing whether compute occupancy priority is supported by the implementation',type='structs']
+--
+The sname:VkPhysicalDeviceComputeOccupancyPriorityFeaturesNV structure is
+defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceComputeOccupancyPriorityFeaturesNV.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-computeOccupancyPriority]] pname:computeOccupancyPriority is
+    true if compute occupancy priority is supported.
+
+:refpage: VkPhysicalDeviceComputeOccupancyPriorityFeaturesNV
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceComputeOccupancyPriorityFeaturesNV.adoc[]
+--
+endif::VK_NV_compute_occupancy_priority[]
+
+ifdef::VK_NV_push_constant_bank[]
+[open,refpage='VkPhysicalDevicePushConstantBankFeaturesNV',desc='Structure describing push constant bank features',type='structs']
+--
+The sname:VkPhysicalDevicePushConstantBankFeaturesNV structure is defined
+as:
+
+include::{generated}/api/structs/VkPhysicalDevicePushConstantBankFeaturesNV.adoc[]
+
+This structure describes the following features:
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-pushConstantBank]] pname:pushConstantBank indicates whether
+    push constant bank functionality is supported.
+
+:refpage: VkPhysicalDevicePushConstantBankFeaturesNV
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDevicePushConstantBankFeaturesNV.adoc[]
+--
+endif::VK_NV_push_constant_bank[]
+
+ifdef::VK_EXT_descriptor_heap[]
+[open,refpage='VkPhysicalDeviceDescriptorHeapFeaturesEXT',desc='Structure describing support for descriptor heaps',type='structs']
+--
+The sname:VkPhysicalDeviceDescriptorHeapFeaturesEXT structure is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceDescriptorHeapFeaturesEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-descriptorHeap]] pname:descriptorHeap specifies whether
+    <<descriptorheaps, descriptor heaps>> can: be used.
+  * [[features-descriptorHeapCaptureReplay]]
+    pname:descriptorHeapCaptureReplay specifies whether
+    <<descriptorheaps-writing,heap descriptors>> can: be captured and
+    replayed.
+
+:refpage: VkPhysicalDeviceDescriptorHeapFeaturesEXT
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceDescriptorHeapFeaturesEXT.adoc[]
+--
+endif::VK_EXT_descriptor_heap[]
+
+ifdef::VK_VALVE_shader_mixed_float_dot_product[]
+[open,refpage='VkPhysicalDeviceShaderMixedFloatDotProductFeaturesVALVE',desc='Structure describing support for mixed float dot products',type='structs']
+--
+The sname:VkPhysicalDeviceShaderMixedFloatDotProductFeaturesVALVE structure
+is defined as:
+
+include::{generated}/api/structs/VkPhysicalDeviceShaderMixedFloatDotProductFeaturesVALVE.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * [[features-shaderMixedFloatDotProductFloat16AccFloat32]]
+    pname:shaderMixedFloatDotProductFloat16AccFloat32 indicates whether the
+    implementation supports shaders with the
+    code:DotProductFloat16AccFloat32VALVE capability.
+  * [[features-shaderMixedFloatDotProductFloat16AccFloat16]]
+    pname:shaderMixedFloatDotProductFloat16AccFloat16 indicates whether the
+    implementation supports shaders with the
+    code:DotProductFloat16AccFloat16VALVE capability.
+  * [[features-shaderMixedFloatDotProductBFloat16Acc]]
+    pname:shaderMixedFloatDotProductBFloat16Acc indicates whether the
+    implementation supports shaders with the code:DotProductBFloat16AccVALVE
+    capability.
+  * [[features-shaderMixedFloatDotProductFloat8AccFloat32]]
+    pname:shaderMixedFloatDotProductFloat8AccFloat32 indicates whether the
+    implementation supports shaders with the
+    code:DotProductFloat8AccFloat32VALVE capability.
+
+:refpage: VkPhysicalDeviceShaderMixedFloatDotProductFeaturesVALVE
+include::{chapters}/features.adoc[tag=features]
+
+include::{generated}/validity/structs/VkPhysicalDeviceShaderMixedFloatDotProductFeaturesVALVE.adoc[]
+--
+endif::VK_VALVE_shader_mixed_float_dot_product[]
+
 
 [[features-requirements]]
 == Feature Requirements
@@ -9234,17 +9644,28 @@ endif::VKSC_VERSION_1_0[]
 
 All other features defined in the Specification are optional:.
 
+[NOTE]
+====
+Applications running on Vulkan implementations advertising a
+slink:VkPhysicalDeviceDriverProperties::pname:conformanceVersion less than
+1.4.4.0 should be aware that the
+<<features-formatRgba10x6WithoutYCbCrSampler,pname:formatRgba10x6WithoutYCbCrSampler>>
+feature may not be supported despite `apiext:VK_EXT_rgba10x6_formats` being
+advertised.
+====
+
+
 // intentionally using VK_VERSION_1_3 for this block
 ifdef::VK_VERSION_1_3[]
-[[profile-features]]
-== Profile Features
+[[milestone-features]]
+== Roadmap Milestone Features
 
 
-[[profile-features-roadmap-2022]]
+[[milestone-features-roadmap-2022]]
 === Roadmap 2022
 
 Implementations that claim support for the <<roadmap-2022, Roadmap 2022>>
-profile must: support the following features:
+milestone must: support the following features:
 
   * <<features-fullDrawIndexUint32, pname:fullDrawIndexUint32>>
   * <<features-imageCubeArray, pname:imageCubeArray>>
@@ -9305,11 +9726,11 @@ profile must: support the following features:
   * <<features-scalarBlockLayout, pname:scalarBlockLayout>>
 
 
-[[profile-features-roadmap-2024]]
+[[milestone-features-roadmap-2024]]
 === Roadmap 2024
 
 Implementations that claim support for the <<roadmap-2024, Roadmap 2024>>
-profile must: support the following features:
+milestone must: support the following features:
 
   * <<features-multiDrawIndirect, pname:multiDrawIndirect>>
   * <<features-shaderImageGatherExtended, pname:shaderImageGatherExtended>>
@@ -9319,4 +9740,19 @@ profile must: support the following features:
   * <<features-shaderFloat16, pname:shaderFloat16>>
   * <<features-storageBuffer16BitAccess, pname:storageBuffer16BitAccess>>
   * <<features-storageBuffer8BitAccess, pname:storageBuffer8BitAccess>>
+
+// intentionally using VK_VERSION_1_4 for this block
+ifdef::VK_VERSION_1_4[]
+[[milestone-features-roadmap-2026]]
+=== Roadmap 2026
+
+Implementations that claim support for the <<roadmap-2026, Roadmap 2026>>
+milestone must: support the following features:
+
+  * <<features-hostImageCopy, pname:hostImageCopy>>
+  * <<features-robustBufferAccess2, pname:robustBufferAccess2>>
+  * <<features-robustImageAccess2, pname:robustImageAccess2>>
+  * <<features-nullDescriptor, pname:nullDescriptor>>
+
+endif::VK_VERSION_1_4[]
 endif::VK_VERSION_1_3[]

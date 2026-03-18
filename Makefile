@@ -1,4 +1,4 @@
-# Copyright 2014-2025 The Khronos Group Inc.
+# Copyright 2014-2026 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 # Vulkan Specification makefile
@@ -151,12 +151,12 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 330
+PATCHVERSION = 344
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 20
+SCPATCHVERSION = 21
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
@@ -597,6 +597,17 @@ check-txtfiles:
 check-xrefs: $(HTMLDIR)/vkspec.html
 	$(PYTHON) $(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
 
+# Check for UNRESOLVED or PROPOSED issues in extension appendices
+# This is not run as part of 'allchecks' since it would fail in most new
+# extension branches, but instead triggered only in main branch by CI
+CHECK_PROPOSED = git grep -n -E 'PROPOSED|UNRESOLVED' $(SPECDIR)/appendices/VK_*.adoc
+check-proposed:
+	if test `$(CHECK_PROPOSED) | wc -l` != 0 ; then \
+	    echo "PROPOSED or UNRESOLVED issues should not be present in published extension appendices:" ; \
+	    $(CHECK_PROPOSED) ; \
+	    exit 1 ; \
+	fi
+
 # Generated refpage sources. For now, always build all refpages.
 MANSOURCES   = $(wildcard $(REFPATH)/*.adoc)
 
@@ -857,18 +868,21 @@ setup_features_antora: xrefMap features_nav_antora
 
 # Construct the features component nav.adoc from the current list of
 # features, so it remains up to date.
+# If you create feature documentation which is not matched by the
+# FEATURES_ADOC pattern below, it will need to be updated.
 # This could be merged into antora-prep.py but is very specific
 # to the features module, so that is pointless.
 # We no longer include the proposal template.
 # To restore it, add
 #   -templatepath proposals/template.adoc
 # and uncomment that option in the script.
+FEATURES_ADOC = $(filter-out %Roadmap.adoc %template.adoc, $(wildcard proposals/[A-Z]*.adoc))
 features_nav_antora:
 	scripts/antora-nav-features.py \
 	    -root . \
 	    -component $(shell realpath antora/features/modules/features) \
 	    -roadmappath proposals/Roadmap.adoc \
-	    `find ./proposals -name 'VK_*.adoc'`
+	    $(FEATURES_ADOC)
 
 # Generate Antora refpages module content by extraction from rewritten
 # spec sources.

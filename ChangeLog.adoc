@@ -1,4 +1,4 @@
-Copyright 2016-2025 The Khronos Group Inc.
+Copyright 2016-2026 The Khronos Group Inc.
 SPDX-License-Identifier: CC-BY-4.0
 
 Update Log for the Vulkan-Docs repository on GitHub. Updates are in reverse
@@ -11,6 +11,650 @@ public pull requests that have been accepted.
 
 "`VU`" as used below is an abbreviation for "`valid usage statement`", which
 appears frequently in the change log.
+
+'''
+
+Change log for February 20, 2026 Vulkan 1.4.344 spec update:
+
+Github Issues
+
+  * Clarify the NOTE describing how the <<limits-viewportboundsrange,
+    viewportBoundsRange>> limit is defined (public issue 2634).
+  * Remove collision between type name and structure member / parameter
+    names in VK_SEC_ubm_surface, disallow this in style guide as it affects
+    some downstream language bindings, and add a check to xml_consistency.py
+    (public issue 2679).
+  * Remove extra double-quote at the end of a comment (public PR 2680).
+
+Internal Issues
+
+  * Relax vkGetCalibratedTimestampsKHR VU 09246 to allow
+    VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT time domain calibrations to not
+    be unique, and the VkSwapchainCalibratedTimestampInfoEXT::swapchain
+    external synchronization requirement, allowing calibration of multiple
+    present stages and determining timestamps for a swapchain-local
+    time-domain in the same thread as vkGetPastPresentationTimingEXT
+    (internal issue 4596).
+  * Fix VkVideoSessionParametersKHR `parent` attribute to correct
+    parent-child relationship in implicit VUs (internal issue 4615).
+  * Add a NOTE to <<decode-av1-picture-info, AV1 Std Picture Information>>
+    regarding a known decode app bug and driver workaround (internal issue
+    4639).
+  * Generate new "`Structure Chaining`" documentation linking structures
+    back to the base structures the extend (internal issue 4670).
+  * Move VU 04745 from standalone SPIR-V to runtime SPIR-V section (internal
+    issue 4682).
+  * Reorder XML entries to not need dependency tracking for enabling modular
+    headers (internal MR 7994).
+  * Remove unnecessary parenthesis in complex XML dependencies (internal MR
+    7995).
+  * Add boolean expression support to XML `protect` attribute (internal MR
+    7996).
+  * Update legacy header comments and registry schema documentation to match
+    specification language for "`ignored`" legacy entries (internal MR
+    7998).
+  * Unify description of VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT in
+    VkAccessFlagBits and the corresponding bit in VkAccessFlagBits2
+    (internal MR 8062).
+  * Fix Vulkan Object Flags/Handles (internal MR 8067).
+
+New Extensions
+
+  * VK_VALVE_shader_mixed_float_dot_product
+
+'''
+
+Change log for February 6, 2026 Vulkan 1.4.343 spec update:
+
+Github Issues
+
+  * State that a vkAcquireNextImage*KHR fence happens-after semaphore
+    (public issue 2278).
+  * Use more consistent <<commandbuffers-lifecycle, command buffer state
+    definitions>> (public issue 2647).
+  * Remove advice about SPIR-V decorations in the VK_EXT_descriptor_heap
+    proposal document, since it cannot apply definitions>> (public issue
+    2666).
+  * Add anchors for tables that did not have them, and corresponding markup
+    guidance in the style guide (public issue 2670).
+
+Internal Issues
+
+  * Fix language and markup issues for vkWaitForPresentKHR and
+    VkPresentId2KHR (internal issue 4070).
+  * Restore description of FRAGMENT_REGION_BIT in VK_EXT_custom_resolve
+    proposal (internal issue 4569).
+  * Add interaction between tensors and
+    {fragment,vertex}PipelineStoreAndAtomics features (internal issue 4613).
+  * Fix some pipeline library flag VUs by moving them from
+    VkPipelineLibraryCreateInfoKHR to VkGraphicsPipelineCreateInfo and
+    VkRayTracingPipelineCreateInfoKHR (internal issue 4659).
+  * Add new common render pass QFOT/Layout transition restriction VUs to
+    wait events commands (internal issue 4672).
+  * Fix vkGetSwapchainTimeDomainPropertiesEXT to require pTimeDomains and
+    pTimeDomainIds to both be `NULL`, or both be non-`NULL` (internal merge
+    request 7966).
+  * Add VK_ARM_tensors interactions with several other extensions (internal
+    MR 7988).
+  * Add OpUntypedArrayLengthKHR to common shader descriptor heap VU 11378
+    (internal MR 8002).
+  * Update <<tessellation, shader object tessellation>> Spacing*
+    descriptions to match VUs (internal MR 8009).
+  * Add Roadmap 2022 limit for maxPerStageDescriptorSamples to the
+    <<limits-types, Required Limit Types>> table (internal MR 8012).
+  * Add CI test to prevent UNRESOLVED and PROPOSED issues in published
+    extension appendices (internal MR 8026).
+  * Mark VkCopyMemoryToImageIndirectInfoKHR::flags,
+    VkCopyMemoryIndirectInfoKHR::srcCopyFlags, and
+    VkCopyMemoryIndirectInfoKHR::dstCopyFlags as `optional` in XML (internal
+    MR 8028).
+  * Fixes to VkDataGraphPipelineCreateInfoARM VUs and XML attributes
+    (internal MR 8028).
+  * Remove redundant VkBuildPartitionedAccelerationStructureInfoNV VU 10561
+    (internal MR 8032).
+  * Remove implicit VU for
+    VkBuildPartitionedAccelerationStructureInfoNV::scratchData (internal MR
+    8033).
+  * Add missing `<spirvextension>` XML tag for
+    SPV_QCOM_cooperative_matrix_conversion (internal MR 8038).
+  * Minor consistency and markup fixes to
+    VkSubsampledImageFormatPropertiesEXT, <<descriptorheaps-writing, Writing
+    Descriptors>>, vkWriteSamplerDescriptorsEXT, and
+    vkWriteResourceDescriptorsEXT (internal MR 8044).
+
+New Extensions
+
+  * VK_SEC_ubm_surface
+
+'''
+
+Change log for January 30, 2026 Vulkan 1.4.342 spec update:
+
+Github Issues
+
+  * Update reference from srcBuffer to srcImage for CmdCopyImage (public PR
+    2664).
+
+Internal Issues
+
+  * Take packed formats into account in common build acceleration structure
+    VU 03711 (internal issue 4643).
+  * Remove clause about the internally synchronized bit from XML
+    `implicitexternsyncparams` description for vkDestroyDevice (internal
+    issue 4645).
+  * Add VkBufferCreateinfo VUs 11277 / 11279 for VK_EXT_descriptor_heap
+    (internal issue 4646).
+  * Simplify and clean up alignment rules introduced as VUs by
+    VK_EXT_descriptor_heap by referring to the
+    <<limits-minStorageBufferOffsetAlignment,
+    minStorageBufferOffsetAlignment>> limit (internal issue 4649).
+  * Fix size alignment in VkResourceDescriptorInfoEXT VU 11454 (internal
+    issue 4655).
+  * Add FuncPointer / FuncPointerParam classes to vulkan_object (internal MR
+    7736).
+  * Add bitpos field to vulkan_object Flag class (internal MR 7875).
+  * Add specVersionValue field to vulkan_object Extension class (internal MR
+    7877).
+  * Update deprecation text in VK_EXT_descriptor_buffer appendix and add
+    <<legacy-resource-objects>> and <<legacy-descriptor-sets>> sections to
+    the <<legacy, Legacy and Superseded Functionality>> appendix (internal
+    MR 7997).
+  * Fix VkDeviceCreateInfo VU 02802 disallowing mixed internsync and
+    externsync queues (internal MR 8001).
+  * Use Oxford comma consistently (internal MR 8005).
+  * Fix Roadmap extension and version requirements in VP_KHR_roadmap.json
+    (internal MR 8007).
+  * Fix standalone SPIR-V VUs 06673 and 06674 for push constant requirements
+    for banks (internal MR 8011).
+  * Resolve all "`UNRESOLVED`" and "`PROPOSED`" issues in published
+    extension appendices (internal MRs 8013, 8014).
+  * Add API convention selection based on target API name to base_generator
+    (internal MR 8020).
+  * Change vkCmdBuildPartitionedAccelerationStructuresNV VU 10549 to only
+    imply when acceleration structures are different (internal MR 8030).
+
+New Extensions
+
+  * VK_QCOM_cooperative_matrix_conversion
+
+'''
+
+Change log for January 23, 2026 Vulkan 1.4.341 spec update:
+
+Internal Issues
+
+  * Add Roadmap 2026 (internal MR 7937).
+
+'''
+
+Change log for January 23, 2026 Vulkan 1.4.340 spec update:
+
+Github Issues
+
+  * Fix copy/paste error in WSI chapter (public PR 2643).
+  * Adjust XML dependency for VK_KHR_swapchain_maintenance1 (public PR 2646).
+
+Internal Issues
+
+  * Fix <<fragmentdensi1ymap-fetch-density-value, fragment density map texel
+    size calculation>> equation (internal MR 7355).
+  * Remove inaccurate and unnecessary open/closed GOP definitions from video
+    encode descriptions (internal MR 7954).
+  * Remove redundant common draw VU 07748 (internal MR 7968).
+  * Update VkBufferCreateInfo VU 09641 to refer to the
+    <<resources-effective-buffer-usage, effective buffer usage>>, rather
+    than just `usage` (internal MR 7974).
+  * Tighten wording around common draw dispatch VU 08114 and in the
+    <<descriptor-validity, descriptor validity>> section (internal MR 7984).
+  * Remove overlap and simplify VK_ARM_data_graph (internal MR 7989).
+  * Fix XML dependencies for VK_QCOM_tile_shading (internal MR 7990).
+
+New Extensions
+
+  * VK_KHR_internally_synchronized_queues
+  * VK_EXT_descriptor_heap
+  ** Update VK_NVX_image_view_handle for VK_EXT_descriptor_heap interaction
+  * VK_EXT_shader_subgroup_partitioned
+  * VK_NV_push_constant_bank_support
+
+'''
+
+Change log for January 16, 2026 Vulkan 1.4.339 spec update:
+
+Github Issues
+
+  * Clarify VkMemoryAllocateFlagBits VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT
+    definition by removing wording around vkGetBufferOpaqueCaptureAddress
+    where not needed (public issue 2636).
+  * Rewrite common draw VUs for feedback loop layouts
+    and corresponding language in the specification body
+    discussing <<renderpass-feedbackloop, feedback loops>>
+    (public issue 2644).
+  * Make message from building video codec headers diagnostic, instead of
+    warning, and remove redundant `codec_headers` target in CI scripts
+    (public issue 2655).
+  * Update Vulkan-Hpp generator stage in github CI to enable C++23 test and
+    run in the same container as other CI stages (public issue 2654).
+
+Internal Issues
+
+  * Update <type category="funcpointer"> schema to simplify format and
+    include more information, representing function pointers in the same way
+    as <command> tags. Update RNC schema and schema document to separately
+    validate different categories of <type> tags (internal issue 5).
++
+[NOTE]
+====
+This is a backwards-incompatible, breaking schema change. We are usually
+very reluctant to do this, but there was sufficiently internal demand and
+the scope of the change is small. We have updated all generators using
+funcpointers in the Vulkan-Docs repository, as well as the Vulkan-Hpp
+generator, to accommodate the change. Other downstream XML consumers may
+need to modify how they interpret these tags.
+====
+  * Fix builtin VUs for MeshShader (internal issue 4142).
+  * Remove old vkDestroyPipelineLayout VU 02004 (internal issue 4625).
+  * Move VK_EXT_pipeline_creation_cache_control and
+    VK_EXT_pipeline_protected_access VUs for different pipeline types to
+    common validity (internal MR 7945).
+  * Fix XML `depends` logic for VK_KHR_present_id (internal MR 7956).
+  * Update generated markup for the extension appendices so that each
+    extension starts on a new PDF page (internal MR 7957).
+  * Remove redundant VkMemoryMapPlacedInfoEXT VU 09576 (internal MR 7965).
+  * Skip spirvcapability `xml_consistency.py` check for non-vulkan apis
+    (internal MR 7975).
+  * Remove Vulkan SC JSON tooling, now found in the VulkanSC-pcutil
+    repository (internal MR 7976).
+
+'''
+
+Change log for January 10, 2026 Vulkan 1.4.338 spec update:
+
+Github Issues
+
+  * Factor out function-specific scoping of semaphore signal / wait (public
+    issue 1175).
+  * Define <<resources-external-image-layout-rules, Image Layout Rules with
+    External Memory>> to use with D3D 10+11 interop and add corresponding
+    VkImageMemoryBarrier VUs (public issue 1436)
+  * Fix various markup macro and whitespace typos (public PRs 2637, 2638,
+    2639, 2642).
+  * Do not run CI when pushing tags (public PR 2635).
+
+Internal Issues
+
+  * Make definition of max work group count limits consistent for mesh and
+    task shaders (internal issue 4479)
+  * Simplify definition of <<synchronization-framebuffer-regions,
+    Framebuffer Region Dependencies>> (internal issue 4535).
+  * Fix some VkPresentTimingInfoEXT VUs (internal issues 4571, 4573).
+  * Remove redundant VkDescriptorGetInfoEXT VUs (internal MR 7669).
+  * Fix XML validity attributes and VUID 09956 for VK_ARM_data_graph
+    (internal MR 7833).
+  * Add missing maxMeshMultiviewViewCount VUs for
+    VkGraphicsPipelineCreateInfo (internal MR 7911).
+  * Add indirect addressing clarifications to cluster acceleration structure
+    VUs (internal MR 7924.
+  * Fix typo OpImageWeightedSampleQCOM -> OpImageSampleWeightedQCOM
+    (internal MR 7929).
+  * Combine some related VUs for vkUpdateDescriptorSets and
+    VkGraphicsPipelineCreateInfo (internal MR 7931).
+  * Add missing vkUpdateDescriptorSets VU for VK_ARM_tensor (internal MR
+    7933).
+  * Simplify VkBufferCreateInfo VU 09641 (internal MR 7934).
+  * Combine some VkSubpassDescription VUs (internal MR 7938).
+  * Add ratified spec build to CI (internal MR 7939).
+  * Add missing VK_QCOM_tile_memory_heap interactions to vkBindImageMemory
+    and VkBindImageMemoryInfo VUs (internal MR 7940).
+  * Fix vkCmdBindTileMemoryQCOM `NULL` typo (internal MR 7941).
+  * Add missing PerPrimitiveEXT index bounds VU for
+    <<spirvenv-module-validation-runtime, Runtime SPIR-V Validation>>
+    (internal MR 7943).
+  * Add `scripts/nextfreebits.py` to summarize remaining bits which may be
+    reserved in bitmask types (internal MR 7948).
+  * Fixes and additions for VK_QCOM_tile_memory_heap in common subpass
+    description, VkFramebufferCreateInfo, and VkRenderPassBeginInfo VUs
+    (internal MR 7950).
+  * Update CI to use newer Docker image (internal MR 7969).
+
+'''
+
+Change log for December 19, 2025 Vulkan 1.4.337 spec update:
+
+Internal Issues
+
+  * Clarify the definition of the <<features-ycbcr2plane444Formats,
+    ycbcr2plane444Formats>> feature, and add VUs restrict related formats
+    when the feature is not enabled (internal issue 4029).
+  * Make the <<limits-maxPerStageDescriptorInputAttachments,
+    pname:maxPerStageDescriptorInputAttachments>> limit the max index for
+    common subpass description and VkRenderingInputAttachmentIndexInfo VUs,
+    and add an explanatory NOTE in its definition (internal issue 4506).
+  * Reword custom resolve overdraw normative language in
+    vkCmdBeginCustomResolveEXT and add "`Overdraw`" as a glossary term
+    (internal issue 4510).
+  * Merge KHR and remaining vendor extension markup in separate files into
+    the chapters they are included from (internal issue 4516).
+  * Clarify shader indices in VkRayTracingShaderGroupCreateInfoKHR VUs
+    (internal issue 4568).
+  * Add missing vkCmdBeginRendering VUs to check the VkImageLayout for both
+    VK_EXT_fragment_density_map and VK_KHR_fragment_shading_rate (internal
+    issue 4577).
+  * Specify that
+    VkAccelerationStructureInstanceKHR::accelerationStructureReference
+    refers to a BLAS (internal issue 4578).
+  * Add VkDescriptorDataEXT buffer alignment VUs (internal issue 4580).
+  * Fix text markup in some equations in the
+    <<textures-weightimage-filteroperation, Weight Sampling Operation>>
+    section (internal issue 4583).
+  * Fix ordering of "`if`" and "`must`" clauses in some MSRTSS VUs (internal
+    issue 4592).
+  * Fix some, and add some new common indirect memory to image command and
+    memory to image copy VUs (internal MR 7897).
+  * Add missing VK_BASE_VERSION_1_3 to some markup conditionals referring
+    only to VK_KHR_synchronization2 in VUs (internal MR 7906).
+  * Clarify some attachment layout VUs as validated on the GPU timeline for
+    vkCmdBeginRendering (internal MR 7909).
+  * Add VU requiring the primitiveFragmentShadingRateMeshShader feature to
+    be enabled when using PrimitiveShadingRateKHR in the MeshEXT execution
+    model (internal MR 7910).
+  * Disable VK_OHOS_native_buffer (internal MR 7917).
+  * Reorder <<pipelines-ray-tracing, Ray Tracing Pipelines>> section and add
+    subsections (internal MR 7920).
+  * Embed required image usage flags into VkImageViewCreateInfo VU 04441
+    instead of referring to an external list in a different part of the
+    specification (internal MR 7927).
+
+New Extensions
+
+  * VK_EXT_texture_compression_astc_3d
+  * VK_EXT_shader_long_vector
+
+'''
+
+Change log for December 12, 2025 Vulkan 1.4.336 spec update:
+
+Github Issues
+
+  * Add a NOTE to the <<interfaces-resources-layout, Offset and Stride
+    (#2627) Assignment>> section linking to a different explanation of the
+    requirements in the Vulkan Guide (public issue 2621).
+  * Change XML `bitvalues` attribute to `requires` for a few 32-bit
+    Vk*FlagBits types (public PR 2624).
+  * Clarify that the VkDeviceDeviceMemoryReportCreateInfoEXT::pUserData
+    pointer passed through callbacks can be NULL in XML and the places in
+    the specification it is specified (Vulkan-ValidationLayers issue 11228).
+
+Internal Issues
+
+  * Make enumerant names in the single-file HTML specification and
+    independent refpage outputs into links to the enumerated type definition
+    they belong to (not done for Antora, yet) (internal issue 4283).
+  * Add Mesh and Task shaders to standalone SPIR-V LocalSize VU 10685
+    (internal issue 4432).
+  * Move VUs requiring image layouts match image usage from common image
+    memory barrier to common image layout section and include them with
+    VkHostImageLayoutTransitionInfo (internal issue 4467).
+  * Clarify the use of extended queues without the corresponding feature
+    enable for VkDeviceQueueCreateInfo (internal issue 4494).
+  * Add a NOTE to vkCmdEndRendering explaining multi-pass ordering
+    considerations (internal issue 4513).
+  * Add ShaderObject maxBoundDescriptorSets VU for VkShaderCreateInfoEXT
+    (internal issue 4518).
+  * Clarify unsized arrays of input attachments in the
+    <<interfaces-inputattachment, Fragment Input Attachment Interface>>
+    section (internal issue 4545).
+  * Add <<descriptorsets-inputattachment, allowed ImageLayout for
+    InputAttachment>> (internal issue 4567).
+  * Restore missing validity include for
+    vkCmdDecompressMemoryIndirectCountNV (internal issue 4514).
+  * Relax phrasing of VK_KHR_suboptimal from "`is returned if an image
+    became available`" to "`may be returned...`" in the discussion of
+    vkAcquireNextImageKHR in the <<wsi-swapchain, WSI Swapchain>> chapter
+    (internal MR 7102).
+  * Add VUs to vkGetQueryPoolResults to check stride only when queryCount >
+    1 (internal MR 7476).
+  * Clarify when scratch data must be valid in VUs for
+    vkBuildAccelerationStructuresKHR, vkBuildMicromapsEXT,
+    VkBuildPartitionedAccelerationStructureInfoNV,
+    VkClusterAccelerationStructureCommandsInfoNV, vkCmdBuildMicromapsEXT,
+    and common build acceleration structure (internal MR 7628).
+  * Specify `optional` XML attributes for VkDeviceAddress members of
+    VkBuildPartitionedAccelerationStructureInfoNV,
+    VkClusterAccelerationStructureCommandsInfoNV, allowing them to be zero
+    and update VkClusterAccelerationStructureCommandsInfoNV accordingly
+    (internal MR 7782).
+  * Use new consistent phrasing for buffer usage language consistently in
+    existing VUs (internal MR 7851).
+  * Typo fix to VkDescriptorGetInfoEXT VU 12216 (internal MR 7870).
+  * Fix copy-indirect and create-view interaction with disjoint planes for
+    common VU 07665 and VkImageViewCreateInfo VU 01020 (internal MR 7878).
+  * Remove "`Alternatively, to`" phrasing from vk*2 command descriptions so
+    the corresponding refpages read sensibly in isolation from the vk*non-2
+    command descriptions found immediately above in the full specification
+    (internal MR 7888).
+  * Add dynamic rendering VUs for VK_QCOM_multiview_per_view_viewports
+    equivalent to VkGraphicsPipelineCreateInfo VUs 07730 and 07731 (internal
+    MR 7892).
+  * Cleanup and unify markup style of proposal documents, and remove
+    RESOLVED: from issues since every published proposal should have
+    resolved all issues (internal MR 7899).
+  * Add VkRenderingAttachmentInfo VU to enforce resolveMode !=
+    VK_RESOLVE_MODE_NONE if multisampledRenderToSingleSampledEnable is true
+    (internal MR 7902).
+  * Evaluate complex dependencies in XML at format feature generator
+    runtime, instead of relying on asciidoc which cannot evaluate all such
+    expressions properly (internal MR 7908).
+
+New Extensions
+
+  * VK_NV_compute_occupancy_priority
+
+'''
+
+Change log for November 28, 2025 Vulkan 1.4.335 spec update:
+
+Github Issues
+
+  * Apply -removeExtensions genvk.py flag to platform headers (public PR
+    2616).
+
+Internal Issues
+
+  * Update tessellation VUs for shader objects to constrain patch size,
+    subdivision, spacing / orientation, and point mode as to which shader
+    stages they can appear in, and enforce matching rules across stages
+    (internal issues 3458, 3747).
+  * Evaluate complex dependencies in XML at syncgenerator runtime, instead
+    of relying on asciidoc which cannot evaluate all such expressions
+    properly. This restores several tokens in the generated tables related
+    to VK_KHR_ray_tracing_pipeline (internal issue 4133).
+  * Merge remaining FUCHSIA, GGP, and [GOOGLE] vendor extension markup in
+    separate files into the chapters they are included from (internal issue
+    4516).
+  * Add missing VU for VK_KHR_copy_memory_indirect commands requiring source
+    and destination memory be from ranges allocated from buffers and images
+    with the correct USAGE flags set (internal issue 4546).
+  * Mark vkCmdDebug*EXT in XML as state, not action commands (internal issue
+    4558).
+  * Clarify address mode parameters and type ranges for VkSamplerCreateInfo
+    and VkSamplerAddressMode (internal issue 4560).
+  * Require support for at least one queue family supporting graphics,
+    compute, or video operations in VkQueueFlagBits (internal issue 4566).
+  * Add USAGE flag VUs for vkGetDescriptorEXT (internal MR 7801).
+  * Add standalone SPIR-V device Scope VU for OpTypeCooperativeMatrixKHR
+    (internal MR 7827).
+  * Merge orphaned VK_EXT_metal_surface include into WSI chapter (internal
+    MR 7854).
+  * Add VkDescriptorSetLayoutBinding VU restricting YCbCr samplers (internal
+    MR 7858).
+  * Fix / split VUs for
+    VkClusterAccelerationStructureCommandsInfoNV::dstAddressesArray
+    (internal MR 7861).
+
+New Extensions
+
+  * VK_EXT_present_timing
+
+'''
+
+Change log for November 21, 2025 Vulkan 1.4.334 spec update:
+
+Github Issues
+
+  * Cleanup VkComputePipelineCreateInfo layout reuse restriction language
+    (public issue 2612).
+  * De-alias VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV from
+    VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT and restore the
+    original enum value for
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_INVOCATION_REORDER_FEATURES_NV,
+    after realizing the aliasing was done incorrectly and that the
+    underlying SPIR-V extensions were not identical (public issue 2620).
+
+Internal Issues
+
+  * Clarify that VkSparseImageFormatProperties::imageGranularity is always
+    in terms of texels (internal issue 4430).
+  * Merge remaining vendor and EXT extension markup in separate files into
+    the chapters they are included from (internal issue 4516).
+  * Add VkDescriptorSetLayoutBinding VU to disallow mix and matching of
+    immutable YCbCr samplers (internal issue 4521).
+  * Clarify YCbCr shader restrictions in runtime SPIR-V VUs and the
+    <<textures-operation-validation, Instruction/Sampler/Image View
+    Validation>> section (internal issues 4532, 4544).
+  * Use "`for each element`" instead of "`for any element`" in all relevant
+    VUs (internal issue 4534).
+  * Add a NOTE that images created with vkImportMetalTextureInfoEXT require
+    no memory binding operations (internal MR 6738).
+  * Add a NOTE at the end of the <<features-requirements, Feature
+    Requirements>> section that the formatRgba10x6WithoutYCbCrSampler
+    feature may not be supported on older implementations (internal MR
+    7445).
+  * Add a common image copy VU banning depth/stencil copies when the source
+    and destination aspects do not match (internal MR 7770).
+  * Clarify that VkSamplerCreateInfo::addressModeW is ignored with
+    unnormalizedCoordinates (internal MR 7796)
+  * Add missing VK_INDIRECT_COMMANDS_TOKEN_TYPE_DRAW_INDEXED_EXT to
+    VkIndirectCommandsLayoutCreateInfoEXT VU 11104 (internal MR 7805).
+  * Add missing vkCmdExecuteGeneratedCommandsEXT VU constraining compute
+    commands inside a render pass instance (internal MR 7807).
+  * Remove un-needed conditional markup from standalone SPIR-V VUs (internal
+    MR 7836).
+  * Fix descriptorCount restriction in common pipeline create info VU 07991
+    (internal MR 7842).
+  * Use globally consistent phrasing when describing a requirement for USAGE
+    flags to be set (internal MR 7842).
+
+'''
+
+Change log for November 14, 2025 Vulkan 1.4.333 spec update:
+
+Github Issues
+
+  * Fix `const` pNext in returnedonly="true" structs (public PR 2601).
+  * Update description of queue objects to omit "`execution engines`"
+    (public issue 2604).
+
+Internal Issues
+
+  * Add CI checks in xml_consistency.py for cases where pNext members must
+    not be `const` (internal issue 2734).
+  * Use "`for each element`" instead of "`for any element`" in VUs for ray
+    tracing extensions, and document this pattern in the style guide
+    (internal issue 4534).
+  * Add acceleration structures to vkUpdateDescriptorSetWithTemplate VU
+    01685 (internal issue 4536).
+  * Add common query results VUs restricting
+    VK_QUERY_RESULT_WITH_STATUS_BIT_KHR based on the query type (internal
+    issue 4484).
+  * Fix `const` pNext in VkPhysicalDeviceDataGraphModelFeaturesQCOM
+    (internal MR 7804).
+  * Merge INTEL, NN, NV, QCOM, and QNX extension markup in separate files
+    into the chapters they are included from (internal issue 4516).
+  * Update pipeline library dependency explanation in the
+    VK_KHR_ray_tracing_pipeline extension appendix (internal MR 7828).
+
+New Extensions
+
+  * VK_EXT_custom_resolve
+  * VK_EXT_ray_tracing_invocation_reorder
+
+'''
+
+Change log for November 7, 2025 Vulkan 1.4.332 spec update:
+
+Github Issues
+
+  * Generate refpage aliases in Antora site build and remove now-redundant
+    'alias' attributes from refpage markup (public PRs 2610, 2611).
+  * Remove 'returnedonly' XML attribute from
+    VkPhysicalDeviceFragmentDensityMapLayeredFeaturesVALVE (public PR 2607).
+
+Internal Issues
+
+  * Require contiguous memory per plane for multiplanar images, instead of
+    for the entire image, in common image copy and image layout transition
+    VUs (internal issue 3344).
+  * Attempt to clarify <<interfaces-raypipeline, ray payload matching
+    requirements>> (internal issue 4373).
+  * Clarify fragment density map texel size calculation with dynamic
+    rendering in the <<fragmentdensitymap-fetch-density-value, Fetch Density
+    Value>> section (internal issue 4480).
+  * Improve host synchronization NOTE for VkBufferMemoryBarrier (internal
+    issue 4504).
+  * Add VkQueryPoolCreateInfo VU to require queue family support for
+    status-only query pool creation (internal issue 4511).
+  * Make chapter markup filenames consistent with the extension names they
+    document (internal issue 4516).
+  * Merge AMD extension markup in separate files into the chapters it is
+    included from (internal issue 4516).
+  * Add missing VUs that VkDeviceOrHostAddressKHR cannot be null in
+    ray-tracing extensions (internal MR 7613).
+  * Add conditional markup to glossary for compute- and graphics-specific
+    terms (internal MR 7752).
+  * Add missing common push descriptor template VU (internal MR 7772).
+  * Replace use of refpage attribute in SPIR-V VUIDs with `Standalone` or
+    `Runtime` as appropriate (internal MR 7773).
+  * Add missing VK_KHR_get_physical_device_properties2 dependencies to XML
+    (internal MR 7777).
+  * Add autogenerated "Equivalent to" for promoted APIs (internal MR 7779)
+    and add CI test for old usage (internal MR 7798).
+  * Take VkShaderModuleCreateInfo into account for pipeline binary matching
+    in VkPipelineBinaryInfoKHR (internal MR 7785).
+  * Replace "`indifferent of`" with "`regardless of`" and add CI test
+    (internal MR 7799).
+
+New Extensions
+
+  * VK_QCOM_data_graph_model
+
+'''
+
+Change log for October 31, 2025 Vulkan 1.4.331 spec update:
+
+Internal Issues
+
+  * Clarify treatment of zero shader binding table addresses in common ray
+    tracing VUs (internal issue 4460).
+  * Add vkGetDescriptorSetLayoutSizeEXT VU for descriptor set layout with
+    the PUSH_DESCRIPTOR bit set (internal issue 4473).
+  * Add introductory paragraph to the <<dense-geometry-format, Dense
+    Geometry Format Version 1>> section (internal issue 4519).
+  * Add a runtime SPIR-V VU to ensure that any pointer a BDA uses is inside
+    a valid VkBuffer (internal MR 7754).
+  * Refactor <<queries, Queries>> chapter for parts which are optional in
+    Vulkan Base compute / graphics profiles (internal MR 7756).
+  * Add missing VkPhysicalDeviceMemoryDecompressionPropertiesEXT VU that
+    decompressionMethods is valid (internal MR 7760).
+  * Remove `const` from VkPhysicalDevicePresentationPropertiesOHOS::pNext
+    (internal MR 7762).
+  * Clarify <<textures-blockmatch, Block Matching>> blockSize behavior with
+    `VK_QCOM_image_processing` (internal MR 7764).
+
+New Extensions
+
+  * VK_ARM_performance_counters_by_region
+  * VK_OHOS_external_memory
 
 '''
 
@@ -607,7 +1251,7 @@ Internal Issues
   * Don't require host-image-copy on external resources in
     vkGetPhysicalDeviceImageFormatProperties and
     vkGetPhysicalDeviceImageFormatProperties2 (internal issue 4078)
-  * Update common copy image VUs to account for texel block extend (internal
+  * Update common copy image VUs to account for texel block extent (internal
     issue 4113)
   * Increase the framebuffer/viewport width/height minimum requirement for
     Vulkan 1.4 to support 8k rendering (internal issue 4117).
@@ -751,7 +1395,7 @@ Internal Issues
     stages (internal issue 4233).
   * Add runtime SPIR-V VUs for workgroup layout storage rules (internal
     issue 4255).
-  * Update VkBufferDeviceAddressInfo and vkGetBufferOpaqueCaptureAddress for
+  * Update VkBufferDeviceAddressInfo and vkGetBufferOpaqueCaptureAddress to
     forbid obtaining the device address of a non-sparse and non-mapped
     buffer (internal MR 6883).
   * Rewrite the <<fundamentals-objectmodel-lifetime, Object Lifetime>>
@@ -939,7 +1583,7 @@ Internal Issues
   * Specify that only the lower 32 bits are used in VkStridedDeviceAddressNV
     (internal MR 7173).
   * Add Vulkan object and base generator scripts for inclusion in
-    Vulkan-Headers (internal MR 7180),
+    Vulkan-Headers (internal MR 7180).
   * Update links to SPIR-V registry and add a missing spirvextension XML
     block (internal MR 7187).
 
@@ -1677,7 +2321,7 @@ Internal Issues
     XML 'deprecated' attributes, describing why they're deprecated (internal
     issue 2897).
   * Clarify language about OpFDiv(x,0) generating infinity and relocate to
-    the <<spirvenv-precision-core-table>> Precision of core SPIR-V
+    the <<spirvenv-precision-core-table, Precision of core SPIR-V
     Instructions>> table (internal issue 3902).
   * Update the <<memory-external-android-hardware-buffer-external-formats,
     Android Hardware Buffer External Formats>> section to address confusion
@@ -1697,7 +2341,7 @@ Internal Issues
   * Update VkImageCreateInfo VU 06722 and add new VU to fix mutable image
     creation for planar images to match up with imageview VUs (internal MR
     6774).
-  * Remove unhelpful (because unobserveable) additional notes about float
+  * Remove unhelpful (because unobservable) additional notes about float
     precision in <<spirvenv-precision-operation, Precision and Operation of
     SPIR-V Instructions>> (internal MR 6778).
   * Add video codec and capabilities metadata to the XML (internal MR 6787).
@@ -1813,7 +2457,7 @@ Internal Issues
   * Use VK_FILTER_CUBIC_IMG instead of the EXT alias in the
     VkSamplerCreateInfo IMG-specific VU 07911 (internal MR 6697).
   * All VK_IMAGE_CREATE_PROTECTED_BIT to report different memoryTypes in the
-    implementiation guarantees of properties about memory requirements in
+    implementation guarantees of properties about memory requirements in
     the <<resources-association, Resource Memory Association>> section
     (internal MR 6698).
   * Fix markup in vkCmdExecuteCommands VU 09681 (internal MR 6713).
@@ -1853,7 +2497,7 @@ Internal Issues
   * Add links from VkGraphicsPipelineCreateInfo VUs back to the
     corresponding structure members, to avoid duplicating lists of relevant
     dynamic state (internal MR 6681).
-  * Fix typo in Vk_KHR_dynamic_rendering_local_read proposal document
+  * Fix typo in VK_KHR_dynamic_rendering_local_read proposal document
     (internal MR 6686).
   * Make the <<ray-tracing-shader-call, Shader Call Instructions>> list into
     a table (internal MR 6687).
@@ -2077,7 +2721,7 @@ Internal Issues
     Instruction/Sampler/Image View Validation>> section about conditions
     requiring a CTS waiver on some implementations (internal MR 6589).
   * Add a common draw vertex binding VU for primitiveRestartEnable list
-    topology, corresponding to VkPipelinInputAssemblyStateCreateInfo VU
+    topology, corresponding to VkPipelineInputAssemblyStateCreateInfo VU
     06252 (public Vulkan-ValidationLayers issue 4413).
 
 '''
@@ -2562,7 +3206,7 @@ Internal Issues
   * Consolidate synchronization VUs (internal MR 6164).
   * Rewrite some spec language for apiext:VK_NV_cuda_kernel_launch to be
     internally consistent and follow style guidelines (internal MR 6234).
-  * Fix names of apiext:VK_NV_cuda_kernnel_launch enums for use with
+  * Fix names of apiext:VK_NV_cuda_kernel_launch enums for use with
     apiext:VK_EXT_debug_report (internal MR 6235).
   * Fix common VUs for slink:VkDeviceImageSubresourceInfoKHR to insert
     correct image parameter name (internal MR 6264).
@@ -2744,7 +3388,7 @@ Internal Issues
   * Add reflow test for list continuation in VUs (internal MR 6177).
   * Correct type of flink:vkQueueNotifyOutOfBandNV::pname:pQueueTypeInfo
     (internal MR 6179).
-  * Add XML `len` attribute for slink:VkFrameBoundaryEXT::pname:pTag order>>
+  * Add XML `len` attribute for slink:VkFrameBoundaryEXT::pname:pTag
     (internal MR 6180).
   * Consolidate VUs for apiext:VK_ANDROID_external_format_resolve (internal
     MR 6183).
@@ -4143,7 +4787,7 @@ Internal Issues:
   * Fix minor markup consistency typos in feature and limit xrefs (internal
     merge request 5563).
   * Fix typo in apiext:VK_QCOM_image_processing for required value of
-    code:unnormalizedCooordinates for the input code:sampler (internal merge
+    code:unnormalizedCoordinates for the input code:sampler (internal merge
     request 5564).
   * Fix typo in slink:VkDescriptorDataEXT language (internal merge request
     5568).
@@ -4666,7 +5310,7 @@ Internal Issues:
     repository, and update scripts and tools to match (internal issue 3204)
   * Tag apiext:VK_ARM_rasterization_order_attachment_access as promoted to
     EXT in XML (internal merge request 5364)
-  * Fix a typo in the "` Color Sample Coverage`" section (internal merge
+  * Fix a typo in the "`Color Sample Coverage`" section (internal merge
     request 5367)
   * Fix apiext:VK_EXT_fragment_density_map2 appendix to include the correct
     extension interface information (internal merge request 5368)
@@ -5369,7 +6013,7 @@ Internal Issues:
     flink:vkCmdWriteTimestamp and flink:vkCmdWriteTimestamp2 (internal issue
     2287).
   * Add pname:samplerFilterMinmax feature valid usage statement to
-    slink:VkSamplerCreateInfo (internal issu 2747).
+    slink:VkSamplerCreateInfo (internal issue 2747).
   * Add success and error codes to `vk.xml` for flink:vkWaitForPresentKHR
     (internal issue 2822).
   * Add footnote to flink:vkGetDeviceProcAddr suggesting, but not requiring
@@ -5945,13 +6589,13 @@ GitHub Issues:
   * Refer to flink:vkCmdPipelineBarrier2KHR::pname:pDependencyInfo as a
     pointer, not an array (public issue 1456).
   * Fix spelling and add backwards-compatibility aliases for some
-    elink:VkPipelinCreateFlagBits values (public issue 1676).
+    elink:VkPipelineCreateFlagBits values (public issue 1676).
   * Fix typo in apiext:VK_INTEL_shader_integer_functions2 (public issue
     1696).
   * Replace usage of {depth, color} buffer with {depth, color} attachment
     (public pull request 1701).
   * Add restriction to the <<formats-mandatory-features-depth-stencil,
-    manadatory format support table>> for depth/stencil formats preventing
+    mandatory format support table>> for depth/stencil formats preventing
     implementations from advertising those bits in
     slink:VkFormatProperties::pname:bufferFeatures (public
     Vulkan-ValidationLayers issue 3225).
@@ -6537,7 +7181,7 @@ Internal Issues:
     match similar statement for flink:vkGetDeviceQueue, and split off part
     of it into a new VU statement (internal issue 2645).
   * Fix a few enumerant and member names in the provisional video extensions
-    to comply with the spec style guidelinse (internal issue 2710).
+    to comply with the spec style guidelines (internal issue 2710).
   * Update the descriptions of flink:vkCmdDrawMultiEXT and
     flink:vkCmdDrawMultiIndexedEXT to clarify how they are equivalent to
     calling underlying drawing commands multiple times with different
@@ -6716,7 +7360,7 @@ Internal Issues:
     simplified image type / image view type compatibility table, and move
     the parameter compatibility portions of the table into explicit valid
     usage statements (internal issue 2586).
-  * Define the slink:VkPipelinCacheHeaderVersionOne structure in `vk.xml`
+  * Define the slink:VkPipelineCacheHeaderVersionOne structure in `vk.xml`
     instead of the previous "`Layout for pipeline cache header version one`"
     table (internal merge request 4011).
   * Make the `requires` attribute of the `spirvcapability` XML tag required
@@ -6726,7 +7370,7 @@ Internal Issues:
 
 New Extensions:
 
-  * `<<VK_NV_extermal_memory_rdma>>`
+  * `<<VK_NV_external_memory_rdma>>`
 
 '''
 
@@ -8336,7 +8980,7 @@ Internal Issues:
   * Copy over import/export behavior for sync file descriptor value `-1`
     from slink:VkImportFenceFdInfoKHR to slink:VkImportSemaphoreFdInfoKHR
     (internal issue 2274).
-  * State that a deriviative group is a quad scope instance in the
+  * State that a derivative group is a quad scope instance in the
     <<shaders-derivative-operations, Derivative Operations>> section
     (internal merge request 4025)
 
@@ -8455,7 +9099,7 @@ Internal Issues:
   * Add valid usage statement to slink:VkImageCreateInfo requiring that
     images with linear tiling cannot have sparse residency (internal merge
     request 3988).
-  * Clarify that the ptext:maxPerStageDesciptorUpdateAfterBind*
+  * Clarify that the ptext:maxPerStageDescriptorUpdateAfterBind*
     <<limits-required, Required Limits>> must be at least the corresponding
     non- ptext:UpdateAfterBind limits (internal merge request 3992).
 
@@ -9517,7 +10161,7 @@ GitHub Issues:
   * Fix issue 2 wording in the `<<VK_KHR_surface>>` appendix (public pull
     request 1100).
   * Fix valid usage statements for
-    slink:VkSwapchainCreateInfoKhr::pname:minImageCount interactions with
+    slink:VkSwapchainCreateInfoKHR::pname:minImageCount interactions with
     `<<VK_KHR_shared_presentable_image>>` (public pull request 1101).
   * Change the etext:VK_QUERY_SCOPE_* tokens in the
     slink:VkPerformanceCounterScopeKHR to aliases of new
@@ -9688,7 +10332,7 @@ Internal Issues:
     (internal merge request 3422).
   * Add Visual Studio folders to `.gitignore` (internal merge request 3450).
   * Add language to
-    slink:sname:VkPipelineCoverageModulationStateCreateInfoNV documenting
+    slink:VkPipelineCoverageModulationStateCreateInfoNV documenting
     that coverage modulation has no effect when using the
     ename:VK_COVERAGE_REDUCTION_MODE_TRUNCATE_NV reduction mode, clarifying
     an interaction with `<<VK_NV_coverage_reduction_mode>>` (internal merge
@@ -10235,7 +10879,7 @@ Internal Issues:
     <<spirvenv-module-validation, Validation Rules within a Module>>
     sections, and for the <<limits-minTexelGatherOffset>> and
     <<limits-maxTexelGatherOffset>> limits (internal issue 1723).
-  * Require code:code:OpGroupNonUniformBroadcast to take a constant `Id`
+  * Require code:OpGroupNonUniformBroadcast to take a constant `Id`
     operand in the <<spirvenv-module-validation, Validation Rules within a
     Module>> sections (internal issue 1726).
   * Note that the swapchain specified in slink:VkImageSwapchainCreateInfoKHR
@@ -10327,7 +10971,7 @@ Internal Issues:
     slink:VkFramebufferCreateInfo (internal issue 1670).
   * Refactor common valid usage statements for flink:vkCmdBeginQuery and
     flink:vkCmdBeginQueryIndexedEXT (internal issue 1682).
-  * Prohibit the ename:ename:VK_SAMPLER_YCBCR_RANGE_ITU_NARROW range from
+  * Prohibit the ename:VK_SAMPLER_YCBCR_RANGE_ITU_NARROW range from
     being used in slink:VkSamplerYcbcrConversionCreateInfo for formats with
     a bit depth less than 8 (internal issue 1688).
   * Add missing interactions with `<<VK_EXT_host_query_reset_usage>>` in the
@@ -10582,7 +11226,7 @@ Internal Issues:
   * Fix some inconsistencies in structures and corresponding pname:sType
     enumerant names by renaming
     sname:VkPhysicalDeviceShaderDrawParameterFeatures ->
-    slink:slink:VkPhysicalDeviceShaderDrawParametersFeatures;
+    slink:VkPhysicalDeviceShaderDrawParametersFeatures;
     sname:VkPhysicalDeviceVariablePointerFeatures ->
     slink:VkPhysicalDeviceVariablePointerFeatures;
     sname:VkPhysicalDeviceVariablePointerFeaturesKHR ->
@@ -10867,7 +11511,7 @@ Internal Issues:
 
   * Document restrictions on image queries for {YCbCr} formats in the
     <<formats-requiring-sampler-ycbcr-conversion>> table as well as
-    for slink:sname:VkImageFormatProperties and slink:VkImageCreateInfo
+    for slink:VkImageFormatProperties and slink:VkImageCreateInfo
     (internal issue 1361).
   * Correct type of the code:FragSizeEXT built-in in the
     <<interfaces-builtin-variables, Built-In Variables>> section (internal
@@ -11035,7 +11679,7 @@ Internal Issues:
     policy, we discussed and consider this an acceptable risk, but have
     polled the mesa-dev list in case there are use cases we missed (internal
     issue 1492).
-  * Set spec vetsion to 1 for `VK_GOOGLE_hlsl_functionality1` and
+  * Set spec version to 1 for `VK_GOOGLE_hlsl_functionality1` and
     `VK_GOOGLE_decorate_string` in `vk.xml` (internal MR 2948).
   * Remove redundant valid usage statement `VkImageCreateInfo-pNext-02395`
     (internal MR 2950).
@@ -11061,8 +11705,8 @@ Public Issues:
   * Fix valid usage and XML issues found in public issues 789 and 790 for
     the `VK_EXT_debug_utils` extension (public pull request 794).
   * Replace references to `VK_NV_dedicated_allocation` with links to the
-    corresponding slink:slink:VkMemoryDedicatedRequirements and
-    slink:slink:VkMemoryDedicatedAllocateInfo structures in the description
+    corresponding slink:VkMemoryDedicatedRequirements and
+    slink:VkMemoryDedicatedAllocateInfo structures in the description
     of elink:VkExternalMemoryFeatureFlagBits (public issue 801).
   * Fix miscellaneous minor markup and spelling issues in
     `VK_NV_ray_tracing` extension (public pull request 860).
@@ -12412,7 +13056,7 @@ Internal Issues:
     <<shaders-fragment-execution, Fragment Shader Execution>> sections; for
     the <<features-features-sampleRateShading, sampleRateShading>> feature;
     for code:FragCoord, code:SampleId, and code:SamplePosition; and for
-    slink:sname:VkPipelineMultisampleStateCreateInfo (internal issue 1134).
+    slink:VkPipelineMultisampleStateCreateInfo (internal issue 1134).
   * Clarify the meaning of the ptext:maxDescriptorSet* limits in footnote 8
     of the <<features-limits-required,Required Limits>> table (internal
     issue 1139).
@@ -14950,7 +15594,7 @@ GitHub Issues:
     pname:ppEnabledLayerNames (in the <<initialization-instances>> and
     <<devsandqueues-device-creation>> sections) (public issue 214).
   * Add missing validity rule to flink:vkCmdBeginRenderPass requiring
-    compatibility between slink:VkAttachmentDescription pname:initalLayout
+    compatibility between slink:VkAttachmentDescription pname:initialLayout
     members and the corresponding attached framebuffer images (public issue
     233).
   * Fix Unicode arrows appearing in output instead of relational operators
@@ -15591,8 +16235,7 @@ GitHub Issues:
     no effect (public issue 4).
   * Minor fixes to ref pages to track descriptions of memory bits that
     changed in the core spec. Fix name of a member in the description of
-    sname:sname:VkPipelineMultisampleStateCreateInfo (public issues 8,
-    13).
+    sname:VkPipelineMultisampleStateCreateInfo (public issues 8, 13).
   * Remove redundant validity statement for
     sname:VkGraphicsPipelineCreateInfo::pname:stageCount (public issue
     14).

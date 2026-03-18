@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[fundamentals]]
@@ -19,9 +18,9 @@ commands and behavior in the remainder of the Specification.
 The Vulkan Specification assumes and requires: the following properties of
 the host environment with respect to Vulkan implementations:
 
-  * The host must: have runtime support for 8, 16, 32 and 64-bit signed and
-    unsigned twos-complement integers, all addressable at the granularity of
-    their size in bytes.
+  * The host must: have runtime support for 8-, 16-, 32-, and 64-bit signed
+    and unsigned twos-complement integers, all addressable at the
+    granularity of their size in bytes.
   * The host must: have runtime support for 32- and 64-bit floating-point
     types satisfying the range and precision constraints in the
     <<fundamentals-floating-point, Floating-Point Computation>> section.
@@ -94,23 +93,18 @@ for any purpose.
 [[fundamentals-queueoperation]]
 === Queue Operation
 
-Vulkan queues provide an interface to the execution engines of a device.
-Commands for these execution engines are recorded into command buffers ahead
-of execution time, and then submitted to a queue for execution.
-Once submitted to a queue, command buffers will begin and complete execution
-without further application intervention, though the order of this execution
-is dependent on a number of <<synchronization, implicit and explicit
-ordering constraints>>.
+Each device supports a number of <<devsandqueues-queues,queues>>, which
+provide an interface for <<devsandqueues-submission, submitting work>> for
+execution on the device.
 
-Work is submitted to queues using _queue submission commands_ that typically
-take the form ftext:vkQueue* (e.g. flink:vkQueueSubmit
-ifndef::VKSC_VERSION_1_0[, flink:vkQueueBindSparse]
-), and can: take a list of semaphores upon which to wait before work begins
-and a list of semaphores to signal once work has completed.
-The work itself, as well as signaling and waiting on the semaphores are all
-_queue operations_.
-Queue submission commands return control to the application once queue
-operations have been submitted - they do not wait for completion.
+<<devsandqueues-submission,_Queue submission commands_>> are used to submit
+work, along with a set of <<synchronization, synchronization primitives>>
+used to constrain the order of submitted operations.
+Queues are intended for asynchronous execution of submitted workloads, and
+queue submission commands should: return as soon as the work has been
+submitted, without waiting for the work to complete.
+Once submitted to a queue, work will begin and complete execution without
+further application intervention.
 
 There are no implicit ordering constraints between queue operations on
 different queues, or between queues and the host, so these may: operate in
@@ -119,6 +113,9 @@ Explicit ordering constraints between different queues or with the host can:
 be expressed with <<synchronization-semaphores,semaphores>> and
 <<synchronization-fences,fences>>.
 
+Many commands for queues are recorded into <<commandbuffers,_command
+buffers_>> first, before the command buffers are then submitted to a queue
+for execution.
 Command buffer submissions to a single queue respect
 <<synchronization-submission-order, submission order>> and other
 <<synchronization-implicit, implicit ordering guarantees>>, but otherwise
@@ -208,7 +205,7 @@ occurs in the command buffer, regardless of when it is executed.
 The devices, queues, and other entities in Vulkan are represented by Vulkan
 objects.
 At the API level, all objects are referred to by handles.
-There are two classes of handles, dispatchable and non-dispatchable.
+There are two classes of handles: dispatchable and non-dispatchable.
 _Dispatchable_ handle types are a pointer to an opaque type.
 This pointer may: be used by layers as part of intercepting API commands,
 and thus each API command takes a dispatchable type as its first parameter.
@@ -1539,7 +1536,7 @@ Computation`" below.
 These requirements only apply to computations performed in Vulkan operations
 outside of shader execution, such as texture image specification and
 sampling, and per-fragment operations.
-Range and precision requirements during shader execution differ and are
+Range and precision requirements during shader execution differ, and are
 specified by the <<spirvenv-precision-operation, Precision and Operation of
 SPIR-V Instructions>> section.
 
@@ -1875,9 +1872,62 @@ include::{generated}/api/structs/VkRect2D.adoc[]
 include::{generated}/validity/structs/VkRect2D.adoc[]
 --
 
+ifdef::VK_EXT_descriptor_heap[]
+=== Host Address Ranges
+
+[open,refpage='VkHostAddressRangeEXT',desc='Structure specifying a host address range',type='structs']
+--
+A host address range indicates a range of host memory.
+
+include::{generated}/api/structs/VkHostAddressRangeEXT.adoc[]
+
+  * pname:address is a host memory address.
+  * pname:size is the size of the range.
+
+include::{generated}/validity/structs/VkHostAddressRangeEXT.adoc[]
+--
+
+[open,refpage='VkHostAddressRangeConstEXT',desc='Structure specifying a constant host address range',type='structs']
+--
+A constant host address range indicates a range of host memory that cannot
+be altered.
+
+include::{generated}/api/structs/VkHostAddressRangeConstEXT.adoc[]
+
+  * pname:address is a read-only host memory address.
+  * pname:size is the size of the range.
+
+include::{generated}/validity/structs/VkHostAddressRangeConstEXT.adoc[]
+--
+
+endif::VK_EXT_descriptor_heap[]
+
+ifdef::VK_EXT_descriptor_heap,VK_KHR_copy_memory_indirect[]
+=== Device Address Ranges
+
+ifdef::VK_EXT_descriptor_heap[]
+[open,refpage='VkDeviceAddressRangeEXT',desc='Structure specifying a device address range',type='structs']
+--
+:refpage: VkDeviceAddressRangeEXT
+
+A device address range indicates a sized range of device memory.
+
+include::{generated}/api/structs/VkDeviceAddressRangeEXT.adoc[]
+
+  * pname:address is a basetype:VkDeviceAddress specifying the start of the
+    range.
+  * pname:size is a basetype:VkDeviceSize specifying the size of the range.
+
+.Valid Usage
+****
+include::{chapters}/commonvalidity/device_address_range_common.adoc[]
+****
+
+include::{generated}/validity/structs/VkDeviceAddressRangeEXT.adoc[]
+--
+endif::VK_EXT_descriptor_heap[]
 
 ifdef::VK_KHR_copy_memory_indirect[]
-=== Device Address Ranges
 
 [open,refpage='VkStridedDeviceAddressRangeKHR',desc='Structure specifying a device address range with a stride',type='structs']
 --
@@ -1903,6 +1953,9 @@ include::{chapters}/commonvalidity/device_address_range_common.adoc[]
 include::{generated}/validity/structs/VkStridedDeviceAddressRangeKHR.adoc[]
 --
 endif::VK_KHR_copy_memory_indirect[]
+
+endif::VK_EXT_descriptor_heap,VK_KHR_copy_memory_indirect[]
+
 // VkStructureType is pretty long,
 // so keep it as a last chapter section for readability.
 === Structure Types

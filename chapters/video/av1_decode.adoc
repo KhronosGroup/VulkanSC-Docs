@@ -1,5 +1,4 @@
-// Copyright 2023-2025 The Khronos Group Inc.
-//
+// Copyright 2023-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[decode-av1]]
@@ -388,6 +387,19 @@ pname:pStdPictureInfo are interpreted as follows:
   ** code:pMiRowStarts is a pointer to an array of code:TileRows number of
      unsigned integers that corresponds to code:MiRowStarts defined in
      section 6.8.14 of the <<aomedia-av1,AV1 Specification>>;
++
+[NOTE]
+====
+Historically some applications incorrectly specified the values in
+code:pMiColStarts and code:pMiRowStarts in terms of superblocks instead of
+mode info blocks, therefore it is recommended for implementations to ignore
+the values specified in code:pMiColStarts and code:pMiRowStarts.
+Instead, the values should be calculated based on
+code:flags.uniform_tile_spacing_flag, code:pWidthInSbsMinus1,
+code:pHeightInSbsMinus1, the <<decode-av1-sequence-header,sequence header>>
+parameter code:flags.use_128x128_superblock, and the coded extent of the
+decoded picture.
+====
   ** code:pWidthInSbsMinus1 is a pointer to an array of code:TileCols number
      of unsigned integers that corresponds to code:width_in_sbs_minus_1
      defined in section 6.8.14 of the <<aomedia-av1,AV1 Specification>>;
@@ -514,6 +526,15 @@ endif::VK_KHR_video_maintenance2[]
 include::{generated}/validity/structs/VkVideoDecodeAV1PictureInfoKHR.adoc[]
 --
 
+[open,refpage='VK_MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR',desc='Length of an array of supported queue priorities',type='consts']
+--
+ename:VK_MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR is the length of the array
+of DPB slot or AV1 reference names passed in
+slink:VkVideoDecodeAV1PictureInfoKHR::pname:referenceNameSlotIndices.
+
+include::{generated}/api/enums/VK_MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR.adoc[]
+--
+
 [open,refpage='VkVideoDecodeAV1DpbSlotInfoKHR',desc='Structure specifies AV1 DPB information when decoding a frame',type='structs']
 --
 The sname:VkVideoDecodeAV1DpbSlotInfoKHR structure is defined as:
@@ -635,6 +656,7 @@ operation ename:VK_VIDEO_CODEC_OPERATION_DECODE_AV1_BIT_KHR, as returned by
 flink:vkGetPhysicalDeviceQueueFamilyProperties2 in
 slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations.
 
+[[av1_decode-required-video-std-header-versions-table]]
 .Required <<video-std-header-version,Video Std Header Versions>>
 [options="header"]
 |====
@@ -642,6 +664,7 @@ slink:VkQueueFamilyVideoPropertiesKHR::pname:videoCodecOperations.
 | `vulkan_video_codec_av1std_decode` | 1.0.0
 |====
 
+[[av1_decode-required-video-capabilities-table]]
 .Required Video Capabilities
 [width="100%",cols="<35,<14,<11",options="header"]
 |====

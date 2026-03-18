@@ -1,6 +1,6 @@
 #!/usr/bin/env python3 -i
 #
-# Copyright 2013-2025 The Khronos Group Inc.
+# Copyright 2013-2026 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -83,8 +83,14 @@ class InterfaceDocGenerator(OutputGenerator):
                             for api in sorted(dict[required][parent]):
                                 write(f"  ** {markup}{api}", file=fp)
                         else:
+                            # Do not emit _EXTENSION_NAME and _SPEC_VERSION
+                            # 'enums' as linkable spec macros, because they
+                            # are not APIs.
                             for api in sorted(dict[required][parent]):
-                                write(f"  * {markup}{api}", file=fp)
+                                if api.endswith('_EXTENSION_NAME') or api.endswith('_SPEC_VERSION'):
+                                    write(f"  * etext:{api}", file=fp)
+                                else:
+                                    write(f"  * {markup}{api}", file=fp)
 
                 write('', file=fp)
 

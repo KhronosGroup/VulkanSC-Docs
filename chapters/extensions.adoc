@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[extendingvulkan]]
@@ -628,6 +627,12 @@ If the `apiext:VK_KHR_ray_tracing_pipeline` extension is advertised as
 supported by this query, the `apiext:VK_KHR_pipeline_library` extension
 must: also be supported.
 endif::VK_KHR_ray_tracing_pipeline[]
+
+ifdef::VK_EXT_descriptor_heap[]
+If the `apiext:VK_EXT_descriptor_heap` extension is advertised as supported
+by this query, the `apiext:VK_KHR_shader_untyped_pointers` extension must:
+also be supported.
+endif::VK_EXT_descriptor_heap[]
 
 // This use of VK_VERSION_1_3 in this block is intentional
 ifdef::VK_VERSION_1_3[]

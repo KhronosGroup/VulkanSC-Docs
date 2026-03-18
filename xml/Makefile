@@ -1,4 +1,4 @@
-# Copyright 2013-2025 The Khronos Group Inc.
+# Copyright 2013-2026 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -37,7 +37,6 @@ GENERATED   = ../gen
 INCLUDE     = $(GENERATED)/include
 TESTS	    = ../tests
 VULKAN	    = $(INCLUDE)/vulkan
-JSON	    = $(GENERATED)/out/json
 SRC	    = ../src
 
 VULKAN_API ?= vulkansc
@@ -63,7 +62,6 @@ STATIC_HEADERS = $(VULKAN)/vulkan$(API_SUFFIX).h $(VULKAN)/vk_platform.h
 
 # Where static headers are stored
 STATIC				 = ../include/vulkan
-STATIC_JSON_SRC			 = ../json
 
 # Vulkan platform-specific headers
 PLATFORM_HEADERS = \
@@ -74,6 +72,7 @@ PLATFORM_HEADERS = \
     $(VULKAN)/vulkan_macos.h \
     $(VULKAN)/vulkan_vi.h \
     $(VULKAN)/vulkan_wayland.h \
+    $(VULKAN)/vulkan_ubm.h \
     $(VULKAN)/vulkan_win32.h \
     $(VULKAN)/vulkan_xcb.h \
     $(VULKAN)/vulkan_xlib.h \
@@ -92,26 +91,12 @@ endif
 HEADERS_H = $(VULKAN)/vulkan$(API_SUFFIX)_core.h $(PLATFORM_HEADERS)
 ifeq ($(VULKAN_API),vulkansc)
 HEADERS_HPP = $(VULKAN)/vulkan$(API_SUFFIX)_core.hpp
-STATIC_JSON = $(STATIC_JSON_SRC)/vkpcc.json
-JSON_PCC    = $(JSON)/vkpcc.json
-STATIC_CTS_COPY = \
-	 $(JSON)/cts/vkjson_data_default.h \
-	 $(JSON)/cts/vkjson_parser_default.h
-JSON_SCHEMA = $(JSON)/vk.json
-JSON_GENERATOR = $(JSON)/vulkan_json_data.hpp \
-		 $(JSON)/vulkan_json_gen.h \
-		 $(JSON)/vulkan_json_gen.c
-JSON_PARSER = $(JSON)/vulkan_json_parser.hpp
-JSON_CTS = $(JSON)/cts/vulkan_json_data.hpp  $(JSON)/cts/vulkan_json_parser.hpp
-JSON_SCRIPTS = $(SCRIPTS)/json_parser.py $(SCRIPTS)/json_generator.py
 endif
 HEADERS = $(HEADERS_H) $(HEADERS_HPP)
-JSON_FILES = $(JSON_SCHEMA) $(JSON_GENERATOR) $(JSON_PARSER)
-JSON_CTS_FILES = $(JSON_CTS)
 
 default: install
 
-install: $(HEADERS) $(STATIC_HEADERS) $(CODEC_HEADERS) $(JSON_FILES) $(JSON_PCC) $(JSON_CTS_FILES) $(STATIC_CTS_COPY)
+install: $(HEADERS) $(STATIC_HEADERS) $(CODEC_HEADERS)
 
 $(VULKAN)/vulkan$(API_SUFFIX).h: $(STATIC)/vulkan$(API_SUFFIX).h
 	$(QUIET)$(MKDIR) $(VULKAN)
@@ -228,31 +213,6 @@ vtest: $(CODEC_HEADERS)
 
 ################################################
 
-# Autogenerate JSON Schema and utils from the XML API description
-$(JSON_FILES): $(VKH_DEPENDS) $(JSON_SCRIPTS)
-	$(QUIET)$(MKDIR) $(JSON)
-	$(PYTHON) $(GENSCRIPT) $(GENOPTS) -registry $(VKXML) \
-	    -o $(JSON) $(notdir $@)
-
-$(JSON_CTS_FILES): $(VKH_DEPENDS) $(JSON_SCRIPTS)
-	$(QUIET)$(MKDIR) $(JSON)/cts
-	$(PYTHON) $(GENSCRIPT) $(GENOPTS) -registry $(VKXML) --iscts \
-	    -o $(JSON)/cts $(notdir $@)
-
-$(JSON)/cts/vkjson_data_default.h: $(STATIC_JSON_SRC)/vkjson_data_default.h
-	$(QUIET)$(MKDIR) $(JSON)/cts
-	$(CP) $? $@
-
-$(JSON)/cts/vkjson_parser_default.h: $(STATIC_JSON_SRC)/vkjson_parser_default.h
-	$(QUIET)$(MKDIR) $(JSON)/cts
-	$(CP) $? $@
-
-$(JSON_PCC): $(STATIC_JSON)
-	$(QUIET)$(MKDIR) $(JSON)
-	$(CP) $? $@
-
-################################################
-
 # Files to clean up
 PYDIRT = diag.txt dumpReg.txt errwarn.txt *.pyc regdump.txt
 DIRT = $(PYDIRT) ERRS *.o
@@ -263,5 +223,4 @@ clean_dirt:
 
 # Clean generated targets and intermediates
 clean clobber: clean_dirt
-	-$(RMRF) $(INCLUDE) $(JSON)
 	-$(RMRF) $(INCLUDE) $(VIDEO_INCLUDE)

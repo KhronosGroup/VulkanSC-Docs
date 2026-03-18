@@ -1,4 +1,4 @@
-// Copyright 2024-2025 The Khronos Group Inc.
+// Copyright 2024-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -57,7 +57,7 @@ for which the specified present time has lapsed.
 
 == Issues
 
-=== RESOLVED: Is the presentation engine required to wait for the next vblank to return images of obsolete present requests?
+=== Is the presentation engine required to wait for the next vblank to return images of obsolete present requests?
 
 No, but images must be released in the same (FIFO) order they were presented in.
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2025 The Khronos Group Inc.
+// Copyright 2018-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -7,7 +7,7 @@ include::{generated}/meta/{refprefix}VK_EXT_fragment_density_map.adoc[]
 === Other Extension Metadata
 
 *Last Modified Date*::
-    2021-09-30
+    2025-05-20
 *Interactions and External Dependencies*::
   - This extension provides API support for
     {GLSLregistry}/ext/GLSL_EXT_fragment_invocation_density.txt[`GL_EXT_fragment_invocation_density`]
@@ -173,4 +173,5 @@ endif::isrefpage[]
   ** Initial version
   * Revision 2, 2021-09-30 (Jon Leech)
   ** Add interaction with `apiext:VK_KHR_format_feature_flags2` to `vk.xml`
-
+  * Revision 3, 2025-05-20 (Matthew Netsch)
+  ** Fixes fragmentDensityTexelSize calculation equation

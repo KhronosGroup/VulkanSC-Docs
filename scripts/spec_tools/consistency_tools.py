@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 -i
 #
 # Copyright (c) 2019 Collabora, Ltd.
-# Copyright 2018-2025 The Khronos Group Inc.
+# Copyright 2018-2026 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -308,7 +308,8 @@ class XMLChecker:
         # If there's no text between the tags, there will be no string
         # between those tags' text in itertext()
         text_parts = list(param.itertext())
-        type_idx = text_parts.index(getElemType(param))
+        type_name = getElemType(param)
+        type_idx = text_parts.index(type_name)
         name_idx = text_parts.index(param_name)
         if name_idx - type_idx == 1:
             self.record_error(

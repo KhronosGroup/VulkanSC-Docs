@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2023-2025 The Khronos Group Inc.
+# Copyright 2023-2026 The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
@@ -160,7 +160,7 @@ Print various lists of extensions with attributes in semicolon separated lists.
 
     promoted_cores = ['VK_VERSION_1_0', 'VK_VERSION_1_1', 'VK_VERSION_1_2']
     future_cores = ['VK_VERSION_1_3']
-    unsupported_platforms = ['xlib', 'xcb', 'wayland', 'win32', 'xlib_xrandr',
+    unsupported_platforms = ['xlib', 'xcb', 'wayland', 'ubm', 'win32', 'xlib_xrandr',
                              'android', 'ggp', 'vi', 'fuchsia', 'directfb',
                              'provisional', 'macos', 'ios', 'metal']
     removals = set()

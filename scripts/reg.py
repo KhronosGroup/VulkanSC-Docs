@@ -1,6 +1,6 @@
 #!/usr/bin/env python3 -i
 #
-# Copyright 2013-2025 The Khronos Group Inc.
+# Copyright 2013-2026 The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -557,10 +557,13 @@ class Registry:
         "dictionary of enum values mapped to their type, such as VK_FOO_VALUE -> VkFoo"
 
         self.apidict = {}
-        "dictionary of FeatureInfo objects for `<feature>` elements keyed by API name"
+        "dictionary of FeatureInfo objects for `<feature>` elements keyed by feature name"
 
         self.extensions = []
         "list of `<extension>` Elements"
+
+        self.genFeatures = {}
+        "dictionary of FeatureInfo objects for *generated* <feature> and <extension> Elements keyed by feature name"
 
         self.extdict = {}
         "dictionary of FeatureInfo objects for `<extension>` elements keyed by extension name"
@@ -654,6 +657,7 @@ class Registry:
 
         - fname - name of type / enum / command
         - dictionary - self.{type|enum|cmd}dict"""
+
         key = (fname, self.genOpts.apiname)
         if key in dictionary:
             # self.gen.logMsg('diag', 'Found API-specific element for feature', fname)
@@ -724,10 +728,14 @@ class Registry:
         self.typedict = {}
         for type_elem in self.reg.findall('types/type'):
             # If the <type> does not already have a 'name' attribute, set
-            # it from contents of its <name> tag.
+            # it from contents of its <name> tag, or from the contents of
+            # its <proto><name> tag for funcpointer types.
             name = type_elem.get('name')
             if name is None:
-                name_elem = type_elem.find('name')
+                if type_elem.get('category') == 'funcpointer':
+                    name_elem = type_elem.find('proto/name')
+                else:
+                    name_elem = type_elem.find('name')
                 if name_elem is None or not name_elem.text:
                     raise RuntimeError("Type without a name!")
                 name = name_elem.text
@@ -788,7 +796,8 @@ class Registry:
                 name_elem = cmd.find('proto/name')
                 if name_elem is None or not name_elem.text:
                     raise RuntimeError("Command without a name!")
-                name = cmd.set('name', name_elem.text)
+                name = name_elem.text
+                cmd.set('name', name)
             ci = CmdInfo(cmd)
             self.addElementInfo(cmd, ci, 'command', self.cmddict)
             alias = cmd.get('alias')
@@ -831,6 +840,18 @@ class Registry:
         #   from toplevel <api> and <extension> tags.
         self.apidict = {}
         format_condition = dict()
+
+        def addFormatCondition(format_name, feature_name):
+            """Helper to add or append a feature/extension to a format's condition list.
+               Avoids adding duplicates."""
+            if format_name in format_condition:
+                # Check if this feature is already in the condition list
+                existing_conditions = format_condition[format_name].split(',')
+                if feature_name not in existing_conditions:
+                    format_condition[format_name] += f",{feature_name}"
+            else:
+                format_condition[format_name] = feature_name
+
         for feature in self.reg.findall('feature'):
             featureInfo = FeatureInfo(feature)
             self.addElementInfo(feature, featureInfo, 'feature', self.apidict)
@@ -871,7 +892,7 @@ class Registry:
                             format_name = enum.get('name')
                             if enum.get('alias'):
                                 format_name = enum.get('alias')
-                            format_condition[format_name] = featureInfo.name
+                            addFormatCondition(format_name, featureInfo.name)
                         addEnumInfo = True
                     elif enum.get('value') or enum.get('bitpos') or enum.get('alias'):
                         # self.gen.logMsg('diag', 'Adding extension constant "enum"',
@@ -928,10 +949,7 @@ class Registry:
                             format_name = enum.get('name')
                             if enum.get('alias'):
                                 format_name = enum.get('alias')
-                            if format_name in format_condition:
-                                format_condition[format_name] += f",{featureInfo.name}"
-                            else:
-                                format_condition[format_name] = featureInfo.name
+                            addFormatCondition(format_name, featureInfo.name)
                         elif groupName == "VkPipelineStageFlagBits2":
                             stage_flag = enum.get('name')
                             if enum.get('alias'):
@@ -1796,7 +1814,7 @@ class Registry:
 
         # Get all matching API feature names & add to list of FeatureInfo
         # Note we used to select on feature version attributes, not names.
-        features = []
+        self.genFeatures = {}
         apiMatch = False
         for key in self.apidict:
             fi = self.apidict[key]
@@ -1804,11 +1822,11 @@ class Registry:
             if apiNameMatch(self.genOpts.apiname, api):
                 apiMatch = True
                 if regVersions.match(fi.name):
-                    # Matches API & version #s being generated. Mark for
-                    # emission and add to the features[] list .
+                    # Matches API & version #s being generated.
+                    # Mark for emission and add to the generated features list.
                     # @@ Could use 'declared' instead of 'emit'?
                     fi.emit = (regEmitVersions.match(fi.name) is not None)
-                    features.append(fi)
+                    self.genFeatures[fi.name] = fi
                     if not fi.emit:
                         self.gen.logMsg('diag', 'NOT tagging feature api =', api,
                                         'name =', fi.name, 'version =', fi.version,
@@ -1826,10 +1844,10 @@ class Registry:
                                 'name =', fi.name,
                                 '(does not match requested API)')
         if not apiMatch:
-            self.gen.logMsg('warn', 'No matching API versions found!')
+            self.gen.logMsg('diag', 'No matching API versions found! (ignore if building codec headers from video.xml)')
 
         # Get all matching extensions, in order by their extension number,
-        # and add to the list of features.
+        # and add to the features list.
         # Start with extensions whose 'supported' attributes match the API
         # being generated. Add extensions matching the pattern specified in
         # regExtensions, then remove extensions matching the pattern
@@ -1870,10 +1888,11 @@ class Registry:
                 include = False
 
             # If the extension is to be included, add it to the
-            # extension features list.
+            # generated features dictionary and to the required
+            # extensions list.
             if include:
                 ei.emit = (regEmitExtensions.match(extName) is not None)
-                features.append(ei)
+                self.genFeatures[ei.name] = ei
                 if not ei.emit:
                     self.gen.logMsg('diag', 'NOT tagging extension',
                                     extName,
@@ -1907,9 +1926,10 @@ class Registry:
             si.emit = (regEmitFormats.match(key) is not None)
             formats.append(si)
 
-        # Sort the features list, if a sort procedure is defined
+        # Order the features list, if a sort procedure is defined
+        orderedFeatures = list(self.genFeatures.keys())
         if self.genOpts.sortProcedure:
-            self.genOpts.sortProcedure(features)
+            self.genOpts.sortProcedure(orderedFeatures, self.genFeatures)
 
         # Passes 1+2: loop over requested API versions and extensions tagging
         #   types/commands/features as required (in an <require> block) or no
@@ -1919,14 +1939,14 @@ class Registry:
         #   match the profile attribute (if any) of the <require> and
         #   <remove> tags.
         self.gen.logMsg('diag', 'PASS 1: TAG FEATURES')
-        for f in features:
+        for f in (self.genFeatures[name] for name in orderedFeatures):
             self.gen.logMsg('diag', 'PASS 1: Tagging required and features for', f.name)
             self.fillFeatureDictionary(f.elem, f.name, self.genOpts.apiname, self.genOpts.profile)
             self.requireFeatures(f.elem, f.name, self.genOpts.apiname, self.genOpts.profile)
             self.deprecateFeatures(f.elem, f.name, self.genOpts.apiname, self.genOpts.profile)
             self.assignAdditionalValidity(f.elem, self.genOpts.apiname, self.genOpts.profile)
 
-        for f in features:
+        for f in (self.genFeatures[name] for name in orderedFeatures):
             self.gen.logMsg('diag', 'PASS 2: Tagging removed features for', f.name)
             self.removeFeatures(f.elem, f.name, self.genOpts.apiname, self.genOpts.profile)
             self.removeAdditionalValidity(f.elem, self.genOpts.apiname, self.genOpts.profile)
@@ -1955,7 +1975,7 @@ class Registry:
         #   generated.
         self.gen.logMsg('diag', 'PASS 3: GENERATE INTERFACES FOR FEATURES')
         self.gen.beginFile(self.genOpts)
-        for f in features:
+        for f in (self.genFeatures[name] for name in orderedFeatures):
             self.gen.logMsg('diag', 'PASS 3: Generating interface for',
                             f.name)
             emit = self.emitFeatures = f.emit

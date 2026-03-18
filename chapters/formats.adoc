@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[formats]]
@@ -770,6 +769,108 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
     compressed format where each 128-bit compressed texel block encodes a
     12{times}12 rectangle of signed floating-point RGBA texel data.
 endif::VK_BASE_VERSION_1_3,VK_EXT_texture_compression_astc_hdr[]
+ifdef::VK_EXT_texture_compression_astc_3d[]
+  * ename:VK_FORMAT_ASTC_3x3x3_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 3{times}3{times}3 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_3x3x3_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 3{times}3{times}3 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_3x3x3_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 3{times}3{times}3 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x3x3_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}3{times}3 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x3x3_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}3{times}3 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_4x3x3_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}3{times}3 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x4x3_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}3 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x4x3_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}3 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_4x4x3_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}3 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x4x4_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}4 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_4x4x4_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}4 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_4x4x4_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 4{times}4{times}4 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x4x4_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}4{times}4 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x4x4_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}4{times}4 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_5x4x4_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}4{times}4 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x5x4_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}4 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x5x4_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}4 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_5x5x4_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}4 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x5x5_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}5 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_5x5x5_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}5 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_5x5x5_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 5{times}5{times}5 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x5x5_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}5{times}5 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x5x5_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}5{times}5 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_6x5x5_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}5{times}5 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x6x5_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}5 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x6x5_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}5 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_6x6x5_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}5 cuboid of signed floating-point RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x6x6_UNORM_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}6 cuboid of unsigned normalized RGBA texel data.
+  * ename:VK_FORMAT_ASTC_6x6x6_SRGB_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}6 cuboid of unsigned normalized RGBA texel data with
+    sRGB nonlinear encoding applied to the RGB components.
+  * ename:VK_FORMAT_ASTC_6x6x6_SFLOAT_BLOCK_EXT specifies a four-component,
+    ASTC compressed format where each 128-bit compressed texel block encodes
+    a 6{times}6{times}6 cuboid of signed floating-point RGBA texel data.
+endif::VK_EXT_texture_compression_astc_3d[]
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * ename:VK_FORMAT_G8B8G8R8_422_UNORM specifies a four-component, 32-bit
     format containing a pair of G components, an R component, and a B
@@ -855,7 +956,7 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
   * ename:VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM specifies an unsigned
     normalized _multi-planar format_ that has an 8-bit G component in plane
     0, an 8-bit B component in plane 1, and an 8-bit R component in plane 2.
-    Each plane has the same dimensions and each R, G and B component
+    Each plane has the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -980,7 +1081,7 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     in the top 10 bits of each 16-bit word of plane 1, and a 10-bit R
     component in the top 10 bits of each 16-bit word of plane 2, with the
     bottom 6 bits of each word unused.
-    Each plane has the same dimensions and each R, G and B component
+    Each plane has the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1105,7 +1206,7 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     in the top 12 bits of each 16-bit word of plane 1, and a 12-bit R
     component in the top 12 bits of each 16-bit word of plane 2, with the
     bottom 4 bits of each word unused.
-    Each plane has the same dimensions and each R, G and B component
+    Each plane has the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1203,7 +1304,7 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
     normalized _multi-planar format_ that has a 16-bit G component in each
     16-bit word of plane 0, a 16-bit B component in each 16-bit word of
     plane 1, and a 16-bit R component in each 16-bit word of plane 2.
-    Each plane has the same dimensions and each R, G and B component
+    Each plane has the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1216,7 +1317,7 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_ycbcr_2plane_444_formats[]
     normalized _multi-planar format_ that has an 8-bit G component in plane
     0, and a two-component, 16-bit BR plane 1 consisting of an 8-bit B
     component in byte 0 and an 8-bit R component in byte 1.
-    Both planes have the same dimensions and each R, G and B component
+    Both planes have the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1228,7 +1329,7 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_ycbcr_2plane_444_formats[]
     32-bit BR plane 1 consisting of a 10-bit B component in the top 10 bits
     of the word in bytes 0..1, and a 10-bit R component in the top 10 bits
     of the word in bytes 2..3, the bottom 6 bits of each word unused.
-    Both planes have the same dimensions and each R, G and B component
+    Both planes have the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1240,7 +1341,7 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_ycbcr_2plane_444_formats[]
     32-bit BR plane 1 consisting of a 12-bit B component in the top 12 bits
     of the word in bytes 0..1, and a 12-bit R component in the top 12 bits
     of the word in bytes 2..3, the bottom 4 bits of each word unused.
-    Both planes have the same dimensions and each R, G and B component
+    Both planes have the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1251,7 +1352,7 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_ycbcr_2plane_444_formats[]
     16-bit word of plane 0, and a two-component, 32-bit BR plane 1
     consisting of a 16-bit B component in the word in bytes 0..1, and a
     16-bit R component in the word in bytes 2..3.
-    Both planes have the same dimensions and each R, G and B component
+    Both planes have the same dimensions and each R, G, and B component
     contributes to a single texel.
     The location of each plane when this image is in linear layout can be
     determined via flink:vkGetImageSubresourceLayout, using
@@ -1396,6 +1497,19 @@ ifdef::VK_ARM_tensors[]
   * ename:VK_FORMAT_R8_BOOL_ARM specifies a one-component 8-bit boolean
     format that has a single 8-bit R component.
     See <<fundamentals-bool>>.
+ifdef::VK_KHR_shader_bfloat16[]
+  * ename:VK_FORMAT_R16_SFLOAT_FPENCODING_BFLOAT16_ARM specifies a
+    one-component, 16-bit signed floating-point format with BFLOAT16
+    encoding that has a single 16-bit R component.
+endif::VK_KHR_shader_bfloat16[]
+ifdef::VK_EXT_shader_float8[]
+  * ename:VK_FORMAT_R8_SFLOAT_FPENCODING_FLOAT8E4M3_ARM specifies a
+    one-component, 8-bit signed floating-point format with FLOAT8E4M3
+    encoding that has a single 8-bit R component.
+  * ename:VK_FORMAT_R8_SFLOAT_FPENCODING_FLOAT8E5M2_ARM specifies a
+    one-component, 8-bit signed floating-point format with FLOAT8E5M2
+    encoding that has a single 8-bit R component.
+endif::VK_EXT_shader_float8[]
 endif::VK_ARM_tensors[]
 --
 
@@ -1418,7 +1532,8 @@ These planes are also <<formats-size-compatibility,size-compatible>> with
 any format that is <<formats-size-compatibility, size-compatible>> with the
 listed single-plane format.
 
-.Plane Format Compatibility Table
+[[formats-plane-format-compatibility-table]]
+.Plane Format Compatibility
 [width="95%",cols="1,6,3,3",options="header"]
 |====
 ^| Plane ^| Compatible format for plane ^| Width relative to the width _w_ of the plane with the largest dimensions ^| Height relative to the height _h_ of the plane with the largest dimensions
@@ -1537,6 +1652,26 @@ The suffix etext:_BLOCK indicates that the format is a block-compressed
 format, with the representation of multiple texels encoded interdependently
 within a region.
 
+ifdef::VK_ARM_tensors[]
+The suffix `+_FPENCODING_<encoding>+` indicates that the format uses a
+floating-point encoding, specified by `<encoding>`, that is different from
+IEEE754.
+
+[[formats-fpencoding]]
+.Interpretation of FP Encoding
+[width="95%",cols="2,10",options="header"]
+|====
+| FP Encoding    | Description
+ifdef::VK_EXT_shader_float8[]
+| FLOAT8E4M3     | 8-bit signed float with 4-bit mantissa and 3-bit exponent
+| FLOAT8E5M2     | 8-bit signed float with 5-bit mantissa and 2-bit exponent
+endif::VK_EXT_shader_float8[]
+ifdef::VK_KHR_shader_bfloat16[]
+| BFLOAT16       | 16-bit signed float with 7-bit mantissa and 8-bit exponent (a.k.a. "brain float 16")
+endif::VK_KHR_shader_bfloat16[]
+|====
+endif::VK_ARM_tensors[]
+
 [[formats-compressionscheme]]
 .Interpretation of Compression Scheme
 [width="95%",cols="2,10",options="header"]
@@ -1589,8 +1724,8 @@ The texel block size for each format is shown in the
 The representation of non-packed formats is that the first component
 specified in the name of the format is in the lowest memory addresses and
 the last component specified is in the highest memory addresses.
-See <<formats-non-packed,Byte mappings for non-packed/compressed color
-formats>>.
+See <<formats-non-packed, Byte Mappings for Non-Packed/Compressed Color
+Formats>>.
 The in-memory ordering of bytes within a component is determined by the host
 endianness.
 
@@ -1926,6 +2061,26 @@ include::{generated}/api/protos/vkGetPhysicalDeviceFormatProperties.adoc[]
   * pname:pFormatProperties is a pointer to a slink:VkFormatProperties
     structure in which physical device properties for pname:format are
     returned.
+
+ifdef::VK_EXT_ycbcr_2plane_444_formats[]
+.Valid Usage
+****
+  * [[VUID-vkGetPhysicalDeviceFormatProperties-None-12272]]
+    If
+ifdef::VK_BASE_VERSION_1_3[Vulkan 1.3 is not supported,]
+ifdef::VK_KHR_maintenance5[]
+    the <<features-maintenance5,pname:maintenance5>> feature is not
+    supported,
+endif::VK_KHR_maintenance5[]
+ifdef::VK_KHR_maintenance5,VK_BASE_VERSION_1_3[and]
+    the <<features-ycbcr2plane444Formats,pname:ycbcr2plane444Formats>>
+    feature is not supported, pname:format must: not be
+    ename:VK_FORMAT_G8_B8R8_2PLANE_444_UNORM,
+    ename:VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16,
+    ename:VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16, or
+    ename:VK_FORMAT_G16_B16R16_2PLANE_444_UNORM
+****
+endif::VK_EXT_ycbcr_2plane_444_formats[]
 
 include::{generated}/validity/protos/vkGetPhysicalDeviceFormatProperties.adoc[]
 --
@@ -2273,6 +2428,26 @@ fname:vkGetPhysicalDeviceFormatProperties2 behaves similarly to
 flink:vkGetPhysicalDeviceFormatProperties, with the ability to return
 extended information in a pname:pNext chain of output structures.
 
+ifdef::VK_EXT_ycbcr_2plane_444_formats[]
+.Valid Usage
+****
+  * [[VUID-vkGetPhysicalDeviceFormatProperties2-None-12273]]
+    If
+ifdef::VK_BASE_VERSION_1_3[Vulkan 1.3 is not supported,]
+ifdef::VK_KHR_maintenance5[]
+    the <<features-maintenance5,pname:maintenance5>> feature is not
+    supported,
+endif::VK_KHR_maintenance5[]
+ifdef::VK_KHR_maintenance5,VK_BASE_VERSION_1_3[and]
+    the <<features-ycbcr2plane444Formats,pname:ycbcr2plane444Formats>>
+    feature is not supported, pname:format must: not be
+    ename:VK_FORMAT_G8_B8R8_2PLANE_444_UNORM,
+    ename:VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16,
+    ename:VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16, or
+    ename:VK_FORMAT_G16_B16R16_2PLANE_444_UNORM
+****
+endif::VK_EXT_ycbcr_2plane_444_formats[]
+
 include::{generated}/validity/protos/vkGetPhysicalDeviceFormatProperties2.adoc[]
 --
 
@@ -2487,7 +2662,7 @@ endif::VK_BASE_VERSION_1_3,VK_KHR_format_feature_flags2[]
 endif::VK_EXT_image_drm_format_modifier[]
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_format_feature_flags2[]
-[open,refpage='VkFormatProperties3',desc='Structure specifying image format properties',type='structs',alias='VkFormatProperties3KHR']
+[open,refpage='VkFormatProperties3',desc='Structure specifying image format properties',type='structs']
 --
 To query supported format extended features which are properties of the
 physical device, add slink:VkFormatProperties3 structure to the pname:pNext
@@ -2517,7 +2692,7 @@ corresponding fields of sname:VkFormatProperties2::pname:formatProperties.
 include::{generated}/validity/structs/VkFormatProperties3.adoc[]
 --
 
-[open,refpage='VkFormatFeatureFlagBits2',desc='Bitmask specifying features supported by a buffer',type='enums',alias='VkFormatFeatureFlagBits2KHR']
+[open,refpage='VkFormatFeatureFlagBits2',desc='Bitmask specifying features supported by a buffer',type='enums']
 --
 Bits which can: be set in the slink:VkFormatProperties3 features
 pname:linearTilingFeatures, pname:optimalTilingFeatures, and
@@ -2766,7 +2941,8 @@ ifdef::VK_QCOM_image_processing[]
 endif::VK_QCOM_image_processing[]
 ifdef::VK_BASE_VERSION_1_4,VK_EXT_host_image_copy[]
   * ename:VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT specifies that an
-    image can: be created with ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT.
+    image can: be created with the ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT
+    usage flag set.
 endif::VK_BASE_VERSION_1_4,VK_EXT_host_image_copy[]
 ifdef::VK_KHR_copy_memory_indirect[]
   * ename:VK_FORMAT_FEATURE_2_COPY_IMAGE_INDIRECT_DST_BIT_KHR specifies that
@@ -2891,7 +3067,7 @@ flink:vkGetPhysicalDeviceFormatProperties2::pname:format:
     be used as a destination tensor for <<copies-tensors,copy commands>>.
   * ename:VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM specifies that a tensor
     view can: be used as a <<descriptorsets-storagetensor,storage tensor>>
-    with <<pipelines-compute,compute pipelines>>.
+    in shaders.
   * ename:VK_FORMAT_FEATURE_2_TENSOR_IMAGE_ALIASING_BIT_ARM specifies that a
     tensor can: be aliased to an image or that an image can: be aliased to a
     tensor.
@@ -2902,7 +3078,7 @@ ifdef::VK_ARM_data_graph[]
 endif::VK_ARM_data_graph[]
 endif::VK_ARM_tensors[]
 
-[open,refpage='VkFormatFeatureFlags2',desc='Bitmask of VkFormatFeatureFlagBits2',type='flags',alias='VkFormatFeatureFlags2KHR']
+[open,refpage='VkFormatFeatureFlags2',desc='Bitmask of VkFormatFeatureFlagBits2',type='flags']
 --
 include::{generated}/api/flags/VkFormatFeatureFlags2.adoc[]
 
@@ -3018,6 +3194,7 @@ ename:VK_FORMAT_FEATURE_TRANSFER_SRC_BIT and
 ename:VK_FORMAT_FEATURE_TRANSFER_DST_BIT.
 endif::VK_BASE_VERSION_1_1,VK_KHR_maintenance1[]
 
+[[formats-key-for-format-feature-tables-table]]
 .Key for Format Feature Tables
 [width="70%",cols="1,10"]
 |====
@@ -3031,6 +3208,7 @@ preconditions, with more information in the table where the symbol appears
 preconditions, with more information in the table where the symbol appears
 |====
 
+[[formats-feature-bits-in-optimaltilingfeatures-table]]
 .Feature Bits in pname:optimalTilingFeatures
 [width="70%"]
 |====
@@ -3055,6 +3233,7 @@ ifdef::VK_KHR_copy_memory_indirect[]
 endif::VK_KHR_copy_memory_indirect[]
 |====
 
+[[formats-feature-bits-in-bufferfeatures-table]]
 .Feature Bits in pname:bufferFeatures
 [width="70%"]
 |====
@@ -3953,6 +4132,7 @@ Additional restrictions, including, but not limited to, further required
 format feature flags specific to the particular use of the resource may:
 apply, as described in the respective sections of this specification.
 
+[[formats-format-feature-dependent-buffer-usage-flags-table]]
 .Format Feature Dependent Buffer Usage Flags
 [cols="50%,50%",options="header"]
 |====
@@ -3962,6 +4142,7 @@ apply, as described in the respective sections of this specification.
 |ename:VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | ename:VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT
 |====
 
+[[formats-format-feature-dependent-image-usage-flags-table]]
 .Format Feature Dependent Image Usage Flags
 [cols="50%,50%",options="header"]
 |====
@@ -3992,6 +4173,7 @@ endif::VK_ARM_tensors[]
 |====
 
 ifdef::VK_ARM_tensors[]
+[[formats-format-feature-dependent-tensor-usage-flags-table]]
 .Format feature dependent tensor usage flags
 [cols="50%,50%",options="header"]
 |====
@@ -4016,6 +4198,7 @@ features on the listed tensor formats.
 The following tables show which tensor feature bits must: be supported for
 each format.
 
+[[formats-key-for-tensor-format-feature-tables-table]]
 .Key for tensor format feature tables
 [width="70%",cols="1,10"]
 |====
@@ -4025,6 +4208,7 @@ of the named formats, with more information in the table
 where the symbol appears
 |====
 
+[[formats-feature-bits-in-pname:optimaltilingtensorfeatures-table]]
 .Feature bits in pname:optimalTilingTensorFeatures
 [width="70%"]
 |====
@@ -4033,6 +4217,7 @@ where the symbol appears
 |ename:VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM
 |====
 
+[[formats-feature-bits-in-pname:lineartilingtensorfeatures-table]]
 .Feature bits in pname:linearTilingTensorFeatures
 [width="70%"]
 |====

@@ -1,5 +1,4 @@
-// Copyright 2023-2025 The Khronos Group Inc.
-//
+// Copyright 2023-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[roadmap-2024]]
@@ -7,7 +6,7 @@
 
 The Roadmap 2024 milestone is intended to be supported by newer
 mid-to-high-end devices shipping in 2024 or shortly thereafter across
-mainstream smartphone, tablet, laptops, console and desktop devices.
+mainstream smartphone, tablet, laptop, console, and desktop devices.
 
 Two of the core aims of this roadmap profile are to enable developers to
 rely on a number of important rasterization and shader features have been
@@ -30,9 +29,9 @@ descriptors>> and the various minor improvements included in
 apiext:VK_KHR_maintenance5.
 
 
-=== Required Profiles
+=== Required Milestones
 
-This profile requires the Roadmap 2022 profile.
+This milestone requires the Roadmap 2022 profile.
 
 
 === Required Features
@@ -58,6 +57,7 @@ The following core optional features are required to be supported:
 
 The following core increased limits are required:
 
+[[roadmap-2024-vulkan-1.0-limits-table]]
 .Vulkan 1.0 Limits
 [width="100%",cols="<35,<9,<14,<14,<11",options="header"]
 |====
@@ -67,6 +67,7 @@ The following core increased limits are required:
 | pname:timestampComputeAndGraphics          | - | FALSE | TRUE  | Boolean
 |====
 
+[[roadmap-2024-vulkan-1.2-limits-table]]
 .Vulkan 1.2 Limits
 [width="100%",cols="<35,<9,<14,<14,<11",options="header"]
 |====

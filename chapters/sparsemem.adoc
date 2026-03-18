@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[sparsememory]]
@@ -888,7 +887,7 @@ include::{generated}/api/structs/VkSparseImageFormatProperties.adoc[]
   * pname:aspectMask is a bitmask elink:VkImageAspectFlagBits specifying
     which aspects of the image the properties apply to.
   * pname:imageGranularity is the width, height, and depth of the sparse
-    image block in texels or compressed texel blocks.
+    image block in texels.
   * pname:flags is a bitmask of elink:VkSparseImageFormatFlagBits specifying
     additional information about the sparse resource.
 
@@ -1239,7 +1238,7 @@ include::{generated}/validity/protos/vkGetImageSparseMemoryRequirements2.adoc[]
 --
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_maintenance4[]
-[open,refpage='vkGetDeviceImageSparseMemoryRequirements',desc='Query the memory requirements for a sparse image',type='protos',alias='vkGetDeviceImageSparseMemoryRequirementsKHR']
+[open,refpage='vkGetDeviceImageSparseMemoryRequirements',desc='Query the memory requirements for a sparse image',type='protos']
 --
 To determine the sparse memory requirements for an image resource without
 creating an object, call:
@@ -1797,6 +1796,16 @@ include::{generated}/api/structs/VkBindSparseInfo.adoc[]
     If semaphores to be signaled are provided, they define a
     <<synchronization-semaphores-signaling, semaphore signal operation>>.
 
+The first <<synchronization-dependencies-scopes, synchronization scope>> of
+each <<synchronization-semaphores-signaling,semaphore signal operation>>
+defined by this structure includes all sparse binding operations defined by
+this structure.
+
+The second <<synchronization-dependencies-scopes, synchronization scope>> of
+each <<synchronization-semaphores-waiting,semaphore wait operation>> defined
+by this structure includes all sparse binding operations defined by this
+structure.
+
 ifdef::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
 .Valid Usage
 ****
@@ -1850,7 +1859,7 @@ ifdef::VK_EXT_frame_boundary+VK_ARM_tensors[]
   * [[VUID-VkBindSparseInfo-pNext-09753]]
     If the pname:pNext chain of this structure includes a
     slink:VkFrameBoundaryTensorsARM structure then it must: also include a
-    slink:VkFrameBoundaryEXT structure.
+    slink:VkFrameBoundaryEXT structure
 endif::VK_EXT_frame_boundary+VK_ARM_tensors[]
 ****
 endif::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]

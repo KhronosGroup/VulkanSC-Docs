@@ -1,4 +1,4 @@
-// Copyright 2018-2025 The Khronos Group Inc.
+// Copyright 2018-2026 The Khronos Group Inc.
 //
 // SPDX-License-Identifier: CC-BY-4.0
 
@@ -68,8 +68,8 @@ This means the framebuffer coordinates need to undergo a shift to the left.
 ====
 
 The offset fragment coordinate [eq]#(x',y')# <<images-reads, reads a texel
-from the fragment density map>> at image coordinates [eq]#(x,y,0,layer,0,0),
-where [eq]#(x,y)# are calculated as:
+from the fragment density map>> at image coordinates
+[eq]#(x,y,0,layer,0,0)#, where [eq]#(x,y)# are calculated as:
 
   {empty}:: latexmath:[x =
             \mathbin{clamp}(\left\lfloor{\frac{x'}{fragmentDensityTexelSize_{width}}}\right\rfloor,
@@ -82,9 +82,32 @@ endif::VK_EXT_fragment_density_map_offset,VK_QCOM_fragment_density_map_offset[]
 Where the size of each region in the framebuffer is:
 
   {empty}:: latexmath:[fragmentDensityTexelSize'_{width} =
-            {2^{\lceil{\log_2(\frac{framebuffer_{width}}{fragmentDensityMap_{width}})}\rceil}}]
+            {2^{\lceil{\log_2(\lfloor{\frac{framebuffer_{width}}{fragmentDensityMap_{width}}}\rfloor)}\rceil}}]
   {empty}:: latexmath:[fragmentDensityTexelSize'_{height} =
-            {2^{\lceil{\log_2(\frac{framebuffer_{height}}{fragmentDensityMap_{height}})}\rceil}}]
+            {2^{\lceil{\log_2(\lfloor{\frac{framebuffer_{height}}{fragmentDensityMap_{height}}}\rfloor)}\rceil}}]
+
+[NOTE]
+====
+The original spec did not include the floor in the equation above.
+Implementations have shipped with and without the floor.
+Given that the earliest implementations shipped with the floor, the spec now
+reflects that as most content was written with this behavior.
+
+All implementations exposing support for version 3 or greater of the
+extension must: implement with the floor included.
+====
+
+ifdef::VK_GRAPHICS_VERSION_1_3,VK_KHR_dynamic_rendering[]
+If using flink:vkCmdBeginRendering, then latexmath:[framebuffer_{width}] and
+latexmath:[framebuffer_{height}] are defined as:
+
+  {empty}:: latexmath:[framebuffer_{width} = renderAreaOffset_{x} {plus}
+            renderAreaExtent_{width}]
+  {empty}:: latexmath:[framebuffer_{height} = renderAreaOffset_{y} {plus}
+            renderAreaExtent_{height}]
+
+using slink:VkRenderingInfo::pname:renderArea.
+endif::VK_GRAPHICS_VERSION_1_3,VK_KHR_dynamic_rendering[]
 
 This region is subject to the limits in
 sname:VkPhysicalDeviceFragmentDensityMapPropertiesEXT and therefore the

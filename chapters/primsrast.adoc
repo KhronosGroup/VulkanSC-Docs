@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[primsrast]]
@@ -272,7 +271,7 @@ When enabled, primitives are discarded after they are processed by the last
 active shader stage in the pipeline before rasterization.
 
 ifdef::VK_GRAPHICS_VERSION_1_3,VK_EXT_extended_dynamic_state2,VK_EXT_shader_object[]
-[open,refpage='vkCmdSetRasterizerDiscardEnable',desc='Control whether primitives are discarded before the rasterization stage dynamically for a command buffer',type='protos',alias='vkCmdSetRasterizerDiscardEnableEXT']
+[open,refpage='vkCmdSetRasterizerDiscardEnable',desc='Control whether primitives are discarded before the rasterization stage dynamically for a command buffer',type='protos']
 --
 To <<pipelines-dynamic-state, dynamically enable>> whether primitives are
 discarded before the rasterization stage, call:
@@ -676,6 +675,7 @@ framebuffer location [eq]#(x,y)# and the fragment size [eq]#(f~w~,f~h~)#:
 
 The tables below illustrate the pixel index for multi-pixel fragments:
 
+[[primsrast-pixel-indices-1-wide-table]]
 .Pixel Indices - 1 Wide
 [align="center"]
 |====
@@ -686,6 +686,7 @@ The tables below illustrate the pixel index for multi-pixel fragments:
 .>| image:{images}/pixel_index_1x4.svg[pdfwidth=90pt,align="center",opts="{imageopts}"]
 |====
 
+[[primsrast-pixel-indices-2-wide-table]]
 .Pixel Indices - 2 Wide
 [align="center"]
 |====
@@ -696,6 +697,7 @@ The tables below illustrate the pixel index for multi-pixel fragments:
 .>| image:{images}/pixel_index_2x4.svg[pdfwidth=90pt,align="center",opts="{imageopts}"]
 |====
 
+[[primsrast-pixel-indices-4-wide-table]]
 .Pixel Indices - 4 Wide
 [align="center"]
 |====
@@ -1841,8 +1843,8 @@ include::{generated}/api/protos/vkCmdBindShadingRateImageNV.adoc[]
     of ename:VK_FORMAT_R8_UINT
   * [[VUID-vkCmdBindShadingRateImageNV-imageView-02061]]
     If pname:imageView is not dlink:VK_NULL_HANDLE, it must: have been
-    created with a pname:usage value including
-    ename:VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV
+    created with the ename:VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV usage
+    flag set
   * [[VUID-vkCmdBindShadingRateImageNV-imageView-02062]]
     If pname:imageView is not dlink:VK_NULL_HANDLE, pname:imageLayout must:
     match the actual elink:VkImageLayout of each subresource accessible from
@@ -2636,7 +2638,7 @@ vertex for the point.
 == Line Segments
 
 ifdef::VK_GRAPHICS_VERSION_1_4,VK_KHR_line_rasterization,VK_EXT_line_rasterization[]
-[open,refpage='VkPipelineRasterizationLineStateCreateInfo',desc='Structure specifying parameters of a newly created pipeline line rasterization state',type='structs',alias='VkPipelineRasterizationLineStateCreateInfoKHR VkPipelineRasterizationLineStateCreateInfoEXT']
+[open,refpage='VkPipelineRasterizationLineStateCreateInfo',desc='Structure specifying parameters of a newly created pipeline line rasterization state',type='structs']
 --
 Line segment rasterization options are controlled by the
 slink:VkPipelineRasterizationLineStateCreateInfo structure.
@@ -2714,7 +2716,7 @@ pname:lineStippleFactor and pname:lineStipplePattern are ignored.
 include::{generated}/validity/structs/VkPipelineRasterizationLineStateCreateInfo.adoc[]
 --
 
-[open,refpage='VkLineRasterizationMode',desc='Line rasterization modes',type='enums',alias='VkLineRasterizationModeKHR VkLineRasterizationModeEXT']
+[open,refpage='VkLineRasterizationMode',desc='Line rasterization modes',type='enums']
 --
 Possible values of
 slink:VkPipelineRasterizationLineStateCreateInfo::pname:lineRasterizationMode,
@@ -3254,7 +3256,7 @@ every line segment in a group of independent segments.
 If the line segment has been clipped, then the value of _s_ at the beginning
 of the line segment is implementation-dependent.
 
-[open,refpage='vkCmdSetLineStipple',desc='Set line stipple dynamically for a command buffer',type='protos',alias='vkCmdSetLineStippleKHR vkCmdSetLineStippleEXT']
+[open,refpage='vkCmdSetLineStipple',desc='Set line stipple dynamically for a command buffer',type='protos']
 --
 To <<pipelines-dynamic-state, dynamically set>> the line stipple state,
 call:
@@ -3376,7 +3378,7 @@ triangles.
 --
 
 ifdef::VK_GRAPHICS_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
-[open,refpage='vkCmdSetFrontFace',desc='Set front face orientation dynamically for a command buffer',type='protos',alias='vkCmdSetFrontFaceEXT']
+[open,refpage='vkCmdSetFrontFace',desc='Set front face orientation dynamically for a command buffer',type='protos']
 --
 To <<pipelines-dynamic-state, dynamically set>> the front face orientation,
 call:
@@ -3449,7 +3451,7 @@ elink:VkCullModeFlagBits.
 --
 
 ifdef::VK_GRAPHICS_VERSION_1_3,VK_EXT_extended_dynamic_state,VK_EXT_shader_object[]
-[open,refpage='vkCmdSetCullMode',desc='Set cull mode dynamically for a command buffer',type='protos',alias='vkCmdSetCullModeEXT']
+[open,refpage='vkCmdSetCullMode',desc='Set cull mode dynamically for a command buffer',type='protos']
 --
 To <<pipelines-dynamic-state, dynamically set>> the cull mode, call:
 
@@ -3732,7 +3734,7 @@ If the depth bias enable is ename:VK_FALSE, no bias is applied and the
 fragment's depth values are unchanged.
 
 ifdef::VK_GRAPHICS_VERSION_1_3,VK_EXT_extended_dynamic_state2,VK_EXT_shader_object[]
-[open,refpage='vkCmdSetDepthBiasEnable',desc='Control whether to bias fragment depth values dynamically for a command buffer',type='protos',alias='vkCmdSetDepthBiasEnableEXT']
+[open,refpage='vkCmdSetDepthBiasEnable',desc='Control whether to bias fragment depth values dynamically for a command buffer',type='protos']
 --
 To <<pipelines-dynamic-state, dynamically enable>> whether to bias fragment
 depth values, call:
@@ -3975,14 +3977,14 @@ include::{generated}/api/structs/VkDepthBiasRepresentationInfoEXT.adoc[]
     If the <<features-leastRepresentableValueForceUnormRepresentation,
     pname:leastRepresentableValueForceUnormRepresentation>> feature is not
     enabled, pname:depthBiasRepresentation must: not be
-    `VK_DEPTH_BIAS_REPRESENTATION_LEAST_REPRESENTABLE_VALUE_FORCE_UNORM_EXT`
+    ename:VK_DEPTH_BIAS_REPRESENTATION_LEAST_REPRESENTABLE_VALUE_FORCE_UNORM_EXT
   * [[VUID-VkDepthBiasRepresentationInfoEXT-floatRepresentation-08948]]
     If the <<features-floatRepresentation, pname:floatRepresentation>>
     feature is not enabled, pname:depthBiasRepresentation must: not be
-    `VK_DEPTH_BIAS_REPRESENTATION_FLOAT_EXT`
+    ename:VK_DEPTH_BIAS_REPRESENTATION_FLOAT_EXT
   * [[VUID-VkDepthBiasRepresentationInfoEXT-depthBiasExact-08949]]
     If the <<features-depthBiasExact, pname:depthBiasExact>> feature is not
-    enabled, pname:depthBiasExact must: be `VK_FALSE`
+    enabled, pname:depthBiasExact must: be ename:VK_FALSE
 ****
 
 include::{generated}/validity/structs/VkDepthBiasRepresentationInfoEXT.adoc[]

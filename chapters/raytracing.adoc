@@ -1,5 +1,4 @@
-// Copyright 2018-2025 The Khronos Group Inc.
-//
+// Copyright 2018-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[ray-tracing]]
@@ -67,8 +66,17 @@ ifdef::VK_NV_ray_tracing_invocation_reorder[]
 | code:OpHitObjectTraceRayMotionNV |X|X| | |
 | code:OpHitObjectExecuteShaderNV | | |X|X|
 endif::VK_NV_ray_tracing_invocation_reorder[]
+ifdef::VK_EXT_ray_tracing_invocation_reorder[]
+| code:OpHitObjectExecuteShaderEXT | | |X|X|
+| code:OpHitObjectTraceRayEXT |X|X| | |
+| code:OpHitObjectReorderExecuteShaderEXT | | |X|X|
+| code:OpHitObjectTraceReorderExecuteEXT |X|X|X|X|
+ifdef::VK_NV_ray_tracing_motion_blur[]
+| code:OpHitObjectTraceRayMotionEXT |X|X| | |
+| code:OpHitObjectTraceMotionReorderExecuteEXT |X|X|X|X|
+endif::VK_NV_ray_tracing_motion_blur[]
+endif::VK_EXT_ray_tracing_invocation_reorder[]
 |====
-
 
 ifdef::VK_COMPUTE_VERSION_1_1[]
 The invocations created by shader call instructions are grouped into
@@ -120,6 +128,15 @@ endif::VK_NV_ray_tracing_motion_blur[]
 ifdef::VK_NV_ray_tracing_invocation_reorder[]
 code:OpReorderThreadWithHintNV, code:OpReorderThreadWithHitObjectNV,
 endif::VK_NV_ray_tracing_invocation_reorder[]
+ifdef::VK_EXT_ray_tracing_invocation_reorder[]
+code:OpReorderThreadWithHintEXT, code:OpReorderThreadWithHitObjectEXT,
+code:OpHitObjectTraceRayEXT, code:OpHitObjectReorderExecuteShaderEXT,
+code:OpHitObjectTraceReorderExecuteEXT,
+ifdef::VK_NV_ray_tracing_motion_blur[]
+code:OpHitObjectTraceRayMotionEXT,
+code:OpHitObjectTraceMotionReorderExecuteEXT,
+endif::VK_NV_ray_tracing_motion_blur[]
+endif::VK_EXT_ray_tracing_invocation_reorder[]
 code:OpReportIntersectionKHR, and code:OpExecuteCallableKHR instructions are
 invocation repack instructions.
 
@@ -298,7 +315,8 @@ include::{generated}/api/protos/vkCmdBindInvocationMaskHUAWEI.adoc[]
     of ename:VK_FORMAT_R8_UINT
   * [[VUID-vkCmdBindInvocationMaskHUAWEI-imageView-04979]]
     If pname:imageView is not dlink:VK_NULL_HANDLE, it must: have been
-    created with ename:VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI set
+    created with the ename:VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI usage
+    flag set
   * [[VUID-vkCmdBindInvocationMaskHUAWEI-imageView-04980]]
     If pname:imageView is not dlink:VK_NULL_HANDLE, pname:imageLayout must:
     be ename:VK_IMAGE_LAYOUT_GENERAL
@@ -689,9 +707,12 @@ not be dynamically uniform if different invocations of the same shader can
 reference different data in the shader record buffer, such as if the same
 shader occurs twice in the shader binding table with a different shader
 record buffer.
-In this case, indexing resources based on values in the
-code:ShaderRecordBufferKHR storage class, the index should be decorated as
-code:NonUniform.
+In this case,
+ifdef::VK_EXT_descriptor_heap[]
+if the code:DescriptorHeapEXT capability is not declared,
+endif::VK_EXT_descriptor_heap[]
+when indexing resources based on values in the code:ShaderRecordBufferKHR
+storage class, the index should be decorated as code:NonUniform.
 ====
 
 

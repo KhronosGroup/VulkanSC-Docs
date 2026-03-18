@@ -1,4 +1,4 @@
-// Copyright 2025 The Khronos Group Inc.
+// Copyright 2025-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 = VK_KHR_maintenance10
@@ -48,6 +48,7 @@ not apply to all depth/stencil image formats, and may not apply to
 compute-only or transfer-only queue families.
 
 The following new image feature bits are added:
+
 * VK_FORMAT_FEATURE_2_DEPTH_COPY_ON_COMPUTE_QUEUE_BIT_KHR specifies
   that the depth aspect of the format can be copied using a compute-only queue
 * VK_FORMAT_FEATURE_2_DEPTH_COPY_ON_TRANSFER_QUEUE_BIT_KHR specifies
@@ -72,7 +73,7 @@ to enable reuse in more extensions.
 === Add flags for extending dynamic rendering attachment info
 
 When dynamic rendering was developed, the `VkRenderingAttachmentInfo` was created lacking a `flags` member for
-easy extendability. Legacy render passes have a `flags`` member for attachment descriptions. 
+easy extendability. Legacy render passes have a `flags`` member for attachment descriptions.
 
 This extension allows chaining the following struct to `VkRenderingAttachmentInfo`:
 

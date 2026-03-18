@@ -1,5 +1,4 @@
-// Copyright 2015-2025 The Khronos Group Inc.
-//
+// Copyright 2015-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 [[synchronization]]
@@ -329,7 +328,7 @@ Implementations should: use these pipeline stages to avoid unnecessary
 stalls or cache flushing.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkPipelineStageFlagBits2',desc='Pipeline stage flags for VkPipelineStageFlags2',type='enums',alias='VkPipelineStageFlagBits2KHR']
+[open,refpage='VkPipelineStageFlagBits2',desc='Pipeline stage flags for VkPipelineStageFlags2',type='enums']
 --
 Bits which can: be set in a tlink:VkPipelineStageFlags2 mask, specifying
 stages of execution, are:
@@ -539,7 +538,7 @@ The first 31 values are common to both, and are interchangeable.
 ====
 --
 
-[open,refpage='VkPipelineStageFlags2',desc='64-bit mask of pipeline stage flags',type='flags',alias='VkPipelineStageFlags2KHR']
+[open,refpage='VkPipelineStageFlags2',desc='64-bit mask of pipeline stage flags',type='flags']
 --
 tname:VkPipelineStageFlags2 is a bitmask type for setting a mask of zero or
 more elink:VkPipelineStageFlagBits2 flags:
@@ -967,7 +966,7 @@ mask_, its second <<synchronization-dependencies-access-scopes, access
 scope>> only includes accesses via the access types specified in that mask.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkAccessFlagBits2',desc='Access flags for VkAccessFlags2',type='enums',alias='VkAccessFlagBits2KHR']
+[open,refpage='VkAccessFlagBits2',desc='Access flags for VkAccessFlags2',type='enums']
 --
 Bits which can: be set in the pname:srcAccessMask and pname:dstAccessMask
 members of slink:VkMemoryBarrier2KHR, slink:VkImageMemoryBarrier2KHR, and
@@ -1084,6 +1083,10 @@ endif::VK_EXT_shader_tile_image[]
     via certain render pass <<renderpass-load-operations, load>>,
     <<renderpass-store-operations, store>>, and
     <<renderpass-resolve-operations, multisample resolve>> operations.
+ifdef::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
+    This includes <<renderpass-resolve-operations, multisample resolve>>
+    operations for depth/stencil resolve attachments.
+endif::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
     Such access occurs in the
     ename:VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT pipeline stage.
   * ename:VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT specifies read
@@ -1320,6 +1323,12 @@ ifdef::VK_ARM_data_graph[]
     resources in the ename:VK_PIPELINE_STAGE_2_DATA_GRAPH_BIT_ARM pipeline
     stage.
 endif::VK_ARM_data_graph[]
+ifdef::VK_EXT_descriptor_heap[]
+  * ename:VK_ACCESS_2_SAMPLER_HEAP_READ_BIT_EXT specifies read access to a
+    sampler heap in any shader pipeline stage.
+  * ename:VK_ACCESS_2_RESOURCE_HEAP_READ_BIT_EXT specifies read access to a
+    resource heap in any shader pipeline stage.
+endif::VK_EXT_descriptor_heap[]
 
 [NOTE]
 ====
@@ -1338,7 +1347,7 @@ The first 31 values are common to both, and are interchangeable.
 ====
 --
 
-[open,refpage='VkAccessFlags2',desc='64-bit mask of access flags',type='flags',alias='VkAccessFlags2KHR']
+[open,refpage='VkAccessFlags2',desc='64-bit mask of access flags',type='flags']
 --
 tname:VkAccessFlags2 is a bitmask type for setting a mask of zero or more
 elink:VkAccessFlagBits2:
@@ -1517,15 +1526,14 @@ ifdef::VK_EXT_shader_tile_image[]
     in the ename:VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT pipeline stage.
 endif::VK_EXT_shader_tile_image[]
   * ename:VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT specifies write access to a
-ifndef::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
-    <<renderpass, color or resolve attachment>>
-endif::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
+    <<renderpass, color attachment>> during a <<renderpass, render pass>> or
+    via certain render pass <<renderpass-load-operations, load>>,
+    <<renderpass-store-operations, store>>, and
+    <<renderpass-resolve-operations, multisample resolve>> operations.
 ifdef::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
-    <<renderpass, color, resolve, or depth/stencil resolve attachment>>
+    This includes <<renderpass-resolve-operations, multisample resolve>>
+    operations for depth/stencil resolve attachments.
 endif::VK_GRAPHICS_VERSION_1_2,VK_KHR_depth_stencil_resolve[]
-    during a <<renderpass, render pass>> or via certain render pass
-    <<renderpass-load-operations, load>> and <<renderpass-store-operations,
-    store>> operations.
     Such access occurs in the
     ename:VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT pipeline stage.
   * ename:VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT specifies read access
@@ -1774,131 +1782,63 @@ dependencies.
 A dependency with non-framebuffer-space pipeline stages is neither
 framebuffer-global nor framebuffer-local.
 
-ifndef::VK_QCOM_render_pass_shader_resolve,VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-A _framebuffer region_ is a set of sample (x, y, layer, sample) coordinates
-that is a subset of the entire framebuffer.
-endif::VK_QCOM_render_pass_shader_resolve,VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-ifdef::VK_QCOM_render_pass_shader_resolve,VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-A _framebuffer region_ is a subset of the entire framebuffer, and can:
-either be:
-
-  * A _sample region_, which is set of sample (x, y, layer, sample)
-    coordinates that is a subset of the entire framebuffer, or
-  * A _fragment region_, which is a set of fragment (x, y, layer)
-    coordinates that is a subset of the entire framebuffer.
-endif::VK_QCOM_render_pass_shader_resolve,VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-
-Both <<synchronization-dependencies-scopes, synchronization scopes>> of a
-framebuffer-local dependency include only the operations performed within
-corresponding framebuffer regions (as defined below).
-No ordering guarantees are made between different framebuffer regions for a
-framebuffer-local dependency.
-
-Both <<synchronization-dependencies-scopes, synchronization scopes>> of a
-framebuffer-global dependency include operations on all framebuffer-regions.
-
-If the first synchronization scope includes operations on pixels/fragments
-with N samples and the second synchronization scope includes operations on
-pixels/fragments with M samples, where N does not equal M, then a
-framebuffer region containing all samples at a given (x, y, layer)
-coordinate in the first synchronization scope corresponds to a region
-containing all samples at the same coordinate in the second synchronization
-scope.
-ifndef::VK_QCOM_render_pass_shader_resolve[]
-In other words, it is a pixel granularity dependency.
-endif::VK_QCOM_render_pass_shader_resolve[]
-ifdef::VK_QCOM_render_pass_shader_resolve[]
-In other words, the framebuffer region is a fragment region and it is a
-pixel granularity dependency.
-endif::VK_QCOM_render_pass_shader_resolve[]
-If N equals M,
-ifdef::VK_QCOM_render_pass_shader_resolve[]
-and if the sname:VkSubpassDescription::pname:flags does not specify the
-ename:VK_SUBPASS_DESCRIPTION_FRAGMENT_REGION_BIT_QCOM flag,
-endif::VK_QCOM_render_pass_shader_resolve[]
-then a framebuffer region containing a single (x, y, layer, sample)
-coordinate in the first synchronization scope corresponds to a region
-containing the same sample at the same coordinate in the second
+Framebuffer-global dependencies require synchronization from all framebuffer
+operations in the first <<synchronization-dependencies-scopes,
+synchronization scope>> to all framebuffer operations in the second
 synchronization scope.
-ifndef::VK_QCOM_render_pass_shader_resolve[]
-In other words, it is a sample granularity dependency.
-endif::VK_QCOM_render_pass_shader_resolve[]
-ifdef::VK_QCOM_render_pass_shader_resolve[]
-In other words, the framebuffer region is a sample region and it is a sample
-granularity dependency.
-endif::VK_QCOM_render_pass_shader_resolve[]
 
+Framebuffer-local dependencies instead partition the framebuffer operations
+into _framebuffer regions_, and dependencies are only formed between
+framebuffer regions with overlapping [eq]#(x, y, layer,
+ifdef::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+view,
+endif::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+sample)# coordinates.
+How a framebuffer-local dependency is partitioned depends on the nature of
+the dependency and what is being synchronized, as outlined below.
+
+  * If the ename:VK_DEPENDENCY_BY_REGION_BIT flag is specified in a
+    synchronization command, each region in that dependency covers a single
+    [eq]#(x,y,layer)# position.
+  ** If the dependency is between two operations where the sample counts
+     match,
+ifdef::VK_EXT_custom_resolve[]
+     ename:VK_RENDERING_FRAGMENT_REGION_BIT_EXT is not also specified,
+endif::VK_EXT_custom_resolve[]
+ifdef::VK_QCOM_render_pass_shader_resolve,VK_EXT_custom_resolve[]
+     and the operations are not both in subpasses specified with
+     ename:VK_SUBPASS_DESCRIPTION_FRAGMENT_REGION_BIT_EXT,
+endif::VK_QCOM_render_pass_shader_resolve,VK_EXT_custom_resolve[]
+     the regions are further split to only cover a single [eq]#sample#.
+ifdef::VK_QCOM_tile_shading[]
+  ** If the dependency is between commands that enable
+     <<renderpass-tile-shading,tile shading>>, instead of a single
+     [eq]#(x,y)# position, each region covers multiple [eq]#(x,y)# positions
+     according to the tile size and the specified apron.
+endif::VK_QCOM_tile_shading[]
+ifdef::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+  * If the ename:VK_DEPENDENCY_VIEW_LOCAL_BIT flag is specified in a
+    synchronization command, each region covers a single [eq]#(view)#.
+endif::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
 ifdef::VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
-If the pipeline performing the operation was created with
-ename:VK_PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT,
-ename:VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT,
-or
-ename:VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_STENCIL_ACCESS_BIT_EXT,
-the framebuffer region is a fragment region and it is a pixel granularity
-dependency.
+  * Each region in an automatic framebuffer-local dependency inserted
+    between framebuffer-space operations performed by pipelines created with
+    ename:VK_PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT,
+    ename:VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT,
+    or
+    ename:VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_STENCIL_ACCESS_BIT_EXT,
+    covers a single [eq]#(x,y,layer,sample)# position.
 endif::VK_EXT_rasterization_order_attachment_access,VK_ARM_rasterization_order_attachment_access[]
 
-ifdef::VK_QCOM_tile_shading[]
-For commands recorded within a render pass that enables
-<<renderpass-tile-shading,tile shading>>, the framebuffer region is a tile
-region and it is a tile granularity dependency.
-endif::VK_QCOM_tile_shading[]
-
-[NOTE]
-====
-ifndef::VK_QCOM_tile_shading[Since]
-ifdef::VK_QCOM_tile_shading[]
-For commands recorded within a render pass instance that enables
-<<renderpass-tile-shading,tile shading>>, the fragment shader invocations
-for a given tile will be grouped together, but the tiles do not run in any
-particular order, and the fragment shader invocations within a tile do not
-run in any particular order.
-Otherwise,
-endif::VK_QCOM_tile_shading[]
-fragment shader invocations are not specified to run in any particular
-groupings, the size of a framebuffer region is implementation-dependent, not
-known to the application, and must: be assumed to be no larger than
-specified above.
-====
-
-[NOTE]
-====
-Practically, the pixel vs. sample granularity dependency means that if an
-input attachment has a different number of samples than the pipeline's
-pname:rasterizationSamples, then a fragment can: access any sample in the
-input attachment's pixel even if it only uses framebuffer-local
-dependencies.
-If the input attachment has the same number of samples, then the fragment
-can: only access the covered samples in its input code:SampleMask (i.e. the
-fragment operations happen-after a framebuffer-local dependency for each
-sample the fragment covers).
-To access samples that are not covered,
-ifdef::VK_QCOM_render_pass_shader_resolve[]
-either the sname:VkSubpassDescription::pname:flags
-ename:VK_SUBPASS_DESCRIPTION_FRAGMENT_REGION_BIT_QCOM flag is required, or
-endif::VK_QCOM_render_pass_shader_resolve[]
-a framebuffer-global dependency is required.
-
-ifdef::VK_QCOM_tile_shading[]
-For a tile granularity dependency, a fragment shader can: use
-<<renderpass-tile-shading-attachment-access,tile attachment variables>> to
-access any pixel or sample within the _active tile_ for color, depth/stencil
-or input attachments even if only framebuffer-local dependencies are used.
-endif::VK_QCOM_tile_shading[]
-
-====
-
-If a synchronization command includes a pname:dependencyFlags parameter, and
-specifies the ename:VK_DEPENDENCY_BY_REGION_BIT flag, then it defines
-framebuffer-local dependencies for the framebuffer-space pipeline stages in
-that synchronization command, for all framebuffer regions.
-If no pname:dependencyFlags parameter is included, or the
-ename:VK_DEPENDENCY_BY_REGION_BIT flag is not specified, then a
-framebuffer-global dependency is specified for those stages.
-The ename:VK_DEPENDENCY_BY_REGION_BIT flag does not affect the dependencies
-between non-framebuffer-space pipeline stages, nor does it affect the
-dependencies between framebuffer-space and non-framebuffer-space pipeline
-stages.
+If none of the above conditions partitions the regions across one of the
+[eq]#x#, [eq]#y#, [eq]#layer#,
+ifdef::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+[eq]#view#,
+endif::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+or [eq]#sample# dimensions, all coordinates for that dimension are included
+in each region.
+If this is true for all of those dimensions, the dependency is
+framebuffer-global.
 
 [NOTE]
 ====
@@ -1911,29 +1851,12 @@ force all implementations to flush data to memory, or to a higher level
 cache, breaking any potential locality optimizations.
 ====
 
-
-ifdef::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
-[[synchronization-view-local-dependencies]]
-=== View-Local Dependencies
-
-In a render pass instance that has <<renderpass-multiview,multiview>>
-enabled, dependencies can: be either view-local or view-global.
-
-A view-local dependency only includes operations from a single
-<<renderpass-multiview-view-local,source view>> from the source subpass in
-the first synchronization scope, and only includes operations from a single
-<<renderpass-multiview-view-local,destination view>> from the destination
-subpass in the second synchronization scope.
-A view-global dependency includes all views in the view mask of the source
-and destination subpasses in the corresponding synchronization scopes.
-
-If a synchronization command includes a pname:dependencyFlags parameter and
-specifies the ename:VK_DEPENDENCY_VIEW_LOCAL_BIT flag, then it defines
-view-local dependencies for that synchronization command, for all views.
-If no pname:dependencyFlags parameter is included or the
-ename:VK_DEPENDENCY_VIEW_LOCAL_BIT flag is not specified, then a view-global
-dependency is specified.
-endif::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
+[NOTE]
+====
+It does not matter whether a framebuffer local dependency is within a single
+render pass or between two different render passes - the dependencies are
+always between regions with overlapping framebuffer coordinates.
+====
 
 
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_device_group[]
@@ -2059,12 +1982,21 @@ ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:pSubmits parameter of flink:vkQueueSubmit2,
 endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     from lowest index to highest.
-  . The fence signal operation defined by the pname:fence parameter of a
-    flink:vkQueueSubmit
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[or flink:vkQueueSubmit2]
-ifndef::VKSC_VERSION_1_0[or flink:vkQueueBindSparse]
-    command is ordered after all semaphore signal operations defined by that
-    command.
+  . The fence signal operation defined by the pname:fence parameter of the
+    following commands
+ifdef::VK_KHR_swapchain[]
+ifdef::VK_BASE_VERSION_1_1,VK_KHR_device_group[]
+    and the slink:VkAcquireNextImageInfoKHR::pname:fence member of the
+    variable referred to by the pname:pAcquireInfo parameter of
+    flink:vkAcquireNextImage2KHR
+endif::VK_BASE_VERSION_1_1,VK_KHR_device_group[]
+endif::VK_KHR_swapchain[]
+    is ordered after all semaphore signal operations defined by that
+    command:
+  ** flink:vkQueueSubmit
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[  ** flink:vkQueueSubmit2]
+ifndef::VKSC_VERSION_1_0[  ** flink:vkQueueBindSparse]
+ifdef::VK_KHR_swapchain[  ** flink:vkAcquireNextImageKHR]
 
 Semaphore signal operations defined by a single slink:VkSubmitInfo
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[or slink:VkSubmitInfo2]
@@ -2582,7 +2514,7 @@ include::{generated}/api/structs/VkSciSyncAttributesInfoNV.adoc[]
   * pname:primitiveType is the synchronization primitive type.
 
 NvSciSync disallows multi-signalers, therefore clients must: specify their
-permission types as one of signaler, waiter or signaler_waiter.
+permission types as one of signaler, waiter, or signaler_waiter.
 In addition, NvSciSync requires clients to specify which primitive type is
 to be used in synchronization, hence clients also need to provide the
 primitive type (slink:VkFence or slink:VkSemaphore) that will be used.
@@ -2764,6 +2696,7 @@ include::{generated}/api/protos/vkGetFenceStatus.adoc[]
 Upon success, fname:vkGetFenceStatus returns the status of the fence object,
 with the following return codes:
 
+[[synchronization-fence-object-status-codes-table]]
 .Fence Object Status Codes
 [width="80%",options="header"]
 |====
@@ -2939,8 +2872,114 @@ See the description of <<synchronization-host-access-types, host access
 types>> for more information.
 ====
 
+
 ifdef::VK_EXT_display_control[]
-include::{chapters}/VK_EXT_display_control/fence_events.adoc[]
+=== Alternate Methods to Signal Fences
+
+Besides submitting a fence to a queue as part of a
+<<devsandqueues-submission, queue submission>> command, a fence may: also be
+signaled when a particular event occurs on a device or display.
+
+[open,refpage='vkRegisterDeviceEventEXT',desc='Signal a fence when a device event occurs',type='protos']
+--
+:refpage: vkRegisterDeviceEventEXT
+
+To create a fence that will be signaled when an event occurs on a device,
+call:
+
+include::{generated}/api/protos/vkRegisterDeviceEventEXT.adoc[]
+
+  * pname:device is a logical device on which the event may: occur.
+  * pname:pDeviceEventInfo is a pointer to a slink:VkDeviceEventInfoEXT
+    structure describing the event of interest to the application.
+  * pname:pAllocator controls host memory allocation as described in the
+    <<memory-allocation, Memory Allocation>> chapter.
+  * pname:pFence is a pointer to a handle in which the resulting fence
+    object is returned.
+
+include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
+
+include::{generated}/validity/protos/vkRegisterDeviceEventEXT.adoc[]
+--
+
+[open,refpage='VkDeviceEventInfoEXT',desc='Describe a device event to create',type='structs']
+--
+The sname:VkDeviceEventInfoEXT structure is defined as:
+
+include::{generated}/api/structs/VkDeviceEventInfoEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:deviceEvent is a elink:VkDeviceEventTypeEXT value specifying when
+    the fence will be signaled.
+
+include::{generated}/validity/structs/VkDeviceEventInfoEXT.adoc[]
+--
+
+[open,refpage='VkDeviceEventTypeEXT',desc='Events that can occur on a device object',type='enums']
+--
+Possible values of slink:VkDeviceEventInfoEXT::pname:deviceEvent, specifying
+when a fence will be signaled, are:
+
+include::{generated}/api/enums/VkDeviceEventTypeEXT.adoc[]
+
+  * ename:VK_DEVICE_EVENT_TYPE_DISPLAY_HOTPLUG_EXT specifies that the fence
+    is signaled when a display is plugged into or unplugged from the
+    specified device.
+    Applications can: use this notification to determine when they need to
+    re-enumerate the available displays on a device.
+--
+
+[open,refpage='vkRegisterDisplayEventEXT',desc='Signal a fence when a display event occurs',type='protos']
+--
+:refpage: vkRegisterDisplayEventEXT
+
+To create a fence that will be signaled when an event occurs on a
+slink:VkDisplayKHR object, call:
+
+include::{generated}/api/protos/vkRegisterDisplayEventEXT.adoc[]
+
+  * pname:device is a logical device associated with pname:display
+  * pname:display is the display on which the event may: occur.
+  * pname:pDisplayEventInfo is a pointer to a slink:VkDisplayEventInfoEXT
+    structure describing the event of interest to the application.
+  * pname:pAllocator controls host memory allocation as described in the
+    <<memory-allocation, Memory Allocation>> chapter.
+  * pname:pFence is a pointer to a handle in which the resulting fence
+    object is returned.
+
+include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
+
+include::{generated}/validity/protos/vkRegisterDisplayEventEXT.adoc[]
+--
+
+[open,refpage='VkDisplayEventInfoEXT',desc='Describe a display event to create',type='structs']
+--
+The sname:VkDisplayEventInfoEXT structure is defined as:
+
+include::{generated}/api/structs/VkDisplayEventInfoEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:displayEvent is a elink:VkDisplayEventTypeEXT specifying when the
+    fence will be signaled.
+
+include::{generated}/validity/structs/VkDisplayEventInfoEXT.adoc[]
+--
+
+[open,refpage='VkDisplayEventTypeEXT',desc='Events that can occur on a display object',type='enums']
+--
+Possible values of slink:VkDisplayEventInfoEXT::pname:displayEvent,
+specifying when a fence will be signaled, are:
+
+include::{generated}/api/enums/VkDisplayEventTypeEXT.adoc[]
+
+  * ename:VK_DISPLAY_EVENT_TYPE_FIRST_PIXEL_OUT_EXT specifies that the fence
+    is signaled when the first pixel of the next display refresh cycle
+    leaves the display engine for the display.
+--
 endif::VK_EXT_display_control[]
 
 
@@ -3184,12 +3223,12 @@ The handle types supported by pname:handleType are:
     If pname:handle is not `NULL`, pname:name must: be `NULL`
   * [[VUID-VkImportFenceWin32HandleInfoKHR-handle-01539]]
     If pname:handle is not `NULL`, it must: obey any requirements listed for
-    pname:handleType in <<external-fence-handle-types-compatibility,external
-    fence handle types compatibility>>
+    pname:handleType in <<external-fence-handle-types-compatibility,
+    external fence handle types compatibility>>
   * [[VUID-VkImportFenceWin32HandleInfoKHR-name-01540]]
     If pname:name is not `NULL`, it must: obey any requirements listed for
-    pname:handleType in <<external-fence-handle-types-compatibility,external
-    fence handle types compatibility>>
+    pname:handleType in <<external-fence-handle-types-compatibility,
+    external fence handle types compatibility>>
 ****
 
 include::{generated}/validity/structs/VkImportFenceWin32HandleInfoKHR.adoc[]
@@ -3265,7 +3304,7 @@ The handle types supported by pname:handleType are:
     sname:VkImportFenceFdInfoKHR>> table
   * [[VUID-VkImportFenceFdInfoKHR-fd-01541]]
     pname:fd must: obey any requirements listed for pname:handleType in
-    <<external-fence-handle-types-compatibility,external fence handle types
+    <<external-fence-handle-types-compatibility, external fence handle types
     compatibility>>
   * [[VUID-VkImportFenceFdInfoKHR-handleType-07306]]
     If pname:handleType refers to a handle type with copy payload
@@ -3588,7 +3627,7 @@ currently reserved for future use.
 --
 
 ifdef::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
-[open,refpage='VkSemaphoreTypeCreateInfo',desc='Structure specifying the type of a newly created semaphore',type='structs',alias='VkSemaphoreTypeCreateInfoKHR']
+[open,refpage='VkSemaphoreTypeCreateInfo',desc='Structure specifying the type of a newly created semaphore',type='structs']
 --
 The sname:VkSemaphoreTypeCreateInfo structure is defined as:
 
@@ -3639,7 +3678,7 @@ endif::VK_NV_external_sci_sync[]
 include::{generated}/validity/structs/VkSemaphoreTypeCreateInfo.adoc[]
 --
 
-[open,refpage='VkSemaphoreType',desc='Specifies the type of a semaphore object',type='enums',alias='VkSemaphoreTypeKHR']
+[open,refpage='VkSemaphoreType',desc='Specifies the type of a semaphore object',type='enums']
 --
 Possible values of slink:VkSemaphoreTypeCreateInfo::pname:semaphoreType,
 specifying the type of a semaphore, are:
@@ -4409,25 +4448,8 @@ respect to the counter value set to be signaled as specified in
 slink:VkTimelineSemaphoreSubmitInfo or slink:VkSemaphoreSignalInfo.
 endif::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
 
-The first <<synchronization-dependencies-scopes, synchronization scope>>
-includes every command submitted in the same batch.
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-In the case of flink:vkQueueSubmit2, the first synchronization scope is
-limited to the pipeline stage specified by
-slink:VkSemaphoreSubmitInfo::pname:stageMask.
-endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-Semaphore signal operations that are defined by flink:vkQueueSubmit
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-or flink:vkQueueSubmit2
-endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-additionally include all commands that occur earlier in
-<<synchronization-submission-order,submission order>>.
-Semaphore signal operations that are defined by flink:vkQueueSubmit
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[or flink:vkQueueSubmit2]
-ifndef::VKSC_VERSION_1_0[or flink:vkQueueBindSparse]
-additionally include in the first synchronization scope any semaphore and
-fence signal operations that occur earlier in
-<<synchronization-signal-operation-order,signal operation order>>.
+The first <<synchronization-dependencies-scopes, synchronization scope>> of
+a semaphore signal operation is defined by the command which defines it.
 
 The second <<synchronization-dependencies-scopes, synchronization scope>>
 includes only the semaphore signal operation.
@@ -4462,9 +4484,10 @@ signaled with respect to the counter value waited on as specified in
 slink:VkTimelineSemaphoreSubmitInfo.
 endif::VK_BASE_VERSION_1_2,VK_KHR_timeline_semaphore[]
 
-The first <<synchronization-dependencies-scopes, synchronization scope>>
-includes one <<synchronization-semaphores-signaling,semaphore signal
-operation>> for each semaphore waited on by this batch.
+The first <<synchronization-dependencies-scopes, synchronization scope>> of
+any wait semaphore operation includes one
+<<synchronization-semaphores-signaling,semaphore signal operation>> for each
+semaphore waited on by this batch.
 The specific signal operation waited on for each semaphore must: meet the
 following criteria:
 
@@ -4502,25 +4525,8 @@ applications must: ensure that other synchronization dependencies exist to
 prevent any data races.
 endif::VK_KHR_timelines_semaphore[]
 
-
-The second <<synchronization-dependencies-scopes, synchronization scope>>
-includes every command submitted in the same batch.
-In the case of flink:vkQueueSubmit, the second synchronization scope is
-limited to operations on the pipeline stages determined by the
-<<synchronization-pipeline-stages-masks, destination stage mask>> specified
-by the corresponding element of pname:pWaitDstStageMask.
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-In the case of flink:vkQueueSubmit2, the second synchronization scope is
-limited to the pipeline stage specified by
-slink:VkSemaphoreSubmitInfo::pname:stageMask.
-endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-Also, in the case of
-ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-either flink:vkQueueSubmit2 or
-endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-flink:vkQueueSubmit, the second synchronization scope additionally includes
-all commands that occur later in
-<<synchronization-submission-order,submission order>>.
+The second <<synchronization-dependencies-scopes, synchronization scope>> of
+a wait operation is defined by each command.
 
 The first <<synchronization-dependencies-access-scopes, access scope>> is
 empty.
@@ -4545,53 +4551,6 @@ semaphore is signaled again, with execution dependencies used to ensure
 these occur in order.
 Binary semaphore waits and signals should thus occur in discrete 1:1 pairs.
 ====
-
-ifdef::VK_KHR_swapchain[]
-[NOTE]
-====
-A common scenario for using pname:pWaitDstStageMask with values other than
-ename:VK_PIPELINE_STAGE_ALL_COMMANDS_BIT is when synchronizing a window
-system presentation operation against subsequent command buffers which
-render the next frame.
-In this case, a presentation image must: not be overwritten until the
-presentation operation completes, but other pipeline stages can: execute
-without waiting.
-A mask of ename:VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT prevents
-subsequent color attachment writes from executing until the semaphore
-signals.
-Some implementations may: be able to execute transfer operations and/or
-pre-rasterization work before the semaphore is signaled.
-
-If an image layout transition needs to be performed on a presentable image
-before it is used in a framebuffer, that can: be performed as the first
-operation submitted to the queue after acquiring the image, and should: not
-prevent other work from overlapping with the presentation operation.
-For example, a sname:VkImageMemoryBarrier could use:
-
-  * pname:srcStageMask = ename:VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
-  * pname:srcAccessMask = 0
-  * pname:dstStageMask = ename:VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
-  * pname:dstAccessMask = ename:VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-    ename:VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT.
-  * pname:oldLayout = ename:VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-  * pname:newLayout = ename:VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-
-Alternatively, pname:oldLayout can: be ename:VK_IMAGE_LAYOUT_UNDEFINED, if
-the image's contents need not be preserved.
-
-This barrier accomplishes a dependency chain between previous presentation
-operations and subsequent color attachment output operations, with the
-layout transition performed in between, and does not introduce a dependency
-between previous work and any
-<<pipelines-graphics-subsets-pre-rasterization,pre-rasterization shader
-stage>>s.
-More precisely, the semaphore signals after the presentation operation
-completes, the semaphore wait stalls the
-ename:VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT stage, and there is a
-dependency from that same stage to itself with the layout transition
-performed in between.
-====
-endif::VK_KHR_swapchain[]
 
 
 [[synchronization-semaphores-waiting-state]]
@@ -4628,7 +4587,7 @@ following host operations:
   * Signal the semaphore with a particular counter value from the host using
     the flink:vkSignalSemaphore command.
 
-[open,refpage='vkGetSemaphoreCounterValue',desc='Query the current state of a timeline semaphore',type='protos',alias='vkGetSemaphoreCounterValueKHR']
+[open,refpage='vkGetSemaphoreCounterValue',desc='Query the current state of a timeline semaphore',type='protos']
 --
 :refpage: vkGetSemaphoreCounterValue
 
@@ -4668,7 +4627,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 include::{generated}/validity/protos/vkGetSemaphoreCounterValue.adoc[]
 --
 
-[open,refpage='vkWaitSemaphores',desc='Wait for timeline semaphores on the host',type='protos',alias='vkWaitSemaphoresKHR']
+[open,refpage='vkWaitSemaphores',desc='Wait for timeline semaphores on the host',type='protos']
 --
 :refpage: vkWaitSemaphores
 
@@ -4718,7 +4677,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 include::{generated}/validity/protos/vkWaitSemaphores.adoc[]
 --
 
-[open,refpage='VkSemaphoreWaitInfo',desc='Structure containing information about the semaphore wait condition',type='structs',alias='VkSemaphoreWaitInfoKHR']
+[open,refpage='VkSemaphoreWaitInfo',desc='Structure containing information about the semaphore wait condition',type='structs']
 --
 The sname:VkSemaphoreWaitInfo structure is defined as:
 
@@ -4757,7 +4716,7 @@ endif::VK_NV_external_sci_sync,VK_NV_external_sci_sync2[]
 include::{generated}/validity/structs/VkSemaphoreWaitInfo.adoc[]
 --
 
-[open,refpage='VkSemaphoreWaitFlagBits',desc='Bitmask specifying additional parameters of a semaphore wait operation',type='enums',alias='VkSemaphoreWaitFlagBitsKHR']
+[open,refpage='VkSemaphoreWaitFlagBits',desc='Bitmask specifying additional parameters of a semaphore wait operation',type='enums']
 --
 Bits which can: be set in slink:VkSemaphoreWaitInfo::pname:flags, specifying
 additional parameters of a semaphore wait operation, are:
@@ -4780,7 +4739,7 @@ endif::VK_KHR_timeline_semaphore[]
     sname:VkSemaphoreWaitInfo::pname:pValues.
 --
 
-[open,refpage='VkSemaphoreWaitFlags',desc='Bitmask of VkSemaphoreWaitFlagBits',type='flags',alias='VkSemaphoreWaitFlagsKHR']
+[open,refpage='VkSemaphoreWaitFlags',desc='Bitmask of VkSemaphoreWaitFlagBits',type='flags']
 --
 include::{generated}/api/flags/VkSemaphoreWaitFlags.adoc[]
 
@@ -4792,7 +4751,7 @@ tname:VkSemaphoreWaitFlags is a bitmask type for setting a mask of zero or
 more elink:VkSemaphoreWaitFlagBits.
 --
 
-[open,refpage='vkSignalSemaphore',desc='Signal a timeline semaphore on the host',type='protos',alias='vkSignalSemaphoreKHR']
+[open,refpage='vkSignalSemaphore',desc='Signal a timeline semaphore on the host',type='protos']
 --
 :refpage: vkSignalSemaphore
 
@@ -4827,7 +4786,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 include::{generated}/validity/protos/vkSignalSemaphore.adoc[]
 --
 
-[open,refpage='VkSemaphoreSignalInfo',desc='Structure containing information about a semaphore signal operation',type='structs',alias='VkSemaphoreSignalInfoKHR']
+[open,refpage='VkSemaphoreSignalInfo',desc='Structure containing information about a semaphore signal operation',type='structs']
 --
 The sname:VkSemaphoreSignalInfo structure is defined as:
 
@@ -5125,14 +5084,12 @@ The handle types supported by pname:handleType are:
     If pname:handle is not `NULL`, pname:name must: be `NULL`
   * [[VUID-VkImportSemaphoreWin32HandleInfoKHR-handle-01542]]
     If pname:handle is not `NULL`, it must: obey any requirements listed for
-    pname:handleType in
-    <<external-semaphore-handle-types-compatibility,external semaphore
-    handle types compatibility>>
+    pname:handleType in <<external-semaphore-handle-types-compatibility,
+    external semaphore handle types compatibility>>
   * [[VUID-VkImportSemaphoreWin32HandleInfoKHR-name-01543]]
     If pname:name is not `NULL`, it must: obey any requirements listed for
-    pname:handleType in
-    <<external-semaphore-handle-types-compatibility,external semaphore
-    handle types compatibility>>
+    pname:handleType in <<external-semaphore-handle-types-compatibility,
+    external semaphore handle types compatibility>>
   * [[VUID-VkImportSemaphoreWin32HandleInfoKHR-handleType-03261]]
     If pname:handleType is
     ename:VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT or
@@ -5229,7 +5186,7 @@ The handle types supported by pname:handleType are:
     sname:VkImportSemaphoreFdInfoKHR>> table
   * [[VUID-VkImportSemaphoreFdInfoKHR-fd-01544]]
     pname:fd must: obey any requirements listed for pname:handleType in
-    <<external-semaphore-handle-types-compatibility,external semaphore
+    <<external-semaphore-handle-types-compatibility, external semaphore
     handle types compatibility>>
   * [[VUID-VkImportSemaphoreFdInfoKHR-handleType-03263]]
     If pname:handleType is
@@ -5343,9 +5300,8 @@ The handle types supported by pname:handleType are:
     by sname:VkImportSemaphoreZirconHandleInfoFUCHSIA>> table
   * [[VUID-VkImportSemaphoreZirconHandleInfoFUCHSIA-zirconHandle-04766]]
     pname:zirconHandle must: obey any requirements listed for
-    pname:handleType in
-    <<external-semaphore-handle-types-compatibility,external semaphore
-    handle types compatibility>>
+    pname:handleType in <<external-semaphore-handle-types-compatibility,
+    external semaphore handle types compatibility>>
   * [[VUID-VkImportSemaphoreZirconHandleInfoFUCHSIA-zirconHandle-04767]]
     pname:zirconHandle must: have code:ZX_RIGHTS_BASIC and
     code:ZX_RIGHTS_SIGNAL rights
@@ -5653,6 +5609,7 @@ include::{generated}/api/protos/vkGetEventStatus.adoc[]
 Upon success, fname:vkGetEventStatus returns the state of the event object
 with the following return codes:
 
+[[synchronization-event-object-status-codes-table]]
 .Event Object Status Codes
 [width="80%",options="header"]
 |====
@@ -5771,7 +5728,7 @@ inserted in command buffers.
 
 [[synchronization-events-signaling-device]]
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='vkCmdSetEvent2',desc='Set an event object to signaled state',type='protos',alias='vkCmdSetEvent2KHR']
+[open,refpage='vkCmdSetEvent2',desc='Set an event object to signaled state',type='protos']
 --
 To signal an event from a device, call:
 
@@ -5902,7 +5859,7 @@ endif::VK_KHR_maintenance9[]
 include::{generated}/validity/protos/vkCmdSetEvent2.adoc[]
 --
 
-[open,refpage='VkDependencyInfo',desc='Structure specifying dependency information for a synchronization command',type='structs',alias='VkDependencyInfoKHR']
+[open,refpage='VkDependencyInfo',desc='Structure specifying dependency information for a synchronization command',type='structs']
 --
 The sname:VkDependencyInfo structure is defined as:
 
@@ -6032,7 +5989,7 @@ include::{generated}/validity/protos/vkCmdSetEvent.adoc[]
 
 [[synchronization-events-unsignaling-device]]
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='vkCmdResetEvent2',desc='Reset an event object to non-signaled state',type='protos',alias='vkCmdResetEvent2KHR']
+[open,refpage='vkCmdResetEvent2',desc='Reset an event object to non-signaled state',type='protos']
 --
 :refpage: vkCmdResetEvent2
 
@@ -6173,8 +6130,10 @@ include::{generated}/validity/protos/vkCmdResetEvent.adoc[]
 --
 
 ifdef::VK_COMPUTE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='vkCmdWaitEvents2',desc='Wait for one or more events',type='protos',alias='vkCmdWaitEvents2KHR']
+[open,refpage='vkCmdWaitEvents2',desc='Wait for one or more events',type='protos']
 --
+:refpage: vkCmdWaitEvents2
+
 To wait for one or more events to enter the signaled state on a device,
 call:
 
@@ -6248,6 +6207,7 @@ condition.
 
 .Valid Usage
 ****
+include::{chapters}/commonvalidity/fine_sync_renderpass_common.adoc[]
   * [[VUID-vkCmdWaitEvents2-synchronization2-03836]]
     The <<features-synchronization2, pname:synchronization2>> feature must:
     be enabled
@@ -6255,7 +6215,7 @@ condition.
     Members of pname:pEvents must: not have been signaled by
     flink:vkCmdSetEvent
   * [[VUID-vkCmdWaitEvents2-pEvents-10788]]
-    For any element [eq]#i# of pname:pEvents,
+    For each element [eq]#i# of pname:pEvents,
 ifdef::VK_KHR_maintenance9[]
     if the pname:dependencyFlags member of the [eq]##i##th element of
     pname:pDependencyInfos does not include
@@ -6266,13 +6226,13 @@ endif::VK_KHR_maintenance9[]
     element of pname:pDependencyInfos
 ifdef::VK_KHR_maintenance9[]
   * [[VUID-vkCmdWaitEvents2-pEvents-10789]]
-    For any element [eq]#i# of pname:pEvents, if the pname:dependencyFlags
+    For each element [eq]#i# of pname:pEvents, if the pname:dependencyFlags
     member of the [eq]##i##th element of pname:pDependencyInfos includes
     ename:VK_DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR, that event must: be
     signaled by flink:vkCmdSetEvent2 with
     ename:VK_DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR
   * [[VUID-vkCmdWaitEvents2-pEvents-10790]]
-    For any element [eq]#i# of pname:pEvents, if the pname:dependencyFlags
+    For each element [eq]#i# of pname:pEvents, if the pname:dependencyFlags
     member of the [eq]##i##th element of pname:pDependencyInfos includes
     ename:VK_DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR, the union of
     pname:srcStageMask members of all elements of pname:pMemoryBarriers,
@@ -6282,20 +6242,20 @@ ifdef::VK_KHR_maintenance9[]
     flink:vkCmdSetEvent2 command
 endif::VK_KHR_maintenance9[]
   * [[VUID-vkCmdWaitEvents2-pEvents-03839]]
-    For any element [eq]#i# of pname:pEvents, if that event is signaled by
+    For each element [eq]#i# of pname:pEvents, if that event is signaled by
     flink:vkSetEvent, barriers in the [eq]##i##th element of
     pname:pDependencyInfos must: include only host operations in their first
     <<synchronization-dependencies-scopes, synchronization scope>>
   * [[VUID-vkCmdWaitEvents2-pEvents-03840]]
-    For any element [eq]#i# of pname:pEvents, if barriers in the [eq]##i##th
-    element of pname:pDependencyInfos include only host operations, the
-    [eq]##i##th element of pname:pEvents must: be signaled before
-    flink:vkCmdWaitEvents2 is executed
+    For each element [eq]#i# of pname:pEvents, if barriers in the
+    [eq]##i##th element of pname:pDependencyInfos include only host
+    operations, the [eq]##i##th element of pname:pEvents must: be signaled
+    before flink:vkCmdWaitEvents2 is executed
   * [[VUID-vkCmdWaitEvents2-pEvents-03841]]
-    For any element [eq]#i# of pname:pEvents, if barriers in the [eq]##i##th
-    element of pname:pDependencyInfos do not include host operations, the
-    [eq]##i##th element of pname:pEvents must: be signaled by a
-    corresponding flink:vkCmdSetEvent2 that occurred earlier in
+    For each element [eq]#i# of pname:pEvents, if barriers in the
+    [eq]##i##th element of pname:pDependencyInfos do not include host
+    operations, the [eq]##i##th element of pname:pEvents must: be signaled
+    by a corresponding flink:vkCmdSetEvent2 that occurred earlier in
     <<synchronization-submission-order,submission order>>
   * [[VUID-vkCmdWaitEvents2-srcStageMask-03842]]
     The pname:srcStageMask member of any element of the
@@ -6487,6 +6447,7 @@ include::{chapters}/commonvalidity/access_mask_common.adoc[]
 include::{chapters}/commonvalidity/stage_mask_common.adoc[]
 include::{chapters}/commonvalidity/access_mask_common.adoc[]
 include::{chapters}/commonvalidity/fine_sync_commands_common.adoc[]
+include::{chapters}/commonvalidity/fine_sync_renderpass_common.adoc[]
   * [[VUID-vkCmdWaitEvents-srcStageMask-06459]]
     Any pipeline stage included in pname:srcStageMask must: be supported by
     the capabilities of the queue family specified by the
@@ -6542,7 +6503,7 @@ endif::VK_COMPUTE_VERSION_1_0[]
 == Pipeline Barriers
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='vkCmdPipelineBarrier2',desc='Insert a memory dependency',type='protos',alias='vkCmdPipelineBarrier2KHR']
+[open,refpage='vkCmdPipelineBarrier2',desc='Insert a memory dependency',type='protos']
 --
 :refpage: vkCmdPipelineBarrier2
 
@@ -6583,6 +6544,7 @@ same subpass or render pass instance.
 .Valid Usage
 ****
 include::{chapters}/commonvalidity/pipeline_barrier_common.adoc[]
+include::{chapters}/commonvalidity/fine_sync_renderpass_common.adoc[]
   * [[VUID-vkCmdPipelineBarrier2-synchronization2-03848]]
     The <<features-synchronization2, pname:synchronization2>> feature must:
     be enabled
@@ -6741,6 +6703,7 @@ include::{chapters}/commonvalidity/access_mask_common.adoc[]
 include::{chapters}/commonvalidity/stage_mask_common.adoc[]
 include::{chapters}/commonvalidity/access_mask_common.adoc[]
 include::{chapters}/commonvalidity/fine_sync_commands_common.adoc[]
+include::{chapters}/commonvalidity/fine_sync_renderpass_common.adoc[]
 include::{chapters}/commonvalidity/pipeline_barrier_common.adoc[]
   * [[VUID-vkCmdPipelineBarrier-oldLayout-10758]]
     If called within a render pass instance using a slink:VkRenderPass
@@ -6772,12 +6735,12 @@ endif::VK_GRAPHICS_VERSION_1_3,VK_KHR_dynamic_rendering[]
     stages>>
   * [[VUID-vkCmdPipelineBarrier-srcStageMask-09633]]
     If either pname:srcStageMask or pname:dstStageMask includes
-    ename:VK_PIPELINE_STAGE_HOST_BIT, for any element of
+    ename:VK_PIPELINE_STAGE_HOST_BIT, for each element of
     pname:pImageMemoryBarriers, pname:srcQueueFamilyIndex and
     pname:dstQueueFamilyIndex must: be equal
   * [[VUID-vkCmdPipelineBarrier-srcStageMask-09634]]
     If either pname:srcStageMask or pname:dstStageMask includes
-    ename:VK_PIPELINE_STAGE_HOST_BIT, for any element of
+    ename:VK_PIPELINE_STAGE_HOST_BIT, for each element of
     pname:pBufferMemoryBarriers, pname:srcQueueFamilyIndex and
     pname:dstQueueFamilyIndex must: be equal
   * [[VUID-vkCmdPipelineBarrier-srcQueueFamilyIndex-10388]]
@@ -6806,10 +6769,13 @@ specifying how execution and memory dependencies are formed, are:
 include::{generated}/api/enums/VkDependencyFlagBits.adoc[]
 
   * ename:VK_DEPENDENCY_BY_REGION_BIT specifies that dependencies will be
-    <<synchronization-framebuffer-regions, framebuffer-local>>.
+    split into multiple <<synchronization-framebuffer-regions,
+    framebuffer-local regions>> according to the [eq]#(x,y,layer,sample)#
+    coordinates.
 ifdef::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
   * ename:VK_DEPENDENCY_VIEW_LOCAL_BIT specifies that dependencies will be
-    <<synchronization-view-local-dependencies, view-local>>.
+    split into multiple <<synchronization-framebuffer-regions,
+    framebuffer-local regions>> according to the [eq]#view#.
 endif::VK_GRAPHICS_VERSION_1_1,VK_KHR_multiview[]
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_device_group[]
   * ename:VK_DEPENDENCY_DEVICE_GROUP_BIT specifies that dependencies are
@@ -6867,7 +6833,7 @@ Global memory barriers apply to memory accesses involving all memory objects
 that exist at the time of its execution.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkMemoryBarrier2',desc='Structure specifying a global memory barrier',type='structs',alias='VkMemoryBarrier2KHR']
+[open,refpage='VkMemoryBarrier2',desc='Structure specifying a global memory barrier',type='structs']
 --
 :refpage: VkMemoryBarrier2
 
@@ -6978,7 +6944,7 @@ Buffer memory barriers can: also be used to define a
 specified buffer range.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkBufferMemoryBarrier2',desc='Structure specifying a buffer memory barrier',type='structs',alias='VkBufferMemoryBarrier2KHR']
+[open,refpage='VkBufferMemoryBarrier2',desc='Structure specifying a buffer memory barrier',type='structs']
 --
 :refpage: VkBufferMemoryBarrier2
 
@@ -7159,9 +7125,16 @@ made available to the host domain.
 
 [NOTE]
 ====
-When ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT is used, available memory in
-host domain is automatically made visible to host domain, and any host write
-is automatically made available to host domain.
+Host writes to device memory that was allocated without
+ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT have to be flushed with
+flink:vkFlushMappedMemoryRanges before they can be accessed safely on the
+device.
+Similarly, device writes to such memory have to be invalidated with
+flink:vkInvalidateMappedMemoryRanges before they can be accessed safely on
+the host.
+
+Memory allocated with ename:VK_MEMORY_PROPERTY_HOST_COHERENT_BIT does not
+need to have these additional operations performed.
 ====
 
 [[buffer-memory-barrier-ownership-transfer]]
@@ -7193,10 +7166,10 @@ include::{chapters}/commonvalidity/buffer_memory_barrier_common.adoc[]
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkBufferMemoryBarrier-None-09049]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:buffer was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, at least one of
     pname:srcQueueFamilyIndex and pname:dstQueueFamilyIndex must: be
@@ -7204,10 +7177,10 @@ endif::VK_KHR_synchronization2[]
 endif::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkBufferMemoryBarrier-None-09050]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:buffer was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, pname:srcQueueFamilyIndex must: be
     ename:VK_QUEUE_FAMILY_IGNORED
@@ -7216,10 +7189,10 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
 endif::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkBufferMemoryBarrier-None-09051]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:buffer was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, pname:dstQueueFamilyIndex must: be
     ename:VK_QUEUE_FAMILY_IGNORED
@@ -7257,7 +7230,7 @@ Image memory barriers can: also be used to define
 specified image subresource range.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[open,refpage='VkImageMemoryBarrier2',desc='Structure specifying an image memory barrier',type='structs',alias='VkImageMemoryBarrier2KHR']
+[open,refpage='VkImageMemoryBarrier2',desc='Structure specifying an image memory barrier',type='structs']
 --
 :refpage: VkImageMemoryBarrier2
 
@@ -7358,12 +7331,11 @@ If this memory barrier defines a <<synchronization-queue-transfers, queue
 family ownership transfer operation>>, the layout transition is only
 executed once between the queues.
 
-[NOTE]
-====
-When the old and new layout are equal, the layout values are ignored - data
-is preserved no matter what values are specified, or what layout the image
-is currently in.
-====
+[[synchronization-image-barrier2-ignored-layout]]
+If pname:srcQueueFamilyIndex and pname:dstQueueFamilyIndex are equal and
+pname:oldLayout and pname:newLayout are also equal, the layout values are
+ignored and the image contents are preserved regardless of the values of
+pname:oldLayout, pname:newLayout, and the current layout of the image.
 
 ifdef::VK_KHR_maintenance9[]
 If pname:image is a 3D image created with
@@ -7409,6 +7381,8 @@ endif::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
 .Valid Usage
 ****
+
+:imagelayoutnotignored: <<synchronization-image-barrier2-ignored-layout, layouts are not ignored>>,
 
 :stageMaskName: srcStageMask
 :accessMaskName: srcAccessMask
@@ -7516,13 +7490,12 @@ pname:oldLayout and pname:newLayout define an
 the specified image subresource range.
 
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
-[NOTE]
-====
+[[synchronization-image-barrier-ignored-layout]]
 If the <<features-synchronization2, pname:synchronization2>> feature is
-enabled, when the old and new layout are equal, the layout values are
-ignored - data is preserved no matter what values are specified, or what
-layout the image is currently in.
-====
+enabled, pname:srcQueueFamilyIndex and pname:dstQueueFamilyIndex are equal,
+and pname:oldLayout and pname:newLayout are also equal, the layout values
+are ignored and the image contents are preserved regardless of the values of
+pname:oldLayout, pname:newLayout, and the current layout of the image.
 endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
 
 ifdef::VK_KHR_maintenance9[]
@@ -7548,15 +7521,23 @@ endif::VK_BASE_VERSION_1_1,VK_KHR_sampler_ycbcr_conversion[]
 
 .Valid Usage
 ****
+
+ifdef::VK_KHR_synchronization2[]
+:imagelayoutnotignored: <<synchronization-image-barrier-ignored-layout, layouts are not ignored>>,
+endif::VK_KHR_synchronization2[]
+ifndef::VK_KHR_synchronization2[]
+:imagelayoutnotignored:
+endif::VK_KHR_synchronization2[]
+
 include::{chapters}/commonvalidity/image_memory_barrier_common.adoc[]
 include::{chapters}/commonvalidity/image_layout_transition_common.adoc[]
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkImageMemoryBarrier-None-09052]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:image was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, at least one of
     pname:srcQueueFamilyIndex and pname:dstQueueFamilyIndex must: be
@@ -7564,10 +7545,10 @@ endif::VK_KHR_synchronization2[]
 endif::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkImageMemoryBarrier-None-09053]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:image was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, pname:srcQueueFamilyIndex must: be
     ename:VK_QUEUE_FAMILY_IGNORED
@@ -7576,16 +7557,33 @@ ifdef::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
 endif::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
   * [[VUID-VkImageMemoryBarrier-None-09054]]
     If
-ifdef::VK_KHR_synchronization2[]
+ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     the <<features-synchronization2, pname:synchronization2>> feature is not
     enabled, and
-endif::VK_KHR_synchronization2[]
+endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     pname:image was created with a sharing mode of
     ename:VK_SHARING_MODE_CONCURRENT, pname:dstQueueFamilyIndex must: be
     ename:VK_QUEUE_FAMILY_IGNORED
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
     or ename:VK_QUEUE_FAMILY_EXTERNAL
 endif::VK_BASE_VERSION_1_1,VK_KHR_external_memory[]
+ifdef::VK_KHR_external_memory_win32[]
+  * [[VUID-VkImageMemoryBarrier-dstQueueFamilyIndex-12331]]
+    If pname:dstQueueFamilyIndex is ename:VK_QUEUE_FAMILY_EXTERNAL and
+    pname:image was created with
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT or
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_KMT_BIT in
+    slink:VkExternalMemoryImageCreateInfo::pname:handleTypes,
+    pname:newLayout must: be ename:VK_IMAGE_LAYOUT_GENERAL
+  * [[VUID-VkImageMemoryBarrier-srcQueueFamilyIndex-12332]]
+    If pname:srcQueueFamilyIndex is ename:VK_QUEUE_FAMILY_EXTERNAL and
+    pname:image was created with
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT or
+    ename:VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_KMT_BIT in
+    slink:VkExternalMemoryImageCreateInfo::pname:handleTypes,
+    pname:oldLayout must: be ename:VK_IMAGE_LAYOUT_GENERAL or
+    ename:VK_IMAGE_LAYOUT_UNDEFINED
+endif::VK_KHR_external_memory_win32[]
 ****
 
 include::{generated}/validity/structs/VkImageMemoryBarrier.adoc[]
@@ -7596,7 +7594,7 @@ To facilitate usage of images whose memory is initialized on the host,
 Vulkan allows image layout transitions to be performed by the host as well,
 albeit supporting limited layouts.
 
-[open,refpage='vkTransitionImageLayout',desc='Perform an image layout transition on the host',type='protos',alias='vkTransitionImageLayoutEXT']
+[open,refpage='vkTransitionImageLayout',desc='Perform an image layout transition on the host',type='protos']
 --
 To perform an image layout transition on the host, call:
 
@@ -7619,7 +7617,7 @@ endif::VK_EXT_host_image_copy[]
 include::{generated}/validity/protos/vkTransitionImageLayout.adoc[]
 --
 
-[open,refpage='VkHostImageLayoutTransitionInfo',desc='Structure specifying the parameters of a host-side image layout transition',type='structs',alias='VkHostImageLayoutTransitionInfoEXT']
+[open,refpage='VkHostImageLayoutTransitionInfo',desc='Structure specifying the parameters of a host-side image layout transition',type='structs']
 --
 :refpage: VkHostImageLayoutTransitionInfo
 
@@ -7688,8 +7686,10 @@ on the device.
 .Valid Usage
 ****
   * [[VUID-VkHostImageLayoutTransitionInfo-image-09055]]
-    pname:image must: have been created with
-    ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT
+    pname:image must: have been created with the
+    ename:VK_IMAGE_USAGE_HOST_TRANSFER_BIT usage flag set
+
+:imagelayoutnotignored:
 include::{chapters}/commonvalidity/image_layout_transition_common.adoc[]
   * [[VUID-VkHostImageLayoutTransitionInfo-oldLayout-09229]]
     pname:oldLayout must: be either ename:VK_IMAGE_LAYOUT_UNDEFINED or the
@@ -7861,7 +7861,7 @@ also explicitly manage ownership transfers between local and external queues
 (or equivalent constructs in external APIs) regardless of the
 elink:VkSharingMode specified when creating them.
 
-[open,refpage='VK_QUEUE_FAMILY_EXTERNAL',desc='External queue family index sentinel',type='consts',alias='VK_QUEUE_FAMILY_EXTERNAL_KHR']
+[open,refpage='VK_QUEUE_FAMILY_EXTERNAL',desc='External queue family index sentinel',type='consts']
 --
 The special queue family index ename:VK_QUEUE_FAMILY_EXTERNAL represents any
 queue external to the resource's current Vulkan instance, as long as the
@@ -8271,7 +8271,7 @@ ifdef::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]
 [[calibrated-timestamps]]
 == Calibrated Timestamps
 
-[open,refpage='vkGetCalibratedTimestampsKHR',desc='Query calibrated timestamps',type='protos',alias='vkGetCalibratedTimestampsEXT']
+[open,refpage='vkGetCalibratedTimestampsKHR',desc='Query calibrated timestamps',type='protos']
 --
 :refpage: vkGetCalibratedTimestampsKHR
 
@@ -8325,6 +8325,10 @@ timestamps on a regular basis.
   * [[VUID-vkGetCalibratedTimestampsKHR-timeDomain-09246]]
     The pname:timeDomain value of each slink:VkCalibratedTimestampInfoKHR in
     pname:pTimestampInfos must: be unique
+ifdef::VK_EXT_present_timing[]
+    except for those with a value of
+    ename:VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT
+endif::VK_EXT_present_timing[]
 ****
 
 include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
@@ -8332,7 +8336,7 @@ include::{chapters}/commonvalidity/no_dynamic_allocations_common.adoc[]
 include::{generated}/validity/protos/vkGetCalibratedTimestampsKHR.adoc[]
 --
 
-[open,refpage='VkCalibratedTimestampInfoKHR',desc='Structure specifying the input parameters of a calibrated timestamp query',type='structs',alias='VkCalibratedTimestampInfoEXT']
+[open,refpage='VkCalibratedTimestampInfoKHR',desc='Structure specifying the input parameters of a calibrated timestamp query',type='structs']
 --
 The sname:VkCalibratedTimestampInfoKHR structure is defined as:
 
@@ -8353,11 +8357,17 @@ endif::VK_EXT_calibrated_timestamps[]
   * [[VUID-VkCalibratedTimestampInfoKHR-timeDomain-02354]]
     pname:timeDomain must: be one of the elink:VkTimeDomainKHR values
     returned by flink:vkGetPhysicalDeviceCalibrateableTimeDomainsKHR
+ifdef::VK_EXT_present_timing[]
+  * [[VUID-VkCalibratedTimestampInfoKHR-timeDomain-12227]]
+    If pname:timeDomain is ename:VK_TIME_DOMAIN_SWAPCHAIN_LOCAL_EXT or
+    ename:VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT, the pname:pNext chain
+    must: include a slink:VkSwapchainCalibratedTimestampInfoEXT structure
+endif::VK_EXT_present_timing[]
 ****
 include::{generated}/validity/structs/VkCalibratedTimestampInfoKHR.adoc[]
 --
 
-[open,refpage='VkTimeDomainKHR',desc='Supported time domains',type='enums',alias='VkTimeDomainEXT']
+[open,refpage='VkTimeDomainKHR',desc='Supported time domains',type='enums']
 --
 The set of supported time domains consists of:
 
@@ -8376,7 +8386,17 @@ ifdef::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
 endif::VK_BASE_VERSION_1_3,VK_KHR_synchronization2[]
     and are defined to be incrementing according to the
     <<limits-timestampPeriod, pname:timestampPeriod>> of the device.
-
+ifdef::VK_EXT_present_timing[]
+  * ename:VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT specifies a time domain
+    unique to a particular swapchain and a specific present stage.
+    Timestamp values in this time domain are in units of nanosecond and are
+    comparable only with other values from the same swapchain and present
+    stage.
+  * ename:VK_TIME_DOMAIN_SWAPCHAIN_LOCAL_EXT specifies a time domain unique
+    to a particular swapchain.
+    Timestamp values in this time domain are in units of nanosecond and are
+    comparable only with other values from the same swapchain.
+endif::VK_EXT_present_timing[]
   * ename:VK_TIME_DOMAIN_CLOCK_MONOTONIC_KHR specifies the CLOCK_MONOTONIC
     time domain available on POSIX platforms.
     Timestamp values in this time domain are in units of nanoseconds and are
@@ -8432,4 +8452,41 @@ QueryPerformanceCounter(&counter);
 return counter.QuadPart;
 ----
 --
+
+ifdef::VK_EXT_present_timing[]
+[open,refpage='VkSwapchainCalibratedTimestampInfoEXT',desc='Structure specifying the swapchain to calibrate a swapchain-local timestamp query',type='structs']
+--
+The sname:VkSwapchainCalibratedTimestampInfoEXT structure is defined as:
+
+include::{generated}/api/structs/VkSwapchainCalibratedTimestampInfoEXT.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:swapchain is the swapchain to retrieve the swapchain-local
+    timestamp from.
+  * pname:presentStage is zero or a tlink:VkPresentStageFlagsEXT value used
+    to identify a single present stage when calibrating a timestamp in the
+    ename:VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT time domain.
+  * pname:timeDomainId is the id for the opaque time domain being
+    calibrated.
+
+pname:timeDomainId must: be an id previously reported by
+flink:vkGetSwapchainTimeDomainPropertiesEXT for pname:swapchain.
+If the pname:timeDomainId is no longer supported by the pname:swapchain,
+implementations may: report zero as the calibrated timestamp value.
+
+.Valid Usage
+****
+  * [[VUID-VkSwapchainCalibratedTimestampInfoEXT-timeDomain-12228]]
+    If the pname:timeDomain member of the slink:VkCalibratedTimestampInfoKHR
+    structure in this structure's pname:pNext chain is
+    ename:VK_TIME_DOMAIN_PRESENT_STAGE_LOCAL_EXT, pname:presentStage must:
+    specify one and only one present stage
+****
+
+
+include::{generated}/validity/structs/VkSwapchainCalibratedTimestampInfoEXT.adoc[]
+--
+endif::VK_EXT_present_timing[]
 endif::VK_KHR_calibrated_timestamps,VK_EXT_calibrated_timestamps[]

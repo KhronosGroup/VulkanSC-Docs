@@ -104,6 +104,10 @@ EXTENSION_API_NAME_EXCEPTIONS = set((
     'VkDeviceOrHostAddressConstKHR',
     'OHNativeWindow',
     'OHBufferHandle',
+    'OH_NativeBuffer',
+    'VkTensorARM',
+    'VkTensorViewCreateInfoARM',
+    'VkTensorViewCreateFlagsARM',
 ))
 
 # These are APIs which contain _RESERVED_ intentionally
@@ -117,11 +121,23 @@ CHECK_PARAM_POINTER_NAME_EXCEPTIONS = {
     ('vkGetDrmDisplayEXT', 'VkDisplayKHR', 'display') : None,
 }
 
-# Exceptions to pNext member requiring an optional attribute
+# Exceptions to pNext member requiring an 'optional' attribute
 CHECK_MEMBER_PNEXT_OPTIONAL_EXCEPTIONS = set((
     'VkVideoEncodeInfoKHR',
     'VkVideoEncodeRateControlLayerInfoKHR',
 ))
+
+# Exceptions to pNext member 'const' checks
+CHECK_MEMBER_PNEXT_CONST_EXCEPTIONS = (
+    'VkBaseInStructure',
+    'VkBaseOutStructure',
+)
+
+# If a structure extends these structures, it must have a non-const pNext
+STRUCTEXTENDS_REQUIRED_VARIABLE_PNEXT = (
+    'VkPhysicalDeviceProperties2',
+    'VkPhysicalDeviceFeatures2',
+)
 
 # Exceptions to VK_INCOMPLETE being required for, and only applicable to, array
 # enumeration functions
@@ -132,6 +148,8 @@ CHECK_ARRAY_ENUMERATION_RETURN_CODE_EXCEPTIONS = set((
     'vkCreatePipelineBinariesKHR',
     'vkGetPipelineBinaryDataKHR',
     'vkConvertCooperativeVectorMatrixNV',
+    'vkGetPastPresentationTimingEXT',
+    'vkGetSwapchainTimeDomainPropertiesEXT',
 ))
 
 # Exceptions to unknown structure type constants.
@@ -350,11 +368,18 @@ If you are working in an old branch using the old (non-enumerant) "queues" names
         Called from check_params."""
         super().check_param(param)
 
-        if not self.is_api_type(param):
-            return
-
         param_text = ''.join(param.itertext())
         param_name = getElemName(param)
+        param_type = param.find('type').text
+
+        # Make sure parameter/member name and type name do not collide (pub2679)
+        if param_name == param_type:
+            message = f'{self.entity}.{param_name} member/parameter has an identical type name {param_type}, which is not allowed. Removing window system prefixes from the member/parameter is the most common fix.'
+            self.record_error(message, elem=param)
+
+        # The name match error above can happen with external types
+        if not self.is_api_type(param):
+            return
 
         # Make sure the number of leading 'p' matches the pointer count.
         pointercount = param.find('type').tail
@@ -363,7 +388,6 @@ If you are working in an old branch using the old (non-enumerant) "queues" names
         if pointercount:
             prefix = 'p' * pointercount
             if not param_name.startswith(prefix):
-                param_type = param.find('type').text
                 message = "Apparently incorrect pointer-related name prefix for {} - expected it to start with '{}'".format(
                     param_text, prefix)
                 if (self.entity, param_type, param_name) in CHECK_PARAM_POINTER_NAME_EXCEPTIONS:
@@ -376,6 +400,15 @@ If you are working in an old branch using the old (non-enumerant) "queues" names
         if optional == 'false':
             message = f'{self.entity}.{param_name} member has disallowed \'optional="false"\' attribute (remove this attribute)'
             self.record_error(message, elem=param)
+
+        # Make sure members of VkQueue type do not have `externsync="true"` to account for
+        # VK_KHR_internally_synchronized_queues
+        if param_type == 'VkQueue':
+            externsync = param.get('externsync')
+            if externsync and externsync == 'true':
+                message = f'{self.entity}.{param_name} member has disallowed \'externsync="true"\' attribute,\n\
+which conflicts with VK_KHR_internally_synchronized_queues. Use \'externsync="maybe"\''
+                self.record_error(message, elem=param)
 
         # Make sure pNext members have optional="true" attributes
         if param_name == self.conventions.nextpointer_member_name:
@@ -416,6 +449,33 @@ If you are working in an old branch using the old (non-enumerant) "queues" names
                     self.record_warning('(Allowed exception)', message)
                 else:
                     self.record_error(message)
+
+            if name not in CHECK_MEMBER_PNEXT_CONST_EXCEPTIONS:
+                # Ensure that 'returnedonly' structures, and structures
+                # extending VkPhysicalDeviceFeatures2 or
+                # VkPhysicalDeviceProperties2, have non-'const' pNext
+                # pointers.
+                # Enforcing that non-returnedonly pNext are const is not
+                # viable, with hundreds of examples either way
+                returnedonly = info.elem.get('returnedonly', 'false')
+                structextends = info.elem.get('structextends', '').split(',')
+
+
+                # Look for 'const' at beginning, rather than parsing
+                if next_member.text is None:
+                    # Does not start with text, must not have leading 'const'
+                    has_const = False
+                else:
+                    has_const = (next_member.text[0:5] == 'const')
+
+                if returnedonly == 'true' and has_const:
+                     message = '{}.{} must not be \'const\' for a \'returnedonly\' structure'.format(name, next_name)
+                     self.record_error(message)
+                if has_const:
+                    for basename in STRUCTEXTENDS_REQUIRED_VARIABLE_PNEXT:
+                        if basename in structextends:
+                            message = '{}.{} must not be \'const\' because this structure extends {}'.format(name, next_name, basename)
+                            self.record_error(message)
 
     def check_type_limittype(self, name, info):
         """Check whether a struct has 'limittype' attributes for members, if
@@ -840,39 +900,6 @@ If this is intentional, either make this name an alias of the correct name and g
 
         Called from check."""
 
-        astc3d_formats = [
-                'VK_FORMAT_ASTC_3x3x3_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_3x3x3_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_3x3x3_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x3x3_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x3x3_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x3x3_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x3_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x3_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x3_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x4_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x4_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_4x4x4_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x4x4_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x4x4_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x4x4_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x4_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x4_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x4_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x5_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x5_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_5x5x5_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x5x5_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x5x5_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x5x5_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x5_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x5_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x5_SFLOAT_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x6_UNORM_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x6_SRGB_BLOCK_EXT',
-                'VK_FORMAT_ASTC_6x6x6_SFLOAT_BLOCK_EXT'
-        ]
-
         # Need to build list of formats from rest of <enums>
         enum_formats = []
         for enum in self.reg.groupdict['VkFormat'].elem:
@@ -906,7 +933,7 @@ If this is intentional, either make this name an alias of the correct name and g
         for enum in self.reg.groupdict['VkFormat'].elem:
             name = enum.get('name')
             if enum.get('alias') is None and name != 'VK_FORMAT_UNDEFINED':
-                if name not in found_formats and name not in astc3d_formats:
+                if name not in found_formats:
                     self.set_error_context(entity=name, elem=enum)
                     self.record_error('The <enum> has no matching <format> for ', name)
 
@@ -916,12 +943,14 @@ If this is intentional, either make this name an alias of the correct name and g
         # Check for invalid version names in e.g.
         #    <enable version="VK_VERSION_1_2"/>
         # Could also consistency check struct / extension tags here
-        for capname in self.reg.spirvcapdict:
-            for elem in self.reg.spirvcapdict[capname].elem.findall('enable'):
-                version = elem.get('version')
-                if version is not None and version not in self.reg.apidict:
-                    self.set_error_context(entity=capname, elem=elem)
-                    self.record_error(f'<spirvcapability> {capname} enabled by a nonexistent version {version}')
+        # Skip this check when xml_api_name is not "vulkan"
+        if self.conventions.xml_api_name == 'vulkan':
+            for capname in self.reg.spirvcapdict:
+                for elem in self.reg.spirvcapdict[capname].elem.findall('enable'):
+                    version = elem.get('version')
+                    if version is not None and version not in self.reg.apidict:
+                        self.set_error_context(entity=capname, elem=elem)
+                        self.record_error(f'<spirvcapability> {capname} enabled by a nonexistent version {version}')
 
 if __name__ == '__main__':
 

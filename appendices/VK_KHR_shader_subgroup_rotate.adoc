@@ -1,5 +1,4 @@
-// Copyright (c) 2021-2023 Khronos Group.
-//
+// Copyright 2021-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 include::{generated}/meta/{refprefix}VK_KHR_shader_subgroup_rotate.adoc[]
@@ -31,7 +30,7 @@ include::{generated}/interfaces/VK_KHR_shader_subgroup_rotate.adoc[]
 
 Functionality in this extension is included in core Vulkan 1.4 with the KHR
 suffix omitted.
-The original type, enum and command names are still available as aliases of
+The original type, enum, and command names are still available as aliases of
 the core functionality.
 
 === Version History

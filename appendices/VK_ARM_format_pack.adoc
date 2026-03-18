@@ -1,4 +1,4 @@
-// Copyright 2025 The Khronos Group Inc.
+// Copyright 2025-2026 The Khronos Group Inc.
 // SPDX-License-Identifier: CC-BY-4.0
 
 include::{generated}/meta/{refprefix}VK_ARM_format_pack.adoc[]
@@ -31,7 +31,7 @@ include::{generated}/interfaces/VK_ARM_format_pack.adoc[]
 Many existing extension have the format in the name, but in this case we
 want to expose multiple formats.
 
-We will describe this set of formats as a "pack".
+We will describe this set of formats as a "`pack`".
 
 ==== Compatibility classes
 
