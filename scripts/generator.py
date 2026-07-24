@@ -74,8 +74,8 @@ def genProtectDirective(protect_str):
     if not protect_str:
         return ('', '')
 
-    # Check if this is a boolean expression (contains operators or parens)
-    if any(c in protect_str for c in [',', '+', '(', ')']):
+    # Check if this is a boolean expression (contains operators, parens, or negation)
+    if any(c in protect_str for c in [',', '+', '(', ')', '!']):
         # Use the dependency parser to handle complex expressions
         from parse_dependency import protectLanguageC
         try:
@@ -545,6 +545,7 @@ class OutputGenerator:
         stripped = []
         for elem in enums:
             name = elem.get('name')
+            alias = elem.get('alias')
             (numVal, strVal) = self.enumToValue(elem, True)
 
             if name in nameMap:
@@ -571,13 +572,15 @@ class OutputGenerator:
                 # still add this enum to the list.
                 (name2, numVal2, strVal2) = valueMap[numVal]
 
-                msg = 'Two enums found with the same value: {} = {} = {}'.format(
-                    name, name2.get('name'), strVal)
-                self.logMsg('error', msg)
+                # If an enum is tagged with both a value and an alias then this is deliberate - no error
+                if alias != name2.get('name'):
+                    msg = 'Two enums found with the same value: {} = {} = {}. '.format(name, name2.get('name'), strVal)
+                    msg += 'If this is deliberate, tagging one as an `alias` of the other will fix this error.'
+                    self.logMsg('error', msg)
 
             # Track this enum to detect followon duplicates
             nameMap[name] = [elem, numVal, strVal]
-            if numVal is not None:
+            if alias is None and numVal is not None:
                 valueMap[numVal] = [elem, numVal, strVal]
 
             # Add this enum to the list
@@ -618,8 +621,8 @@ class OutputGenerator:
 
         if reason == 'aliased':
             return f'{padding}// {name} is a legacy alias\n'
-        elif reason == 'ignored':
-            return f'{padding}// {name} is legacy and ignored\n'
+        elif reason == 'unused':
+            return f'{padding}// {name} is legacy and not used\n'
         elif reason == 'true':
             return f'{padding}// {name} is legacy, but no reason was given in the API XML\n'
         else:

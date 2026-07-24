@@ -114,7 +114,7 @@ https://registry.khronos.org/vulkan/ .
 = Getting Started
 
 See
-https://gitlab.khronos.org/vulkan/vulkan/blob/main/xml/BUILD.adoc[`xml/BUILD.adoc`]
+https://github.com/KhronosGroup/Vulkan-Docs/blob/main/BUILD.adoc[`xml/BUILD.adoc`]
 in the `Vulkan-Docs` repository for information on required toolchain
 components such as Python 3, pass:[g++], and GNU make.
 
@@ -849,7 +849,7 @@ Member tags may define many attributes providing metadata about that member.
     Indicates that this member has been marked as legacy.
     Possible values are:
   ** `"true"` - marked as legacy, but no explanation given.
-  ** `"ignored"` - functionality described by this member is ignored.
+  ** `"unused"` - this member is not used by the implementation and must be 0.
   * attr:externsync - optional.
     If provided, the attribute value must be `"true"`.
     The default value if unspecified is `"false"`.
@@ -863,6 +863,19 @@ Member tags may define many attributes providing metadata about that member.
     changes.
     The attribute value should be a feature name for which a corresponding
     `features-**name**` anchor exists.
+  * attr:flagsextend - optional.
+    Name of a structure extending the structure this member belongs to.
+    If present in the `pNext` chain, the attr:flagsextendmember of that
+    structure will be used, instead of the flags value specified by this
+    member.
+  * attr:flagsextendmember - optional.
+    Name of a member within the attr:flagsextend structure specifying the
+    flags value that is used, instead of the flags value specified by this
+    member.
+    attr:flagsextend and attr:flagsextendmember are used to inform
+    generation of implicit valid usage statements and validation layer code.
+    If one of attr:flagsextend and attr:flagsextendmember is defined, the
+    other must be defined as well.
   * attr:len - optional.
     Valid length of the data array described by the member, in array
     elements.
@@ -989,6 +1002,9 @@ the following tags are supported:
     Contains the struct or union member name being described.
     Unlike other C type declarations, the tag:name tag must always be
     provided in tag:member tags.
+  ** attr:alias - optional. Another union member name or extension name which
+    this member is an alias of.
+    Alias chaining (A aliases B aliases C) is not supported.
   * tag:enum - optional.
     May appear multiple times.
     Contains a valid enumerant name found in another tag:type tag, and which
@@ -1010,8 +1026,12 @@ the following tags are supported:
     <type requires="stddef">typedef ptrdiff_t <name>VKlongint</name>;</type>
     <type name="VkEnum" category="enum"/>
     <type category="struct" name="VkStruct">
-        <member><type>VkEnum</type> <name>srcEnum</name></member>
         <member><type>VkEnum</type> <name>dstEnum</name></member>
+        <member><type>Vklongint</type> <name>dstVal</name></member>
+    </type>
+    <type category="struct" name="VkPhysicalDeviceVulkan12Features" structextends="VkPhysicalDeviceFeatures2,VkDeviceCreateInfo">
+        <member><type>VkBool32</type> <name alias="VK_KHR_sampler_mirror_clamp_to_edge">samplerMirrorClampToEdge</name></member>
+        <member><type>VkBool32</type> <name alias="VkPhysicalDevice8BitStorageFeatures::storageBuffer8BitAccess">storageBuffer8BitAccess</name><comment>8-bit integer variables supported in StorageBuffer</comment></member>
     </type>
 </types>
 
@@ -1029,7 +1049,7 @@ generation, it will result in the following declarations:
 [source,c]
 --------------------------------------
 #include <stddef.h>
-typedef ptrdiff_t VKlongint.
+typedef ptrdiff_t VKlongint;
 
 typedef enum {
     VK_ENUM_ZERO = 0,
@@ -1038,7 +1058,7 @@ typedef enum {
 
 typedef struct {
     VkEnum    dstEnum;
-    VkLongint dstVal;
+    Vklongint dstVal;
 } VkStruct;
 --------------------------------------
 
@@ -1144,7 +1164,7 @@ Each tag:enum tag defines a single API token.
     Indicates that this enum has been marked as legacy.
     Possible values are:
   ** `"true"` - marked as legacy, but no explanation given.
-  ** `"ignored"` - functionality described by this enum is ignored.
+  ** `"unused"` - this enum is not used by the implementation and must not be passed to the API.
   ** `"aliased"` - an old name not following Vulkan conventions.
      The equivalent alias following Vulkan conventions should be used
      instead.
@@ -1169,17 +1189,19 @@ Each tag:enum tag defines a single API token.
     enum definition with conditional compilation directives in generated
     headers.
     May be a single preprocessor token (e.g. `VK_USE_PLATFORM_WIN32_KHR`) or
-    a boolean expression using the same syntax as attr:depends:
+    a boolean expression using the same syntax as attr:depends, extended with
+    support for logical NOT:
   ** `,` for logical OR
   ** `+` for logical AND
   ** `()` for grouping
+  ** `!` prefix on a token for logical NOT
 +
 `,` and `+` are of equal precedence, and lower than `()`.
 Expressions are evaluated left-to-right for operators of the same precedence.
 +
-Single tokens generate `#ifdef` directives in the output header, while
-expressions generate `#if` directives with `defined()` macros around each
-term.
+Single tokens (with no operators) generate `#ifdef` directives in the output
+header, while expressions generate `#if` directives with `defined()` macros
+around each term (and `!defined()` for negated terms).
 +
 Examples:
 +
@@ -1188,18 +1210,44 @@ Examples:
   * `protect="VK_A+VK_B"` generates `#if defined(VK_A) && defined(VK_B)`
   * `protect="(VK_A+VK_B),VK_C"` generates
     `#if (defined(VK_A) && defined(VK_B)) || defined(VK_C)`
+  * `protect="VK_A+!VK_B"` generates `#if defined(VK_A) && !defined(VK_B)`
 
 [NOTE]
 ====
-Using attr:alias on an tag:enum means you want the attr:name defined by the
-tag to be treated as an alias of the token name in the attr:alias attribute
-value.
-For example, the following tag defines `VK_ALIAS` as an alias of `VK_VALUE`:
+Tagging two enums with the same value and no other context will result in an
+error during spec generation, to avoid accidental aliasing.
+However there are times where aliasing is deliberate and desirable.
+Using attr:alias on an tag:enum indicates that two values are deliberate
+aliases of each other.
+For example, the following tag defines `VK_ENUM_TYPE_NEW` as a new alias of
+`VK_ENUM_TYPE_ORIGINAL`:
 
 [source,xml]
 --------------------------------------
-<enum name="VK_ALIAS" alias="VK_VALUE">
+<enum extends="VkEnumType" name="VK_ENUM_TYPE_NEW" alias="VK_ENUM_TYPE_ORIGINAL">
 --------------------------------------
+
+Typically this will result in a C definition explicitly aliasing the other:
+
+[source,c]
+----
+VK_ENUM_TYPE_NEW = VK_ENUM_TYPE_ORIGINAL;
+----
+
+Providing a attr:bitpos or attr:value tag alongside the attr:alias tag will
+still indicate that the aliasing is deliberate:
+
+[source,xml]
+--------------------------------------
+<enum extends="VkEnumType" value="0" name="VK_ENUM_TYPE_NEW" alias="VK_ENUM_TYPE_ORIGINAL">
+--------------------------------------
+
+However the generated C will use the attr:bitpos or attr:value instead:
+
+[source,c]
+----
+VK_ENUM_TYPE_NEW = 0;
+----
 ====
 
 [NOTE]
@@ -2073,6 +2121,8 @@ The tag has no content, but contains attributes:
     Name of the command.
   * attr:comment - optional.
     Arbitrary string (unused).
+  * attr:supersededby - optional.
+    Name of command it is superseded by, tag:deprecate block only.
 
 === Enum Tags
 
@@ -2090,6 +2140,8 @@ All forms of this tag support the following attributes:
     This definition is only used if the requested API name matches the
     attribute.
     May be used to address subtle incompatibilities.
+  * attr:supersededby - optional.
+    Name of enum it is superseded by, tag:deprecate block only.
 
 There are two forms of tag:enum tags:
 
@@ -2198,6 +2250,8 @@ The tag has no content, but contains attributes:
     Name of the type.
   * attr:comment - optional.
     Arbitrary string (unused).
+  * attr:supersededby - optional.
+    Name of type it is superseded by, tag:deprecate block only.
 
 
 [[tag-required-examples]]
@@ -2261,6 +2315,9 @@ The tag has no content, but contains attributes:
     must be from the same structure.
   * attr:comment - optional.
     Arbitrary string (unused).
+  * attr:supersededby - optional.
+    Name of the feature, command, or other interface it is superseded by,
+    tag:deprecate block only.
 
 [NOTE]
 ====
@@ -3646,6 +3703,20 @@ Changes to the `.xml` files and Python scripts are logged in GitHub history.
 [[changelog]]
 = Change Log
 
+  * 2026-07-01 - Allow <<tag-required-feature, tag:feature>> tags inside
+    tag:deprecate blocks, so a feature structure member can be marked legacy
+    without adding attr:deprecated directly to its tag:member tag (internal
+    MR 8301).
+  * 2026-06-15 - Add attr:alias attribute to the tag:name tag within structure
+    and union tag:member tags to support member aliasing.
+  * 2026-04-07 - Add support for `!` (logical NOT) prefix on tokens in
+    attr:protect boolean expressions, generating `!defined()` in output
+    headers.
+  * 2026-03-31 - Add attr:flagsextend and attr:flagsextendmember attributes
+    to tag:struct tag:member tags, to specify a 64-bit flags value replacing
+    a 32-bit flags value (internal issue 4589).
+  * 2026-03-04 - Update the `"ignored"` value for the attr:deprecated
+    attribute to match updated spec (internal issue 4725), rename to "unused".
   * 2026-02-18 - Update the tag:enum and tag:member attr:deprecated
     attribute to describe `"ignored"` consistently with the generators and
     specification (internal MR 7998).

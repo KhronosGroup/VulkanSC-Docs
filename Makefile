@@ -151,12 +151,12 @@ VERBOSE =
 # ADOCOPTS options for asciidoc->HTML5 output
 
 NOTEOPTS     = -a editing-notes -a implementation-guide
-PATCHVERSION = 344
+PATCHVERSION = 356
 BASEOPTS     =
 
 ifneq (,$(findstring VKSC_VERSION_1_0,$(VERSIONS)))
 VKSPECREVISION := 1.2.$(PATCHVERSION)
-SCPATCHVERSION = 21
+SCPATCHVERSION = 22
 SPECREVISION = 1.0.$(SCPATCHVERSION)
 BASEOPTS = -a baserevnumber="$(VKSPECREVISION)"
 else
@@ -225,8 +225,7 @@ ADOCMISCOPTS = --failure-level ERROR
 # as apimap.rb
 ADOCEXTS     = -I$(GENERATED) \
 	       -r $(CONFIGS)/spec-macros.rb \
-	       -r $(CONFIGS)/open_listing_block.rb \
-	       -r $(CONFIGS)/ifdef-mismatch.rb
+	       -r $(CONFIGS)/open_listing_block.rb
 ADOCOPTS     = -d book $(ADOCMISCOPTS) $(ATTRIBOPTS) $(NOTEOPTS) $(VERBOSE) $(ADOCEXTS)
 
 # HTML target-specific Asciidoctor extensions and options
@@ -334,33 +333,10 @@ $(KATEXINSTDIR): $(KATEXSRCDIR)
 # There is some complexity to try and avoid short virtual targets like 'html'
 # causing specs to *always* be regenerated.
 
-CHUNKER = $(SCRIPTS)/asciidoctor-chunker/asciidoctor-chunker.js
-CHUNKINDEX = $(CONFIGS)/chunkindex
-# Only the $(CHUNKER) step is required unless the search index is to be
-# generated and incorporated into the chunked spec.
-#
-# Dropped $(QUIET) for now
-# Should set NODE_PATH=/usr/local/lib/node_modules or wherever, outside Makefile
-# Copying chunked.js into target avoids a warning from the chunker
-chunked: $(HTMLDIR)/vkspec.html $(SPECSRC) $(COMMONDOCS)
-	$(QUIET)$(CHUNKINDEX)/addscripts.sh $(HTMLDIR)/vkspec.html $(HTMLDIR)/prechunked.html
-	$(QUIET)$(CP) $(CHUNKINDEX)/chunked.css $(CHUNKINDEX)/chunked.js \
-	    $(CHUNKINDEX)/lunr.js $(HTMLDIR)
-	$(QUIET)$(NODEJS) $(CHUNKER) $(HTMLDIR)/prechunked.html -o $(HTMLDIR)
-	$(QUIET)$(RM) $(HTMLDIR)/prechunked.html
-	$(QUIET)$(RUBY) $(CHUNKINDEX)/generate-index.rb $(HTMLDIR)/chap*html | \
-	    $(NODEJS) $(CHUNKINDEX)/build-index.js > $(HTMLDIR)/search.index.js
-
-# This is a temporary target while the new chunker is pre-release.
-# Eventually we will either pull the chunker into CI, or permanently
-# store a copy of the short JavaScript chunker in this repository.
-CHUNKERVERSION = asciidoctor-chunker_v1.0.0
-CHUNKURL = https://github.com/wshito/asciidoctor-chunker/releases/download/v1.0.0/$(CHUNKERVERSION).zip
-getchunker:
-	wget $(CHUNKURL) -O $(CHUNKERVERSION).zip
-	unzip $(CHUNKERVERSION).zip
-	mv $(CHUNKERVERSION)/* scripts/asciidoctor-chunker/
-	$(RMRF) $(CHUNKERVERSION).zip $(CHUNKERVERSION)
+chunked:
+	$(QUIET)echo "The 'chunked' target is no longer supported as of the 1.4.355 spec update."
+	$(QUIET)echo "Please use https://docs.vulkan.org instead."
+	$(QUIET)false
 
 html: $(HTMLDIR)/vkspec.html $(SPECSRC) $(COMMONDOCS)
 
@@ -463,13 +439,16 @@ reflow:
 # Automated markup and consistency checks, invoked by 'allchecks' and
 # 'ci-allchecks' targets or individually.
 
-# Sources of spec-type markup - spec, registry schema document, and style guide
-MARKUP_SPEC_SOURCES = $(SPECDIR)/[a-z]*.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/style
+# Sources of spec-type markup - spec, registry schema document, and
+# style guide.
+# This is a mix of paths and filenames, and relies on 'git grep' to
+# expand paths to files.
+MARKUP_SPEC_SOURCES = $(SPECDIR)/[a-z]*.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices $(SPECDIR)/config/*.adoc $(SPECDIR)/style
 
 # Look for disallowed contractions
 CHECK_CONTRACTIONS = git grep -n -i -F -f $(ROOTDIR)/config/CI/contractions | grep -v -E -f $(ROOTDIR)/config/CI/contractions-allowed
 check-contractions:
-	if test `$(CHECK_CONTRACTIONS) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_CONTRACTIONS) | wc -l` != 0 ; then \
 	    echo "Contractions found that are not allowed:" ; \
 	    $(CHECK_CONTRACTIONS) ; \
 	    exit 1 ; \
@@ -478,8 +457,9 @@ check-contractions:
 # Look for duplicate words
 CHECK_DUPLICATES = $(PYTHON) $(ROOTDIR)/scripts/find_duplicates.py `find *.adoc appendices chapters config scripts style -name '*.adoc'`
 check-duplicates:
-	if ! $(CHECK_DUPLICATES) ; then \
+	$(QUIET) if ! $(CHECK_DUPLICATES) ; then \
 	    echo "Successive duplicate words found that are not allowed" ; \
+	    $(CHECK_DUPLICATES) ; \
 	    exit 1 ; \
 	fi
 
@@ -488,7 +468,7 @@ check-duplicates:
 # check-writing target below.
 CODESPELL = codespell --config $(ROOTDIR)/config/CI/codespellrc
 check-spelling:
-	if ! $(CODESPELL) > /dev/null ; then \
+	$(QUIET) if ! $(CODESPELL) > /dev/null ; then \
 	    echo "Found probable misspellings. Corrections can be added to config/CI/codespell-allowed, or files excluded in config/CI/codespellrc if there is no other option:" ; \
 	    $(CODESPELL) ; \
 	    exit 1 ; \
@@ -499,7 +479,7 @@ check-spelling:
 # made in outstanding extension branches for new text.
 CHECK_WRITING = git grep -n -E -f $(ROOTDIR)/config/CI/writing $(SPECDIR)/[a-z]*.adoc $(SPECDIR)/chapters $(SPECDIR)/appendices
 check-writing:
-	if test `$(CHECK_WRITING) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_WRITING) | wc -l` != 0 ; then \
 	    echo "Found old style writing. Please refer to the style guide or similar language in current main branch for fixes:" ; \
 	    $(CHECK_WRITING) ; \
 	    exit 1 ; \
@@ -508,7 +488,7 @@ check-writing:
 # Look for bullet list items not preceded by exactly two spaces, per styleguide
 CHECK_BULLETS = git grep -n -E '^( |   +)[-*]+ ' $(MARKUP_SPEC_SOURCES)
 check-bullets:
-	if test `$(CHECK_BULLETS) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_BULLETS) | wc -l` != 0 ; then \
 	    echo "Bullet list item found not preceded by exactly two spaces:" ; \
 	    $(CHECK_BULLETS) ; \
 	    exit 1 ; \
@@ -517,7 +497,7 @@ check-bullets:
 # Look for VU text ending in a period
 CHECK_VUPERIOD = ag --nocolor --asciidoc '\* \[\[VUID[^.]+\.\n( {2}\* \[\[VUID|\*\*\*\*)' $(MARKUP_SPEC_SOURCES)
 check-vuperiod:
-	if test `$(CHECK_VUPERIOD) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_VUPERIOD) | wc -l` != 0 ; then \
 	    echo "VU rule ending with a disallowed period found. Note that the matched text may be very long:" ; \
 	    $(CHECK_VUPERIOD) ; \
 	    exit 1 ; \
@@ -526,7 +506,7 @@ check-vuperiod:
 # Look for common macro markup errors
 CHECK_MARKUP = git grep -n -E -f $(ROOTDIR)/config/CI/markup $(MARKUP_SPEC_SOURCES)
 check-markup:
-	if test `$(CHECK_MARKUP) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_MARKUP) | wc -l` != 0 ; then \
 	    echo "Common macro markup errors found. Please refer to the style guide or similar markup in current main branch for fixes:" ; \
 	    $(CHECK_MARKUP) ; \
 	    exit 1 ; \
@@ -535,14 +515,14 @@ check-markup:
 # Look for asciidoctor conditionals inside VU statements; and for
 # duplicated VUID numbers, but only in spec sources.
 check-reflow:
-	$(PYTHON) $(SCRIPTS)/reflow.py -nowrite -noflow -check FAIL -checkVUID FAIL $(SPECFILES)
+	$(QUIET) $(PYTHON) $(SCRIPTS)/reflow.py -nowrite -noflow -check FAIL -checkVUID FAIL $(SPECFILES)
 
 # Look for files whose Khronos copyright has not been updated to the
 # current year
 DATE_YEAR = $(shell date +%Y)
 CHECK_DATES = git grep -z -l 'Copyright.*The Khronos' | xargs -0 git grep -L 'Copyright.*$(DATE_YEAR).*The Khronos'
 check-copyright-dates:
-	if test `$(CHECK_DATES) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_DATES) | wc -l` != 0 ; then \
 	    echo "Files with out-of-date Khronos copyrights (must be updated to $(DATE_YEAR):" ; \
 	    $(CHECK_DATES) ; \
 	    exit 1 ; \
@@ -551,14 +531,14 @@ check-copyright-dates:
 # Look for proper use of custom markup macros
 #   --ignore_count 0 can be incremented if there are unfixable errors
 check-links:
-	$(PYTHON) $(SCRIPTS)/check_spec_links.py -Werror --ignore_count 0
+	$(QUIET) $(PYTHON) $(SCRIPTS)/check_spec_links.py -Werror --ignore_count 0
 
 # Perform XML consistency checks
 # Use '-warn' option to display warnings as well as errors
 CHECK_UGLY_TYPE_DECL = git grep -E '</type>\*+<name>' $(VKXML)
 check-consistency:
-	$(PYTHON) $(SCRIPTS)/xml_consistency.py
-	if test `$(CHECK_UGLY_TYPE_DECL) | wc -l` != 0 ; then \
+	$(QUIET) $(PYTHON) $(SCRIPTS)/xml_consistency.py
+	$(QUIET) if test `$(CHECK_UGLY_TYPE_DECL) | wc -l` != 0 ; then \
 	    echo "XML contains declarations lacking whitespace:" ; \
 	    $(CHECK_UGLY_TYPE_DECL) ; \
 	    exit 1 ; \
@@ -566,20 +546,24 @@ check-consistency:
 
 # Look for untagged use of 'undefined' in spec sources
 check-undefined:
-	$(SCRIPTS)/ci/check_undefined
+	$(QUIET) $(SCRIPTS)/ci/check_undefined
 
 # Look for use of custom macros in the proposals and other
 # non-Specification document (except for the ChangeLog*.adoc) markup
 CHECK_CUSTOM_MACROS = git grep -n -E -f $(ROOTDIR)/config/CI/custom-macros [A-Z][A-Z]*.adoc proposals/
 CHECK_PROPOSALS = git grep -n -E -f $(ROOTDIR)/config/CI/proposals-disallowed proposals/
 check-custom-macros:
-	if test `$(CHECK_CUSTOM_MACROS) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_CUSTOM_MACROS) | wc -l` != 0 ; then \
 	    echo "Found use of specification macros in proposal or repository metadocumentation, where they are not allowed. Please use straight asciidoc markup like *must* for fixes:" ; \
 	    $(CHECK_CUSTOM_MACROS) ; \
 	    exit 1 ; \
 	fi
-	if test `$(CHECK_PROPOSALS) | wc -l` != 0 ; then \
-	    echo "Found use of {refpage} attribute in proposals (use {docs} or {extensions}, see proposals/template.adoc); or of asciidoctor markup which cannot be rendered on github, such as include: or asciimath: directives:" ; \
+	$(QUIET) if test `$(CHECK_PROPOSALS) | wc -l` != 0 ; then \
+	    echo "Found use of one or more of:" ; \
+	    echo "  - {extensions} attribute in proposals (use xref:{docs} or xref:{refpages})" ; \
+	    echo "  - link: used with {docs} or {extensions} (use xref:)" ; \
+	    echo "  - asciidoctor markup which cannot be rendered on github, such as include: or asciimath: directives" ; \
+	    echo "(see proposals/template.adoc) for examples" ; \
 	    $(CHECK_PROPOSALS) ; \
 	    exit 1 ; \
 	fi
@@ -587,7 +571,7 @@ check-custom-macros:
 # Look for '.txt' and '.asciidoc' files, which should almost all be .adoc now
 CHECK_TXTFILES = find . -name '*.txt' -o -name '*.asciidoc' | grep -v -E -f $(ROOTDIR)/config/CI/txt-files-allowed
 check-txtfiles:
-	if test `$(CHECK_TXTFILES) | wc -l` != 0 ; then \
+	$(QUIET) if test `$(CHECK_TXTFILES) | wc -l` != 0 ; then \
 	    echo "*.txt and/or .asciidoc files found that are not allowed (use .adoc):" ; \
 	    $(CHECK_TXTFILES) ; \
 	    exit 1 ; \
@@ -595,16 +579,28 @@ check-txtfiles:
 
 # Check for valid xrefs in the output html
 check-xrefs: $(HTMLDIR)/vkspec.html
-	$(PYTHON) $(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
+	$(QUIET) $(PYTHON) $(SCRIPTS)/check_html_xrefs.py $(HTMLDIR)/vkspec.html
+
+# Check for stuff that should not be published.
+# This is not part of 'allchecks' since it would fail in most new
+# extension branches, and runs only on main branch in CI.
+check-internal-phrasing: check-proposed check-gitlab
 
 # Check for UNRESOLVED or PROPOSED issues in extension appendices
-# This is not run as part of 'allchecks' since it would fail in most new
-# extension branches, but instead triggered only in main branch by CI
-CHECK_PROPOSED = git grep -n -E 'PROPOSED|UNRESOLVED' $(SPECDIR)/appendices/VK_*.adoc
+CHECK_PROPOSED = git grep -n -E 'PROPOSED|UNRESOLVED' $(SPECDIR)/appendices/
 check-proposed:
-	if test `$(CHECK_PROPOSED) | wc -l` != 0 ; then \
-	    echo "PROPOSED or UNRESOLVED issues should not be present in published extension appendices:" ; \
+	$(QUIET) if test `$(CHECK_PROPOSED) | wc -l` != 0 ; then \
+	    echo "PROPOSED or UNRESOLVED issues should not be published in extension appendices:" ; \
 	    $(CHECK_PROPOSED) ; \
+	    exit 1 ; \
+	fi
+
+# Check for internal gitlab links anywhere in markup sources
+CHECK_GITLAB = git grep -n 'gitlab.khronos.org' $(MARKUP_SPEC_SOURCES) proposals/
+check-gitlab:
+	$(QUIET) if test `$(CHECK_GITLAB) | wc -l` != 0 ; then \
+	    echo "Internal gitlab.khronos.org links should not be published, use corresponding github links instead:" ; \
+	    $(CHECK_GITLAB) ; \
 	    exit 1 ; \
 	fi
 
@@ -942,7 +938,7 @@ generated: $(PYAPIMAP) $(GENDEPENDS)
 clean: clean_html clean_pdf clean_man clean_generated clean_antora clean_validusage
 
 clean_html:
-	$(QUIET)$(RMRF) $(HTMLDIR) $(OUTDIR)/katex
+	$(QUIET)$(RMRF) $(HTMLDIR) $(OUTDIR)/katex $(PROPOSALDIR)
 	$(QUIET)$(RM) $(OUTDIR)/styleguide.html $(OUTDIR)/registry.html
 
 clean_pdf:

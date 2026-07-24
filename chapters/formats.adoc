@@ -2166,9 +2166,9 @@ created with the queried
 flink:vkGetPhysicalDeviceFormatProperties::pname:format:
 
   * ename:VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT specifies that an image view
-    can: be <<descriptorsets-sampledimage, sampled from>>.
+    can: be <<descriptors-sampledimage, sampled from>>.
   * ename:VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT specifies that an image view
-    can: be used as a <<descriptorsets-storageimage, storage image>>.
+    can: be used as a <<descriptors-storageimage, storage image>>.
   * ename:VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT specifies that an image
     view can: be used as storage image that supports atomic operations.
   * ename:VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT specifies that an image
@@ -2403,7 +2403,6 @@ more elink:VkFormatFeatureFlagBits.
 --
 
 ifdef::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
-
 [open,refpage='vkGetPhysicalDeviceFormatProperties2',desc='Lists physical device\'s format capabilities',type='protos']
 --
 To query supported format features which are properties of the physical
@@ -2714,9 +2713,9 @@ created with the queried
 flink:vkGetPhysicalDeviceFormatProperties2::pname:format:
 
   * ename:VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT specifies that an image view
-    can: be <<descriptorsets-sampledimage, sampled from>>.
+    can: be <<descriptors-sampledimage, sampled from>>.
   * ename:VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT specifies that an image view
-    can: be used as a <<descriptorsets-storageimage, storage image>>.
+    can: be used as a <<descriptors-storageimage, storage image>>.
   * ename:VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT specifies that an
     image view can: be used as storage image that supports atomic
     operations.
@@ -2904,14 +2903,14 @@ flink:vkGetPhysicalDeviceVideoFormatPropertiesKHR command.
 endif::VK_KHR_video_decode_queue,VK_KHR_video_encode_queue[]
   * ename:VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT specifies that
     image views or buffer views created with this format can: be used as
-    <<descriptorsets-storageimage, storage images>> or
-    <<descriptorsets-storagetexelbuffer, storage texel buffers>>
-    respectively for read operations without specifying a format.
+    <<descriptors-storageimage, storage images>> or
+    <<descriptors-storagetexelbuffer, storage texel buffers>> respectively
+    for read operations without specifying a format.
   * ename:VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT specifies
     that image views or buffer views created with this format can: be used
-    as <<descriptorsets-storageimage, storage images>> or
-    <<descriptorsets-storagetexelbuffer, storage texel buffers>>
-    respectively for write operations without specifying a format.
+    as <<descriptors-storageimage, storage images>> or
+    <<descriptors-storagetexelbuffer, storage texel buffers>> respectively
+    for write operations without specifying a format.
   * ename:VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT specifies
     that image views created with this format can: be used for depth
     comparison performed by code:OpImage*Dref* instructions.
@@ -2927,7 +2926,7 @@ endif::VK_NV_linear_color_attachment[]
 ifdef::VK_QCOM_image_processing[]
   * ename:VK_FORMAT_FEATURE_2_WEIGHT_IMAGE_BIT_QCOM specifies that image
     views created with this format can: be used as the
-    <<descriptorsets-weightimage, weight image>> input to
+    <<descriptors-weightimage, weight image>> input to
     <<textures-weightimage,weight image sampling>> operations.
   * ename:VK_FORMAT_FEATURE_2_WEIGHT_SAMPLED_IMAGE_BIT_QCOM specifies that
     image views created with this format can: be sampled in
@@ -2967,6 +2966,13 @@ with that can: be enumerated using the
 flink:vkGetPhysicalDeviceVideoFormatPropertiesKHR command.
 ====
 endif::VK_KHR_video_encode_quantization_map[]
+ifdef::VK_IMG_filter_linear_2d[]
+  * ename:VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_2D_BIT_IMG
+    specifies that a format supports the behavior required by
+    ename:VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT but only for
+    elink:VkImageType ename:VK_IMAGE_TYPE_2D and ename:VK_IMAGE_TYPE_1D
+endif::VK_IMG_filter_linear_2d[]
+
 
 The following bits may: be set in pname:bufferFeatures, specifying that the
 features are supported by <<VkBuffer,buffers>> or <<VkBufferView,buffer
@@ -3008,11 +3014,11 @@ endif::VK_NV_ray_tracing_linear_swept_spheres[]
 ifdef::VK_BASE_VERSION_1_3,VK_KHR_format_feature_flags2[]
   * ename:VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT specifies that
     buffer views created with this format can: be used as
-    <<descriptorsets-storagetexelbuffer, storage texel buffers>> for read
+    <<descriptors-storagetexelbuffer, storage texel buffers>> for read
     operations without specifying a format.
   * ename:VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT specifies
     that buffer views created with this format can: be used as
-    <<descriptorsets-storagetexelbuffer, storage texel buffers>> for write
+    <<descriptors-storagetexelbuffer, storage texel buffers>> for write
     operations without specifying a format.
 endif::VK_BASE_VERSION_1_3,VK_KHR_format_feature_flags2[]
 ifdef::VK_NV_optical_flow[]
@@ -3027,6 +3033,27 @@ ifdef::VK_NV_optical_flow[]
     image view with this format can: be used as an output cost map for
     <<opticalflow-operations,optical flow operations>>
 endif::VK_NV_optical_flow[]
+ifdef::VK_QCOM_image_processing3+VK_QCOM_image_processing[]
+  * ename:VK_FORMAT_FEATURE_2_BLOCK_MATCHING_SXD_BIT_QCOM specifies that
+    image views created with this format can: be used in
+    code:OpImageBlockMatchSSDQCOM and code:OpImageBlockMatchSADQCOM
+    <<textures-blockmatch,block matching>> operations.
+    Implementations must: set this flag for all formats which it sets the
+    ename:VK_FORMAT_FEATURE_2_BLOCK_MATCHING_BIT_QCOM flag.
+endif::VK_QCOM_image_processing3+VK_QCOM_image_processing[]
+ifdef::VK_ARM_data_graph_optical_flow[]
+  * ename:VK_FORMAT_FEATURE_2_DATA_GRAPH_OPTICAL_FLOW_IMAGE_BIT_ARM
+    specifies that an image view with this format can: be used as an input
+    or reference to <<graphs-operations-opticalflow,optical flow
+    operations>>
+  * ename:VK_FORMAT_FEATURE_2_DATA_GRAPH_OPTICAL_FLOW_VECTOR_BIT_ARM
+    specifies that an image view with this format can: be used as a flow
+    vector map (either as hint, output or global flow) for
+    <<graphs-operations-opticalflow,optical flow operations>>
+  * ename:VK_FORMAT_FEATURE_2_DATA_GRAPH_OPTICAL_FLOW_COST_BIT_ARM specifies
+    that an image view with this format can: be used as an output cost map
+    for <<graphs-operations-opticalflow,optical flow operations>>
+endif::VK_ARM_data_graph_optical_flow[]
 --
 
 ifdef::VK_ARM_tensors[]
@@ -3056,9 +3083,59 @@ include::{generated}/api/structs/VkTensorFormatPropertiesARM.adoc[]
 include::{generated}/validity/structs/VkTensorFormatPropertiesARM.adoc[]
 --
 
-The following bits may: be set in pname:linearTilingTensorFeatures and
-pname:optimalTilingTensorFeatures, specifying that the features are
-supported by tensors or tensor views created with the queried
+ifdef::VK_ARM_tensor_controls[]
+[open,refpage='VkTensorExplicitTilingFormatPropertiesARM',desc='Structure specifying properties of a format used to describe tensor elements with ARM-specific explicit tiling',type='structs']
+--
+The slink:VkTensorExplicitTilingFormatPropertiesARM structure describes
+properties of a elink:VkFormat when that format is used to describe tensor
+elements.
+These properties, like those of slink:VkFormatProperties2, are independent
+of any particular tensor.
+
+The slink:VkTensorExplicitTilingFormatPropertiesARM structure is defined as:
+
+include::{generated}/api/structs/VkTensorExplicitTilingFormatPropertiesARM.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:brick16TilingTensorFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits2 specifying features supported by tensors
+    created with a pname:tiling parameter of
+    ename:VK_TENSOR_TILING_BRICK_16_WIDE_ARM.
+  * pname:brick8TilingTensorFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits2 specifying features supported by tensors
+    created with a pname:tiling parameter of
+    ename:VK_TENSOR_TILING_BRICK_8_WIDE_ARM.
+  * pname:brick4TilingTensorFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits2 specifying features supported by tensors
+    created with a pname:tiling parameter of
+    ename:VK_TENSOR_TILING_BRICK_4_WIDE_ARM.
+  * pname:blockUTilingTensorFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits2 specifying features supported by tensors
+    created with a pname:tiling parameter of
+    ename:VK_TENSOR_TILING_BLOCK_U_INTERLEAVED_ARM.
+  * pname:blockU64kTilingTensorFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits2 specifying features supported by tensors
+    created with a pname:tiling parameter of
+    ename:VK_TENSOR_TILING_BLOCK_U_INTERLEAVED_64K_ARM.
+
+include::{generated}/validity/structs/VkTensorExplicitTilingFormatPropertiesARM.adoc[]
+--
+endif::VK_ARM_tensor_controls[]
+
+The following bits may: be set in
+ifndef::VK_ARM_tensor_controls[]
+pname:linearTilingTensorFeatures and pname:optimalTilingTensorFeatures,
+endif::VK_ARM_tensor_controls[]
+ifdef::VK_ARM_tensor_controls[]
+pname:linearTilingTensorFeatures, pname:optimalTilingTensorFeatures,
+pname:blockUTilingTensorFeatures, pname:blockU64kTilingTensorFeatures,
+pname:brick4TilingTensorFeatures, pname:brick8TilingTensorFeatures, and
+pname:brick16TilingTensorFeatures,
+endif::VK_ARM_tensor_controls[]
+specifying that the features are supported by tensors or tensor views
+created with the queried
 flink:vkGetPhysicalDeviceFormatProperties2::pname:format:
 
   * ename:VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT specifies that a tensor can:
@@ -3066,14 +3143,14 @@ flink:vkGetPhysicalDeviceFormatProperties2::pname:format:
   * ename:VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT specifies that a tensor can:
     be used as a destination tensor for <<copies-tensors,copy commands>>.
   * ename:VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM specifies that a tensor
-    view can: be used as a <<descriptorsets-storagetensor,storage tensor>>
-    in shaders.
+    view can: be used as a <<descriptors-storagetensor,storage tensor>> in
+    shaders.
   * ename:VK_FORMAT_FEATURE_2_TENSOR_IMAGE_ALIASING_BIT_ARM specifies that a
     tensor can: be aliased to an image or that an image can: be aliased to a
     tensor.
 ifdef::VK_ARM_data_graph[]
   * ename:VK_FORMAT_FEATURE_2_TENSOR_DATA_GRAPH_BIT_ARM specifies that a
-    tensor view can: be used as a <<descriptorsets-storagetensor,storage
+    tensor view can: be used as a <<descriptors-storagetensor,storage
     tensor>> with <<graphs-pipelines,data graph pipelines>>.
 endif::VK_ARM_data_graph[]
 endif::VK_ARM_tensors[]
@@ -3090,6 +3167,59 @@ tname:VkFormatFeatureFlags2 is a bitmask type for setting a mask of zero or
 more elink:VkFormatFeatureFlagBits2.
 --
 endif::VK_BASE_VERSION_1_3,VK_KHR_format_feature_flags2[]
+
+ifdef::VK_KHR_extended_flags[]
+[open,refpage='VkFormatProperties4KHR',desc='Structure specifying additional image format properties',type='structs']
+--
+The slink:VkFormatProperties4KHR structure is defined as:
+
+include::{generated}/api/structs/VkFormatProperties4KHR.adoc[]
+
+  * pname:sType is a elink:VkStructureType value identifying this structure.
+  * pname:pNext is `NULL` or a pointer to a structure extending this
+    structure.
+  * pname:linearTilingFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits4KHR specifying features supported by
+    images created with a pname:tiling parameter of
+    ename:VK_IMAGE_TILING_LINEAR.
+  * pname:optimalTilingFeatures is a bitmask of
+    elink:VkFormatFeatureFlagBits4KHR specifying features supported by
+    images created with a pname:tiling parameter of
+    ename:VK_IMAGE_TILING_OPTIMAL.
+  * pname:bufferFeatures is a bitmask of elink:VkFormatFeatureFlagBits4KHR
+    specifying features supported by buffers.
+
+To query supported format extended features which are properties of the
+physical device, add a slink:VkFormatProperties4KHR structure to the
+pname:pNext chain of slink:VkFormatProperties2.
+
+[NOTE]
+====
+sname:VkFormatProperties4KHR supports additional format feature bits beyond
+those in slink:VkFormatProperties3.
+====
+
+include::{generated}/validity/structs/VkFormatProperties4KHR.adoc[]
+--
+
+[open,refpage='VkFormatFeatureFlagBits4KHR',desc='Bitmask specifying features supported by a buffer',type='enums']
+--
+Bits which can: be set in the slink:VkFormatProperties4KHR features
+pname:linearTilingFeatures, pname:optimalTilingFeatures, and
+pname:bufferFeatures are:
+
+include::{generated}/api/enums/VkFormatFeatureFlagBits4KHR.adoc[]
+--
+
+[open,refpage='VkFormatFeatureFlags4KHR',desc='Bitmask of VkFormatFeatureFlagBits4KHR',type='flags']
+--
+include::{generated}/api/flags/VkFormatFeatureFlags4KHR.adoc[]
+
+tname:VkFormatFeatureFlags4KHR is a bitmask type for setting a mask of zero
+or more elink:VkFormatFeatureFlagBits4KHR.
+--
+endif::VK_KHR_extended_flags[]
+
 endif::VK_BASE_VERSION_1_1,VK_KHR_get_physical_device_properties2[]
 
 ifdef::VK_EXT_multisampled_render_to_single_sampled[]
@@ -3281,11 +3411,19 @@ ifdef::VK_BASE_VERSION_1_3,VK_EXT_4444_formats[]
 | ename:VK_FORMAT_A4B4G4R4_UNORM_PACK16      | {sym3} | {sym3} | {sym3} |   |   |   |   |   |   |   |   |   |   |
 // Jon 1.3 TBD - define interaction with 1.3 core here
 15+| Format features marked {sym2} must: be supported for
-pname:optimalTilingFeatures if the sname:VkPhysicalDevice supports the
+pname:optimalTilingFeatures if the `apiext:VK_EXT_4444_formats` extension is
+supported
+ifdef::VK_EXT_4444_formats[]
+and the sname:VkPhysicalDevice supports the
 slink:VkPhysicalDevice4444FormatsFeaturesEXT::pname:formatA4R4G4B4 feature.
+endif::VK_EXT_4444_formats[]
 15+| Format features marked {sym3} must: be supported for
-pname:optimalTilingFeatures if the sname:VkPhysicalDevice supports the
+pname:optimalTilingFeatures if the `apiext:VK_EXT_4444_formats` extension is
+supported
+ifdef::VK_EXT_4444_formats[]
+and the sname:VkPhysicalDevice supports the
 slink:VkPhysicalDevice4444FormatsFeaturesEXT::pname:formatA4B4G4R4 feature.
+endif::VK_EXT_4444_formats[]
 endif::VK_BASE_VERSION_1_3,VK_EXT_4444_formats[]
 |====
 

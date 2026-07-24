@@ -113,7 +113,7 @@ def makeGenOpts(args):
         '/*',
         '** Copyright 2015-2026 The Khronos Group Inc.',
         '**',
-        '** SPDX-License-Identifier' + ': Apache-2.0',
+        '** SPDX-License-Identifier' + ': Apache-2.0 OR MIT',
         '*/',
         ''
     ]
@@ -632,7 +632,7 @@ def makeGenOpts(args):
             profile           = None,
             versions          = scVersions,
             emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
+            defaultExtensions = defaultExtensions,
             addExtensions     = addExtensionsPat,
             removeExtensions  = removeExtensionsPat,
             emitExtensions    = emitExtensionsPat,
@@ -663,7 +663,7 @@ def makeGenOpts(args):
             profile           = None,
             versions          = scVersions,
             emitversions      = scVersions,
-            defaultExtensions = 'vulkansc',
+            defaultExtensions = defaultExtensions,
             addExtensions     = addExtensionsPat,
             removeExtensions  = removeExtensionsPat,
             emitExtensions    = emitExtensionsPat,
